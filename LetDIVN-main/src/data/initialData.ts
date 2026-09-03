@@ -14,7 +14,7 @@ import {
 export const INITIAL_USERS: UserProfile[] = [
   {
     id: 'usr-admin-01',
-    name: 'Nguyễn Văn Hoàng (Admin)',
+    name: "Let's Do It VN",
     email: 'admin@letsdoitvietnam.org',
     role: 'admin',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
