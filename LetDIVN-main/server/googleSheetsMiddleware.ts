@@ -26,6 +26,13 @@ try {
 let cachedToken: { token: string; expiresAt: number } | null = null;
 const sheetMetaCache: Record<string, { title: string; sheetId: number }> = {};
 
+// Failures here previously vanished silently (client callers treat sheets
+// sync as best-effort and swallow errors) — log server-side so a bad
+// registration write is actually diagnosable instead of just "missing".
+function logSheetsError(endpoint: string, detail: unknown): void {
+  console.error(`[google-sheets] ${endpoint} failed:`, detail);
+}
+
 async function getGoogleOAuthToken(): Promise<string> {
   if (!SERVICE_ACCOUNT) {
     throw new Error('Missing Google service account credentials. Add a credentials.json file (see .env.example) or set GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.');
@@ -108,9 +115,11 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
           }
         );
         const data = await sheetsRes.json();
+        if (!sheetsRes.ok) logSheetsError('read', data);
         res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(data));
       } catch (err: any) {
+        logSheetsError('read', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -164,9 +173,11 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const sheetsData = await sheetsRes.json();
+        if (!sheetsRes.ok) logSheetsError('append', sheetsData);
         res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(sheetsData));
       } catch (err: any) {
+        logSheetsError('append', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -207,9 +218,11 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const sheetsData = await sheetsRes.json();
+        if (!sheetsRes.ok) logSheetsError('sync-all', sheetsData);
         res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(sheetsData));
       } catch (err: any) {
+        logSheetsError('sync-all', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -238,9 +251,11 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const clearData = await clearRes.json();
+        if (!clearRes.ok) logSheetsError('clear', clearData);
         res.writeHead(clearRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(clearData));
       } catch (err: any) {
+        logSheetsError('clear', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -291,9 +306,11 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const deleteData = await deleteRes.json();
+        if (!deleteRes.ok) logSheetsError('delete-row', deleteData);
         res.writeHead(deleteRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(deleteData));
       } catch (err: any) {
+        logSheetsError('delete-row', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }

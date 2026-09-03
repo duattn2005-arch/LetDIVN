@@ -68,6 +68,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [isSyncingAll, setIsSyncingAll] = useState(false);
   const [isLoadingLiveSheets, setIsLoadingLiveSheets] = useState(false);
   const [liveSheetRows, setLiveSheetRows] = useState<SheetVolunteerRow[]>([]);
+  const [isShowingFallbackSheetData, setIsShowingFallbackSheetData] = useState(false);
   const [syncResultMsg, setSyncResultMsg] = useState<{ text: string; isError?: boolean } | null>(null);
   const [appScriptUrl, setAppScriptUrl] = useState(localStorage.getItem('ldiv_google_sheet_webhook') || DEFAULT_SPREADSHEET_ID);
   const [savedUrlMsg, setSavedUrlMsg] = useState(false);
@@ -144,8 +145,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       const sheetRes = await fetchDataFromSheets(appScriptUrl);
       if (sheetRes.success && sheetRes.rows.length > 0) {
         setLiveSheetRows(sheetRes.rows);
+        setIsShowingFallbackSheetData(false);
       } else {
-        // Fallback to local volunteer list if sheet is currently empty
+        // Fallback to local volunteer list if the sheet is currently empty
+        // or unreachable — flagged so the UI can be honest that this is NOT
+        // confirmed to be in Google Sheets (see isShowingFallbackSheetData).
         setLiveSheetRows((volunteers.length > 0 ? volunteers : INITIAL_VOLUNTEERS).map((v, idx) => ({
           stt: idx + 1,
           adminRole: v.fullName.includes('Admin') ? '(Admin)' : '',
@@ -158,8 +162,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           eventName: v.eventName,
           skills: (v.skills || []).join(', '),
           status: v.status || 'Approved',
-          notes: v.notes || ''
+          notes: v.notes || '',
+          localId: v.id
         })));
+        setIsShowingFallbackSheetData(true);
       }
     } catch {
       // ignore
@@ -599,6 +605,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                   </button>
                 </div>
               </div>
+
+              {isShowingFallbackSheetData && (
+                <div className="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-amber-950/60 text-amber-300 border border-amber-800 flex items-center gap-2">
+                  <span>⚠</span>
+                  <span>Không đọc được dữ liệu từ Google Sheets thật — đang hiển thị tạm dữ liệu từ CSDL nội bộ. Bảng dưới đây <strong>chưa chắc khớp</strong> với Google Sheet thật, hãy bấm "Mở Sheet" để kiểm tra trực tiếp.</span>
+                </div>
+              )}
 
               {syncResultMsg && (
                 <div className={`px-3.5 py-2 rounded-xl text-xs font-semibold ${syncResultMsg.isError
