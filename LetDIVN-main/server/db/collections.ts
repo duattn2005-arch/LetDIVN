@@ -12,7 +12,12 @@ import type {
 } from '../../src/types.js';
 
 export const events = makeCollection<CleanupEvent>({ table: 'events', idPrefix: 'evt', order: 'created_desc' });
-export const volunteers = makeCollection<VolunteerRegistration>({ table: 'volunteers', idPrefix: 'vol', order: 'created_desc' });
+export const volunteers = makeCollection<VolunteerRegistration>({
+  table: 'volunteers',
+  idPrefix: 'vol',
+  order: 'created_desc',
+  extraColumn: { name: 'event_id', getValue: (item) => item.eventId },
+});
 export const news = makeCollection<NewsArticle>({ table: 'news', idPrefix: 'news', order: 'created_desc' });
 export const partners = makeCollection<Partner>({ table: 'partners', idPrefix: 'part', order: 'sort_order' });
 export const gallery = makeCollection<GalleryItem>({ table: 'gallery', idPrefix: 'gal', order: 'created_desc' });

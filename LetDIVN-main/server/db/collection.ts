@@ -7,6 +7,8 @@ interface CollectionOptions {
   table: string;
   idPrefix: string;
   order: OrderMode;
+  /** For a table with an extra required column outside the {id, created_at, data} shape (e.g. volunteers.event_id, indexed for lookups). */
+  extraColumn?: { name: string; getValue: (item: any) => string };
 }
 
 /**
@@ -16,7 +18,7 @@ interface CollectionOptions {
  * near-identical SQL per resource.
  */
 export function makeCollection<T extends { id: string }>(opts: CollectionOptions) {
-  const { table, idPrefix, order } = opts;
+  const { table, idPrefix, order, extraColumn } = opts;
   const orderSql =
     order === 'sort_order' ? 'ORDER BY sort_order ASC' :
     order === 'created_asc' ? 'ORDER BY created_at ASC' :
@@ -39,6 +41,9 @@ export function makeCollection<T extends { id: string }>(opts: CollectionOptions
       if (order === 'sort_order') {
         const sortOrder = extra?.sortOrder ?? nextSortOrder(table);
         db.prepare(`INSERT INTO ${table} (id, sort_order, data) VALUES (?, ?, ?)`).run(id, sortOrder, JSON.stringify(item));
+      } else if (extraColumn) {
+        db.prepare(`INSERT INTO ${table} (id, ${extraColumn.name}, created_at, data) VALUES (?, ?, ?, ?)`)
+          .run(id, extraColumn.getValue(item), Date.now(), JSON.stringify(item));
       } else {
         db.prepare(`INSERT INTO ${table} (id, created_at, data) VALUES (?, ?, ?)`).run(id, Date.now(), JSON.stringify(item));
       }
@@ -83,7 +88,17 @@ export function makeCollection<T extends { id: string }>(opts: CollectionOptions
       if (order === 'sort_order') {
         db.prepare(`INSERT INTO ${table} (id, sort_order, data) VALUES (?, ?, ?)`).run(item.id, rank, JSON.stringify(item));
       } else if (order === 'created_asc') {
-        db.prepare(`INSERT INTO ${table} (id, created_at, data) VALUES (?, ?, ?)`).run(item.id, rank, JSON.stringify(item));
+        if (extraColumn) {
+          db.prepare(`INSERT INTO ${table} (id, ${extraColumn.name}, created_at, data) VALUES (?, ?, ?, ?)`)
+            .run(item.id, extraColumn.getValue(item), rank, JSON.stringify(item));
+        } else {
+          db.prepare(`INSERT INTO ${table} (id, created_at, data) VALUES (?, ?, ?)`).run(item.id, rank, JSON.stringify(item));
+        }
+      } else if (extraColumn) {
+        // created_desc: earlier array entries must sort first, i.e. need the
+        // largest created_at, so rank counts down.
+        db.prepare(`INSERT INTO ${table} (id, ${extraColumn.name}, created_at, data) VALUES (?, ?, ?, ?)`)
+          .run(item.id, extraColumn.getValue(item), -rank, JSON.stringify(item));
       } else {
         // created_desc: earlier array entries must sort first, i.e. need the
         // largest created_at, so rank counts down.

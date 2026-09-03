@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Send, AlertCircle } from 'lucide-react';
+import { X, Sparkles, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { dbService } from '../services/dbService';
 import { CleanupEvent } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -35,6 +36,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   const [customRole, setCustomRole] = useState('');
   const [notes, setNotes] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Calculate age automatically from birth year
   const yearNumber = parseInt(birthYear, 10);
@@ -71,6 +74,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
         resetFormState();
       }
       setPhoneError(null);
+      setIsSuccess(false);
+      setIsSubmitting(false);
     }
   }, [isOpen, selectedEventId, user, events]);
 
@@ -118,11 +123,13 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   /**
    * Xử lý Submit Form:
    * 1. Gom toàn bộ dữ liệu vào formData.
-   * 2. Gọi saveToGoogleSheet(formData) ngầm độc lập (KHÔNG DÙNG await).
-   * 3. Ngay lập tức gọi onClose() để đóng popup và reset toàn bộ state form về rỗng.
+   * 2. Lưu vào CSDL nội bộ (await để biết chắc đã lưu thành công hay chưa).
+   * 3. Gọi saveToGoogleSheet(formData) ngầm độc lập (KHÔNG DÙNG await, best-effort).
+   * 4. Hiện trạng thái thành công trong popup thay vì đóng popup ngay lập tức.
    */
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     // 1. Kiểm tra ràng buộc số điện thoại (chính xác 10 số)
     const cleanPhone = phone.replace(/\D/g, '');
@@ -158,35 +165,44 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
       skills: finalSkills
     };
 
-    // Lưu vào CSDL nội bộ
-    dbService.addVolunteer({
-      fullName: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      city: formData.city,
-      eventId,
-      eventName: formData.project,
-      ageGroup: `${birthYear} (${ageVal} tuổi)`,
-      tshirtSize: 'L',
-      emergencyContact: formData.phone,
-      skills: finalSkills,
-      status: 'Approved',
-      notes: notes.trim()
-    });
+    setIsSubmitting(true);
+    try {
+      // Lưu vào CSDL nội bộ — chờ kết quả thật để biết có lưu thành công hay không
+      await dbService.addVolunteer({
+        fullName: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        eventId,
+        eventName: formData.project,
+        ageGroup: `${birthYear} (${ageVal} tuổi)`,
+        tshirtSize: 'L',
+        emergencyContact: formData.phone,
+        skills: finalSkills,
+        status: 'Approved',
+        notes: notes.trim()
+      });
 
-    // Lấy URL cấu hình Google Sheet Web App
-    const eventSheetUrl = eventObj?.sheetUrl || '';
-    const globalUrl = getGoogleAppsScriptUrl();
-    const effectiveUrl = eventSheetUrl || globalUrl;
+      // Lấy URL cấu hình Google Sheet Web App
+      const eventSheetUrl = eventObj?.sheetUrl || '';
+      const globalUrl = getGoogleAppsScriptUrl();
+      const effectiveUrl = eventSheetUrl || globalUrl;
 
-    // GỌI HÀM LƯU GOOGLE SHEET CHẠY NGẦM ĐỘC LẬP (KHÔNG DÙNG await ĐỂ TRÁNH NGHẼN CORS MẠNG)
-    saveToGoogleSheet(formData, effectiveUrl).catch((err) => {
-      console.warn('Silent sheet sync:', err);
-    });
+      // Đồng bộ Google Sheet chạy ngầm, không chặn UI thành công (best-effort)
+      saveToGoogleSheet(formData, effectiveUrl).catch((err) => {
+        console.warn('Silent sheet sync:', err);
+      });
 
-    // LẬP TỨC ĐÓNG POPUP FORM VÀ RESET TOÀN BỘ Ô NHẬP LIỆU VỀ RỖNG
-    onClose();
-    resetFormState();
+      try {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      } catch { /* confetti is a visual nicety, never block on it */ }
+
+      setIsSuccess(true);
+    } catch (err: any) {
+      alert(`⚠ Đăng ký thất bại!\n${err?.message || 'Có lỗi xảy ra, vui lòng thử lại.'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -217,8 +233,25 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
         {/* Modal Scrollable Body */}
         <div className="overflow-y-auto flex-1 scrollbar-thin p-4 sm:p-6">
+          {isSuccess ? (
+            <div className="py-8 text-center space-y-4">
+              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <h4 className="text-xl font-black text-slate-900">Đăng Ký Thành Công!</h4>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto">
+                Cảm ơn <strong>{fullName}</strong> đã đăng ký tham gia. Thông tin của bạn đã được lưu vào hệ thống và đồng bộ lên Google Sheets quản trị.
+              </p>
+              <button
+                onClick={handleCloseModal}
+                className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-6 py-2.5 rounded-full cursor-pointer transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            
+
             {/* Event selection */}
             <div>
               <label className="block text-xs font-bold text-slate-800 mb-1">
@@ -397,13 +430,14 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
             <button
               type="submit"
-              disabled={phone.length > 0 && phone.length !== 10}
+              disabled={isSubmitting || (phone.length > 0 && phone.length !== 10)}
               className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm py-3 rounded-2xl shadow-lg hover:shadow-pink-500/25 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <span>Xác Nhận Đăng Ký Tình Nguyện Viên</span>
+              <span>{isSubmitting ? 'Đang Gửi...' : 'Xác Nhận Đăng Ký Tình Nguyện Viên'}</span>
               <Send className="w-4 h-4" />
             </button>
           </form>
+          )}
         </div>
 
       </div>
