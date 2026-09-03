@@ -112,13 +112,15 @@ export const OurTeamPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Avatar with smooth 3D halo */}
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden mb-4 border-4 border-white shadow-xl bg-slate-100 group-hover:scale-105 transition-transform duration-500">
-                <img
-                  src={member.avatar}
-                  alt={member.name}
-                  className="w-full h-full object-cover"
-                />
+              {/* Avatar with gradient ring frame */}
+              <div className="relative w-48 h-48 sm:w-60 sm:h-60 rounded-full mb-5 p-1.5 bg-gradient-to-br from-[#E81A7F] via-pink-400 to-amber-300 shadow-xl group-hover:scale-105 transition-transform duration-500">
+                <div className="w-full h-full rounded-full overflow-hidden border-4 border-white bg-slate-100">
+                  <img
+                    src={member.avatar}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
 
               {/* Department Tag */}
