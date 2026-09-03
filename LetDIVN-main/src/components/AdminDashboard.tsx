@@ -470,18 +470,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         className="relative bg-slate-950 text-slate-100 rounded-3xl max-w-6xl w-full h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-slate-700 animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Floating Refresh Toast Banner */}
-        {refreshToast && (
-          <div className={`absolute top-18 right-6 z-[999999] px-4 py-2 rounded-xl shadow-2xl border text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200 ${
-            refreshToast.isError
-              ? 'bg-red-900 border-red-500 text-red-100'
-              : 'bg-emerald-900 border-emerald-500 text-emerald-100'
-          }`}>
-            <RefreshCw className={`w-3.5 h-3.5 ${isManualRefreshing ? 'animate-spin' : ''}`} />
-            <span>{refreshToast.message}</span>
-          </div>
-        )}
-
+        {/* Header + tab bar share one relative wrapper so the refresh toast below
+            can anchor to "right after both of them" without a guessed pixel offset. */}
+        <div className="relative flex-shrink-0">
         {/* 1. KHUNG VIỀN & HEADER CHÍNH (GRADIENT ĐỎ/TÍM SANG TRỌNG) */}
         <div className="bg-gradient-to-r from-[#990033] via-[#6A0DAD] to-[#120E2E] px-6 py-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0 shadow-lg">
           <div className="flex items-center gap-3.5">
@@ -624,6 +615,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             <BarChart3 className="w-4 h-4" />
             <span>Tổng Quan &amp; KPI</span>
           </button>
+        </div>
+
+        {/* Refresh Toast Banner — anchored to the header+tabs wrapper's own bottom
+            edge, so it always renders just below both, never overlapping either */}
+        {refreshToast && (
+          <div className={`absolute top-full right-6 mt-2 z-[999999] px-4 py-2 rounded-xl shadow-2xl border text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            refreshToast.isError
+              ? 'bg-red-900 border-red-500 text-red-100'
+              : 'bg-emerald-900 border-emerald-500 text-emerald-100'
+          }`}>
+            <RefreshCw className={`w-3.5 h-3.5 ${isManualRefreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshToast.message}</span>
+          </div>
+        )}
         </div>
 
         {/* TAB BODY CONTENT */}
