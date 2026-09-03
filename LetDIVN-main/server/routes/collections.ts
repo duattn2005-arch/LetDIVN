@@ -136,7 +136,7 @@ router.delete('/contacts/:id', requireAdmin, (req, res) => {
 
 // --- Videos ---
 router.get('/videos', (req, res) => res.json(videos.getAll()));
-router.post('/videos', (req, res) => {
+router.post('/videos', requireAdmin, (req, res) => {
   const { youtubeId, title, thumbnailUrl } = req.body || {};
   if (!youtubeId) {
     return res.status(400).json({ error: 'Thiếu mã video YouTube' });
@@ -149,7 +149,7 @@ router.post('/videos', (req, res) => {
   });
   res.json(created);
 });
-router.delete('/videos/:id', (req, res) => {
+router.delete('/videos/:id', requireAdmin, (req, res) => {
   videos.delete(String(req.params.id));
   res.json({ ok: true });
 });
