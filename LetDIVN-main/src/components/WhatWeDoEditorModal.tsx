@@ -158,6 +158,7 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
                 <ImageUploadWidget
                   currentImageUrl={image}
                   onImageSelected={(url) => setImage(url)}
+                  label=""
                 />
               </div>
 

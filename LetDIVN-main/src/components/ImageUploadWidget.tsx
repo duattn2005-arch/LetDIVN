@@ -274,7 +274,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
           <img
             src={previewUrl}
             alt="Preview"
-            className="w-full h-20 object-cover"
+            className="w-full h-12 object-cover"
             onError={() => setError('Không thể tải ảnh từ đường dẫn đã cung cấp')}
           />
           <button
