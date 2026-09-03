@@ -408,7 +408,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {inAppBrowser && (
               <p className="text-[10px] text-amber-700 flex items-start gap-1 px-0.5">
                 <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" />
-                <span>Đang mở trong trình duyệt của ứng dụng này (Messenger/Instagram/Zalo/TikTok...) nên Google có thể báo lỗi — nếu vậy, dùng Email/Tên tài khoản bên dưới hoặc mở bằng Safari/Chrome.</span>
+                <span>Đang mở trong trình duyệt của ứng dụng này (Messenger/Instagram/Zalo/TikTok...) — bấm nút Google có thể bị <strong>treo màn hình trắng mãi không xong</strong> (điện thoại tự mở màn hình đăng nhập ở một trình duyệt khác, mất kết nối với trang này). Cách chắc ăn: dùng <strong>Email/Tên tài khoản</strong> bên dưới, hoặc bấm "•••" ở góc trên → "Mở bằng trình duyệt" để mở <strong>cả trang này</strong> bằng Safari/Chrome trước khi đăng nhập Google.</span>
               </p>
             )}
 
