@@ -176,32 +176,44 @@ export async function verifyGoogleIdToken(
   idToken: string,
   expectedAudience: string
 ): Promise<{ email: string; name: string; picture?: string } | null> {
+  const reject = (reason: string, detail?: unknown) => {
+    console.error(`[google-id-token] rejected: ${reason}`, detail ?? '');
+    return null;
+  };
   try {
     const parts = idToken.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) return reject('malformed token (not 3 parts)');
     const [headerB64, payloadB64, signatureB64] = parts;
 
     const header = JSON.parse(base64UrlToBuffer(headerB64).toString('utf8'));
     const payload = JSON.parse(base64UrlToBuffer(payloadB64).toString('utf8'));
 
     const now = Math.floor(Date.now() / 1000);
-    if (typeof payload.exp !== 'number' || payload.exp < now) return null;
-    if (payload.aud !== expectedAudience) return null;
-    if (payload.iss !== 'https://accounts.google.com' && payload.iss !== 'accounts.google.com') return null;
-    if (!payload.email) return null;
+    if (typeof payload.exp !== 'number' || payload.exp < now) {
+      return reject('expired or missing exp', { exp: payload.exp, now });
+    }
+    if (payload.aud !== expectedAudience) {
+      return reject('aud mismatch', { got: payload.aud, expected: expectedAudience });
+    }
+    if (payload.iss !== 'https://accounts.google.com' && payload.iss !== 'accounts.google.com') {
+      return reject('iss mismatch', { got: payload.iss });
+    }
+    if (!payload.email) return reject('no email claim in payload');
 
     const certs = await getGoogleCerts();
     const cert = certs.find((k) => k.kid === header.kid);
-    if (!cert) return null;
+    if (!cert) {
+      return reject('no matching cert for kid', { kid: header.kid, availableKids: certs.map((k) => k.kid) });
+    }
 
     const publicKey = createPublicKey({ key: cert, format: 'jwk' });
     const verifier = createVerify('RSA-SHA256');
     verifier.update(`${headerB64}.${payloadB64}`);
     const isValid = verifier.verify(publicKey, base64UrlToBuffer(signatureB64));
-    if (!isValid) return null;
+    if (!isValid) return reject('signature verification failed');
 
     return { email: payload.email, name: payload.name || payload.email, picture: payload.picture };
-  } catch {
-    return null;
+  } catch (err) {
+    return reject('threw during verification', err instanceof Error ? err.message : err);
   }
 }

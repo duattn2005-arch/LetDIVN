@@ -157,15 +157,30 @@ router.post('/google', async (req, res) => {
 // (in-app browsers like Messenger/Zalo sever the popup's connection back to
 // the opener). Google posts the ID token here as a real form submission, so
 // the response has to be a redirect back into the SPA, not JSON.
-const GOOGLE_CLIENT_ID = process.env.VITE_GOOGLE_CLIENT_ID || '';
+//
+// Read lazily (per-request), not as a module-level const: apiRouter.ts calls
+// process.loadEnvFile() itself, but ES module imports are hoisted and fully
+// evaluated before the importing module's own top-level code runs — so a
+// top-level `const` here would have captured process.env before .env was
+// ever loaded, always reading empty. envAdminEmails() next door already
+// dodges this the same way, by reading process.env inside a function body.
+function googleClientId(): string {
+  return process.env.VITE_GOOGLE_CLIENT_ID || '';
+}
 
 router.post('/google-onetap', async (req, res) => {
   const credential = req.body?.credential;
-  if (!credential || !GOOGLE_CLIENT_ID) {
+  const clientId = googleClientId();
+  if (!credential || !clientId) {
+    console.error('[google-onetap] missing credential or GOOGLE_CLIENT_ID', {
+      hasCredential: !!credential,
+      hasClientId: !!clientId,
+      bodyKeys: Object.keys(req.body || {}),
+    });
     res.redirect(302, '/?googleLoginError=1');
     return;
   }
-  const profile = await verifyGoogleIdToken(credential, GOOGLE_CLIENT_ID);
+  const profile = await verifyGoogleIdToken(credential, clientId);
   if (!profile) {
     res.redirect(302, '/?googleLoginError=1');
     return;
