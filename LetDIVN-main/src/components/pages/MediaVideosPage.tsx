@@ -79,15 +79,6 @@ export const MediaVideosPage: React.FC = () => {
             <Youtube className="w-10 h-10 text-slate-300 mx-auto" />
             <div className="text-sm font-bold text-slate-700">{t.videosPageEmptyTitle}</div>
             <p className="text-xs text-slate-400 max-w-md mx-auto">{t.videosPageEmptyDesc}</p>
-            <div className="pt-2">
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="btn-pill-3d px-5 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs shadow-md inline-flex items-center gap-2 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{t.videosPageAddBtn}</span>
-              </button>
-            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
