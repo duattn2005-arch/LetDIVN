@@ -1,0 +1,415 @@
+@import "tailwindcss";
+
+html, body, #root {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+  width: 100%;
+  position: relative;
+  scroll-behavior: smooth;
+  background-color: #fafbfc;
+  color: #1e293b;
+}
+
+/* Prevent awkward single-word wrapping on mobile */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+
+/* Mobile responsive smooth touch */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================================
+   1. MULTI-LAYER GLASSMORPHISM & 3D CARDS
+   ========================================================================= */
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 
+              0 20px 40px -15px rgba(232, 26, 127, 0.08);
+}
+
+.glass-card-dark {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.35);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(232, 26, 127, 0.15);
+}
+
+.card-3d,
+article,
+.grid > div.rounded-2xl,
+.grid > div.rounded-3xl,
+.grid > div.rounded-xl {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
+}
+
+.card-3d:hover,
+article:hover,
+.grid > div.rounded-2xl:hover,
+.grid > div.rounded-3xl:hover,
+.grid > div.rounded-xl:hover {
+  transform: translateY(-5px) scale(1.008);
+  box-shadow: 0 24px 45px -10px rgba(232, 26, 127, 0.18), 
+              0 12px 25px -6px rgba(15, 23, 42, 0.07);
+}
+
+/* =========================================================================
+   2. IMAGE ZOOM & 3D PARALLAX EFFECT
+   ========================================================================= */
+.group img,
+.card-image img,
+article img {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+  will-change: transform;
+}
+
+.group:hover img,
+.card-image:hover img,
+article:hover img {
+  transform: scale(1.06) rotate(0.5deg);
+}
+
+/* =========================================================================
+   3. 3D PILL BUTTONS WITH SHIMMER SWEEP & NEON HALO
+   ========================================================================= */
+.btn-pill-3d {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 6px 18px -2px rgba(232, 26, 127, 0.35),
+              inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.btn-pill-3d::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  transform: rotate(25deg);
+  transition: all 0.75s ease;
+  pointer-events: none;
+}
+
+.btn-pill-3d:hover::after {
+  left: 130%;
+}
+
+.btn-pill-3d:hover {
+  transform: translateY(-2.5px) scale(1.02);
+  box-shadow: 0 10px 25px -2px rgba(232, 26, 127, 0.55),
+              0 0 20px rgba(232, 26, 127, 0.35);
+}
+
+.btn-pill-3d:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Generic button hover enhancement */
+button,
+a.inline-flex {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+}
+
+button.bg-\[\#E81A7F\]:hover,
+button[class*="bg-pink-"]:hover {
+  box-shadow: 0 0 22px rgba(232, 26, 127, 0.45), 
+              0 8px 18px -4px rgba(232, 26, 127, 0.3);
+}
+
+/* =========================================================================
+   4. METALLIC & MULTI-COLOR FLOWING GRADIENT TEXT (HIỆU ỨNG CHỮ BIẾN SẮC & CHẠY MÀU)
+   ========================================================================= */
+@keyframes gradient-flow-pixel {
+  0% {
+    background-position: 0px 50%;
+  }
+  100% {
+    background-position: 800px 50%;
+  }
+}
+
+@keyframes hue-shift-continuous {
+  0% {
+    filter: hue-rotate(0deg) saturate(1.4) brightness(1.05);
+  }
+  50% {
+    filter: hue-rotate(180deg) saturate(1.8) brightness(1.2);
+  }
+  100% {
+    filter: hue-rotate(360deg) saturate(1.4) brightness(1.05);
+  }
+}
+
+/* 4.1 Aurora Multi-Color Rainbow Running & Morphing Gradient */
+.metallic-title:not([style*="color"]),
+.animate-gradient-text:not([style*="color"]),
+.text-gradient-animated:not([style*="color"]),
+.rainbow-running-text:not([style*="color"]) {
+  background: linear-gradient(
+    90deg, 
+    #E81A7F 0%, 
+    #FF0055 12%,
+    #FF5E00 24%, 
+    #FFB700 36%, 
+    #00E676 48%, 
+    #00B0FF 60%, 
+    #7C4DFF 72%, 
+    #E040FB 84%, 
+    #E81A7F 100%
+  ) !important;
+  background-size: 800px 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: gradient-flow-pixel 3.5s linear infinite, hue-shift-continuous 6s linear infinite !important;
+  display: inline-block;
+  padding-bottom: 0.06em;
+  will-change: background-position, filter;
+}
+
+.metallic-title:not([style*="color"]) *,
+.animate-gradient-text:not([style*="color"]) *,
+.text-gradient-animated:not([style*="color"]) *,
+.rainbow-running-text:not([style*="color"]) * {
+  background: inherit !important;
+  background-size: inherit !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: inherit !important;
+}
+
+/* 4.2 Lush Green Eco Gradient (Xanh Trồng Cây / Bảo Vệ Rừng) */
+.gradient-text-emerald {
+  background: linear-gradient(135deg, #059669 0%, #10B981 30%, #34D399 50%, #84CC16 75%, #059669 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s ease infinite;
+}
+
+/* 4.3 Ocean Clean Gradient (Xanh Đại Dương) */
+.gradient-text-ocean {
+  background: linear-gradient(135deg, #0284C7 0%, #06B6D4 30%, #38BDF8 50%, #6366F1 75%, #0284C7 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s ease infinite;
+}
+
+/* 4.4 Ultra Vibrant Neon Pink Gradient */
+.gradient-text-pink {
+  background: linear-gradient(135deg, #E81A7F 0%, #FF2E93 30%, #F43F5E 50%, #C026D3 75%, #E81A7F 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s ease infinite;
+}
+
+/* 4.5 FLOWING RAINBOW ANIMATED BORDER (VIỀN CHẠY MÀU CẦU VỒNG XUNG QUANH THẺ LOGO) */
+@keyframes rainbow-border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.rainbow-border-card {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 3px;
+  background: linear-gradient(
+    90deg,
+    #E81A7F,
+    #FF0055,
+    #FF5E00,
+    #FFB700,
+    #00E676,
+    #00B0FF,
+    #7C4DFF,
+    #E040FB,
+    #E81A7F
+  );
+  background-size: 300% 300%;
+  animation: rainbow-border-flow 3.5s ease infinite;
+  box-shadow: 0 4px 15px -2px rgba(232, 26, 127, 0.12);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.rainbow-border-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 28px -4px rgba(232, 26, 127, 0.35);
+}
+
+.rainbow-border-inner {
+  background: #ffffff;
+  border-radius: calc(1.25rem - 3px);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1.25rem;
+  overflow: hidden;
+}
+
+/* 4.5 Fast Dynamic Flowing Wave */
+.gradient-text-flow {
+  background: linear-gradient(90deg, #10B981, #06B6D4, #E81A7F, #8B5CF6, #F59E0B, #10B981);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-flow-fast 3s linear infinite;
+}
+
+/* =========================================================================
+   5. AMBIENT GLOW & FLOATING ANIMATIONS
+   ========================================================================= */
+@keyframes ambient-pulse {
+  0%, 100% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.1) translate(20px, -15px);
+    opacity: 1;
+  }
+}
+
+@keyframes ambient-float {
+  0%, 100% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.12) translate(-25px, 20px);
+    opacity: 1;
+  }
+}
+
+.animate-ambient-pulse {
+  animation: ambient-pulse 14s ease-in-out infinite;
+}
+
+.animate-ambient-float {
+  animation: ambient-float 18s ease-in-out infinite;
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1.2deg);
+  }
+}
+
+.animate-float,
+.badge-float,
+[class*="bg-pink-50"] > svg,
+[class*="bg-white\/20"] > svg {
+  animation: float-gentle 3.5s ease-in-out infinite;
+}
+
+/* =========================================================================
+   6. SEAMLESS COMPACT LAYOUT & EQUAL HEIGHT CARDS
+   ========================================================================= */
+.section-compact {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .section-compact {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+}
+
+/* Standardized line-clamp card heights */
+.card-equal-height {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-equal-height > .card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* =========================================================================
+   7. MARQUEE & UTILITIES
+   ========================================================================= */
+@keyframes marquee-scroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-infinite {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 28s linear infinite;
+  will-change: transform;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ambient Slow Zoom for Banner Photo */
+@keyframes subtle-zoom {
+  0%, 100% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.animate-subtle-zoom {
+  animation: subtle-zoom 20s ease-in-out infinite;
+}

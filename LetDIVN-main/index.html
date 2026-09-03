@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SC9H766FBB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-SC9H766FBB');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Let's do it! Vietnam - World Cleanup Day</title>
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <script>
+      // Shim to ensure window.fetch can be assigned without throwing getter-only TypeError in sandboxed environments
+      (function() {
+        try {
+          var originalFetch = window.fetch ? window.fetch.bind(window) : undefined;
+          var fetchVal = originalFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return fetchVal; },
+            set: function(fn) { fetchVal = fn; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          // ignore if already configured
+        }
+      })();
+    </script>
+    <meta name="description" content="Nền tảng chính thức của Let's do it! Vietnam - Ngày Hội Dọn Rác Thế Giới, kết nối tình nguyện viên, đối tác và hệ sinh thái quản lý dữ liệu môi trường." />
+    <meta property="og:title" content="Let's do it! Vietnam - World Cleanup Day" />
+    <meta property="og:description" content="Nền tảng chính thức của Let's do it! Vietnam - Ngày Hội Dọn Rác Thế Giới, kết nối tình nguyện viên, đối tác và hệ sinh thái quản lý dữ liệu môi trường." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Google Identity Services (OAuth 2.0 / One Tap) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Facebook JavaScript SDK -->
+    <script>
+      window.fbAsyncInit = function() {
+        var fbAppId = '%VITE_FACEBOOK_APP_ID%';
+        if (!fbAppId || fbAppId.indexOf('VITE_FACEBOOK_APP_ID') !== -1) return;
+        FB.init({
+          appId: fbAppId,
+          cookie: true,
+          xfbml: false,
+          version: 'v20.0'
+        });
+      };
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/vi_VN/sdk.js';
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
+  </head>
+  <body class="bg-white text-slate-900 antialiased font-sans selection:bg-pink-500 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+
+

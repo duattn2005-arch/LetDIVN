@@ -1,0 +1,150 @@
+import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
+import type { Request, Response } from 'express';
+import { db } from './db/index.js';
+
+export const SESSION_COOKIE = 'ldiv_session';
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// --- Password hashing (server-side only from here on — never trust a
+// client-computed hash). scrypt is Node's built-in slow KDF, no extra dep. ---
+export function hashPassword(password: string): { salt: string; hash: string } {
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return { salt, hash };
+}
+
+export function verifyPassword(password: string, salt: string, expectedHash: string): boolean {
+  const hash = scryptSync(password, salt, 64);
+  const expected = Buffer.from(expectedHash, 'hex');
+  return hash.length === expected.length && timingSafeEqual(hash, expected);
+}
+
+// --- Sessions: opaque random token in a DB table, sent as an httpOnly cookie.
+// No JWT — a row we can revoke beats a signed blob we can't. ---
+export function createSession(userId: string): string {
+  const token = randomBytes(32).toString('hex');
+  db.prepare('INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)').run(
+    token,
+    userId,
+    Date.now() + SESSION_TTL_MS
+  );
+  return token;
+}
+
+export function destroySession(token: string): void {
+  db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+}
+
+export function getSessionUser(token: string | undefined): any | null {
+  if (!token) return null;
+  const row = db
+    .prepare(
+      `SELECT users.data AS data FROM sessions
+       JOIN users ON users.id = sessions.user_id
+       WHERE sessions.token = ? AND sessions.expires_at > ?`
+    )
+    .get(token, Date.now()) as { data: string } | undefined;
+  return row ? JSON.parse(row.data) : null;
+}
+
+export function setSessionCookie(res: Response, token: string): void {
+  res.cookie(SESSION_COOKIE, token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: SESSION_TTL_MS,
+    path: '/',
+  });
+}
+
+export function clearSessionCookie(res: Response): void {
+  res.clearCookie(SESSION_COOKIE, { path: '/' });
+}
+
+// --- Admin allowlist: a server-only env var (never VITE_-prefixed, so it
+// never ships in the client bundle) plus emails an existing admin granted
+// via the dashboard. Role is decided here, server-side, and nowhere else. ---
+function envAdminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isRootAdminEmail(email: string): boolean {
+  return envAdminEmails().includes(email.trim().toLowerCase());
+}
+
+export function isAllowedAdminEmail(email: string): boolean {
+  const normalized = email.trim().toLowerCase();
+  if (isRootAdminEmail(normalized)) return true;
+  const row = db.prepare('SELECT 1 FROM granted_admins WHERE email = ?').get(normalized);
+  return !!row;
+}
+
+export function getGrantedAdminEmails(): string[] {
+  return (db.prepare('SELECT email FROM granted_admins').all() as { email: string }[]).map((r) => r.email);
+}
+
+export function grantAdmin(email: string): void {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return;
+  db.prepare('INSERT OR IGNORE INTO granted_admins (email) VALUES (?)').run(normalized);
+}
+
+export function revokeAdmin(email: string): void {
+  db.prepare('DELETE FROM granted_admins WHERE email = ?').run(email.trim().toLowerCase());
+}
+
+// --- Password-reset codes (15 min TTL), same scheme as credentials ---
+const RESET_CODE_TTL_MS = 15 * 60 * 1000;
+
+export function generateResetCode(): string {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+export function saveResetCode(email: string, code: string): void {
+  const { salt, hash } = hashPassword(code);
+  db.prepare(
+    'INSERT INTO reset_codes (email, code_hash, expires_at) VALUES (?, ?, ?) ON CONFLICT(email) DO UPDATE SET code_hash = excluded.code_hash, expires_at = excluded.expires_at'
+  ).run(email.trim().toLowerCase(), `${salt}:${hash}`, Date.now() + RESET_CODE_TTL_MS);
+}
+
+export function verifyResetCode(email: string, code: string): boolean {
+  const row = db.prepare('SELECT code_hash, expires_at FROM reset_codes WHERE email = ?').get(email.trim().toLowerCase()) as
+    | { code_hash: string; expires_at: number }
+    | undefined;
+  if (!row || Date.now() > row.expires_at) return false;
+  const [salt, hash] = row.code_hash.split(':');
+  return verifyPassword(code, salt, hash);
+}
+
+export function clearResetCode(email: string): void {
+  db.prepare('DELETE FROM reset_codes WHERE email = ?').run(email.trim().toLowerCase());
+}
+
+// --- Express middleware helpers ---
+export function currentUserFromRequest(req: Request): any | null {
+  const token = (req as any).cookies?.[SESSION_COOKIE];
+  return getSessionUser(token);
+}
+
+export function requireAdmin(req: Request, res: Response, next: () => void): void {
+  const user = currentUserFromRequest(req);
+  if (!user || user.role !== 'admin') {
+    res.status(403).json({ error: 'Yêu cầu quyền Admin' });
+    return;
+  }
+  (req as any).user = user;
+  next();
+}
+
+export function requireAuth(req: Request, res: Response, next: () => void): void {
+  const user = currentUserFromRequest(req);
+  if (!user) {
+    res.status(401).json({ error: 'Chưa đăng nhập' });
+    return;
+  }
+  (req as any).user = user;
+  next();
+}
