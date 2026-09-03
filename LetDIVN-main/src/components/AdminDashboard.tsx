@@ -47,6 +47,7 @@ import {
   fetchDataFromSheets,
   syncAllVolunteersToGoogleSheets,
   clearAllVolunteersFromGoogleSheets,
+  deleteRowFromGoogleSheets,
   validateSheetUrl,
   SheetVolunteerRow,
   DEFAULT_SPREADSHEET_ID
@@ -69,6 +70,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [appScriptUrl, setAppScriptUrl] = useState(localStorage.getItem('ldiv_google_sheet_webhook') || DEFAULT_SPREADSHEET_ID);
   const [savedUrlMsg, setSavedUrlMsg] = useState(false);
   const [isClearingSheet, setIsClearingSheet] = useState(false);
+  const [deletingRowKey, setDeletingRowKey] = useState<number | null>(null);
 
   // Database state lists initialized with real seed data
   const [users, setUsers] = useState<(UserProfile & { hasPassword: boolean })[]>(() =>
@@ -316,6 +318,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     }
   };
 
+  const handleDeleteSheetRow = async (row: SheetVolunteerRow, rowKey: number) => {
+    const label = row.fullName || 'dòng này';
+    if (!window.confirm(`Xóa vĩnh viễn đăng ký của "${label}"? Hành động này không thể hoàn tác.`)) return;
+
+    setDeletingRowKey(rowKey);
+    setSyncResultMsg(null);
+    try {
+      if (row.sheetRowNumber) {
+        const res = await deleteRowFromGoogleSheets(row.sheetRowNumber, appScriptUrl);
+        if (!res.success) throw new Error(res.message || 'Lỗi khi xóa trên Google Sheets');
+        setLiveSheetRows((prev) => prev.filter((r) => r.sheetRowNumber !== row.sheetRowNumber));
+      } else if (row.localId) {
+        await dbService.deleteVolunteer(row.localId);
+      }
+      setSyncResultMsg({ text: `✓ Đã xóa "${label}"` });
+      refreshData();
+    } catch (err: any) {
+      setSyncResultMsg({ text: `⚠ ${err?.message || 'Lỗi khi xóa dòng dữ liệu'}`, isError: true });
+    } finally {
+      setDeletingRowKey(null);
+      setTimeout(() => setSyncResultMsg(null), 5000);
+    }
+  };
+
   const openAdminCustomSheetLink = () => {
     const id = appScriptUrl.includes('/d/') ? appScriptUrl : `https://docs.google.com/spreadsheets/d/${appScriptUrl}`;
     window.open(id, '_blank');
@@ -335,7 +361,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       eventName: v.eventName,
       skills: (v.skills || []).join(', '),
       status: v.status || 'Approved',
-      notes: v.notes || ''
+      notes: v.notes || '',
+      localId: v.id
     })));
 
   const filteredVolunteers = volunteers.filter(v => {
@@ -587,15 +614,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[180px] text-center">
                           <span className="text-[10px] font-bold uppercase">Kỹ Năng</span>
                         </th>
-                        <th className="py-2.5 px-3 text-center min-w-[110px]">
+                        <th className="py-2.5 px-3 border-r border-white/20 text-center min-w-[110px]">
                           <span className="text-[10px] font-bold uppercase">Trạng Thái</span>
+                        </th>
+                        <th className="py-2.5 px-3 text-center min-w-[80px]">
+                          <span className="text-[10px] font-bold uppercase">Thao Tác</span>
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 font-mono text-[11px]">
                       {displayRows.length === 0 ? (
                         <tr>
-                          <td colSpan={10} className="py-12 text-center text-slate-500 font-sans">
+                          <td colSpan={11} className="py-12 text-center text-slate-500 font-sans">
                             <div className="text-sm font-bold text-slate-700 mb-1">Chưa có dữ liệu hàng trong bảng tính</div>
                             <p className="text-xs text-slate-400">Khi có thành viên đăng ký, hàng dữ liệu mới sẽ xuất hiện tự động tại đây!</p>
                           </td>
@@ -646,10 +676,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                               {v.skills}
                             </td>
                             {/* J: Trạng Thái (Badge màu xanh lá cây bo góc Approved) */}
-                            <td className="py-2 px-3 text-center">
+                            <td className="py-2 px-3 border-r border-slate-200 text-center">
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-sans bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs inline-block">
                                 Approved
                               </span>
+                            </td>
+                            {/* Thao Tác: xóa từng người */}
+                            <td className="py-2 px-3 text-center">
+                              <button
+                                onClick={() => handleDeleteSheetRow(v, idx)}
+                                disabled={deletingRowKey === idx}
+                                title="Xóa đăng ký này"
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {deletingRowKey === idx ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                )}
+                              </button>
                             </td>
                           </tr>
                         ))
