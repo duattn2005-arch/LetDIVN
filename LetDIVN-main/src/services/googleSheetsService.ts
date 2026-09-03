@@ -1,4 +1,5 @@
 import { VolunteerRegistration } from '../types';
+import { normalizeBirthYear } from '../utils/volunteerUtils';
 
 export const DEFAULT_SPREADSHEET_ID = '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
 export const GOOGLE_SHEETS_STORAGE_KEY = 'ldiv_google_sheet_webhook';
@@ -119,7 +120,7 @@ export async function fetchDataFromSheets(customSpreadsheetId?: string): Promise
       phone: row[3] || row[2] || '',
       email: row[4] || row[3] || '',
       city: row[5] || row[4] || 'Việt Nam',
-      birthYear: row[6] || row[5] || '',
+      birthYear: normalizeBirthYear(row[6] || row[5] || ''),
       eventName: row[7] || row[6] || 'World Cleanup Day 2026',
       skills: row[8] || row[7] || '',
       status: row[9] || row[8] || 'Approved',

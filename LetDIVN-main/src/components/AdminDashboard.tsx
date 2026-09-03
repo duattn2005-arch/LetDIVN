@@ -29,6 +29,7 @@ import {
   ShieldOff
 } from 'lucide-react';
 import { dbService } from '../services/dbService';
+import { normalizeBirthYear } from '../utils/volunteerUtils';
 import {
   VolunteerRegistration,
   CleanupEvent,
@@ -158,7 +159,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           phone: v.phone,
           email: v.email,
           city: v.city,
-          birthYear: v.birthYear || '',
+          birthYear: normalizeBirthYear(v.birthYear),
           eventName: v.eventName,
           skills: (v.skills || []).join(', '),
           status: v.status || 'Approved',
@@ -262,7 +263,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       `'${v.phone || ''}`,
       `"${(v.email || '').replace(/"/g, '""')}"`,
       `"${(v.city || '').replace(/"/g, '""')}"`,
-      `"${v.birthYear || ''}"`,
+      `"${normalizeBirthYear(v.birthYear)}"`,
       `"${(v.eventName || '').replace(/"/g, '""')}"`,
       `"${(Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')).replace(/"/g, '""')}"`,
       v.status || 'Approved',
@@ -289,7 +290,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       v.phone,
       v.email,
       v.city,
-      v.birthYear || '',
+      normalizeBirthYear(v.birthYear),
       v.eventName,
       Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || ''),
       v.status || 'Approved',
@@ -393,7 +394,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       phone: v.phone,
       email: v.email,
       city: v.city,
-      birthYear: v.birthYear || '',
+      birthYear: normalizeBirthYear(v.birthYear),
       eventName: v.eventName,
       skills: (v.skills || []).join(', '),
       status: v.status || 'Approved',
@@ -708,7 +709,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             </td>
                             {/* G: Năm Sinh */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-bold text-slate-700">
-                              {v.birthYear || ''}
+                              {normalizeBirthYear(v.birthYear)}
                             </td>
                             {/* H: Dự Án / Chiến Dịch (Màu tím/hồng đậm) */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans font-semibold text-purple-800">
@@ -908,7 +909,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                           <div className="text-slate-400 text-[11px]">{v.city}</div>
                         </td>
                         <td className="py-3 px-4 text-slate-300">
-                          <div className="font-bold text-emerald-400">{v.birthYear || ''}</div>
+                          <div className="font-bold text-emerald-400">{normalizeBirthYear(v.birthYear)}</div>
                           <div className="text-slate-400 text-[11px]">{(v.skills || []).join(', ')}</div>
                         </td>
                         <td className="py-3 px-4">
