@@ -318,6 +318,50 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
     return;
   }
 
+  if (req.url?.startsWith('/api/sheets/update-range') && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const parsed = JSON.parse(body || '{}');
+        const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
+        const range = parsed.range; // e.g. "J5" (one cell) or "A5:J5" (a full row)
+        const values = parsed.values; // 2D array matching that range, e.g. [["Pending"]]
+
+        if (!range || !Array.isArray(values)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing range or values' }));
+          return;
+        }
+
+        const token = await getGoogleOAuthToken();
+        const { title: sheetTitle } = await getFirstSheetMeta(spreadsheetId, token);
+
+        const updateRes = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetTitle)}!${range}?valueInputOption=USER_ENTERED`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ values }),
+          }
+        );
+
+        const updateData = await updateRes.json();
+        if (!updateRes.ok) logSheetsError('update-range', updateData);
+        res.writeHead(updateRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(updateData));
+      } catch (err: any) {
+        logSheetsError('update-range', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err?.message || 'Server error' }));
+      }
+    });
+    return;
+  }
+
   next();
 }
 

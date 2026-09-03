@@ -51,6 +51,8 @@ import {
   syncAllVolunteersToGoogleSheets,
   clearAllVolunteersFromGoogleSheets,
   deleteRowFromGoogleSheets,
+  updateCellInGoogleSheets,
+  findSheetRowNumber,
   validateSheetUrl,
   SheetVolunteerRow,
   DEFAULT_SPREADSHEET_ID
@@ -217,14 +219,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // Volunteer CRUD
   const handleDeleteVolunteer = async (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa bản ghi tình nguyện viên này khỏi CSDL?')) {
-      await dbService.deleteVolunteer(id);
-      refreshData();
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bản ghi tình nguyện viên này khỏi CSDL?')) return;
+    const volunteer = volunteers.find((v) => v.id === id);
+    await dbService.deleteVolunteer(id);
+    // Keep the real Google Sheet in sync — find the matching row (by
+    // email/phone, since the sheet has no local db id) and remove it too.
+    if (volunteer) {
+      try {
+        const rowNumber = await findSheetRowNumber(volunteer, appScriptUrl);
+        if (rowNumber) await deleteRowFromGoogleSheets(rowNumber, appScriptUrl);
+      } catch {
+        // best-effort — the DB delete already succeeded either way
+      }
     }
+    refreshData();
   };
 
   const handleUpdateVolunteerStatus = async (id: string, status: VolunteerRegistration['status']) => {
+    const volunteer = volunteers.find((v) => v.id === id);
     await dbService.updateVolunteer(id, { status });
+    // Keep the real Google Sheet's TRẠNG THÁI column (J) in sync too.
+    if (volunteer) {
+      try {
+        const rowNumber = await findSheetRowNumber(volunteer, appScriptUrl);
+        if (rowNumber) await updateCellInGoogleSheets(`J${rowNumber}`, status, appScriptUrl);
+      } catch {
+        // best-effort — the DB update already succeeded either way
+      }
+    }
     refreshData();
   };
 
@@ -332,7 +354,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   const handleClearAllSheetData = async () => {
     const confirmed = window.confirm(
-      `Bạn sắp XÓA VĨNH VIỄN toàn bộ ${displayRows.length} dòng dữ liệu trong Google Sheet thật (chỉ giữ lại dòng tiêu đề). Hành động này KHÔNG THỂ hoàn tác. Tiếp tục?`
+      `Bạn sắp XÓA VĨNH VIỄN toàn bộ ${displayRows.length} dòng dữ liệu trong Google Sheet thật VÀ trong CSDL nội bộ (chỉ giữ lại dòng tiêu đề trên Sheet). Hành động này KHÔNG THỂ hoàn tác. Tiếp tục?`
     );
     if (!confirmed) return;
 
@@ -341,7 +363,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     try {
       const res = await clearAllVolunteersFromGoogleSheets(appScriptUrl);
       if (res.success) {
-        setSyncResultMsg({ text: '✓ Đã xóa toàn bộ dữ liệu trên Google Sheets!' });
+        // Xóa Tất Cả phải xóa sạch cả 2 nơi, không chỉ Sheet — nếu không,
+        // CSDL nội bộ vẫn còn dữ liệu và sẽ hiện lại ngay qua chế độ dự phòng.
+        await Promise.all(volunteers.map((v) => dbService.deleteVolunteer(v.id)));
+        setSyncResultMsg({ text: '✓ Đã xóa toàn bộ dữ liệu trên Google Sheets và CSDL nội bộ!' });
         setLiveSheetRows([]);
         refreshData();
       } else {
@@ -366,8 +391,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         const res = await deleteRowFromGoogleSheets(row.sheetRowNumber, appScriptUrl);
         if (!res.success) throw new Error(res.message || 'Lỗi khi xóa trên Google Sheets');
         setLiveSheetRows((prev) => prev.filter((r) => r.sheetRowNumber !== row.sheetRowNumber));
+        // A live sheet row was appended alongside a local DB record too
+        // (dual-write on registration) — find and remove that match so it
+        // doesn't linger and reappear via fallback display later.
+        const matchingLocal = volunteers.find((v) =>
+          (!!row.email && v.email?.trim().toLowerCase() === row.email.trim().toLowerCase()) ||
+          (!!row.phone && v.phone?.trim() === row.phone.trim())
+        );
+        if (matchingLocal) await dbService.deleteVolunteer(matchingLocal.id);
       } else if (row.localId) {
         await dbService.deleteVolunteer(row.localId);
+        const rowNumber = await findSheetRowNumber(row, appScriptUrl).catch(() => null);
+        if (rowNumber) await deleteRowFromGoogleSheets(rowNumber, appScriptUrl);
       }
       setSyncResultMsg({ text: `✓ Đã xóa "${label}"` });
       refreshData();

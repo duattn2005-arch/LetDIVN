@@ -285,6 +285,55 @@ export async function deleteRowFromGoogleSheets(
 }
 
 /**
+ * Updates a single cell (e.g. the "TRẠNG THÁI" column) on the real Google
+ * Sheet. `cell` is an A1-style reference like "J5".
+ */
+export async function updateCellInGoogleSheets(
+  cell: string,
+  value: string,
+  customUrl?: string
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const rawUrl = customUrl || getGoogleAppsScriptUrl();
+    const spreadsheetId = extractSpreadsheetId(rawUrl);
+
+    const response = await fetch('/api/sheets/update-range', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ spreadsheetId, range: cell, values: [[value]] }),
+    });
+
+    if (response.ok) {
+      return { success: true };
+    }
+    const errData = await response.json().catch(() => ({}));
+    return { success: false, message: errData.error || 'Lỗi khi cập nhật Google Sheets' };
+  } catch (err: any) {
+    return { success: false, message: err?.message || 'Lỗi kết nối Google Sheets' };
+  }
+}
+
+/**
+ * Finds the live sheet row number for a volunteer that only exists locally
+ * (matched by email, falling back to phone), so status updates/deletes made
+ * from the "Tình Nguyện Viên" tab can also apply to the real Google Sheet
+ * row, not just the internal DB.
+ */
+export async function findSheetRowNumber(
+  volunteer: { email?: string; phone?: string },
+  customUrl?: string
+): Promise<number | null> {
+  const { rows } = await fetchDataFromSheets(customUrl);
+  const email = (volunteer.email || '').trim().toLowerCase();
+  const phone = (volunteer.phone || '').trim();
+  const match = rows.find((r) =>
+    (!!email && r.email.trim().toLowerCase() === email) ||
+    (!!phone && r.phone.trim() === phone)
+  );
+  return match?.sheetRowNumber ?? null;
+}
+
+/**
  * Backward compatibility alias for existing code
  */
 export async function appendVolunteerToGoogleSheets(
