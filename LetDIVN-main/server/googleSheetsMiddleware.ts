@@ -33,6 +33,20 @@ function logSheetsError(endpoint: string, detail: unknown): void {
   console.error(`[google-sheets] ${endpoint} failed:`, detail);
 }
 
+// Network blips to Google's servers (DNS hiccup, brief ETIMEDOUT) are common
+// enough on a VPS that a single fetch() failure shouldn't immediately fall
+// back to stale/local data — retry a couple of times with a short delay first.
+async function fetchWithRetry(url: string, options: RequestInit, retries = 2, delayMs = 400): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fetch(url, options);
+    } catch (err) {
+      if (attempt >= retries) throw err;
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+}
+
 async function getGoogleOAuthToken(): Promise<string> {
   if (!SERVICE_ACCOUNT) {
     throw new Error('Missing Google service account credentials. Add a credentials.json file (see .env.example) or set GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.');
@@ -60,7 +74,7 @@ async function getGoogleOAuthToken(): Promise<string> {
   const signature = sign.sign(SERVICE_ACCOUNT.private_key, 'base64url');
   const jwt = `${signatureInput}.${signature}`;
 
-  const res = await fetch('https://oauth2.googleapis.com/token', {
+  const res = await fetchWithRetry('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -108,7 +122,7 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         const spreadsheetId = urlObj.searchParams.get('spreadsheetId') || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
         const token = await getGoogleOAuthToken();
         const { title: sheetTitle } = await getFirstSheetMeta(spreadsheetId, token);
-        const sheetsRes = await fetch(
+        const sheetsRes = await fetchWithRetry(
           `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetTitle)}!A1:Z500`,
           {
             headers: { Authorization: `Bearer ${token}` }
