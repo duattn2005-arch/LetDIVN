@@ -324,22 +324,47 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* 7. Real Cleanup Map — icon-only in the desktop nav (tooltip carries the
-                label) so a long translation (e.g. French "Carte de nettoyage") can't
-                push the language/auth controls off and overlap them. Full label
-                still shows in the mobile menu below, where width isn't tight. */}
-            <button
-              id="nav-cleanup-map"
-              onClick={() => onNavigate('map')}
-              title={t.navMap}
-              className={`shrink-0 flex items-center justify-center p-2.5 rounded-xl transition-all cursor-pointer ${
-                currentView === 'map'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs'
-                  : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/50 font-semibold'
-              }`}
-            >
-              <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
-            </button>
+            {/* 7. Real Cleanup Map — the label's breakpoint depends on how long this
+                language's translation actually is. Short labels (Vietnamese "Bản
+                Đồ", Chinese, Korean) show at the same xl breakpoint as every other
+                nav item — no regression there. Long ones (French "Carte de
+                nettoyage", Spanish, German, English) stay icon-only (tooltip still
+                carries the label) until 1700px, verified clear of the language/
+                auth controls at every width down to xl. */}
+            {/* Tailwind needs complete, static class strings to generate the
+                responsive CSS — it can't see a name built from a template
+                variable — so the two breakpoints are two full literal
+                className strings, picked with a plain ternary, rather than
+                interpolating the breakpoint name into one shared string. */}
+            {t.navMap.length <= 8 ? (
+              <button
+                id="nav-cleanup-map"
+                onClick={() => onNavigate('map')}
+                title={t.navMap}
+                className={`shrink-0 flex items-center gap-1.5 p-2.5 xl:px-3 xl:py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  currentView === 'map'
+                    ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs'
+                    : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/50 font-semibold'
+                }`}
+              >
+                <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
+                <span className="hidden xl:inline">{t.navMap}</span>
+              </button>
+            ) : (
+              <button
+                id="nav-cleanup-map"
+                onClick={() => onNavigate('map')}
+                title={t.navMap}
+                className={`shrink-0 flex items-center gap-1.5 p-2.5 min-[1700px]:px-3 min-[1700px]:py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  currentView === 'map'
+                    ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs'
+                    : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/50 font-semibold'
+                }`}
+              >
+                <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
+                <span className="hidden min-[1700px]:inline">{t.navMap}</span>
+              </button>
+            )}
 
           </nav>
 
