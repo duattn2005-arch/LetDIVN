@@ -39,11 +39,11 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Calculate age automatically from birth year
+  // Năm sinh hợp lệ: từ 1920 đến (năm nay - 6), tương đương tối thiểu 6 tuổi
   const yearNumber = parseInt(birthYear, 10);
-  const calculatedAge = (!isNaN(yearNumber) && yearNumber >= 1920 && yearNumber <= currentYear) 
-    ? (currentYear - yearNumber) 
-    : null;
+  const minBirthYear = 1920;
+  const maxBirthYear = currentYear - 6;
+  const isBirthYearValid = !isNaN(yearNumber) && yearNumber >= minBirthYear && yearNumber <= maxBirthYear;
 
   const resetFormState = () => {
     setFullName('');
@@ -140,8 +140,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     }
 
     // 2. Kiểm tra năm sinh
-    if (calculatedAge === null || calculatedAge < 6 || calculatedAge > 105) {
-      alert(`⚠ Năm sinh không hợp lệ!\nVui lòng nhập năm sinh từ 1920 đến ${currentYear - 6}.`);
+    if (!isBirthYearValid) {
+      alert(`⚠ Năm sinh không hợp lệ!\nVui lòng nhập năm sinh từ ${minBirthYear} đến ${maxBirthYear}.`);
       return;
     }
 
@@ -152,7 +152,6 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     }
 
     const eventTitle = eventObj ? eventObj.title : 'World Cleanup Day 2026';
-    const ageVal = calculatedAge !== null ? String(calculatedAge) : (birthYear || '22');
 
     // Gom toàn bộ dữ liệu từ các ô nhập liệu
     const formData = {
@@ -160,7 +159,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
       phone: cleanPhone,
       email: email.trim(),
       city: address.trim() || 'Việt Nam',
-      age: ageVal,
+      birthYear: birthYear.trim(),
       project: eventTitle,
       skills: finalSkills
     };
@@ -175,7 +174,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
         city: formData.city,
         eventId,
         eventName: formData.project,
-        ageGroup: `${birthYear} (${ageVal} tuổi)`,
+        birthYear: formData.birthYear,
         tshirtSize: 'L',
         emergencyContact: formData.phone,
         skills: finalSkills,
@@ -332,39 +331,28 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
                 />
               </div>
 
-              {/* Năm sinh có tự động tính tuổi */}
+              {/* Năm sinh */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-slate-700">
-                    Năm Sinh (4 số) *
-                  </label>
-                  {calculatedAge !== null && (
-                    <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.2 rounded-full border border-emerald-200">
-                      ⚡ {calculatedAge} tuổi
-                    </span>
-                  )}
-                </div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Năm Sinh (4 số) *
+                </label>
                 <div className="relative">
                   <input
                     type="number"
                     required
-                    min="1920"
-                    max={currentYear - 6}
+                    min={minBirthYear}
+                    max={maxBirthYear}
                     placeholder="VD: 2004"
                     value={birthYear}
                     onChange={handleBirthYearChange}
                     className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-900 font-mono focus:outline-hidden focus:border-[#E81A7F]"
                   />
                 </div>
-                {calculatedAge !== null ? (
-                  <p className="text-[10px] text-emerald-600 mt-1 font-medium">
-                    ✓ Hệ thống tính tự động: <strong>{calculatedAge} tuổi</strong>
-                  </p>
-                ) : birthYear.length === 4 ? (
+                {!isBirthYearValid && birthYear.length === 4 && (
                   <p className="text-[10px] text-red-500 mt-1 font-medium">
-                    Năm sinh không hợp lệ (từ 1920 đến {currentYear - 6})
+                    Năm sinh không hợp lệ (từ {minBirthYear} đến {maxBirthYear})
                   </p>
-                ) : null}
+                )}
               </div>
             </div>
 

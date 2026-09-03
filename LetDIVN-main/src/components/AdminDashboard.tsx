@@ -158,7 +158,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           phone: v.phone,
           email: v.email,
           city: v.city,
-          ageGroup: v.ageGroup || '22 tuổi',
+          birthYear: v.birthYear || '',
           eventName: v.eventName,
           skills: (v.skills || []).join(', '),
           status: v.status || 'Approved',
@@ -253,7 +253,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // CSV Export for Google Sheets & Excel (Bulletproof UTF-8 BOM)
   const exportVolunteersCSV = () => {
-    const headers = ['STT', 'Vai Trò', 'Thời Gian Đăng Ký', 'Họ Và Tên', 'Số Điện Thoại', 'Email', 'Địa Chỉ / Tỉnh Thành', 'Độ Tuổi', 'Dự Án Đăng Ký', 'Kỹ Năng Hoặc Vai Trò', 'Trạng Thái', 'Ghi Chú'];
+    const headers = ['STT', 'Vai Trò', 'Thời Gian Đăng Ký', 'Họ Và Tên', 'Số Điện Thoại', 'Email', 'Địa Chỉ / Tỉnh Thành', 'Năm Sinh', 'Dự Án Đăng Ký', 'Kỹ Năng Hoặc Vai Trò', 'Trạng Thái', 'Ghi Chú'];
     const rows = (liveSheetRows.length > 0 ? liveSheetRows : volunteers).map((v: any, idx) => [
       idx + 1,
       v.adminRole || '',
@@ -262,7 +262,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       `'${v.phone || ''}`,
       `"${(v.email || '').replace(/"/g, '""')}"`,
       `"${(v.city || '').replace(/"/g, '""')}"`,
-      `"${v.ageGroup || ''}"`,
+      `"${v.birthYear || ''}"`,
       `"${(v.eventName || '').replace(/"/g, '""')}"`,
       `"${(Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')).replace(/"/g, '""')}"`,
       v.status || 'Approved',
@@ -281,7 +281,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   };
 
   const copyGoogleSheetToClipboard = () => {
-    const headers = ['STT', 'Thời Gian Đăng Ký', 'Họ Và Tên', 'Số Điện Thoại', 'Email', 'Địa Chỉ / Tỉnh Thành', 'Độ Tuổi', 'Dự Án Đăng Ký', 'Kỹ Năng / Vai Trò', 'Trạng Thái', 'Ghi Chú'];
+    const headers = ['STT', 'Thời Gian Đăng Ký', 'Họ Và Tên', 'Số Điện Thoại', 'Email', 'Địa Chỉ / Tỉnh Thành', 'Năm Sinh', 'Dự Án Đăng Ký', 'Kỹ Năng / Vai Trò', 'Trạng Thái', 'Ghi Chú'];
     const rows = (liveSheetRows.length > 0 ? liveSheetRows : volunteers).map((v: any, idx) => [
       idx + 1,
       new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
@@ -289,7 +289,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       v.phone,
       v.email,
       v.city,
-      v.ageGroup || '',
+      v.birthYear || '',
       v.eventName,
       Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || ''),
       v.status || 'Approved',
@@ -393,7 +393,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       phone: v.phone,
       email: v.email,
       city: v.city,
-      ageGroup: v.ageGroup || '22 tuổi',
+      birthYear: v.birthYear || '',
       eventName: v.eventName,
       skills: (v.skills || []).join(', '),
       status: v.status || 'Approved',
@@ -649,7 +649,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                           <span className="text-[10px] font-bold uppercase">Địa Chỉ</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 text-center min-w-[100px]">
-                          <span className="text-[10px] font-bold uppercase">Tuổi</span>
+                          <span className="text-[10px] font-bold uppercase">Năm Sinh</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[210px] text-center">
                           <span className="text-[10px] font-bold uppercase">Dự Án</span>
@@ -706,9 +706,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans text-slate-800">
                               {v.city}
                             </td>
-                            {/* G: Độ Tuổi */}
+                            {/* G: Năm Sinh */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-bold text-slate-700">
-                              {v.ageGroup || '22 tuổi'}
+                              {v.birthYear || ''}
                             </td>
                             {/* H: Dự Án / Chiến Dịch (Màu tím/hồng đậm) */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans font-semibold text-purple-800">
@@ -887,7 +887,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                       <th className="py-3 px-4 font-semibold">Tên Tình Nguyện Viên</th>
                       <th className="py-3 px-4 font-semibold">Thông Tin Liên Hệ</th>
                       <th className="py-3 px-4 font-semibold">Chiến Dịch &amp; Địa Chỉ</th>
-                      <th className="py-3 px-4 font-semibold">Độ Tuổi &amp; Kỹ Năng</th>
+                      <th className="py-3 px-4 font-semibold">Năm Sinh &amp; Kỹ Năng</th>
                       <th className="py-3 px-4 font-semibold">Trạng Thái</th>
                       <th className="py-3 px-4 font-semibold text-right">Thao Tác</th>
                     </tr>
@@ -908,7 +908,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                           <div className="text-slate-400 text-[11px]">{v.city}</div>
                         </td>
                         <td className="py-3 px-4 text-slate-300">
-                          <div className="font-bold text-emerald-400">{v.ageGroup || '22 tuổi'}</div>
+                          <div className="font-bold text-emerald-400">{v.birthYear || ''}</div>
                           <div className="text-slate-400 text-[11px]">{(v.skills || []).join(', ')}</div>
                         </td>
                         <td className="py-3 px-4">

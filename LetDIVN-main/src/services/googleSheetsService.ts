@@ -54,7 +54,7 @@ export interface SheetVolunteerRow {
   phone: string;
   email: string;
   city: string;
-  ageGroup: string;
+  birthYear: string;
   eventName: string;
   skills: string;
   status: string;
@@ -71,7 +71,7 @@ export interface VolunteerFormData {
   email: string;
   city: string;
   skills: string | string[];
-  age?: string | number;
+  birthYear?: string | number;
   project?: string;
   [key: string]: any;
 }
@@ -119,7 +119,7 @@ export async function fetchDataFromSheets(customSpreadsheetId?: string): Promise
       phone: row[3] || row[2] || '',
       email: row[4] || row[3] || '',
       city: row[5] || row[4] || 'Việt Nam',
-      ageGroup: row[6] || row[5] || '22 tuổi',
+      birthYear: row[6] || row[5] || '',
       eventName: row[7] || row[6] || 'World Cleanup Day 2026',
       skills: row[8] || row[7] || '',
       status: row[9] || row[8] || 'Approved',
@@ -157,13 +157,13 @@ export async function saveToGoogleSheet(
     searchParams.append('email', data.email || '');
     searchParams.append('city', data.city || '');
     searchParams.append('skills', skillsStr);
-    searchParams.append('age', String(data.age || ''));
+    searchParams.append('birthYear', String(data.birthYear || ''));
     searchParams.append('project', data.project || 'World Cleanup Day 2026');
     searchParams.append('id', submissionId);
     searchParams.append('time', submissionTime);
     searchParams.append('status', 'Approved');
 
-    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
+    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, NĂM SINH, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
     const rowValues = [
       submissionId,
       submissionTime,
@@ -171,7 +171,7 @@ export async function saveToGoogleSheet(
       data.phone || '',
       data.email || '',
       data.city || '',
-      String(data.age || ''),
+      String(data.birthYear || ''),
       data.project || 'World Cleanup Day 2026',
       skillsStr,
       'Approved'
@@ -295,7 +295,7 @@ export async function appendVolunteerToGoogleSheets(
     phone: volunteer.phone,
     email: volunteer.email,
     city: volunteer.city,
-    age: volunteer.ageGroup || '22',
+    birthYear: volunteer.birthYear || '',
     project: volunteer.eventName,
     skills: volunteer.skills
   }, customUrl);
@@ -312,7 +312,7 @@ export async function syncAllVolunteersToGoogleSheets(
     const rawUrl = customUrl || getGoogleAppsScriptUrl();
     const spreadsheetId = extractSpreadsheetId(rawUrl);
 
-    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
+    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, NĂM SINH, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
     const headerRow = [
       'ID',
       'THỜI GIAN',
@@ -320,7 +320,7 @@ export async function syncAllVolunteersToGoogleSheets(
       'SĐT',
       'EMAIL',
       'ĐỊA CHỈ',
-      'TUỔI',
+      'NĂM SINH',
       'DỰ ÁN',
       'KỸ NĂNG',
       'TRẠNG THÁI'
@@ -333,7 +333,7 @@ export async function syncAllVolunteersToGoogleSheets(
       v.phone,
       v.email,
       v.city,
-      v.ageGroup || '22',
+      v.birthYear || '',
       v.eventName,
       Array.isArray(v.skills) ? v.skills.join(', ') : '',
       v.status || 'Approved'

@@ -135,7 +135,7 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         const parsed = JSON.parse(body || '{}');
         const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
 
-        // 10 cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
+        // 10 cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, NĂM SINH, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
         const rowValues = parsed.rowValues || (parsed.name || parsed.fullName ? [
           parsed.id || `VOL-${Date.now().toString().slice(-6)}`,
           parsed.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
@@ -143,7 +143,7 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
           parsed.phone || '',
           parsed.email || '',
           parsed.city || parsed.address || '',
-          parsed.age || parsed.ageGroup || '22 tuổi',
+          parsed.birthYear || '',
           parsed.project || parsed.eventName || 'World Cleanup Day 2026',
           parsed.skills || '',
           parsed.status || 'Approved'

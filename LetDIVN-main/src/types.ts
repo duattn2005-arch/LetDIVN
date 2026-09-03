@@ -22,7 +22,7 @@ export interface VolunteerRegistration {
   city: string;
   eventId: string;
   eventName: string;
-  ageGroup: string;
+  birthYear: string;
   tshirtSize: 'S' | 'M' | 'L' | 'XL' | 'XXL';
   emergencyContact: string;
   skills: string[];
