@@ -31,34 +31,53 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const langSpecificKey = language === 'vi' ? contentKey : `${contentKey}__${language}`;
   const colorKey = `${contentKey}__color`;
   const alignKey = `${contentKey}__align`;
+  const colorsKey = `${contentKey}__colors`;
+
+  const parseColors = (raw: string): string[] => {
+    try {
+      const arr = JSON.parse(raw || '[]');
+      return Array.isArray(arr) ? arr.filter((c) => typeof c === 'string') : [];
+    } catch {
+      return [];
+    }
+  };
 
   // `value` starts as defaultValue (known synchronously) so there's no flash
   // of blank content while the first fetch is in flight.
   const [value, setValue] = useState(defaultValue);
   const [color, setColor] = useState('');
   const [align, setAlign] = useState('');
+  // Custom "chạy nhiều màu" set — 2+ hex colors the gradient animation cycles
+  // through. Empty means "use the default built-in rainbow (or the single
+  // static `color` above, if one is set)".
+  const [colors, setColors] = useState<string[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const [draftColor, setDraftColor] = useState(color);
   const [draftAlign, setDraftAlign] = useState(align);
+  const [draftColors, setDraftColors] = useState<string[]>(colors);
 
   useEffect(() => {
     let cancelled = false;
     const refresh = async () => {
-      const [nextVal, nextColor, nextAlign] = await Promise.all([
+      const [nextVal, nextColor, nextAlign, nextColorsRaw] = await Promise.all([
         dbService.getContent(langSpecificKey, defaultValue),
         dbService.getContent(colorKey, ''),
         dbService.getContent(alignKey, ''),
+        dbService.getContent(colorsKey, ''),
       ]);
       if (cancelled) return;
+      const nextColors = parseColors(nextColorsRaw);
       setValue(nextVal);
       setColor(nextColor);
       setAlign(nextAlign);
+      setColors(nextColors);
       setIsEditing((editing) => {
         if (!editing) {
           setDraft(nextVal);
           setDraftColor(nextColor);
           setDraftAlign(nextAlign);
+          setDraftColors(nextColors);
         }
         return editing;
       });
@@ -69,7 +88,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       cancelled = true;
       unsub();
     };
-  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey]);
+  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, colorsKey]);
 
   const handleSave = async () => {
     // An accidentally-cleared field must fall back to the default text, not
@@ -79,6 +98,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       draft.trim() ? dbService.setContent(langSpecificKey, draft) : dbService.resetContent(langSpecificKey),
       draftColor ? dbService.setContent(colorKey, draftColor) : dbService.resetContent(colorKey),
       draftAlign ? dbService.setContent(alignKey, draftAlign) : dbService.resetContent(alignKey),
+      draftColors.length >= 2 ? dbService.setContent(colorsKey, JSON.stringify(draftColors)) : dbService.resetContent(colorsKey),
     ]);
     setIsEditing(false);
   };
@@ -87,6 +107,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraft(value);
     setDraftColor(color);
     setDraftAlign(align);
+    setDraftColors(colors);
     setIsEditing(false);
   };
 
@@ -95,13 +116,16 @@ export const EditableText: React.FC<EditableTextProps> = ({
       dbService.resetContent(langSpecificKey),
       dbService.resetContent(colorKey),
       dbService.resetContent(alignKey),
+      dbService.resetContent(colorsKey),
     ]);
     setDraft(defaultValue);
     setDraftColor('');
     setDraftAlign('');
+    setDraftColors([]);
     setValue(defaultValue);
     setColor('');
     setAlign('');
+    setColors([]);
     setIsEditing(false);
   };
 
@@ -114,6 +138,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       setDraft(value);
       setDraftColor(color);
       setDraftAlign(align);
+      setDraftColors(colors);
       setIsEditing(true);
     }
   };
@@ -122,6 +147,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraft(value);
     setDraftColor(color);
     setDraftAlign(align);
+    setDraftColors(colors);
     setIsEditing(true);
   };
 
@@ -135,9 +161,22 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
   const resolvedValue = (value && value.trim()) ? value : defaultValue;
 
-  const displayStyle: React.CSSProperties | undefined = (color || align)
+  // Priority: 2+ custom "running colors" > single static color > (fall through
+  // to the default built-in rainbow CSS class, when neither is set).
+  const displayStyle: React.CSSProperties | undefined = (colors.length >= 2 || color || align)
     ? {
-        ...(color
+        ...(colors.length >= 2
+          ? {
+              backgroundImage: `linear-gradient(90deg, ${[...colors, colors[0]].join(', ')})`,
+              backgroundSize: '800px 100%',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+              animation: 'gradient-flow-pixel 3.5s linear infinite',
+              display: 'inline-block',
+            }
+          : color
           ? {
               color,
               WebkitTextFillColor: color,
@@ -170,6 +209,22 @@ export const EditableText: React.FC<EditableTextProps> = ({
       { name: 'Tím', hex: '#7c3aed' },
       { name: 'Cam', hex: '#d97706' },
     ];
+    // Colors available for the custom "chạy nhiều màu" mode — the same 8 stops
+    // the default built-in rainbow uses, so any subset still looks cohesive.
+    const RUN_COLOR_PALETTE = [
+      { name: 'Hồng', hex: '#E81A7F' },
+      { name: 'Đỏ hồng', hex: '#FF0055' },
+      { name: 'Cam', hex: '#FF5E00' },
+      { name: 'Vàng', hex: '#FFB700' },
+      { name: 'Xanh lá', hex: '#00E676' },
+      { name: 'Xanh dương', hex: '#00B0FF' },
+      { name: 'Tím', hex: '#7C4DFF' },
+      { name: 'Hồng tím', hex: '#E040FB' },
+    ];
+    const toggleRunColor = (hex: string) => {
+      setDraftColor('');
+      setDraftColors((prev) => (prev.includes(hex) ? prev.filter((c) => c !== hex) : [...prev, hex]));
+    };
 
     return (
       <span className="relative inline-block w-full align-top bg-purple-50 ring-2 ring-purple-400 rounded-xl p-2.5 not-italic z-30 shadow-lg">
@@ -189,30 +244,30 @@ export const EditableText: React.FC<EditableTextProps> = ({
         />
         <div className="flex items-center flex-wrap justify-between gap-1.5 mt-1.5">
           <div className="flex items-center flex-wrap gap-1.5">
-            {/* Rainbow Animated Flowing Gradient Button */}
+            {/* Rainbow Animated Flowing Gradient Button — resets to the default 8-color rainbow */}
             <button
               type="button"
-              onClick={() => setDraftColor('')}
+              onClick={() => { setDraftColor(''); setDraftColors([]); }}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
-                !draftColor
+                !draftColor && draftColors.length === 0
                   ? 'bg-gradient-to-r from-pink-500 via-yellow-400 to-cyan-400 text-white shadow-xs border-transparent scale-105'
                   : 'bg-white border-purple-200 text-slate-700 hover:bg-purple-50'
               }`}
-              title="Bật hiệu ứng chữ chạy biến màu cầu vồng"
+              title="Bật hiệu ứng chữ chạy biến màu cầu vồng mặc định"
             >
-              <span>🌈 Chạy màu</span>
+              <span>🌈 Chạy màu mặc định</span>
             </button>
 
-            {/* Quick Color Swatches */}
+            {/* Quick Color Swatches — one static color, disables running colors */}
             <div className="flex items-center gap-1 bg-white border border-purple-200 rounded-lg p-1">
               {PRESET_COLORS.map((c) => (
                 <button
                   key={c.hex}
                   type="button"
-                  onClick={() => setDraftColor(c.hex)}
+                  onClick={() => { setDraftColor(c.hex); setDraftColors([]); }}
                   title={`Chọn màu ${c.name} (${c.hex})`}
                   className={`w-4 h-4 rounded-full transition-transform cursor-pointer border ${
-                    draftColor.toLowerCase() === c.hex.toLowerCase()
+                    draftColors.length === 0 && draftColor.toLowerCase() === c.hex.toLowerCase()
                       ? 'scale-125 ring-2 ring-purple-500 border-white shadow-xs'
                       : 'border-slate-300 hover:scale-115'
                   }`}
@@ -234,7 +289,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
               <input
                 type="color"
                 value={draftColor || '#0f172a'}
-                onChange={(e) => setDraftColor(e.target.value)}
+                onChange={(e) => { setDraftColor(e.target.value); setDraftColors([]); }}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
             </label>
@@ -302,6 +357,67 @@ export const EditableText: React.FC<EditableTextProps> = ({
               <span>Hủy</span>
             </button>
           </div>
+        </div>
+
+        {/* Custom multi-color running gradient — pick any 2+ colors (or all 8) to cycle through */}
+        <div className="w-full flex flex-col gap-1.5 mt-2 pt-2 border-t border-purple-200">
+          <div className="flex items-center justify-between flex-wrap gap-1">
+            <span className="text-[10px] font-bold text-purple-800">
+              🎨 Chạy nhiều màu tùy chọn (chọn 2 → 8 màu, hoặc để trống dùng mặc định):
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => { setDraftColors(RUN_COLOR_PALETTE.map((c) => c.hex)); setDraftColor(''); }}
+                className="px-2 py-0.5 text-[10px] font-bold text-purple-700 hover:text-purple-900 hover:bg-purple-100 rounded-md cursor-pointer"
+              >
+                Chọn tất cả
+              </button>
+              <button
+                type="button"
+                onClick={() => setDraftColors([])}
+                className="px-2 py-0.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md cursor-pointer"
+              >
+                Bỏ chọn
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center flex-wrap gap-1.5">
+            {RUN_COLOR_PALETTE.map((c) => {
+              const order = draftColors.indexOf(c.hex);
+              const selected = order !== -1;
+              return (
+                <button
+                  key={c.hex}
+                  type="button"
+                  onClick={() => toggleRunColor(c.hex)}
+                  title={selected ? `Bỏ ${c.name} khỏi dải chạy màu` : `Thêm ${c.name} vào dải chạy màu`}
+                  className={`relative w-6 h-6 rounded-full border-2 cursor-pointer transition-transform ${
+                    selected ? 'scale-110 border-white ring-2 ring-purple-500 shadow-xs' : 'border-slate-300 hover:scale-105'
+                  }`}
+                  style={{ backgroundColor: c.hex }}
+                >
+                  {selected && (
+                    <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-purple-700 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                      {order + 1}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {draftColors.length === 1 && (
+            <p className="text-[10px] text-amber-600 font-semibold">Chọn thêm ít nhất 1 màu nữa để chạy màu (1 màu sẽ hiển thị tĩnh).</p>
+          )}
+          {draftColors.length >= 2 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-purple-700 font-semibold shrink-0">Xem trước ({draftColors.length} màu):</span>
+              <span
+                className="flex-1 h-2.5 rounded-full"
+                style={{ background: `linear-gradient(90deg, ${draftColors.join(', ')})` }}
+              />
+            </div>
+          )}
         </div>
       </span>
     );

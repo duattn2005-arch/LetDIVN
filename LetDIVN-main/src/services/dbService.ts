@@ -88,13 +88,20 @@ class DatabaseService {
   }
 
   public async setContent(key: string, value: string): Promise<void> {
-    await this.mutate(`/content/${encodeURIComponent(key)}`, 'PUT', { value });
+    // Not routed through `mutate()` — it calls `notify()` before returning,
+    // which would wake up every EditableText's refresh() (including this
+    // same one) while contentCache still holds the pre-write value for
+    // `key`, making them redraw with stale data. Patch the cache first,
+    // *then* notify.
+    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'PUT', body: JSON.stringify({ value }) });
     if (this.contentCache) this.contentCache[key] = value;
+    this.notify();
   }
 
   public async resetContent(key: string): Promise<void> {
-    await this.mutate(`/content/${encodeURIComponent(key)}`, 'DELETE');
+    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'DELETE' });
     if (this.contentCache) delete this.contentCache[key];
+    this.notify();
   }
 
   // --- EVENTS ---
