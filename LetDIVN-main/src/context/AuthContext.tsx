@@ -23,6 +23,36 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const GOOGLE_REDIRECT_NONCE_KEY = 'ldiv_google_redirect_nonce';
+
+// Full top-level navigation to Google itself — no popup, so no
+// window.opener relationship for an OS-level browser hand-off to sever.
+// Used for in-app browsers (Messenger/Zalo/...) where the popup-based flow
+// can never report back to the opener. The nonce guards against a captured
+// token being replayed later; the server checks it matches on return.
+function redirectToGoogleSignIn(clientId: string): void {
+  const nonce =
+    (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : '') ||
+    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  try { sessionStorage.setItem(GOOGLE_REDIRECT_NONCE_KEY, nonce); } catch { /* ignore */ }
+  const params = new URLSearchParams({
+    client_id: clientId,
+    // Must exactly match an "Authorized redirect URI" already registered
+    // for this OAuth client in Google Cloud Console — reusing this one
+    // (originally added for the old GIS-button flow) avoids needing the
+    // project owner to add yet another one. Nothing needs to actually
+    // handle this path server-side: with no matching route, Express falls
+    // through to the SPA's catch-all and serves index.html, and the ID
+    // token in the fragment never reaches the server anyway — this
+    // component reads it client-side after mount.
+    redirect_uri: `${window.location.origin}/api/auth/google-onetap`,
+    response_type: 'id_token',
+    scope: 'openid email profile',
+    nonce,
+    prompt: 'select_account',
+  });
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+}
 
 async function authRequest<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(`/api/auth${path}`, {
@@ -54,14 +84,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .catch(() => setUser(null))
       .finally(() => setIsLoading(false));
 
-    // Landed back here from the redirect-mode Google sign-in (in-app
-    // browsers) after a failed verification — surface it once, then scrub
-    // the query param so it doesn't linger on refresh/share.
-    if (typeof window !== 'undefined' && window.location.search.includes('googleLoginError=1')) {
-      window.setTimeout(() => alert('Đăng nhập Google thất bại. Vui lòng thử lại hoặc dùng Email/Tên tài khoản.'), 300);
-      const url = new URL(window.location.href);
-      url.searchParams.delete('googleLoginError');
-      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    // Landed back here from the redirect-mode Google sign-in (used for
+    // in-app browsers, where a popup can't report back to its opener — see
+    // loginWithGoogle). Google puts the ID token in the URL fragment, which
+    // never reaches the server, so the client has to read it and hand it to
+    // the backend itself.
+    if (typeof window !== 'undefined' && window.location.hash.includes('id_token=')) {
+      const hashParams = new URLSearchParams(window.location.hash.slice(1));
+      const idToken = hashParams.get('id_token');
+      const hashError = hashParams.get('error');
+      let expectedNonce: string | null = null;
+      try {
+        expectedNonce = sessionStorage.getItem(GOOGLE_REDIRECT_NONCE_KEY);
+        sessionStorage.removeItem(GOOGLE_REDIRECT_NONCE_KEY);
+      } catch { /* ignore */ }
+      // Scrub the token out of the visible URL/history right away regardless of outcome.
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+
+      if (idToken && !hashError) {
+        authRequest<{ user: AuthUser }>('/google-idtoken', { idToken, nonce: expectedNonce })
+          .then(({ user: loggedIn }) => applySession(loggedIn))
+          .catch(() => {
+            window.setTimeout(() => alert('Đăng nhập Google thất bại. Vui lòng thử lại hoặc dùng Email/Tên tài khoản.'), 300);
+          });
+      }
     }
   }, []);
 
@@ -77,14 +123,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!GOOGLE_CLIENT_ID) {
       throw new Error('Đăng nhập Google chưa được cấu hình. Vui lòng thêm VITE_GOOGLE_CLIENT_ID vào file .env (xem hướng dẫn trong .env.example).');
     }
+
+    // In-app browsers (Messenger/Instagram/Zalo/TikTok/...) sever a popup's
+    // connection back to its opener — whether Google renders its own sign-in
+    // UI there or the OS hands the popup off to a separate browser, the
+    // popup-based flow below can never report the result back. A full
+    // top-level redirect has no popup/opener relationship to break: whatever
+    // browser ends up handling it completes the round trip itself.
+    if (isInAppBrowser()) {
+      redirectToGoogleSignIn(GOOGLE_CLIENT_ID);
+      return new Promise<UserProfile>(() => { /* page is navigating away */ });
+    }
+
     if (typeof window === 'undefined' || !(window as any).google?.accounts?.oauth2) {
-      // Google deliberately refuses to run its sign-in script inside in-app
-      // WebViews (Messenger, Instagram, Zalo, TikTok, ...) for security
-      // reasons — that's the actual cause here, not a network/ad-blocker
-      // issue, so tell the user what to really do about it.
-      if (isInAppBrowser()) {
-        throw new Error('Google chặn đăng nhập bên trong trình duyệt nhúng của ứng dụng này (Messenger/Instagram/Zalo/TikTok...) để bảo mật. Vui lòng bấm nút "•••" (hoặc menu chia sẻ) ở góc màn hình và chọn "Mở bằng trình duyệt" (Safari/Chrome), sau đó đăng nhập lại.');
-      }
       throw new Error('Không thể tải dịch vụ đăng nhập Google. Vui lòng kiểm tra kết nối mạng và tắt trình chặn quảng cáo, sau đó thử lại.');
     }
 

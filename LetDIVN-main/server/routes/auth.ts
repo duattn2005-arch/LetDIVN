@@ -153,42 +153,36 @@ router.post('/google', async (req, res) => {
   res.json({ user: withEligibility(user) });
 });
 
-// Redirect-mode "Sign In With Google" — used when the popup flow can't work
-// (in-app browsers like Messenger/Zalo sever the popup's connection back to
-// the opener). Google posts the ID token here as a real form submission, so
-// the response has to be a redirect back into the SPA, not JSON.
+// Redirect-mode Google sign-in — used when the popup flow can't work (in-app
+// browsers like Messenger/Zalo sever the popup's connection back to the
+// opener). The client does a full top-level navigation to Google itself
+// (see AuthContext.tsx) and Google redirects back with the ID token in the
+// URL fragment, which never reaches the server — so the client reads it and
+// posts it here as plain JSON, same shape as the accessToken /google route.
 //
-// Read lazily (per-request), not as a module-level const: apiRouter.ts calls
-// process.loadEnvFile() itself, but ES module imports are hoisted and fully
-// evaluated before the importing module's own top-level code runs — so a
-// top-level `const` here would have captured process.env before .env was
-// ever loaded, always reading empty. envAdminEmails() next door already
-// dodges this the same way, by reading process.env inside a function body.
+// GOOGLE_CLIENT_ID is read lazily (per-request), not as a module-level
+// const: apiRouter.ts calls process.loadEnvFile() itself, but ES module
+// imports are hoisted and fully evaluated before the importing module's own
+// top-level code runs — so a top-level `const` here would have captured
+// process.env before .env was ever loaded, always reading empty.
+// envAdminEmails() next door already dodges this the same way.
 function googleClientId(): string {
   return process.env.VITE_GOOGLE_CLIENT_ID || '';
 }
 
-router.post('/google-onetap', async (req, res) => {
-  const credential = req.body?.credential;
+router.post('/google-idtoken', async (req, res) => {
+  const { idToken, nonce } = req.body || {};
   const clientId = googleClientId();
-  if (!credential || !clientId) {
-    console.error('[google-onetap] missing credential or GOOGLE_CLIENT_ID', {
-      hasCredential: !!credential,
-      hasClientId: !!clientId,
-      bodyKeys: Object.keys(req.body || {}),
-    });
-    res.redirect(302, '/?googleLoginError=1');
-    return;
+  if (!idToken || !clientId) {
+    return res.status(400).json({ error: 'Thiếu idToken hoặc chưa cấu hình Client ID' });
   }
-  const profile = await verifyGoogleIdToken(credential, clientId);
-  if (!profile) {
-    res.redirect(302, '/?googleLoginError=1');
-    return;
-  }
+  const profile = await verifyGoogleIdToken(idToken, clientId, nonce);
+  if (!profile) return res.status(401).json({ error: 'Không xác thực được tài khoản Google' });
+
   const user = upsertGoogleUser(profile);
   const token = createSession(user.id);
   setSessionCookie(res, token);
-  res.redirect(302, '/');
+  res.json({ user: withEligibility(user) });
 });
 
 async function fetchFacebookProfile(accessToken: string): Promise<{ email?: string; name: string; picture?: string } | null> {

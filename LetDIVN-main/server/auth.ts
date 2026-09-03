@@ -174,7 +174,8 @@ function base64UrlToBuffer(input: string): Buffer {
 
 export async function verifyGoogleIdToken(
   idToken: string,
-  expectedAudience: string
+  expectedAudience: string,
+  expectedNonce?: string | null
 ): Promise<{ email: string; name: string; picture?: string } | null> {
   const reject = (reason: string, detail?: unknown) => {
     console.error(`[google-id-token] rejected: ${reason}`, detail ?? '');
@@ -199,6 +200,12 @@ export async function verifyGoogleIdToken(
       return reject('iss mismatch', { got: payload.iss });
     }
     if (!payload.email) return reject('no email claim in payload');
+    // Prevents a captured/leaked token being replayed later to log in as the
+    // victim — the client generates a fresh nonce per redirect attempt and
+    // we require it to come back unchanged inside the signed token.
+    if (expectedNonce && payload.nonce !== expectedNonce) {
+      return reject('nonce mismatch (possible replay)', { got: payload.nonce });
+    }
 
     const certs = await getGoogleCerts();
     const cert = certs.find((k) => k.kid === header.kid);
