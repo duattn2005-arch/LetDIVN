@@ -5,6 +5,37 @@ import { CleanupEvent } from '../types';
 import { dbService } from '../services/dbService';
 import { ImageUploadWidget } from './ImageUploadWidget';
 import { useAuth } from '../context/AuthContext';
+import { sendNotificationEmail } from '../services/emailService';
+
+// Fields that matter enough to a registered volunteer's plans that changing
+// them should trigger an email — pure copy/description edits don't.
+const SCHEDULE_FIELDS: Array<{ key: 'date' | 'time' | 'location' | 'meetingPoint'; label: string }> = [
+  { key: 'date', label: 'Ngày diễn ra' },
+  { key: 'time', label: 'Giờ diễn ra' },
+  { key: 'location', label: 'Địa điểm' },
+  { key: 'meetingPoint', label: 'Điểm tập trung' },
+];
+
+// Best-effort — never blocks or fails the admin's save if an email bounces.
+function notifyVolunteersOfScheduleChange(event: CleanupEvent, changedLabels: string[]): void {
+  dbService
+    .getVolunteers()
+    .then((volunteers) => {
+      const affected = volunteers.filter((v) => v.eventId === event.id && v.email);
+      affected.forEach((v) => {
+        sendNotificationEmail(
+          v.email,
+          v.fullName,
+          `Thông báo thay đổi lịch trình - ${event.title}`,
+          `Xin chào ${v.fullName}, chiến dịch "${event.title}" mà bạn đã đăng ký tham gia vừa được cập nhật (${changedLabels.join(', ')}).\n\n` +
+            `Lịch trình mới:\nNgày: ${event.date}\nGiờ: ${event.time}\nĐịa điểm: ${event.location}` +
+            (event.meetingPoint ? `\nĐiểm tập trung: ${event.meetingPoint}` : '') +
+            `\n\nVui lòng lưu ý để sắp xếp tham gia đúng giờ. Cảm ơn bạn đã đồng hành cùng Let's Do It! Vietnam.`
+        ).catch((err) => console.warn('Silent schedule-change email failed:', err));
+      });
+    })
+    .catch((err) => console.warn('Failed to load volunteers for schedule-change notice:', err));
+}
 
 interface EventEditorModalProps {
   isOpen: boolean;
@@ -120,6 +151,10 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
 
     let saved: CleanupEvent;
     if (eventToEdit) {
+      const changedLabels = SCHEDULE_FIELDS.filter(
+        (f) => (f.key === 'date' ? date : f.key === 'time' ? time : f.key === 'location' ? location : meetingPoint) !== eventToEdit[f.key]
+      ).map((f) => f.label);
+
       saved = await dbService.updateEvent(eventToEdit.id, {
         title,
         category,
@@ -137,6 +172,10 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
         meetingPoint,
         schedule: scheduleItems
       });
+
+      if (changedLabels.length > 0) {
+        notifyVolunteersOfScheduleChange(saved, changedLabels);
+      }
     } else {
       saved = await dbService.addEvent({
         title,

@@ -4,8 +4,8 @@ import { X, Sparkles, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { dbService } from '../services/dbService';
 import { CleanupEvent } from '../types';
-import { useAuth } from '../context/AuthContext';
 import { saveToGoogleSheet, getGoogleAppsScriptUrl } from '../services/googleSheetsService';
+import { sendNotificationEmail } from '../services/emailService';
 
 interface VolunteerModalProps {
   isOpen: boolean;
@@ -13,12 +13,11 @@ interface VolunteerModalProps {
   selectedEventId?: string;
 }
 
-export const VolunteerModal: React.FC<VolunteerModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  selectedEventId 
+export const VolunteerModal: React.FC<VolunteerModalProps> = ({
+  isOpen,
+  onClose,
+  selectedEventId
 }) => {
-  const { user } = useAuth();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
   const currentYear = new Date().getFullYear();
 
@@ -26,12 +25,14 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     dbService.getEvents().then(setEvents);
   }, []);
 
-  const [fullName, setFullName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [phone, setPhone] = useState(user?.phone ? user.phone.replace(/\D/g, '').slice(0, 10) : '');
-  const [address, setAddress] = useState(user?.city || 'Hà Nội');
+  // Always start blank — the person registering fills in their own details,
+  // regardless of which account (if any) happens to be logged in.
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [eventId, setEventId] = useState(selectedEventId || events[0]?.id || '');
-  const [birthYear, setBirthYear] = useState<string>('2004');
+  const [birthYear, setBirthYear] = useState<string>('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>(['Hậu cần & Phân loại rác']);
   const [customRole, setCustomRole] = useState('');
   const [notes, setNotes] = useState('');
@@ -50,14 +51,16 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     setEmail('');
     setPhone('');
     setAddress('');
-    setBirthYear('2004');
+    setBirthYear('');
     setSelectedSkills([]);
     setCustomRole('');
     setNotes('');
     setPhoneError(null);
   };
 
-  // Reset form when modal opens
+  // Reset form when modal opens — always blank, never pre-filled from the
+  // logged-in account, so every registration reflects what the volunteer
+  // actually typed.
   useEffect(() => {
     if (isOpen) {
       if (selectedEventId) {
@@ -65,19 +68,11 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
       } else if (events.length > 0) {
         setEventId(events[0].id);
       }
-      if (user) {
-        setFullName(user.name || '');
-        setEmail(user.email || '');
-        setPhone(user.phone ? user.phone.replace(/\D/g, '').slice(0, 10) : '');
-        setAddress(user.city || 'Hà Nội');
-      } else {
-        resetFormState();
-      }
-      setPhoneError(null);
+      resetFormState();
       setIsSuccess(false);
       setIsSubmitting(false);
     }
-  }, [isOpen, selectedEventId, user, events]);
+  }, [isOpen, selectedEventId, events]);
 
   if (!isOpen) return null;
 
@@ -191,6 +186,23 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
       saveToGoogleSheet(formData, effectiveUrl).catch((err) => {
         console.warn('Silent sheet sync:', err);
       });
+
+      // Gửi email xác nhận đăng ký cho tình nguyện viên, chạy ngầm (best-effort)
+      if (formData.email) {
+        const eventWhen = eventObj ? `${eventObj.date} (${eventObj.time})` : '';
+        const eventWhere = eventObj?.location || eventObj?.city || '';
+        sendNotificationEmail(
+          formData.email,
+          formData.name,
+          `Xác nhận đăng ký tình nguyện viên - ${eventTitle}`,
+          `Xin chào ${formData.name}, bạn đã đăng ký thành công tham gia chiến dịch "${eventTitle}"` +
+            (eventWhen ? ` diễn ra vào ${eventWhen}` : '') +
+            (eventWhere ? ` tại ${eventWhere}` : '') +
+            `. Cảm ơn bạn đã đồng hành cùng Let's Do It! Vietnam. Chúng tôi sẽ báo cho bạn qua email này nếu lịch trình có thay đổi.`
+        ).catch((err) => {
+          console.warn('Silent registration email send failed:', err);
+        });
+      }
 
       try {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
