@@ -69,7 +69,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [activeTab, setActiveTab] = useState<TabType>('sheets');
   const [copiedSheet, setCopiedSheet] = useState(false);
   const [isSyncingAll, setIsSyncingAll] = useState(false);
-  const [isLoadingLiveSheets, setIsLoadingLiveSheets] = useState(false);
   const [liveSheetRows, setLiveSheetRows] = useState<SheetVolunteerRow[]>([]);
   const [syncResultMsg, setSyncResultMsg] = useState<{ text: string; isError?: boolean } | null>(null);
   const [appScriptUrl, setAppScriptUrl] = useState(localStorage.getItem('ldiv_google_sheet_webhook') || DEFAULT_SPREADSHEET_ID);
@@ -100,18 +99,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [isCreatingNews, setIsCreatingNews] = useState(false);
   const [refreshToast, setRefreshToast] = useState<{ message: string; isError?: boolean } | null>(null);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   const handleManualRefresh = async () => {
+    if (isManualRefreshing) return;
+    setIsManualRefreshing(true);
     setRefreshToast({ message: 'Đang làm mới dữ liệu...' });
+    const minSpinPromise = new Promise(resolve => setTimeout(resolve, 1000));
     try {
-      await refreshData();
+      await Promise.all([refreshData(), minSpinPromise]);
       setRefreshToast({ message: '✓ Đã làm mới toàn bộ dữ liệu thành công!', isError: false });
     } catch (err: any) {
+      await minSpinPromise;
       setRefreshToast({ message: '⚠ Lỗi làm mới: ' + (err?.message || 'Không thể kết nối'), isError: true });
+    } finally {
+      setIsManualRefreshing(false);
+      setTimeout(() => {
+        setRefreshToast(null);
+      }, 3000);
     }
-    setTimeout(() => {
-      setRefreshToast(null);
-    }, 3000);
   };
 
   const refreshData = async () => {
@@ -158,7 +164,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     }
 
     // Fetch live rows from Google Sheets API
-    setIsLoadingLiveSheets(true);
     try {
       const sheetRes = await fetchDataFromSheets(appScriptUrl);
       if (sheetRes.success && sheetRes.rows && sheetRes.rows.length > 0) {
@@ -183,8 +188,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       }
     } catch {
       // ignore
-    } finally {
-      setIsLoadingLiveSheets(false);
     }
   };
 
@@ -474,7 +477,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               ? 'bg-red-900 border-red-500 text-red-100'
               : 'bg-emerald-900 border-emerald-500 text-emerald-100'
           }`}>
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLiveSheets ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isManualRefreshing ? 'animate-spin' : ''}`} />
             <span>{refreshToast.message}</span>
           </div>
         )}
@@ -503,11 +506,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           <div className="flex items-center gap-2">
             <button
               onClick={handleManualRefresh}
-              disabled={isLoadingLiveSheets}
+              disabled={isManualRefreshing}
               title="Làm mới dữ liệu từ CSDL & Google Sheets"
-              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 disabled:opacity-50 rounded-xl transition-all cursor-pointer border border-white/15"
+              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 disabled:opacity-75 rounded-xl transition-all cursor-pointer border border-white/15 flex items-center justify-center"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoadingLiveSheets ? 'animate-spin text-emerald-300' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isManualRefreshing ? 'animate-spin text-emerald-300' : ''}`} />
             </button>
             <button
               id="close-db-admin-btn"
