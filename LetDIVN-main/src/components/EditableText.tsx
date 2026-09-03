@@ -439,7 +439,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
         }
       }}
       title="Sửa nội dung (Admin)"
-      className="hidden group-hover/edit:inline-flex ml-1.5 align-middle p-0.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded cursor-pointer shadow-2xs transition-all"
+      className="inline-flex ml-1.5 align-middle p-0.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full ring-1 ring-purple-300 cursor-pointer shadow-2xs transition-all hover:scale-110"
     >
       <Edit3 className="w-3 h-3" />
     </span>
