@@ -67,6 +67,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error('Đăng nhập Google chưa được cấu hình. Vui lòng thêm VITE_GOOGLE_CLIENT_ID vào file .env (xem hướng dẫn trong .env.example).');
     }
     if (typeof window === 'undefined' || !(window as any).google?.accounts?.oauth2) {
+      // Google deliberately refuses to run its sign-in script inside in-app
+      // WebViews (Messenger, Instagram, Zalo, TikTok, ...) for security
+      // reasons — that's the actual cause here, not a network/ad-blocker
+      // issue, so tell the user what to really do about it.
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+      const inAppBrowser = /FBAN|FBAV|Instagram|Line\/|Zalo|MicroMessenger|TikTok|musical_ly|; wv\)/i.test(ua);
+      if (inAppBrowser) {
+        throw new Error('Google chặn đăng nhập bên trong trình duyệt nhúng của ứng dụng này (Messenger/Instagram/Zalo/TikTok...) để bảo mật. Vui lòng bấm nút "•••" (hoặc menu chia sẻ) ở góc màn hình và chọn "Mở bằng trình duyệt" (Safari/Chrome), sau đó đăng nhập lại.');
+      }
       throw new Error('Không thể tải dịch vụ đăng nhập Google. Vui lòng kiểm tra kết nối mạng và tắt trình chặn quảng cáo, sau đó thử lại.');
     }
 
