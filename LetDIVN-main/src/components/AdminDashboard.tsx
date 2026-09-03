@@ -24,7 +24,9 @@ import {
   Check,
   Link as LinkIcon,
   Loader2,
-  KeyRound
+  KeyRound,
+  ShieldCheck,
+  ShieldOff
 } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import {
@@ -82,6 +84,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [partners, setPartners] = useState<Partner[]>(() => INITIAL_PARTNERS);
   const [gallery, setGallery] = useState<GalleryItem[]>(() => INITIAL_GALLERY);
   const [stats, setStats] = useState<Awaited<ReturnType<typeof dbService.getStats>> | null>(null);
+  const [grantedAdmins, setGrantedAdmins] = useState<string[]>([]);
+  const [grantingEmail, setGrantingEmail] = useState<string | null>(null);
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,7 +99,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   const refreshData = async () => {
     try {
-      const [usersRes, volsRes, eventsRes, newsRes, partnersRes, galleryRes, statsRes] = await Promise.allSettled([
+      const [usersRes, volsRes, eventsRes, newsRes, partnersRes, galleryRes, statsRes, grantedRes] = await Promise.allSettled([
         dbService.getUsers(),
         dbService.getVolunteers(),
         dbService.getEvents(),
@@ -103,10 +107,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         dbService.getPartners(),
         dbService.getGallery(),
         dbService.getStats(),
+        dbService.getGrantedAdminEmails(),
       ]);
 
       if (usersRes.status === 'fulfilled' && usersRes.value && usersRes.value.length > 0) {
         setUsers(usersRes.value);
+      }
+      if (grantedRes.status === 'fulfilled' && grantedRes.value) {
+        setGrantedAdmins(grantedRes.value);
       }
       if (volsRes.status === 'fulfilled' && volsRes.value && volsRes.value.length > 0) {
         setVolunteers(volsRes.value);
@@ -175,6 +183,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     if (window.confirm('Bạn có chắc chắn muốn xóa tài khoản này? Mật khẩu đã lưu của tài khoản cũng sẽ bị xóa.')) {
       await dbService.deleteUser(id);
       refreshData();
+    }
+  };
+
+  const handleGrantAdmin = async (name: string, email: string) => {
+    if (!window.confirm(`Cấp quyền Admin cho "${name}" (${email})?\n\nTài khoản này sẽ thấy đúng vai trò Admin từ lần đăng nhập tiếp theo.`)) return;
+    setGrantingEmail(email);
+    try {
+      await dbService.grantAdmin(email);
+      refreshData();
+    } finally {
+      setGrantingEmail(null);
+    }
+  };
+
+  const handleRevokeAdmin = async (name: string, email: string) => {
+    if (!window.confirm(`Thu hồi quyền Admin của "${name}" (${email})?\n\nTài khoản sẽ trở về vai trò thường từ lần đăng nhập tiếp theo.`)) return;
+    setGrantingEmail(email);
+    try {
+      await dbService.revokeAdmin(email);
+      refreshData();
+    } finally {
+      setGrantingEmail(null);
     }
   };
 
@@ -738,6 +768,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     ) : (
                       users.map((u) => {
                         const hasPassword = u.hasPassword;
+                        const email = (u.email || '').trim().toLowerCase();
+                        const isGranted = !!email && grantedAdmins.includes(email);
+                        const isPendingAdmin = isGranted && u.role !== 'admin';
+                        const isBusy = grantingEmail === email;
                         return (
                           <tr key={u.id} className="hover:bg-slate-800/40 transition-colors">
                             <td className="py-3 px-4 font-bold text-white">
@@ -755,16 +789,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                                 </span>
                               )}
                             </td>
-                            <td className="py-3 px-4 text-slate-300 font-mono">{u.role}</td>
+                            <td className="py-3 px-4 text-slate-300 font-mono">
+                              <div>{u.role}</div>
+                              {isPendingAdmin && (
+                                <span className="mt-1 inline-block px-2 py-0.5 rounded-full text-[10px] font-bold font-sans bg-amber-100 text-amber-800 border border-amber-300">
+                                  ⏳ Chờ đăng nhập lại để có quyền Admin
+                                </span>
+                              )}
+                            </td>
                             <td className="py-3 px-4 text-slate-400">{u.joinedAt}</td>
                             <td className="py-3 px-4 text-right">
-                              <button
-                                onClick={() => handleDeleteAccount(u.id)}
-                                className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg transition-colors cursor-pointer"
-                                title="Xóa tài khoản"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                {email && (
+                                  u.role === 'admin' || isGranted ? (
+                                    <button
+                                      onClick={() => handleRevokeAdmin(u.name, email)}
+                                      disabled={isBusy}
+                                      className="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                                      title="Thu hồi quyền Admin"
+                                    >
+                                      {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldOff className="w-3.5 h-3.5" />}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleGrantAdmin(u.name, email)}
+                                      disabled={isBusy}
+                                      className="p-1.5 bg-emerald-950/60 hover:bg-emerald-900 text-emerald-400 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                                      title="Cấp quyền Admin"
+                                    >
+                                      {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+                                    </button>
+                                  )
+                                )}
+                                <button
+                                  onClick={() => handleDeleteAccount(u.id)}
+                                  className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg transition-colors cursor-pointer"
+                                  title="Xóa tài khoản"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
