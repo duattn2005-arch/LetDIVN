@@ -53,6 +53,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
       .catch(() => setUser(null))
       .finally(() => setIsLoading(false));
+
+    // Landed back here from the redirect-mode Google sign-in (in-app
+    // browsers) after a failed verification — surface it once, then scrub
+    // the query param so it doesn't linger on refresh/share.
+    if (typeof window !== 'undefined' && window.location.search.includes('googleLoginError=1')) {
+      window.setTimeout(() => alert('Đăng nhập Google thất bại. Vui lòng thử lại hoặc dùng Email/Tên tài khoản.'), 300);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('googleLoginError');
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
   }, []);
 
   const applySession = (u: AuthUser) => {

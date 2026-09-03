@@ -28,6 +28,10 @@ seedIfEmpty();
 export const apiRouter = Router();
 apiRouter.use(cookieParser());
 apiRouter.use(express.json({ limit: '2mb' }));
+// Google's redirect-mode "Sign In With Google" posts the ID token as a real
+// HTML form (application/x-www-form-urlencoded), not JSON — see
+// routes/auth.ts's /google-onetap.
+apiRouter.use(express.urlencoded({ extended: false, limit: '2mb' }));
 apiRouter.use('/auth', authRoutes);
 apiRouter.use(collectionRoutes);
 apiRouter.use(contentRoutes);

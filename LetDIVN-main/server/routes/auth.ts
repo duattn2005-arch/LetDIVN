@@ -12,6 +12,7 @@ import {
   saveResetCode,
   verifyResetCode,
   clearResetCode,
+  verifyGoogleIdToken,
   SESSION_COOKIE,
 } from '../auth.js';
 import { db } from '../db/index.js';
@@ -122,12 +123,7 @@ async function fetchGoogleProfile(accessToken: string): Promise<{ email: string;
   }
 }
 
-router.post('/google', async (req, res) => {
-  const { accessToken } = req.body || {};
-  if (!accessToken) return res.status(400).json({ error: 'Thiếu accessToken' });
-  const profile = await fetchGoogleProfile(accessToken);
-  if (!profile) return res.status(401).json({ error: 'Không xác thực được tài khoản Google' });
-
+function upsertGoogleUser(profile: { email: string; name: string; picture?: string }): UserProfile {
   let user = getUserByEmail(profile.email);
   const role = roleFor(profile.email, user?.role || 'volunteer');
   if (user) {
@@ -142,9 +138,42 @@ router.post('/google', async (req, res) => {
       joinedAt: new Date().toISOString(),
     });
   }
+  return user;
+}
+
+router.post('/google', async (req, res) => {
+  const { accessToken } = req.body || {};
+  if (!accessToken) return res.status(400).json({ error: 'Thiếu accessToken' });
+  const profile = await fetchGoogleProfile(accessToken);
+  if (!profile) return res.status(401).json({ error: 'Không xác thực được tài khoản Google' });
+
+  const user = upsertGoogleUser(profile);
   const token = createSession(user.id);
   setSessionCookie(res, token);
   res.json({ user: withEligibility(user) });
+});
+
+// Redirect-mode "Sign In With Google" — used when the popup flow can't work
+// (in-app browsers like Messenger/Zalo sever the popup's connection back to
+// the opener). Google posts the ID token here as a real form submission, so
+// the response has to be a redirect back into the SPA, not JSON.
+const GOOGLE_CLIENT_ID = process.env.VITE_GOOGLE_CLIENT_ID || '';
+
+router.post('/google-onetap', async (req, res) => {
+  const credential = req.body?.credential;
+  if (!credential || !GOOGLE_CLIENT_ID) {
+    res.redirect(302, '/?googleLoginError=1');
+    return;
+  }
+  const profile = await verifyGoogleIdToken(credential, GOOGLE_CLIENT_ID);
+  if (!profile) {
+    res.redirect(302, '/?googleLoginError=1');
+    return;
+  }
+  const user = upsertGoogleUser(profile);
+  const token = createSession(user.id);
+  setSessionCookie(res, token);
+  res.redirect(302, '/');
 });
 
 async function fetchFacebookProfile(accessToken: string): Promise<{ email?: string; name: string; picture?: string } | null> {

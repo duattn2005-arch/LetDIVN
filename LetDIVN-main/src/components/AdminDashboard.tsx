@@ -99,8 +99,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [isCreatingVolunteer, setIsCreatingVolunteer] = useState(false);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [isCreatingNews, setIsCreatingNews] = useState(false);
+  const [refreshToast, setRefreshToast] = useState<{ message: string; isError?: boolean } | null>(null);
+
+  const handleManualRefresh = async () => {
+    setRefreshToast({ message: 'Đang làm mới dữ liệu...' });
+    try {
+      await refreshData();
+      setRefreshToast({ message: '✓ Đã làm mới toàn bộ dữ liệu thành công!', isError: false });
+    } catch (err: any) {
+      setRefreshToast({ message: '⚠ Lỗi làm mới: ' + (err?.message || 'Không thể kết nối'), isError: true });
+    }
+    setTimeout(() => {
+      setRefreshToast(null);
+    }, 3000);
+  };
 
   const refreshData = async () => {
+    let freshVols = volunteers;
     try {
       const [usersRes, volsRes, eventsRes, newsRes, partnersRes, galleryRes, statsRes, grantedRes] = await Promise.allSettled([
         dbService.getUsers(),
@@ -113,25 +128,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         dbService.getGrantedAdminEmails(),
       ]);
 
-      if (usersRes.status === 'fulfilled' && usersRes.value && usersRes.value.length > 0) {
+      if (usersRes.status === 'fulfilled' && usersRes.value) {
         setUsers(usersRes.value);
       }
       if (grantedRes.status === 'fulfilled' && grantedRes.value) {
         setGrantedAdmins(grantedRes.value);
       }
-      if (volsRes.status === 'fulfilled' && volsRes.value && volsRes.value.length > 0) {
+      if (volsRes.status === 'fulfilled' && volsRes.value) {
         setVolunteers(volsRes.value);
+        freshVols = volsRes.value;
       }
-      if (eventsRes.status === 'fulfilled' && eventsRes.value && eventsRes.value.length > 0) {
+      if (eventsRes.status === 'fulfilled' && eventsRes.value) {
         setEvents(eventsRes.value);
       }
-      if (newsRes.status === 'fulfilled' && newsRes.value && newsRes.value.length > 0) {
+      if (newsRes.status === 'fulfilled' && newsRes.value) {
         setNews(newsRes.value);
       }
-      if (partnersRes.status === 'fulfilled' && partnersRes.value && partnersRes.value.length > 0) {
+      if (partnersRes.status === 'fulfilled' && partnersRes.value) {
         setPartners(partnersRes.value);
       }
-      if (galleryRes.status === 'fulfilled' && galleryRes.value && galleryRes.value.length > 0) {
+      if (galleryRes.status === 'fulfilled' && galleryRes.value) {
         setGallery(galleryRes.value);
       }
       if (statsRes.status === 'fulfilled' && statsRes.value) {
@@ -145,21 +161,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     setIsLoadingLiveSheets(true);
     try {
       const sheetRes = await fetchDataFromSheets(appScriptUrl);
-      if (sheetRes.success && sheetRes.rows.length > 0) {
+      if (sheetRes.success && sheetRes.rows && sheetRes.rows.length > 0) {
         setLiveSheetRows(sheetRes.rows);
       } else {
         // Fallback to local volunteer list if the sheet is currently empty or unreachable.
-        setLiveSheetRows((volunteers.length > 0 ? volunteers : INITIAL_VOLUNTEERS).map((v, idx) => ({
+        setLiveSheetRows((freshVols.length > 0 ? freshVols : INITIAL_VOLUNTEERS).map((v, idx) => ({
           stt: idx + 1,
-          adminRole: v.fullName.includes('Admin') ? '(Admin)' : '',
-          registeredAt: new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-          fullName: v.fullName,
-          phone: v.phone,
-          email: v.email,
-          city: v.city,
+          adminRole: v.fullName?.includes('Admin') ? '(Admin)' : '',
+          registeredAt: v.registeredAt ? new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '',
+          fullName: v.fullName || '',
+          phone: v.phone || '',
+          email: v.email || '',
+          city: v.city || '',
           birthYear: normalizeBirthYear(v.birthYear),
-          eventName: v.eventName,
-          skills: (v.skills || []).join(', '),
+          eventName: v.eventName || '',
+          skills: (Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')),
           status: v.status || 'Approved',
           notes: v.notes || '',
           localId: v.id
@@ -451,6 +467,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         className="relative bg-slate-950 text-slate-100 rounded-3xl max-w-6xl w-full h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-slate-700 animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Floating Refresh Toast Banner */}
+        {refreshToast && (
+          <div className={`absolute top-18 right-6 z-[999999] px-4 py-2 rounded-xl shadow-2xl border text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            refreshToast.isError
+              ? 'bg-red-900 border-red-500 text-red-100'
+              : 'bg-emerald-900 border-emerald-500 text-emerald-100'
+          }`}>
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLiveSheets ? 'animate-spin' : ''}`} />
+            <span>{refreshToast.message}</span>
+          </div>
+        )}
 
         {/* 1. KHUNG VIỀN & HEADER CHÍNH (GRADIENT ĐỎ/TÍM SANG TRỌNG) */}
         <div className="bg-gradient-to-r from-[#990033] via-[#6A0DAD] to-[#120E2E] px-6 py-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0 shadow-lg">
@@ -475,11 +502,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
           <div className="flex items-center gap-2">
             <button
-              onClick={refreshData}
-              title="Làm mới dữ liệu từ Google Sheets"
-              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition-colors cursor-pointer border border-white/15"
+              onClick={handleManualRefresh}
+              disabled={isLoadingLiveSheets}
+              title="Làm mới dữ liệu từ CSDL & Google Sheets"
+              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 disabled:opacity-50 rounded-xl transition-all cursor-pointer border border-white/15"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoadingLiveSheets ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoadingLiveSheets ? 'animate-spin text-emerald-300' : ''}`} />
             </button>
             <button
               id="close-db-admin-btn"

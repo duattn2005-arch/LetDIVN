@@ -1,4 +1,4 @@
-import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
+import { randomBytes, scryptSync, timingSafeEqual, createPublicKey, createVerify } from 'crypto';
 import type { Request, Response } from 'express';
 import { db } from './db/index.js';
 
@@ -147,4 +147,61 @@ export function requireAuth(req: Request, res: Response, next: () => void): void
   }
   (req as any).user = user;
   next();
+}
+
+// --- Google ID token verification (for the redirect-based "Sign In With
+// Google" flow used by in-app browsers — see AuthContext.tsx). No popup, so
+// no window.opener needed, which is what actually breaks inside Messenger/
+// Zalo's embedded browser. Verifies the JWT signature against Google's
+// published public keys — no client secret required, since this is an ID
+// token (identity only), not an authorization code. ---
+let cachedGoogleCerts: { keys: any[]; fetchedAt: number } | null = null;
+
+async function getGoogleCerts(): Promise<any[]> {
+  const now = Date.now();
+  if (cachedGoogleCerts && now - cachedGoogleCerts.fetchedAt < 60 * 60 * 1000) {
+    return cachedGoogleCerts.keys;
+  }
+  const res = await fetch('https://www.googleapis.com/oauth2/v3/certs');
+  const data: any = await res.json();
+  cachedGoogleCerts = { keys: data.keys || [], fetchedAt: now };
+  return cachedGoogleCerts.keys;
+}
+
+function base64UrlToBuffer(input: string): Buffer {
+  return Buffer.from(input.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+}
+
+export async function verifyGoogleIdToken(
+  idToken: string,
+  expectedAudience: string
+): Promise<{ email: string; name: string; picture?: string } | null> {
+  try {
+    const parts = idToken.split('.');
+    if (parts.length !== 3) return null;
+    const [headerB64, payloadB64, signatureB64] = parts;
+
+    const header = JSON.parse(base64UrlToBuffer(headerB64).toString('utf8'));
+    const payload = JSON.parse(base64UrlToBuffer(payloadB64).toString('utf8'));
+
+    const now = Math.floor(Date.now() / 1000);
+    if (typeof payload.exp !== 'number' || payload.exp < now) return null;
+    if (payload.aud !== expectedAudience) return null;
+    if (payload.iss !== 'https://accounts.google.com' && payload.iss !== 'accounts.google.com') return null;
+    if (!payload.email) return null;
+
+    const certs = await getGoogleCerts();
+    const cert = certs.find((k) => k.kid === header.kid);
+    if (!cert) return null;
+
+    const publicKey = createPublicKey({ key: cert, format: 'jwk' });
+    const verifier = createVerify('RSA-SHA256');
+    verifier.update(`${headerB64}.${payloadB64}`);
+    const isValid = verifier.verify(publicKey, base64UrlToBuffer(signatureB64));
+    if (!isValid) return null;
+
+    return { email: payload.email, name: payload.name || payload.email, picture: payload.picture };
+  } catch {
+    return null;
+  }
 }
