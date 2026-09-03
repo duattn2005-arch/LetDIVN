@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile, UserRole } from '../types';
 import { sendPasswordResetEmail } from '../services/emailService';
+import { isInAppBrowser } from '../utils/browserUtils';
 
 type AuthUser = UserProfile & { isEligibleForAdmin?: boolean };
 
@@ -71,9 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // WebViews (Messenger, Instagram, Zalo, TikTok, ...) for security
       // reasons — that's the actual cause here, not a network/ad-blocker
       // issue, so tell the user what to really do about it.
-      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-      const inAppBrowser = /FBAN|FBAV|Instagram|Line\/|Zalo|MicroMessenger|TikTok|musical_ly|; wv\)/i.test(ua);
-      if (inAppBrowser) {
+      if (isInAppBrowser()) {
         throw new Error('Google chặn đăng nhập bên trong trình duyệt nhúng của ứng dụng này (Messenger/Instagram/Zalo/TikTok...) để bảo mật. Vui lòng bấm nút "•••" (hoặc menu chia sẻ) ở góc màn hình và chọn "Mở bằng trình duyệt" (Safari/Chrome), sau đó đăng nhập lại.');
       }
       throw new Error('Không thể tải dịch vụ đăng nhập Google. Vui lòng kiểm tra kết nối mạng và tắt trình chặn quảng cáo, sau đó thử lại.');
