@@ -177,7 +177,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="nav-who-we-are"
               onClick={() => onNavigate('who-we-are')}
               title={t.navWhoWeAre}
-              className={`shrink-0 max-w-[118px] truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
+              className={`shrink-0 max-w-[118px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
                 currentView === 'who-we-are'
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -191,7 +191,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="nav-what-we-do"
               onClick={() => onNavigate('what-we-do')}
               title={t.navWhatWeDo}
-              className={`shrink-0 max-w-[130px] truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
+              className={`shrink-0 max-w-[130px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
                 currentView === 'what-we-do'
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -205,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="nav-our-team"
               onClick={() => onNavigate('our-team')}
               title={t.navOurTeam}
-              className={`shrink-0 max-w-[82px] truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
+              className={`shrink-0 max-w-[82px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
                 currentView === 'our-team'
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -219,7 +219,7 @@ export const Header: React.FC<HeaderProps> = ({
               id="nav-our-partners"
               onClick={() => onNavigate('our-partners')}
               title={t.navOurPartners}
-              className={`shrink-0 max-w-[100px] truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
+              className={`shrink-0 max-w-[100px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
                 currentView === 'our-partners'
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -240,7 +240,7 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}
               >
-                <span className="max-w-[70px] truncate">{t.navOther}</span>
+                <span className="max-w-[70px] min-[1366px]:max-w-none truncate">{t.navOther}</span>
                 <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${otherDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -302,7 +302,7 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}
               >
-                <span className="max-w-[80px] truncate">{t.navProject}</span>
+                <span className="max-w-[80px] min-[1366px]:max-w-none truncate">{t.navProject}</span>
                 <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${projectsDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -351,7 +351,7 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <MapPin className="w-4.5 h-4.5 shrink-0 text-[#E81A7F]" />
-              <span className="max-w-[80px] truncate">{t.navMap}</span>
+              <span className="max-w-[80px] min-[1366px]:max-w-none truncate">{t.navMap}</span>
             </button>
 
           </nav>
