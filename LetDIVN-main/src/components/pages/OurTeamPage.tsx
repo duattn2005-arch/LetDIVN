@@ -3,7 +3,7 @@ import { dbService } from '../../services/dbService';
 import { TeamMember } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { Sparkles, Linkedin, Facebook, Mail, Plus, Edit3, Trash2, ShieldCheck, UserCheck } from 'lucide-react';
+import { Plus, Edit3, Trash2, ShieldCheck } from 'lucide-react';
 import { TeamMemberEditorModal } from '../TeamMemberEditorModal';
 import { EditableText } from '../EditableText';
 import { TiltCard } from '../TiltCard';
@@ -77,18 +77,20 @@ export const OurTeamPage: React.FC = () => {
                 className="btn-pill-3d inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-6 py-2.5 shadow-lg cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Thêm Thành Viên Mới' : '+ Add New Member'}</span>
+                <span>{language === 'vi' ? 'Thêm Thành Viên Mới' : 'Add New Member'}</span>
               </button>
             </div>
           )}
         </div>
 
-        {/* Team Grid with 3D TiltCards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {/* Team Grid with 3D TiltCards — flex+justify-center (not a CSS grid) so a
+            partial last row (e.g. just 2 members) stays centered instead of
+            sticking to the left with dead space on the right. */}
+        <div className="flex flex-wrap justify-center gap-5 sm:gap-6">
           {team.map((member) => (
-            <TiltCard 
+            <TiltCard
               key={member.id}
-              className="p-6 border border-white/80 shadow-md hover:shadow-2xl flex flex-col items-center text-center relative group"
+              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] p-6 border border-white/80 shadow-md hover:shadow-2xl flex flex-col items-center text-center relative group"
             >
               {/* Admin quick actions overlay buttons */}
               {isAdmin && (
@@ -111,9 +113,9 @@ export const OurTeamPage: React.FC = () => {
               )}
 
               {/* Avatar with smooth 3D halo */}
-              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mb-4 border-4 border-white shadow-xl bg-slate-100 group-hover:scale-105 transition-transform duration-500">
-                <img 
-                  src={member.avatar} 
+              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden mb-4 border-4 border-white shadow-xl bg-slate-100 group-hover:scale-105 transition-transform duration-500">
+                <img
+                  src={member.avatar}
                   alt={member.name}
                   className="w-full h-full object-cover"
                 />
@@ -138,28 +140,6 @@ export const OurTeamPage: React.FC = () => {
               <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 mb-5 flex-grow">
                 {member.bio}
               </p>
-
-              {/* Social Links */}
-              <div className="flex items-center gap-2 pt-3 border-t border-slate-100 w-full justify-center text-slate-400">
-                {member.linkedin && (
-                  <a 
-                    href={member.linkedin} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                )}
-                {member.email && (
-                  <a 
-                    href={`mailto:${member.email}`}
-                    className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
-                  >
-                    <Mail className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
 
               {/* Admin direct edit trigger */}
               {isAdmin && (
