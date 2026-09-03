@@ -160,14 +160,20 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Nav Items: Centered and well-spaced across the available width */}
-          <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-1 xl:gap-2 2xl:gap-3 text-[13px] xl:text-[14px] 2xl:text-[15px] font-semibold overflow-visible no-scrollbar mx-2 2xl:mx-4">
+          {/* Desktop Nav Items: Centered and well-spaced across the available width.
+              Shows only from 1700px — verified (across every supported language,
+              French's "Carte de nettoyage" being the longest) that its full content,
+              always with every label visible, fits without overlapping the
+              language/auth controls at that width or above. Below 1700px the
+              mobile hamburger menu is used instead for every language, which has
+              no width constraint since it's a vertical list. */}
+          <nav className="hidden min-[1700px]:flex flex-1 min-w-0 items-center justify-center gap-3 text-[15px] font-semibold overflow-visible no-scrollbar mx-2 2xl:mx-4">
 
             {/* 1. Who We Are */}
             <button
               id="nav-who-we-are"
               onClick={() => onNavigate('who-we-are')}
-              className={`shrink-0 px-2 2xl:px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'who-we-are' 
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -180,7 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-what-we-do"
               onClick={() => onNavigate('what-we-do')}
-              className={`shrink-0 px-2 2xl:px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'what-we-do' 
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -193,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-team"
               onClick={() => onNavigate('our-team')}
-              className={`shrink-0 px-2 2xl:px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'our-team' 
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -206,7 +212,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-partners"
               onClick={() => onNavigate('our-partners')}
-              className={`shrink-0 px-2 2xl:px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'our-partners' 
                   ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -220,7 +226,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-other-dropdown-btn"
                 onClick={() => setOtherDropdownOpen(!otherDropdownOpen)}
-                className={`shrink-0 flex items-center gap-1.5 px-2 2xl:px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                   currentView === 'media-on-us' || currentView === 'news' || currentView === 'gallery' || currentView === 'videos'
                     ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -281,7 +287,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-projects-dropdown-btn"
                 onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
-                className={`shrink-0 flex items-center gap-1.5 px-2.5 2xl:px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                   currentView === 'projects' || currentView === 'project-detail'
                     ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
@@ -342,7 +348,7 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Right Action Controls: Language Switcher + Auth + Contact Us */}
-          <div className="hidden xl:flex items-center space-x-2 2xl:space-x-3 shrink-0">
+          <div className="hidden min-[1700px]:flex items-center space-x-3 shrink-0">
             
             {/* Multi-Language Selector Dropdown (Flag Only + Dropdown Arrow) */}
             <div className="relative" ref={langRef}>
@@ -485,8 +491,9 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Mobile / Tablet Menu & Language Toggle (Shown when < xl) */}
-          <div className="flex xl:hidden items-center gap-2 shrink-0 z-10">
+          {/* Mobile / Tablet Menu & Language Toggle (shown below 1700px — see the
+              desktop <nav> above for why that's the cutoff now) */}
+          <div className="flex min-[1700px]:hidden items-center gap-2 shrink-0 z-10">
             
             {/* Mobile Lang Button (Flag Only) */}
             <button
@@ -513,9 +520,9 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile / Tablet Drawer Navigation (Shown when < xl) */}
+      {/* Mobile / Tablet Drawer Navigation (shown below 1700px) */}
       {mobileMenuOpen && (
-        <div className="xl:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-2 animate-in slide-in-from-top duration-200 shadow-xl">
+        <div className="min-[1700px]:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-2 animate-in slide-in-from-top duration-200 shadow-xl">
           <div className="flex flex-col space-y-1 text-sm font-semibold text-slate-800">
             
             <button
