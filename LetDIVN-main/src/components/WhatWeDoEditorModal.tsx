@@ -74,13 +74,13 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
     ? createPortal(
         <div className="fixed inset-0 z-[999999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <div
-            className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-100 my-8 animate-in zoom-in-95 duration-200"
+            className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-100 my-8 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#E81A7F]" />
+                <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#E81A7F]" />
                   <span>{itemToEdit ? 'Chỉnh Sửa Hoạt Động (Admin)' : 'Thêm Hoạt Động Mới (Admin)'}</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -96,10 +96,10 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {/* Title & Badge */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Tiêu đề hoạt động *</label>
                   <input
                     type="text"
@@ -107,30 +107,30 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="VD: World Cleanup Day, Chiến dịch giáo dục..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700">Huy hiệu / Nhãn phân loại</label>
                   <input
                     type="text"
                     value={badge}
                     onChange={(e) => setBadge(e.target.value)}
                     placeholder="VD: Chiến Dịch Toàn Cầu, Tập Huấn..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                   />
                 </div>
               </div>
 
               {/* Layout Option */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Bố cục hiển thị</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setLayout('image-left')}
-                    className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                       layout === 'image-left'
                         ? 'border-[#E81A7F] bg-pink-50 text-[#E81A7F] ring-2 ring-[#E81A7F]/20'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
@@ -141,7 +141,7 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setLayout('image-right')}
-                    className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                       layout === 'image-right'
                         ? 'border-[#E81A7F] bg-pink-50 text-[#E81A7F] ring-2 ring-[#E81A7F]/20'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
@@ -153,7 +153,7 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
               </div>
 
               {/* Image Upload Widget */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Hình ảnh đại diện</label>
                 <ImageUploadWidget
                   currentImageUrl={image}
@@ -162,41 +162,41 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
               </div>
 
               {/* Description */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Nội dung mô tả chi tiết</label>
                 <textarea
-                  rows={4}
+                  rows={3}
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                   placeholder="Mô tả ý nghĩa, mục tiêu và tác động của hoạt động..."
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm leading-relaxed focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm leading-relaxed focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                 />
               </div>
 
               {/* Highlights / Bullet points */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700">Các điểm nhấn nổi bật (Mỗi dòng 1 điểm)</label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={highlightsStr}
                   onChange={(e) => setHighlightsStr(e.target.value)}
                   placeholder="VD:&#10;5,000+ Tình nguyện viên tham gia&#10;Thu gom hơn 8,500 kg rác thải"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs leading-relaxed focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-6 py-2 rounded-xl bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
                   <span>{itemToEdit ? 'Lưu Thay Đổi' : 'Thêm Hoạt Động'}</span>

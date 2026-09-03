@@ -89,7 +89,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-emerald-500/50 hover:scale-[1.02]"
               >
                 <Plus className="w-4 h-4" />
-                <span>{language === 'vi' ? '+ Thêm Hoạt Động Mới (Ảnh & Chữ)' : '+ Add New Activity (Image & Text)'}</span>
+                <span>{language === 'vi' ? 'Thêm Hoạt Động Mới (Ảnh & Chữ)' : 'Add New Activity (Image & Text)'}</span>
               </button>
             </div>
           )}
