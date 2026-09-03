@@ -208,7 +208,7 @@ export async function saveToGoogleSheet(
           email: data.email,
           city: data.city,
           skills: skillsStr,
-          age: data.age,
+          birthYear: data.birthYear,
           project: data.project,
           id: submissionId,
           time: submissionTime
