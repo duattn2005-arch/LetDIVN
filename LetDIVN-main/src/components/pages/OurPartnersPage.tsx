@@ -26,8 +26,7 @@ import { EditableText } from '../EditableText';
 
 export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onBecomePartner }) => {
   const { isAdmin } = useAuth();
-  const { t, language } = useLanguage();
-  const ourPartnersDescAfterBrand = (t.ourPartnersDesc || '').replace("Let's do it! Vietnam", '').trim();
+  const { language } = useLanguage();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -139,18 +138,23 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
         <div className="text-center max-w-4xl mx-auto space-y-4">
           <EditableText
             contentKey="ourPartners.title"
-            defaultValue={t.ourPartnersTitle || (language === 'vi' ? 'Đối Tác & Nhà Tài Trợ' : 'Our Partners & Sponsors')}
+            defaultValue="We Work With the Best Partners"
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#E81A7F] tracking-tight leading-tight [text-wrap:balance]"
           />
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]">
-            <span className="whitespace-nowrap font-bold text-slate-800">Let's do it! Vietnam</span>{' '}
-            <EditableText
-              contentKey="ourPartners.subtitle"
-              defaultValue={ourPartnersDescAfterBrand || (language === 'vi' ? 'tự hào nhận được sự đồng hành, bảo trợ và tài trợ từ các tổ chức tiên phong.' : 'is proud to be accompanied and supported by visionary partners and sponsors.')}
-              as="span"
-            />
-          </p>
+          <EditableText
+            contentKey="ourPartners.subtitle"
+            defaultValue="Working with strong partners can make a significant impact."
+            as="p"
+            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
+          />
+          <EditableText
+            contentKey="ourPartners.description"
+            defaultValue="We collaborate with local communities, schools, and businesses to organize large-scale clean-up campaigns. We partners with companies to promote sustainable practices within their operations."
+            as="p"
+            multiline
+            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto [text-wrap:balance]"
+          />
 
           <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <button
