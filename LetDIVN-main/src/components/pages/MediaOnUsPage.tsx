@@ -56,7 +56,7 @@ const MediaCoverageRow: React.FC<{
           <button
             type="button"
             onClick={() => onEdit(item)}
-            title="Chỉnh sửa"
+            title="Edit"
             className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
           >
             <Edit3 className="w-4 h-4" />
@@ -64,7 +64,7 @@ const MediaCoverageRow: React.FC<{
           <button
             type="button"
             onClick={() => onDelete(item)}
-            title="Xóa"
+            title="Delete"
             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
@@ -101,7 +101,7 @@ export const MediaOnUsPage: React.FC = () => {
   };
 
   const handleDelete = (item: MediaCoverageEntry) => {
-    if (window.confirm(`Bạn có chắc muốn xóa mục "${item.title}" không?`)) {
+    if (window.confirm(`Are you sure you want to delete "${item.title}"?`)) {
       dbService.deleteMediaCoverage(item.id);
     }
   };
@@ -141,7 +141,7 @@ export const MediaOnUsPage: React.FC = () => {
                 className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Thêm Mục Báo Chí Mới</span>
+                <span>Add New Press Coverage Entry</span>
               </button>
             </div>
           )}
@@ -150,7 +150,7 @@ export const MediaOnUsPage: React.FC = () => {
         {items.length === 0 ? (
           <div className="text-center py-16 text-slate-400 text-sm flex flex-col items-center gap-2">
             <Sparkles className="w-6 h-6" />
-            <span>Chưa có mục báo chí nào được thêm.</span>
+            <span>No press coverage entries yet.</span>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">

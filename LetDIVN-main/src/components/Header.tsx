@@ -246,7 +246,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60 font-medium transition-colors cursor-pointer flex items-center justify-between"
                   >
                     <span>{t.navMediaOnUs}</span>
-                    <EditableText contentKey="header.otherMediaLabel" defaultValue="Báo chí →" as="span" className="text-[10px] text-pink-500 font-bold" />
+                    <EditableText contentKey="header.otherMediaLabel" defaultValue="Press →" as="span" className="text-[10px] text-pink-500 font-bold" />
                   </button>
                   <button
                     onClick={() => {
@@ -256,7 +256,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60 font-medium transition-colors cursor-pointer flex items-center justify-between"
                   >
                     <span>{t.navNews}</span>
-                    <EditableText contentKey="header.otherNewsLabel" defaultValue="Tin tức →" as="span" className="text-[10px] text-pink-500 font-bold" />
+                    <EditableText contentKey="header.otherNewsLabel" defaultValue="News →" as="span" className="text-[10px] text-pink-500 font-bold" />
                   </button>
                   <button
                     onClick={() => {

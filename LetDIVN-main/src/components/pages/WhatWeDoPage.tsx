@@ -37,28 +37,28 @@ const WhatWeDoActivityCard: React.FC<{
             type="button"
             onClick={() => onToggleLayout(item)}
             className="p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-            title="Đổi vị trí Ảnh (Trái / Phải)"
+            title="Swap image side (left / right)"
           >
             <ArrowLeftRight className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Đổi bên</span>
+            <span className="hidden sm:inline">Swap side</span>
           </button>
           <button
             type="button"
             onClick={() => onEdit(item)}
             className="p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-            title="Chỉnh sửa nội dung & ảnh"
+            title="Edit content & image"
           >
             <Edit3 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Sửa</span>
+            <span className="hidden sm:inline">Edit</span>
           </button>
           <button
             type="button"
             onClick={() => onDelete(item.id, item.title)}
             className="p-1.5 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-            title="Xóa mục này"
+            title="Delete this item"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Xóa</span>
+            <span className="hidden sm:inline">Delete</span>
           </button>
         </div>
       )}

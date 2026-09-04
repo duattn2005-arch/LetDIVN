@@ -46,7 +46,7 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
 
   const handlePdfFileChange = async (file: File) => {
     if (file.type !== 'application/pdf') {
-      alert('Vui lòng chọn tệp định dạng PDF');
+      alert('Please select a PDF file');
       return;
     }
     setIsUploadingPdf(true);
@@ -54,7 +54,7 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
       const url = await dbService.uploadFile(file);
       setPdfUrl(url);
     } catch (err: any) {
-      alert(err?.message || 'Tải PDF lên thất bại. Vui lòng thử lại.');
+      alert(err?.message || 'Failed to upload the PDF. Please try again.');
     } finally {
       setIsUploadingPdf(false);
     }
@@ -63,11 +63,11 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert('Vui lòng nhập tiêu đề (VD: World Cleanup Day 2026)!');
+      alert('Please enter a title (e.g. World Cleanup Day 2026)!');
       return;
     }
     if (!pdfUrl.trim()) {
-      alert('Vui lòng tải lên hoặc dán liên kết tệp PDF danh sách báo chí!');
+      alert('Please upload or paste a link to the press-coverage PDF!');
       return;
     }
 
@@ -95,10 +95,10 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
               <div>
                 <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                   <Newspaper className="w-4 h-4 text-[#E81A7F]" />
-                  <span>{itemToEdit ? 'Chỉnh Sửa Mục Báo Chí (Admin)' : 'Thêm Mục Báo Chí Mới (Admin)'}</span>
+                  <span>{itemToEdit ? 'Edit Press Coverage Entry (Admin)' : 'Add New Press Coverage Entry (Admin)'}</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Mỗi mục là một chiến dịch/năm, kèm số liệu và tệp PDF danh sách báo chí đưa tin
+                  Each entry is one campaign/year, with counts and a PDF listing the press coverage
                 </p>
               </div>
               <button
@@ -113,13 +113,13 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
             <form onSubmit={handleSubmit} className="space-y-3">
               {/* Title */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Tiêu đề (tên nút) *</label>
+                <label className="text-xs font-bold text-slate-700">Title (button label) *</label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="VD: World Cleanup Day 2026"
+                  placeholder="e.g. World Cleanup Day 2026"
                   className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                 />
               </div>
@@ -127,7 +127,7 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
               {/* Article & Segment counts */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Số bài báo (Article)</label>
+                  <label className="text-xs font-bold text-slate-700">Article count</label>
                   <input
                     type="number"
                     min={0}
@@ -137,7 +137,7 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Số phóng sự (Segment)</label>
+                  <label className="text-xs font-bold text-slate-700">Segment count</label>
                   <input
                     type="number"
                     min={0}
@@ -150,19 +150,19 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
 
               {/* Image */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Ảnh đại diện</label>
+                <label className="text-xs font-bold text-slate-700">Cover image</label>
                 <ImageUploadWidget currentImageUrl={image} onImageSelected={(url) => setImage(url)} label="" />
               </div>
 
               {/* PDF Upload */}
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Tệp PDF danh sách báo chí *</label>
+                <label className="text-xs font-bold text-slate-700">Press coverage PDF *</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={pdfUrl}
                     onChange={(e) => setPdfUrl(e.target.value)}
-                    placeholder="Dán liên kết PDF hoặc tải tệp lên..."
+                    placeholder="Paste a PDF link or upload a file..."
                     className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                   />
                   <input
@@ -181,7 +181,7 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
                     className="shrink-0 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
                   >
                     {isUploadingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                    <span>Tải lên</span>
+                    <span>Upload</span>
                   </button>
                 </div>
                 {pdfUrl && (
@@ -192,7 +192,7 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
                     className="inline-flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold hover:underline"
                   >
                     <FileText className="w-3.5 h-3.5" />
-                    <span>Xem tệp PDF hiện tại</span>
+                    <span>View current PDF</span>
                   </a>
                 )}
               </div>
@@ -204,14 +204,14 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
                   onClick={onClose}
                   className="px-5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Hủy
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-6 py-2 rounded-xl bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
-                  <span>{itemToEdit ? 'Lưu Thay Đổi' : 'Thêm Mục Mới'}</span>
+                  <span>{itemToEdit ? 'Save Changes' : 'Add New Entry'}</span>
                 </button>
               </div>
             </form>
