@@ -1,5 +1,5 @@
 import { db } from './index.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo } from './collections.js';
+import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, whoWeAre } from './collections.js';
 import { insertUser } from './users.js';
 import { hashPassword } from '../auth.js';
 import {
@@ -13,6 +13,7 @@ import {
   INITIAL_CONTACTS,
   INITIAL_VIDEOS,
   INITIAL_WHAT_WE_DO,
+  INITIAL_WHO_WE_ARE,
 } from '../../src/data/initialData.js';
 
 /** Runs once per empty collection to ensure seed data is always populated. */
@@ -28,6 +29,7 @@ export function seedIfEmpty(): void {
     if (contacts.count() === 0) INITIAL_CONTACTS.forEach((item, i) => contacts.seedRaw(item, i));
     if (videos.count() === 0) INITIAL_VIDEOS.forEach((item, i) => videos.seedRaw(item, i));
     if (whatWeDo.count() === 0) INITIAL_WHAT_WE_DO.forEach((item, i) => whatWeDo.seedRaw(item, i));
+    if (whoWeAre.count() === 0) INITIAL_WHO_WE_ARE.forEach((item, i) => whoWeAre.seedRaw(item, i));
     const userCount = (db.prepare('SELECT count(*) as c FROM users').get() as any)?.c || 0;
     if (userCount === 0) INITIAL_USERS.forEach((user) => insertUser(user));
 

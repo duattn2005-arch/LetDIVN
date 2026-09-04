@@ -9,6 +9,7 @@ import {
   UserProfile,
   MediaVideo,
   WhatWeDoItem,
+  WhoWeAreItem,
   MediaCoverageEntry
 } from '../types';
 
@@ -50,7 +51,7 @@ class DatabaseService {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || `Yêu cầu thất bại (${res.status})`);
+      throw new Error(body.error || `Request failed (${res.status})`);
     }
     return res.json();
   }
@@ -89,20 +90,13 @@ class DatabaseService {
   }
 
   public async setContent(key: string, value: string): Promise<void> {
-    // Not routed through `mutate()` — it calls `notify()` before returning,
-    // which would wake up every EditableText's refresh() (including this
-    // same one) while contentCache still holds the pre-write value for
-    // `key`, making them redraw with stale data. Patch the cache first,
-    // *then* notify.
-    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'PUT', body: JSON.stringify({ value }) });
+    await this.mutate(`/content/${encodeURIComponent(key)}`, 'PUT', { value });
     if (this.contentCache) this.contentCache[key] = value;
-    this.notify();
   }
 
   public async resetContent(key: string): Promise<void> {
-    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'DELETE' });
+    await this.mutate(`/content/${encodeURIComponent(key)}`, 'DELETE');
     if (this.contentCache) delete this.contentCache[key];
-    this.notify();
   }
 
   // --- EVENTS ---
@@ -246,6 +240,21 @@ class DatabaseService {
     return true;
   }
 
+  // --- WHO WE ARE ---
+  public getWhoWeAre(): Promise<WhoWeAreItem[]> {
+    return this.get('/who-we-are');
+  }
+  public addWhoWeAre(item: Omit<WhoWeAreItem, 'id'>): Promise<WhoWeAreItem> {
+    return this.mutate('/who-we-are', 'POST', item);
+  }
+  public updateWhoWeAre(item: WhoWeAreItem): Promise<WhoWeAreItem> {
+    return this.mutate(`/who-we-are/${encodeURIComponent(item.id)}`, 'PUT', item);
+  }
+  public async deleteWhoWeAre(id: string): Promise<boolean> {
+    await this.mutate(`/who-we-are/${encodeURIComponent(id)}`, 'DELETE');
+    return true;
+  }
+
   // --- MEDIA COVERAGE (Media On Us page) ---
   public getMediaCoverage(): Promise<MediaCoverageEntry[]> {
     return this.get('/media-coverage');
@@ -303,7 +312,7 @@ class DatabaseService {
     const res = await fetch('/api/upload', { method: 'POST', credentials: 'include', body: formData });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || 'Tải ảnh lên thất bại');
+      throw new Error(body.error || 'Image upload failed');
     }
     const data = await res.json();
     return data.url;

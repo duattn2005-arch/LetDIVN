@@ -167,4 +167,13 @@ export interface WhatWeDoItem {
   order?: number;
 }
 
+export interface WhoWeAreItem {
+  id: string;
+  title: string;
+  content: string;
+  image: string;
+  layout?: 'image-left' | 'image-right';
+  order?: number;
+}
+
 

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage } from '../db/collections.js';
+import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage, whoWeAre } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -177,7 +177,7 @@ router.post('/media-coverage', requireAdmin, (req, res) => {
 });
 router.put('/media-coverage/:id', requireAdmin, (req, res) => {
   const updated = mediaCoverage.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
+  if (!updated) return res.status(404).json({ error: 'Item not found' });
   res.json(updated);
 });
 router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
@@ -185,4 +185,22 @@ router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+// --- Who We Are ---
+router.get('/who-we-are', (req, res) => res.json(whoWeAre.getAll()));
+router.post('/who-we-are', requireAdmin, (req, res) => {
+  const all = whoWeAre.getAll();
+  res.json(whoWeAre.insert({ ...req.body, order: all.length + 1 }));
+});
+router.put('/who-we-are/:id', requireAdmin, (req, res) => {
+  const updated = whoWeAre.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Item not found' });
+  res.json(updated);
+});
+router.delete('/who-we-are/:id', requireAdmin, (req, res) => {
+  whoWeAre.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
 export default router;
+
+

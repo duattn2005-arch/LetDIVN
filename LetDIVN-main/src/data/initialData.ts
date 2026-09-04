@@ -8,13 +8,14 @@ import {
   ContactMessage,
   UserProfile,
   MediaVideo,
-  WhatWeDoItem
+  WhatWeDoItem,
+  WhoWeAreItem
 } from '../types';
 
 export const INITIAL_USERS: UserProfile[] = [
   {
     id: 'usr-admin-01',
-    name: "Let's Do It VN",
+    name: 'Nguyen Van Hoang (Admin)',
     email: 'admin@letsdoitvietnam.org',
     role: 'admin',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
@@ -22,11 +23,11 @@ export const INITIAL_USERS: UserProfile[] = [
     joinedAt: '2022-03-15',
     eventsAttended: 28,
     trashCollectedKg: 1450,
-    city: 'Hà Nội'
+    city: 'Hanoi'
   },
   {
     id: 'usr-coord-01',
-    name: 'Trần Thị Mai Linh',
+    name: 'Tran Thi Mai Linh',
     email: 'mailinh.tran@letsdoitvietnam.org',
     role: 'coordinator',
     avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
@@ -34,11 +35,11 @@ export const INITIAL_USERS: UserProfile[] = [
     joinedAt: '2023-01-10',
     eventsAttended: 16,
     trashCollectedKg: 820,
-    city: 'TP. Hồ Chí Minh'
+    city: 'Ho Chi Minh City'
   },
   {
     id: 'usr-vol-01',
-    name: 'Lê Quốc Bảo',
+    name: 'Le Quoc Bao',
     phone: '0988123456',
     role: 'volunteer',
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
@@ -46,138 +47,138 @@ export const INITIAL_USERS: UserProfile[] = [
     joinedAt: '2024-05-20',
     eventsAttended: 6,
     trashCollectedKg: 180,
-    city: 'Đà Nẵng'
+    city: 'Da Nang'
   }
 ];
 
 export const INITIAL_EVENTS: CleanupEvent[] = [
   {
     id: 'evt-wcd-2026',
-    title: 'World Cleanup Day 2026 - Ngày Hội Dọn Rác Thế Giới',
+    title: 'World Cleanup Day 2026',
     category: 'World Cleanup Day',
     date: '2026-09-20',
     time: '06:30 - 11:30',
-    location: 'Quảng trường Nhà Hát Lớn & Bờ hồ Hoàn Kiếm, Hà Nội',
-    city: 'Hà Nội',
+    location: 'Hanoi Opera House Square & Hoan Kiem Lake, Hanoi',
+    city: 'Hanoi',
     coordinates: { lat: 21.0285, lng: 105.8542 },
     image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=1000&auto=format&fit=crop&q=80',
     bannerImage: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&auto=format&fit=crop&q=80',
-    description: 'Sự kiện lớn nhất trong năm của Let\'s do it! Vietnam quy tụ hơn 5,000 tình nguyện viên tham gia thu gom, phân loại và tái chế rác thải trên khắp 63 tỉnh thành cả nước.',
+    description: 'Let\'s do it! Vietnam\'s biggest event of the year, bringing together over 5,000 volunteers to collect, sort, and recycle waste across all 63 provinces and cities nationwide.',
     targetVolunteers: 5000,
     registeredCount: 0,
     trashCollectedKg: 8500,
     status: 'Upcoming',
-    leader: 'Nguyễn Văn Hoàng',
-    meetingPoint: 'Cổng chính Nhà Hát Lớn Hà Nội, Số 1 Tràng Tiền'
+    leader: 'Nguyen Van Hoang',
+    meetingPoint: 'Main gate of Hanoi Opera House, 1 Trang Tien Street'
   },
   {
     id: 'evt-green-ocean-danang',
-    title: 'Green Ocean Campaign - Chiến dịch Biển Xanh Đà Nẵng',
+    title: 'Green Ocean Campaign - Da Nang',
     category: 'Green Ocean Campaign',
     date: '2026-07-15',
     time: '05:30 - 09:30',
-    location: 'Bãi biển Mỹ Khê & Bán đảo Sơn Trà',
-    city: 'Đà Nẵng',
+    location: 'My Khe Beach & Son Tra Peninsula',
+    city: 'Da Nang',
     coordinates: { lat: 16.0544, lng: 108.2435 },
     image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000&auto=format&fit=crop&q=80',
     bannerImage: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1200&auto=format&fit=crop&q=80',
-    description: 'Thu gom rác thải nhựa đại dương, bảo vệ hệ sinh thái rạn san hô và tuyên truyền hạn chế đồ nhựa một lần cho ngư dân, khách du lịch ven biển.',
+    description: 'Collecting ocean plastic waste, protecting coral reef ecosystems, and raising awareness among fishermen and coastal tourists about reducing single-use plastics.',
     targetVolunteers: 1200,
     registeredCount: 0,
     trashCollectedKg: 3200,
     status: 'Upcoming',
-    leader: 'Trần Minh Trí',
-    meetingPoint: 'Công viên Biển Đông, Đường Võ Nguyên Giáp, Sơn Trà'
+    leader: 'Tran Minh Tri',
+    meetingPoint: 'Bien Dong Park, Vo Nguyen Giap Street, Son Tra'
   },
   {
     id: 'evt-env-day-hcm',
-    title: 'Ngày Môi Trường Thế Giới 2026 - TP. Hồ Chí Minh',
+    title: 'World Environment Day 2026 - Ho Chi Minh City',
     category: 'Environmental Day',
     date: '2026-06-05',
     time: '07:00 - 11:00',
-    location: 'Công viên Tao Đàn & Dọc Kênh Nhiêu Lộc - Thị Nghè',
-    city: 'TP. Hồ Chí Minh',
+    location: 'Tao Dan Park & Along Nhieu Loc - Thi Nghe Canal',
+    city: 'Ho Chi Minh City',
     coordinates: { lat: 10.7769, lng: 106.6924 },
     image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1000&auto=format&fit=crop&q=80',
-    description: 'Chiến dịch làm sạch không gian công cộng, cải tạo bờ kênh và phát động phong trào sống xanh không rác thải (Zero Waste Life).',
+    description: 'A campaign to clean up public spaces, restore the canal banks, and launch a Zero Waste Life movement.',
     targetVolunteers: 2500,
     registeredCount: 0,
     trashCollectedKg: 5400,
     status: 'Upcoming',
-    leader: 'Trần Thị Mai Linh',
-    meetingPoint: 'Khu trung tâm Công viên Tao Đàn, Đường Trương Định, Q.1'
+    leader: 'Tran Thi Mai Linh',
+    meetingPoint: 'Central area of Tao Dan Park, Truong Dinh Street, District 1'
   },
   {
     id: 'evt-wildlife-catba',
-    title: 'Bảo Tồn Động Vật Hoang Dã & Dọn Rác Rừng Quốc Gia Cát Bà',
+    title: 'Wildlife Conservation & Cleanup at Cat Ba National Park',
     category: 'Wildlife & Nature',
     date: '2026-08-10',
     time: '06:00 - 12:00',
-    location: 'Vườn Quốc Gia Cát Bà & Vịnh Lan Hạ, Hải Phòng',
-    city: 'Hải Phòng',
+    location: 'Cat Ba National Park & Lan Ha Bay, Hai Phong',
+    city: 'Hai Phong',
     coordinates: { lat: 20.8033, lng: 106.9996 },
     image: 'https://images.unsplash.com/photo-1511497584788-87676104235f?w=1000&auto=format&fit=crop&q=80',
-    description: 'Hành trình làm sạch đường mòn trekking xuyên rừng nguyên sinh Cát Bà, bảo vệ môi trường sống của loài Voọc Cát Bà quý hiếm.',
+    description: 'A trekking-trail cleanup through the primeval forest of Cat Ba, protecting the habitat of the rare Cat Ba langur.',
     targetVolunteers: 500,
     registeredCount: 0,
     trashCollectedKg: 1200,
     status: 'Upcoming',
-    leader: 'Phạm Thu Hằng',
-    meetingPoint: 'Cổng Vườn Quốc Gia Cát Bà, Huyện Cát Hải, Hải Phòng'
+    leader: 'Pham Thu Hang',
+    meetingPoint: 'Cat Ba National Park Gate, Cat Hai District, Hai Phong'
   },
   {
     id: 'evt-workshop-zerowaste',
-    title: 'Workshop Tái Chế Nhựa & Lối Sống Không Rác Thải',
+    title: 'Plastic Recycling & Zero Waste Lifestyle Workshop',
     category: 'Workshop & Education',
     date: '2026-05-25',
     time: '14:00 - 17:30',
-    location: 'Trung tâm Văn hóa Sinh viên TP. Đà Lạt',
-    city: 'Lâm Đồng',
+    location: 'Da Lat Student Cultural Center',
+    city: 'Lam Dong',
     coordinates: { lat: 11.9404, lng: 108.4583 },
     image: 'https://images.unsplash.com/photo-1528190336454-13cd56b45b5a?w=1000&auto=format&fit=crop&q=80',
-    description: 'Khóa tập huấn chuyên sâu về kinh tế tuần hoàn, thực hành phân loại rác tại nguồn và tự làm xà phòng hữu cơ từ dầu ăn thừa.',
+    description: 'An in-depth training course on the circular economy, hands-on source-sorting practice, and making organic soap from used cooking oil.',
     targetVolunteers: 300,
     registeredCount: 0,
     trashCollectedKg: 450,
     status: 'Upcoming',
-    leader: 'Đỗ Hữu Đức',
-    meetingPoint: 'Hội trường Tầng 2, Trung tâm Văn hóa Sinh viên Đà Lạt'
+    leader: 'Do Huu Duc',
+    meetingPoint: '2nd Floor Hall, Da Lat Student Cultural Center'
   },
   {
     id: 'evt-nhatrang-coral',
-    title: 'Hành Trình Biển Xanh - Dọn Rác Rạn San Hô Vịnh Nha Trang',
+    title: 'Green Ocean Journey - Coral Reef Cleanup, Nha Trang Bay',
     category: 'Green Ocean Campaign',
     date: '2026-07-28',
     time: '06:00 - 11:00',
-    location: 'Dọc bãi biển Trần Phú & Đảo Hòn Tre, Nha Trang',
-    city: 'Khánh Hòa',
+    location: 'Along Tran Phu Beach & Hon Tre Island, Nha Trang',
+    city: 'Khanh Hoa',
     coordinates: { lat: 12.2388, lng: 109.1967 },
     image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1000&auto=format&fit=crop&q=80',
-    description: 'Chiến dịch lặn biển nhặt rác đáy đại dương và làm sạch bãi tắm du lịch, bảo vệ hệ sinh thái biển vịnh Nha Trang.',
+    description: 'A scuba cleanup campaign to collect ocean-floor debris and clean tourist beaches, protecting the marine ecosystem of Nha Trang Bay.',
     targetVolunteers: 800,
     registeredCount: 0,
     trashCollectedKg: 2100,
     status: 'Upcoming',
-    leader: 'Lê Hoàng Long',
-    meetingPoint: 'Quảng trường 2/4, Đường Trần Phú, Lộc Thọ, Nha Trang'
+    leader: 'Le Hoang Long',
+    meetingPoint: '2/4 Square, Tran Phu Street, Loc Tho, Nha Trang'
   },
   {
     id: 'evt-cantho-floating',
-    title: 'Dòng Sông Xanh Mekong - Chợ Nổi Cái Răng, Cần Thơ',
+    title: 'Green Mekong River - Cai Rang Floating Market, Can Tho',
     category: 'World Cleanup Day',
     date: '2026-09-20',
     time: '05:30 - 10:30',
-    location: 'Bến Ninh Kiều & Chợ Nổi Cái Răng, Cần Thơ',
-    city: 'Cần Thơ',
+    location: 'Ninh Kieu Wharf & Cai Rang Floating Market, Can Tho',
+    city: 'Can Tho',
     coordinates: { lat: 10.0452, lng: 105.7469 },
     image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1000&auto=format&fit=crop&q=80',
-    description: 'Vớt rác nổi trên sông Cần Thơ và tuyên truyền cho các hộ dân thương hồ không xả rác xuống dòng Mekong.',
+    description: 'Collecting floating trash on the Can Tho River and raising awareness among floating-market households about not dumping waste into the Mekong.',
     targetVolunteers: 600,
     registeredCount: 0,
     trashCollectedKg: 3800,
     status: 'Upcoming',
-    leader: 'Huỳnh Thanh Tùng',
-    meetingPoint: 'Tượng đài Bác Hồ, Bến Ninh Kiều, Cần Thơ'
+    leader: 'Huynh Thanh Tung',
+    meetingPoint: 'Uncle Ho Statue, Ninh Kieu Wharf, Can Tho'
   }
 ];
 
@@ -186,68 +187,68 @@ export const INITIAL_VOLUNTEERS: VolunteerRegistration[] = [];
 export const INITIAL_NEWS: NewsArticle[] = [
   {
     id: 'news-001',
-    title: 'Let\'s do it! Vietnam chính thức phát động chiến dịch World Cleanup Day 2026 trên toàn quốc',
-    slug: 'lets-do-it-vietnam-phat-dong-world-cleanup-day-2026',
+    title: 'Let\'s do it! Vietnam officially launches the World Cleanup Day 2026 campaign nationwide',
+    slug: 'lets-do-it-vietnam-launches-world-cleanup-day-2026',
     category: 'Press Release',
-    summary: 'Chiến dịch Ngày Hội Dọn Rác Thế Giới 2026 đặt mục tiêu thu hút hơn 100.000 lượt người tham gia tại 63 tỉnh thành, hướng tới một Việt Nam xanh và sạch rác thải nhựa.',
-    content: `Hà Nội, ngày 15 tháng 04 năm 2026 — Tổ chức phi lợi nhuận Let's do it! Vietnam hôm nay chính thức công bố kế hoạch triển khai Ngày hội Dọn rác Thế giới (World Cleanup Day 2026). 
+    summary: 'World Cleanup Day 2026 aims to attract over 100,000 participants across 63 provinces and cities, working toward a green Vietnam free of plastic waste.',
+    content: `Hanoi, April 15, 2026 — The non-profit organization Let's do it! Vietnam today officially announced its rollout plan for World Cleanup Day 2026.
 
-Được khởi xướng từ năm 2015, Let's do it! Vietnam đã trở thành ngọn cờ đầu trong phong trào môi trường cộng đồng tại Việt Nam. Năm nay, với thông điệp "Global Impact, Local Action" (Tác động Toàn cầu, Hành động Địa phương), chương trình không chỉ tập trung vào việc dọn sạch các điểm nóng ô nhiễm mà còn chú trọng đào tạo phân loại rác tại nguồn và kết nối mạng lưới tái chế tuần hoàn.
+Founded in 2015, Let's do it! Vietnam has become a leading force in Vietnam's community environmental movement. This year, under the message "Global Impact, Local Action," the program focuses not only on cleaning up pollution hotspots but also on training in source-sorting and building a circular recycling network.
 
-Ban tổ chức kêu gọi sự chung tay của các cơ quan chính quyền, doanh nghiệp, trường đại học và từng cá nhân để cùng nhau tạo nên một ngày hội môi trường lớn nhất trong năm.`,
-    author: 'Ban Truyền Thông Let\'s do it! Vietnam',
+The organizing committee calls on government agencies, businesses, universities, and individuals to join hands in creating the largest environmental event of the year.`,
+    author: 'Let\'s do it! Vietnam Communications Team',
     date: '2026-04-15',
     image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80',
-    source: 'Thông Tấn Xã Việt Nam',
+    source: 'Vietnam News Agency',
     sourceUrl: 'https://vietnamplus.vn',
     views: 4520,
     featured: true
   },
   {
     id: 'news-002',
-    title: 'Đài Truyền Hình Quốc Gia VTV1 đưa tin về hành trình 10 năm hành động vì môi trường của Let\'s do it! Vietnam',
-    slug: 'vtv1-dua-tin-hanh-trinh-10-nam-lets-do-it-vietnam',
+    title: 'National broadcaster VTV1 covers Let\'s do it! Vietnam\'s 10-year environmental journey',
+    slug: 'vtv1-covers-lets-do-it-vietnam-10-year-journey',
     category: 'Media On Us',
-    summary: 'Phóng sự đặc biệt phát sóng trong chương trình "Vì Tương Lai Xanh" tôn vinh những đóng góp không ngừng nghỉ của hàng chục nghìn bạn trẻ tình nguyện viên.',
-    content: `Chương trình "Vì Tương Lai Xanh" phát sóng trên VTV1 đã dành thời lượng 15 phút để phản ánh sinh động hành trình 10 năm (2015 - 2026) của Let's do it! Vietnam. 
+    summary: 'A special feature on the "For a Green Future" program honors the tireless contributions of tens of thousands of young volunteers.',
+    content: `The "For a Green Future" program, aired on VTV1, devoted 15 minutes to a vivid portrayal of Let's do it! Vietnam's 10-year journey (2015-2026).
 
-Từ một nhóm nhỏ các bạn trẻ đầy nhiệt huyết tại Hà Nội và TP.HCM, đến nay tổ chức đã thiết lập mạng lưới điều phối viên tại hơn 40 tỉnh thành, thu gom và xử lý an toàn hơn 5.000 tấn rác thải các loại. Phóng sự nhấn mạnh sự thay đổi nhận thức rõ rệt của cộng đồng dân cư tại các điểm đen rác thải sau mỗi đợt ra quân.`,
+From a small group of passionate young people in Hanoi and Ho Chi Minh City, the organization has grown to a coordinator network spanning more than 40 provinces, safely collecting and processing over 5,000 tons of waste of all kinds. The feature highlighted the marked shift in community awareness at waste hotspots after each cleanup drive.`,
     author: 'VTV News',
     date: '2026-03-28',
     image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80',
-    source: 'VTV1 - Ban Khoa Giáo',
+    source: 'VTV1 - Science & Education Department',
     sourceUrl: 'https://vtv.vn',
     views: 8900,
     featured: true
   },
   {
     id: 'news-003',
-    title: 'Hơn 3 tấn rác nhựa được dọn sạch tại bờ biển Cát Bà trong chiến dịch Mùa Hè Xanh',
-    slug: 'hon-3-tan-rac-nhua-duoc-don-sach-tai-bo-bien-cat-ba',
+    title: 'Over 3 tons of plastic waste cleared from Cat Ba coastline during the Green Summer campaign',
+    slug: 'over-3-tons-plastic-waste-cleared-cat-ba-coastline',
     category: 'News',
-    summary: 'Sự kiện phối hợp giữa Let\'s do it! Vietnam cùng Ban Quản lý Vườn Quốc gia Cát Bà thu hút 350 tình nguyện viên tham gia làm sạch 4km bờ biển.',
-    content: `Trong hai ngày cuối tuần vừa qua, 350 bạn trẻ tình nguyện viên thuộc mạng lưới Let's do it! Vietnam đã cùng người dân địa phương và cán bộ kiểm lâm thực hiện chiến dịch dọn sạch bờ biển vịnh Lan Hạ và đảo Cát Bà.
+    summary: 'A joint event between Let\'s do it! Vietnam and the Cat Ba National Park Management Board drew 350 volunteers to clean up 4km of coastline.',
+    content: `Over the past weekend, 350 young volunteers from the Let's do it! Vietnam network joined local residents and forest rangers in a cleanup campaign along Lan Ha Bay and Cat Ba Island.
 
-Tổng lượng rác thu gom ước tính vượt 3.2 tấn, trong đó phần lớn là phao xốp vỡ, lưới đánh cá cũ, chai nhựa và túi ni-lông trôi dạt. Toàn bộ rác thải tái chế được bàn giao cho đơn vị xử lý chuyên trách.`,
-    author: 'Phạm Thu Hằng',
+The total waste collected was estimated at over 3.2 tons, mostly broken styrofoam floats, old fishing nets, plastic bottles, and drifting plastic bags. All recyclable waste was handed over to a specialized processing unit.`,
+    author: 'Pham Thu Hang',
     date: '2026-04-02',
     image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
-    source: 'Báo Môi Trường & Đô Thị',
+    source: 'Environment & Urban Newspaper',
     sourceUrl: 'https://moitruongvadothi.vn',
     views: 3120,
     featured: false
   },
   {
     id: 'news-004',
-    title: 'Báo Dân Trí: Thanh niên Việt Nam và giấc mơ không rác thải nhựa đại dương',
-    slug: 'dan-tri-thanh-nien-viet-nam-va-giac-mo-khong-rac-thai-nhua',
+    title: 'Dan Tri Newspaper: Vietnamese youth and the dream of an ocean free of plastic waste',
+    slug: 'dan-tri-vietnamese-youth-dream-ocean-free-plastic',
     category: 'Media On Us',
-    summary: 'Bài viết phỏng vấn các trưởng nhóm điều phối Let\'s do it! Vietnam về chiến lược ứng dụng công nghệ bản đồ số trong việc định vị và xử lý các bãi rác tự phát.',
-    content: `Báo Dân Trí số ra ngày 22/04 ghi nhận những sáng kiến đổi mới sáng tạo của đội ngũ công nghệ trẻ tại Let's do it! Vietnam. Việc áp dụng bản đồ số hóa điểm nóng ô nhiễm và hệ thống quản trị dữ liệu tình nguyện viên thời gian thực đã nâng cao hiệu suất điều phối lên gấp 3 lần so với các phương pháp truyền thống.`,
-    author: 'Báo Dân Trí',
+    summary: 'An interview with Let\'s do it! Vietnam\'s coordination team leaders about their strategy for using digital mapping technology to locate and address informal dump sites.',
+    content: `Dan Tri Newspaper's April 22 issue highlighted the innovative initiatives of Let's do it! Vietnam's young tech team. Applying a digital map of pollution hotspots together with a real-time volunteer data management system has boosted coordination efficiency threefold compared to traditional methods.`,
+    author: 'Dan Tri Newspaper',
     date: '2026-04-22',
     image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80',
-    source: 'Báo Điện Tử Dân Trí',
+    source: 'Dan Tri Online Newspaper',
     sourceUrl: 'https://dantri.com.vn',
     views: 5410,
     featured: false
@@ -262,7 +263,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/unilever.png',
     website: 'https://www.unilever.com.vn',
     type: 'Corporate',
-    description: 'Tập đoàn Unilever đồng hành cùng Let\'s do it! Vietnam trong các chiến dịch giảm rác thải nhựa.',
+    description: 'Unilever partners with Let\'s do it! Vietnam on campaigns to reduce plastic waste.',
     joinedYear: 2018
   },
   {
@@ -272,7 +273,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/honda.png',
     website: 'https://www.honda.com.vn',
     type: 'Corporate',
-    description: 'The Power of Dreams - Honda Vietnam tài trợ phương tiện và trang bị bảo hộ dọn rác.',
+    description: 'The Power of Dreams - Honda Vietnam sponsors vehicles and cleanup safety gear.',
     joinedYear: 2019
   },
   {
@@ -282,7 +283,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/hilton.png',
     website: 'https://www.hilton.com',
     type: 'Hospitality',
-    description: 'Chuỗi khách sạn Hilton cam kết phát triển bền vững và giảm thiểu rác thải sinh hoạt.',
+    description: 'The Hilton hotel chain is committed to sustainable development and reducing household waste.',
     joinedYear: 2020
   },
   {
@@ -292,17 +293,17 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/hirdaramani.png',
     website: 'https://www.hirdaramani.com',
     type: 'Manufacturing',
-    description: 'Đối tác dệt may bền vững tiên phong trong bảo vệ môi trường và chuỗi cung ứng xanh.',
+    description: 'A sustainable textile partner pioneering environmental protection and green supply chains.',
     joinedYear: 2021
   },
   {
     id: 'ptn-05',
-    name: 'Quỹ Vì Tương Lai Xanh',
+    name: 'Green Future Fund',
     tier: 'Gold',
     logo: '/partners/tuong-lai-xanh.png',
     website: 'https://vinfutureprize.org',
     type: 'Foundation',
-    description: 'Đồng hành cùng các sáng kiến hành động vì môi trường xanh tại Việt Nam.',
+    description: 'Supporting green environmental action initiatives across Vietnam.',
     joinedYear: 2022
   },
   {
@@ -312,7 +313,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/vinuniversity.png',
     website: 'https://vinuni.edu.vn',
     type: 'University',
-    description: 'Viện nghiên cứu và trung tâm phát triển bền vững Đại học VinUni.',
+    description: 'VinUniversity\'s research institute and sustainable development center.',
     joinedYear: 2021
   },
   {
@@ -322,7 +323,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/vingroup.png',
     website: 'https://vingroup.net',
     type: 'Corporate',
-    description: 'Tập đoàn Vingroup bảo trợ các chiến dịch vì một Việt Nam xanh - sạch - đẹp.',
+    description: 'Vingroup sponsors campaigns for a green, clean, and beautiful Vietnam.',
     joinedYear: 2019
   },
   {
@@ -332,7 +333,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/the-body-shop.png',
     website: 'https://www.thebodyshop.com.vn',
     type: 'Retail',
-    description: 'Thương hiệu mỹ phẩm thuần chay tiên phong tái chế bao bì nhựa tại Việt Nam.',
+    description: 'A vegan cosmetics brand pioneering plastic packaging recycling in Vietnam.',
     joinedYear: 2020
   },
   {
@@ -342,7 +343,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/easia-travel.png',
     website: 'https://www.easia-travel.com',
     type: 'Travel',
-    description: 'Du lịch xanh bền vững và làm sạch các điểm đến du lịch sinh thái.',
+    description: 'Sustainable green tourism and cleanup of eco-tourism destinations.',
     joinedYear: 2021
   },
   {
@@ -352,7 +353,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/usaid.png',
     website: 'https://www.usaid.gov/vietnam',
     type: 'International Organization',
-    description: 'Cơ quan Phát triển Quốc tế Hoa Kỳ hỗ trợ các chương trình giảm thiểu rác thải nhựa đại dương.',
+    description: 'The U.S. Agency for International Development supports programs to reduce ocean plastic waste.',
     joinedYear: 2018
   },
   {
@@ -362,7 +363,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/yseali.png',
     website: 'https://asean.usmission.gov/yseali/',
     type: 'International Organization',
-    description: 'Sáng kiến Thủ lĩnh Trẻ Đông Nam Á - Đồng hành cùng các dự án môi trường thanh niên.',
+    description: 'The Young Southeast Asian Leaders Initiative - Supporting youth-led environmental projects.',
     joinedYear: 2019
   },
   {
@@ -372,7 +373,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/us-embassy.png',
     website: 'https://vn.usembassy.gov/',
     type: 'Diplomatic Mission',
-    description: 'Đại sứ quán Hoa Kỳ tại Hà Nội - Tài trợ các chương trình sinh thái và giáo dục cộng đồng.',
+    description: 'The U.S. Embassy in Hanoi - Sponsoring ecological and community education programs.',
     joinedYear: 2017
   },
   {
@@ -382,7 +383,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/fuwa3e.png',
     website: 'https://fuwa.com.vn',
     type: 'Eco Brand',
-    description: 'Chế phẩm sinh học từ dứa lên men - Giải pháp tẩy rửa hữu cơ an toàn cho nguồn nước.',
+    description: 'A bio-enzyme made from fermented pineapple - a safe, organic cleaning solution for water sources.',
     joinedYear: 2021
   },
   {
@@ -392,7 +393,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/pizza-4ps.png',
     website: 'https://pizza4ps.com',
     type: 'Restaurant Chain',
-    description: 'Chuỗi nhà hàng tiên phong phong trào Nhà Hàng Không Rác Thải (Zero Waste Restaurant).',
+    description: 'A restaurant chain pioneering the Zero Waste Restaurant movement.',
     joinedYear: 2020
   },
   {
@@ -402,7 +403,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/go-bigc.png',
     website: 'https://go-vietnam.vn',
     type: 'Retail',
-    description: 'Hệ thống đại siêu thị đồng hành phân loại rác tái chế và sử dụng túi sinh học.',
+    description: 'A hypermarket chain supporting recyclable waste sorting and the use of biodegradable bags.',
     joinedYear: 2019
   },
   {
@@ -412,7 +413,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/the-empyrean.png',
     website: 'https://theempyreanhotel.com',
     type: 'Hospitality',
-    description: 'Khu nghỉ dưỡng xanh với các chiến dịch dọn sạch bãi biển Cam Ranh định kỳ.',
+    description: 'A green resort running regular beach cleanup campaigns in Cam Ranh.',
     joinedYear: 2022
   },
   {
@@ -422,7 +423,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/mainetti.png',
     website: 'https://www.mainetti.com',
     type: 'Packaging',
-    description: 'Giải pháp tái chế móc treo và bao bì nhựa tuần hoàn trong ngành thời trang.',
+    description: 'Recycling solutions for hangers and circular plastic packaging in the fashion industry.',
     joinedYear: 2021
   },
   {
@@ -432,7 +433,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/7-bridges.png',
     website: 'https://7bridgesbrewing.com',
     type: 'F&B',
-    description: 'Thương hiệu bia thủ công tiên phong cam kết phát triển bền vững và bảo vệ môi trường.',
+    description: 'A craft beer brand pioneering commitments to sustainable development and environmental protection.',
     joinedYear: 2022
   },
   {
@@ -442,7 +443,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/intrepid.png',
     website: 'https://www.intrepidtravel.com',
     type: 'Travel',
-    description: 'Tổ chức du lịch mạo hiểm bền vững hàng đầu thế giới với các tour du lịch không rác thải.',
+    description: 'A leading global sustainable adventure travel company offering zero-waste tours.',
     joinedYear: 2018
   },
   {
@@ -452,7 +453,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/luxury-travel.png',
     website: 'https://luxurytravelvietnam.com',
     type: 'Travel',
-    description: 'Dịch vụ lữ hành cao cấp đồng hành cùng các hoạt động bảo tồn sinh thái Việt Nam.',
+    description: 'A premium travel service supporting ecological conservation activities in Vietnam.',
     joinedYear: 2020
   },
   {
@@ -462,17 +463,17 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/canon.png',
     website: 'https://vn.canon',
     type: 'Technology',
-    description: 'Tập đoàn Canon với triết lý Kyosei (Cùng sống và làm việc vì lợi ích chung) tài trợ bảo vệ môi trường.',
+    description: 'Canon, guided by its Kyosei philosophy (living and working together for the common good), sponsors environmental protection.',
     joinedYear: 2016
   },
   {
     id: 'ptn-22',
-    name: 'Thế Hệ Xanh (Live & Learn)',
+    name: 'Green Generation (Live & Learn)',
     tier: 'Gold',
     logo: '/partners/the-he-xanh.png',
     website: 'https://livelearn.vn',
     type: 'NGO Network',
-    description: 'Mạng lưới thanh niên hành động vì không khí sạch và môi trường xanh bền vững.',
+    description: 'A youth network acting for clean air and a sustainable green environment.',
     joinedYear: 2017
   },
   {
@@ -482,7 +483,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/th-school.png',
     website: 'https://thschool.edu.vn',
     type: 'Education',
-    description: 'Hệ thống trường học sinh thái phát động các phong trào phân loại rác và bảo vệ thiên nhiên cho học sinh.',
+    description: 'An eco-school system launching waste-sorting and nature-protection initiatives for students.',
     joinedYear: 2021
   },
   {
@@ -492,7 +493,7 @@ export const INITIAL_PARTNERS: Partner[] = [
     logo: '/partners/cbtw.png',
     website: 'https://cbtw.tech',
     type: 'Technology',
-    description: 'Tập đoàn công nghệ toàn cầu hỗ trợ các giải pháp số hóa và chuyển đổi số xanh.',
+    description: 'A global technology corporation supporting digitalization and green digital transformation solutions.',
     joinedYear: 2023
   }
 ];
@@ -500,62 +501,62 @@ export const INITIAL_PARTNERS: Partner[] = [
 export const INITIAL_GALLERY: GalleryItem[] = [
   {
     id: 'gal-01',
-    title: 'Đại hội quân Ngày Hội Dọn Rác Thế Giới WCD 2024 tại Nhà Hát Lớn Hà Nội',
+    title: 'World Cleanup Day 2024 Kickoff Rally at Hanoi Opera House',
     eventName: 'World Cleanup Day 2024',
     year: 2024,
-    city: 'Hà Nội',
+    city: 'Hanoi',
     imageUrl: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80',
-    caption: 'Hơn 2.000 tình nguyện viên rực rỡ trong màu áo vàng - xanh truyền thống cùng hô vang khẩu hiệu Let\'s do it! Vietnam.',
+    caption: 'Over 2,000 volunteers in the traditional yellow-and-green colors chanting the Let\'s do it! Vietnam slogan.',
     category: 'World Cleanup Day'
   },
   {
     id: 'gal-02',
-    title: 'Phân loại rác thải nhựa và tái chế sau chiến dịch dọn sạch bãi biển Mỹ Khê',
+    title: 'Sorting and recycling plastic waste after the My Khe Beach cleanup campaign',
     eventName: 'Green Ocean Campaign',
     year: 2024,
-    city: 'Đà Nẵng',
+    city: 'Da Nang',
     imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80',
-    caption: 'Hàng trăm bao rác tái chế được cân đo và bàn giao cho nhà máy xử lý tuần hoàn.',
+    caption: 'Hundreds of bags of recyclable waste were weighed and handed over to a circular processing plant.',
     category: 'Ocean Cleanups'
   },
   {
     id: 'gal-03',
-    title: 'Hành động nhỏ, ý nghĩa lớn: Các bạn nhỏ tình nguyện viên nhí tại TP. Hồ Chí Minh',
+    title: 'Small actions, big impact: young junior volunteers in Ho Chi Minh City',
     eventName: 'Environmental Day 2024',
     year: 2024,
-    city: 'TP. Hồ Chí Minh',
+    city: 'Ho Chi Minh City',
     imageUrl: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80',
-    caption: 'Thế hệ tương lai cùng gia đình chung tay nhặt sạch rác thải nhựa tại công viên Tao Đàn.',
+    caption: 'The next generation joins their families to pick up plastic waste at Tao Dan Park.',
     category: 'Youth & Community'
   },
   {
     id: 'gal-04',
-    title: 'Đội hình thanh niên tình nguyện làm sạch Kênh Nhiêu Lộc - Thị Nghè',
+    title: 'Youth volunteer team cleans up Nhieu Loc - Thi Nghe Canal',
     eventName: 'Clean Up Sai Gon River',
     year: 2023,
-    city: 'TP. Hồ Chí Minh',
+    city: 'Ho Chi Minh City',
     imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
-    caption: 'Các bạn tình nguyện viên không ngại khó khăn vớt rác ven bờ kênh, trả lại vẻ đẹp thơ mộng cho dòng sông.',
+    caption: 'Volunteers braved the hard work of pulling trash from the canal banks, restoring the river\'s scenic beauty.',
     category: 'River Cleanups'
   },
   {
     id: 'gal-05',
-    title: 'Workshop đào tạo Điều phối viên Môi trường tại Hà Nội',
+    title: 'Environmental Coordinator Training Workshop in Hanoi',
     eventName: 'Leader Training Workshop',
     year: 2024,
-    city: 'Hà Nội',
+    city: 'Hanoi',
     imageUrl: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&auto=format&fit=crop&q=80',
-    caption: 'Tập huấn kỹ năng lãnh đạo nhóm, an toàn lao động và phân loại rác khoa học cho hơn 80 nhóm trưởng.',
+    caption: 'Training in team leadership skills, workplace safety, and scientific waste sorting for more than 80 team leaders.',
     category: 'Workshops & Training'
   },
   {
     id: 'gal-06',
-    title: 'Chiến dịch bảo vệ rạn san hô và sinh vật biển Cát Bà',
+    title: 'Coral reef and marine life protection campaign, Cat Ba',
     eventName: 'Save The Wildlife Cat Ba',
     year: 2023,
-    city: 'Hải Phòng',
+    city: 'Hai Phong',
     imageUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop&q=80',
-    caption: 'Đội lặn tình nguyện phối hợp thu gom ngư cụ đánh bắt bỏ quên dưới đáy biển vịnh Lan Hạ.',
+    caption: 'Volunteer divers worked together to collect abandoned fishing gear from the seabed of Lan Ha Bay.',
     category: 'Wildlife & Nature'
   }
 ];
@@ -563,47 +564,47 @@ export const INITIAL_GALLERY: GalleryItem[] = [
 export const INITIAL_TEAM: TeamMember[] = [
   {
     id: 'tm-01',
-    name: 'Nguyễn Văn Hoàng',
-    role: 'Chủ Tịch & Trưởng Ban Điều Hành Quốc Gia',
-    department: 'Ban Lãnh Đạo (National Board)',
+    name: 'Nguyen Van Hoang',
+    role: 'Chairman & National Executive Director',
+    department: 'Leadership (National Board)',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
-    bio: 'Nhà hoạt động xã hội với 10 năm kinh nghiệm dẫn dắt các chiến dịch môi trường quy mô toàn quốc, đại diện Let\'s do it! Vietnam tại hội nghị WCD Toàn Cầu.',
+    bio: 'A social activist with 10 years of experience leading nationwide environmental campaigns, representing Let\'s do it! Vietnam at the Global WCD conference.',
     linkedin: 'https://linkedin.com'
   },
   {
     id: 'tm-02',
-    name: 'Trần Thị Mai Linh',
-    role: 'Giám Đốc Dự Án Khu Vực Miền Nam',
-    department: 'Ban Điều Phối Dự Án',
+    name: 'Tran Thi Mai Linh',
+    role: 'Southern Region Project Director',
+    department: 'Project Coordination',
     avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80',
-    bio: 'Chuyên gia quản lý dự án phát triển bền vững, kết nối hơn 30 trường đại học và tổ chức thanh niên tại TP.HCM và các tỉnh Đồng Bằng Sông Cửu Long.',
+    bio: 'A sustainable development project management expert, connecting over 30 universities and youth organizations across Ho Chi Minh City and the Mekong Delta provinces.',
     facebook: 'https://facebook.com'
   },
   {
     id: 'tm-03',
-    name: 'Phạm Minh Trí',
-    role: 'Trưởng Ban Đối Ngoại & Tài Trợ Doanh Nghiệp',
-    department: 'Ban Hợp Tác & Tài Trợ',
+    name: 'Pham Minh Tri',
+    role: 'Head of External Affairs & Corporate Sponsorship',
+    department: 'Partnerships & Sponsorship',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-    bio: 'Kinh nghiệm 8 năm trong mảng CSR và ESG cho các tập đoàn đa quốc gia, phụ trách mở rộng mạng lưới nhà tài trợ cho Let\'s do it! Vietnam.',
+    bio: '8 years of experience in CSR and ESG for multinational corporations, responsible for expanding Let\'s do it! Vietnam\'s sponsor network.',
     linkedin: 'https://linkedin.com'
   },
   {
     id: 'tm-04',
-    name: 'Đặng Ngọc Ánh',
-    role: 'Giám Đốc Truyền Thông & Marketing Xã Hội',
-    department: 'Ban Truyền Thông',
+    name: 'Dang Ngoc Anh',
+    role: 'Director of Communications & Social Marketing',
+    department: 'Communications',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80',
-    bio: 'Sáng tạo các chiến dịch viral tiếp cận hơn 5 triệu người trẻ trên mạng xã hội, thúc đẩy thói quen phân loại rác và lối sống xanh.',
+    bio: 'Creates viral campaigns reaching over 5 million young people on social media, promoting waste-sorting habits and a green lifestyle.',
     facebook: 'https://facebook.com'
   },
   {
     id: 'tm-05',
-    name: 'Lê Quốc Bảo',
-    role: 'Trưởng Ban Công Nghệ & Quản Trị Cơ Sở Dữ Liệu',
-    department: 'Ban Công Nghệ (Tech Team)',
+    name: 'Le Quoc Bao',
+    role: 'Head of Technology & Database Administration',
+    department: 'Tech Team',
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop&q=80',
-    bio: 'Kỹ sư phần mềm phát triển hệ thống bản đồ số hóa rác thải và nền tảng quản trị tình nguyện viên tự động cho tổ chức.',
+    bio: 'A software engineer building the digital waste-hotspot mapping system and automated volunteer management platform for the organization.',
     linkedin: 'https://linkedin.com'
   }
 ];
@@ -611,21 +612,21 @@ export const INITIAL_TEAM: TeamMember[] = [
 export const INITIAL_CONTACTS: ContactMessage[] = [
   {
     id: 'msg-01',
-    name: 'Trần Văn Long',
+    name: 'Tran Van Long',
     email: 'long.tran@university.edu.vn',
     phone: '0988776655',
-    subject: 'Đăng ký phối hợp tổ chức Ngày Hội Dọn Rác tại khuôn viên KTX ĐHQG',
-    message: 'Xin chào BTC Let\'s do it! Vietnam, chúng tôi muốn phối hợp tổ chức một ngày dọn dẹp và thu gom rác nhựa cho khoảng 1.000 sinh viên tại KTX khu B.',
+    subject: 'Proposal to co-organize a Cleanup Day at the National University dormitory',
+    message: 'Hello Let\'s do it! Vietnam organizing committee, we would like to co-organize a cleanup and plastic waste collection day for about 1,000 students at the Block B dormitory.',
     status: 'In Review',
     createdAt: '2026-05-04T15:30:00Z'
   },
   {
     id: 'msg-02',
-    name: 'Nguyễn Thị Hồng',
+    name: 'Nguyen Thi Hong',
     email: 'hong.nguyen@greensolutions.vn',
     phone: '0912998877',
-    subject: 'Đề xuất tài trợ găng tay và túi rác tự hủy sinh học cho chiến dịch WCD 2026',
-    message: 'Công ty chúng tôi muốn tài trợ 10.000 đôi găng tay tái sử dụng và 5.000 túi phân loại rác chuẩn môi trường cho các điểm dọn rác ở Hà Nội và Đà Nẵng.',
+    subject: 'Proposal to sponsor gloves and biodegradable trash bags for the WCD 2026 campaign',
+    message: 'Our company would like to sponsor 10,000 pairs of reusable gloves and 5,000 environmentally certified waste-sorting bags for cleanup sites in Hanoi and Da Nang.',
     status: 'Replied',
     createdAt: '2026-05-02T09:10:00Z'
   }
@@ -634,39 +635,58 @@ export const INITIAL_CONTACTS: ContactMessage[] = [
 // Starts empty on purpose: past seed data used made-up YouTube IDs
 // (falsely attributed to BBC/AFP/VTV3/VnExpress) whose thumbnails all
 // 404 — never fabricate video IDs, let admins add the org's real videos
-// via the "Thêm Video" button on the Videos page.
+// via the "Add Video" button on the Videos page.
 export const INITIAL_VIDEOS: MediaVideo[] = [];
 
 export const INITIAL_WHAT_WE_DO: WhatWeDoItem[] = [
   {
     id: 'wwd-1',
-    badge: 'Chiến Dịch Toàn Cầu',
+    badge: 'Global Campaign',
     title: 'World Cleanup Day',
     desc: 'Every year, we join hands with millions of volunteers across the globe on World Cleanup Day. Armed with gloves and determination, we clean up litter, plastic waste, and debris from streets, parks, and waterways. Together, we’re shaping a cleaner future for Vietnam.',
     image: '/what-we-do-wcd.jpg',
     layout: 'image-left',
-    highlights: ['5,000+ Tình nguyện viên mỗi năm', 'Thu gom 8,500+ kg rác', '63 Tỉnh thành toàn quốc'],
+    highlights: ['5,000+ volunteers every year', '8,500+ kg of waste collected', '63 provinces nationwide'],
     order: 1
   },
   {
     id: 'wwd-2',
-    badge: 'Tập Huấn & Hội Thảo',
+    badge: 'Training & Workshops',
     title: 'Educational Campaigns',
     desc: 'Knowledge is power. We believe that informed citizens can drive change. Through workshops, seminars, and awareness campaigns, we educate people about waste management, recycling, and environmental conservation. Our goal? Empower individuals to take action and protect our planet.',
     image: '/what-we-do-edu.jpg',
     layout: 'image-right',
-    highlights: ['Hội thảo lối sống bền vững', 'Tập huấn phân loại rác', 'Lan tỏa đến trường học & doanh nghiệp'],
+    highlights: ['Sustainable lifestyle workshops', 'Waste-sorting training', 'Outreach to schools & businesses'],
     order: 2
   },
   {
     id: 'wwd-3',
-    badge: 'Kết Nối Cộng Đồng',
+    badge: 'Community Engagement',
     title: 'Community Engagement',
     desc: 'Our strength lies in our communities. We organize local cleanups, tree planting events, and collaborative projects that bring people together. By fostering a sense of responsibility and camaraderie, we inspire long-term sustainable habits.',
     image: '/what-we-do-comm.jpg',
     layout: 'image-left',
-    highlights: ['Hoạt động dọn rác khu dân cư', 'Trồng cây xanh đô thị', 'Thói quen sống không rác thải'],
+    highlights: ['Neighborhood cleanup activities', 'Urban tree planting', 'Zero-waste living habits'],
     order: 3
+  }
+];
+
+export const INITIAL_WHO_WE_ARE: WhoWeAreItem[] = [
+  {
+    id: 'wwa-1',
+    title: 'Where It All Began',
+    content: 'Let’s Do It Vietnam began as part of the global Let’s Do It World movement, which originated in Estonia in 2008 with a massive cleanup event that inspired millions worldwide. Recognizing the urgent need for action in Vietnam, a group of passionate environmentalists and community leaders established Let’s Do It Vietnam in 2015.',
+    image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=1000&auto=format&fit=crop&q=80',
+    layout: 'image-left',
+    order: 1
+  },
+  {
+    id: 'wwa-2',
+    title: "Let's Do It Vietnam Today",
+    content: 'Since its inception, Let’s Do It Vietnam has grown exponentially, organizing nationwide cleanup events, educational workshops, and awareness campaigns to combat waste and promote environmental sustainability. The organization has mobilized thousands of volunteers, collaborated with local governments, businesses, and schools, and played a pivotal role in shaping a greener future for Vietnam. Through relentless dedication and community engagement, Let\'s Do It Vietnam continues to inspire positive change and environmental stewardship across the country.',
+    image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1000&auto=format&fit=crop&q=80',
+    layout: 'image-right',
+    order: 2
   }
 ];
 
