@@ -7,6 +7,122 @@ import { WhatWeDoItem } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { WhatWeDoEditorModal } from '../WhatWeDoEditorModal';
+import { useAutoTranslate, useAutoTranslateList } from '../../hooks/useAutoTranslate';
+
+// Admin-entered content (title/desc/badge/highlights) is free text typed in
+// whatever language the admin used, with no per-language storage of its own
+// — unlike the site's fixed UI chrome. Split into its own component (rather
+// than inlining this in the .map() below) purely so each item's translation
+// hooks — a fixed set of hook calls per card — can run per item regardless
+// of how many activities or highlight lines it has.
+const WhatWeDoActivityCard: React.FC<{
+  item: WhatWeDoItem;
+  isAdmin: boolean;
+  onToggleLayout: (item: WhatWeDoItem) => void;
+  onEdit: (item: WhatWeDoItem) => void;
+  onDelete: (id: string, title: string) => void;
+}> = ({ item, isAdmin, onToggleLayout, onEdit, onDelete }) => {
+  const isImageLeft = item.layout !== 'image-right';
+  const translatedBadge = useAutoTranslate(item.badge || '');
+  const translatedTitle = useAutoTranslate(item.title);
+  const translatedDesc = useAutoTranslate(item.desc);
+  const translatedHighlights = useAutoTranslateList(item.highlights || []);
+
+  return (
+    <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group">
+      {/* Admin Quick Action Floating Buttons */}
+      {isAdmin && (
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-700 shadow-md">
+          <button
+            type="button"
+            onClick={() => onToggleLayout(item)}
+            className="p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
+            title="Đổi vị trí Ảnh (Trái / Phải)"
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Đổi bên</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onEdit(item)}
+            className="p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
+            title="Chỉnh sửa nội dung & ảnh"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sửa</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(item.id, item.title)}
+            className="p-1.5 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
+            title="Xóa mục này"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Xóa</span>
+          </button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+
+        {/* Photo Column */}
+        <div className={`lg:col-span-6 ${isImageLeft ? 'lg:order-1' : 'lg:order-2'}`}>
+          <div className="rounded-2xl overflow-hidden shadow-md border border-slate-100 aspect-16/10 bg-slate-900 group-hover:shadow-lg transition-shadow">
+            <EditableImage
+              contentKey={`whatWeDo.${item.id}.img`}
+              defaultValue={item.image}
+              alt={item.title}
+              wrapperClassName="w-full h-full"
+              className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+            />
+          </div>
+        </div>
+
+        {/* Text & Content Column */}
+        <div className={`lg:col-span-6 space-y-4 ${isImageLeft ? 'lg:order-2' : 'lg:order-1'}`}>
+          {/* Badge */}
+          {item.badge && (
+            <span className="inline-block bg-pink-100/90 text-[#E81A7F] text-[11px] font-black uppercase px-3 py-1 rounded-full tracking-wide">
+              {translatedBadge}
+            </span>
+          )}
+
+          {/* Title */}
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#E81A7F] leading-tight">
+            <EditableText
+              contentKey={`whatWeDo.${item.id}.title`}
+              defaultValue={translatedTitle}
+              as="span"
+            />
+          </h2>
+
+          {/* Description */}
+          <div className="text-sm sm:text-base text-slate-600 leading-relaxed">
+            <EditableText
+              contentKey={`whatWeDo.${item.id}.desc`}
+              defaultValue={translatedDesc}
+              as="p"
+              multiline
+            />
+          </div>
+
+          {/* Highlights / Features (if present) */}
+          {translatedHighlights.length > 0 && (
+            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {translatedHighlights.map((hl, hIdx) => (
+                <div key={hIdx} className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>{hl}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+};
 
 export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onExploreProjects }) => {
   const { t, language } = useLanguage();
@@ -97,107 +213,16 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
 
         {/* Dynamic List of What We Do Activities */}
         <div className="space-y-10">
-          {items.map((item) => {
-            const isImageLeft = item.layout !== 'image-right';
-
-            return (
-              <div
-                key={item.id}
-                className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group"
-              >
-                {/* Admin Quick Action Floating Buttons */}
-                {isAdmin && (
-                  <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-700 shadow-md">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleLayout(item)}
-                      className="p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                      title="Đổi vị trí Ảnh (Trái / Phải)"
-                    >
-                      <ArrowLeftRight className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Đổi bên</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEdit(item)}
-                      className="p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                      title="Chỉnh sửa nội dung & ảnh"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Sửa</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(item.id, item.title)}
-                      className="p-1.5 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                      title="Xóa mục này"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Xóa</span>
-                    </button>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                  
-                  {/* Photo Column */}
-                  <div className={`lg:col-span-6 ${isImageLeft ? 'lg:order-1' : 'lg:order-2'}`}>
-                    <div className="rounded-2xl overflow-hidden shadow-md border border-slate-100 aspect-16/10 bg-slate-900 group-hover:shadow-lg transition-shadow">
-                      <EditableImage
-                        contentKey={`whatWeDo.${item.id}.img`}
-                        defaultValue={item.image}
-                        alt={item.title}
-                        wrapperClassName="w-full h-full"
-                        className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Text & Content Column */}
-                  <div className={`lg:col-span-6 space-y-4 ${isImageLeft ? 'lg:order-2' : 'lg:order-1'}`}>
-                    {/* Badge */}
-                    {item.badge && (
-                      <span className="inline-block bg-pink-100/90 text-[#E81A7F] text-[11px] font-black uppercase px-3 py-1 rounded-full tracking-wide">
-                        {item.badge}
-                      </span>
-                    )}
-
-                    {/* Title */}
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#E81A7F] leading-tight">
-                      <EditableText
-                        contentKey={`whatWeDo.${item.id}.title`}
-                        defaultValue={item.title}
-                        as="span"
-                      />
-                    </h2>
-
-                    {/* Description */}
-                    <div className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                      <EditableText
-                        contentKey={`whatWeDo.${item.id}.desc`}
-                        defaultValue={item.desc}
-                        as="p"
-                        multiline
-                      />
-                    </div>
-
-                    {/* Highlights / Features (if present) */}
-                    {item.highlights && item.highlights.length > 0 && (
-                      <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {item.highlights.map((hl, hIdx) => (
-                          <div key={hIdx} className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <span>{hl}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                </div>
-              </div>
-            );
-          })}
+          {items.map((item) => (
+            <WhatWeDoActivityCard
+              key={item.id}
+              item={item}
+              isAdmin={isAdmin}
+              onToggleLayout={handleToggleLayout}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+            />
+          ))}
         </div>
 
         {/* Process Steps */}
