@@ -175,6 +175,7 @@ export const OurTeamPage: React.FC = () => {
                 )}
 
                 {/* Social Links */}
+                {(member.linkedin || member.email) && (
                 <div className="flex items-center gap-2 pt-3 mt-auto border-t border-slate-100 w-full justify-center text-slate-400">
                   {member.linkedin && (
                     <a
@@ -195,6 +196,7 @@ export const OurTeamPage: React.FC = () => {
                     </a>
                   )}
                 </div>
+                )}
 
                 {/* Admin direct edit trigger */}
                 {isAdmin && (
