@@ -3,7 +3,7 @@ import { dbService } from '../../services/dbService';
 import { TeamMember } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { Plus, Edit3, Trash2, ShieldCheck } from 'lucide-react';
+import { Sparkles, Linkedin, Facebook, Mail, Plus, Edit3, Trash2, ShieldCheck, UserCheck } from 'lucide-react';
 import { TeamMemberEditorModal } from '../TeamMemberEditorModal';
 import { EditableText } from '../EditableText';
 import { TiltCard } from '../TiltCard';
@@ -17,16 +17,27 @@ export const OurTeamPage: React.FC = () => {
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [columns, setColumns] = useState<2 | 3>(3);
 
   const loadTeam = () => {
     dbService.getTeam().then(setTeam);
   };
 
+  const loadColumns = () => {
+    dbService.getContent('ourTeam.gridColumns', '3').then((val) => setColumns(val === '2' ? 2 : 3));
+  };
+
   useEffect(() => {
     loadTeam();
-    const unsub = dbService.subscribe(loadTeam);
+    loadColumns();
+    const unsub = dbService.subscribe(() => { loadTeam(); loadColumns(); });
     return () => unsub();
   }, []);
+
+  const handleSetColumns = (next: 2 | 3) => {
+    setColumns(next);
+    dbService.setContent('ourTeam.gridColumns', String(next));
+  };
 
   const handleAddNew = () => {
     setSelectedMember(null);
@@ -39,7 +50,7 @@ export const OurTeamPage: React.FC = () => {
   };
 
   const handleDelete = (member: TeamMember) => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa thành viên "${member.name}" khỏi danh sách đội ngũ?`)) {
+    if (window.confirm(`Are you sure you want to remove "${member.name}" from the team list?`)) {
       dbService.deleteTeamMember(member.id);
       loadTeam();
     }
@@ -52,7 +63,7 @@ export const OurTeamPage: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <EditableText
             contentKey="ourTeam.title"
-            defaultValue={t.ourTeamTitle || "Đội Ngũ Let's do it! Vietnam"}
+            defaultValue={t.ourTeamTitle || "The Let's do it! Vietnam Team"}
             as="h1"
             className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
           />
@@ -79,18 +90,36 @@ export const OurTeamPage: React.FC = () => {
                 <Plus className="w-4 h-4" />
                 <span>{language === 'vi' ? 'Thêm Thành Viên Mới' : 'Add New Member'}</span>
               </button>
+              <div className="inline-flex items-center gap-1 bg-white border border-slate-200 rounded-full p-1 shadow-xs">
+                <button
+                  onClick={() => handleSetColumns(2)}
+                  title="2 columns per row"
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-colors cursor-pointer ${
+                    columns === 2 ? 'bg-[#E81A7F] text-white' : 'text-slate-500 hover:bg-slate-100'
+                  }`}
+                >
+                  2
+                </button>
+                <button
+                  onClick={() => handleSetColumns(3)}
+                  title="3 columns per row"
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-colors cursor-pointer ${
+                    columns === 3 ? 'bg-[#E81A7F] text-white' : 'text-slate-500 hover:bg-slate-100'
+                  }`}
+                >
+                  3
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Team Grid with 3D TiltCards — flex+justify-center (not a CSS grid) so a
-            partial last row (e.g. just 2 members) stays centered instead of
-            sticking to the left with dead space on the right. */}
-        <div className="flex flex-wrap justify-center gap-5 sm:gap-6">
+        {/* Team Grid with 3D TiltCards */}
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 ${columns === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2 max-w-4xl mx-auto'}`}>
           {team.map((member) => (
             <TiltCard
               key={member.id}
-              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] p-6 border border-white/80 shadow-md hover:shadow-2xl flex flex-col items-center text-center relative group"
+              className="p-6 border border-white/80 shadow-md hover:shadow-2xl flex flex-col items-center text-center relative group"
             >
               {/* Admin quick actions overlay buttons */}
               {isAdmin && (
@@ -98,29 +127,29 @@ export const OurTeamPage: React.FC = () => {
                   <button
                     onClick={() => handleEdit(member)}
                     className="p-1.5 bg-white/90 hover:bg-white text-slate-700 hover:text-[#E81A7F] rounded-full shadow-md transition-colors cursor-pointer border border-slate-200"
-                    title="Chỉnh sửa thông tin"
+                    title="Edit information"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(member)}
                     className="p-1.5 bg-white/90 hover:bg-white text-slate-700 hover:text-red-600 rounded-full shadow-md transition-colors cursor-pointer border border-slate-200"
-                    title="Xóa thành viên"
+                    title="Delete member"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               )}
 
-              {/* Avatar with gradient ring frame */}
-              <div className="relative w-48 h-48 sm:w-60 sm:h-60 rounded-full mb-5 p-1.5 bg-gradient-to-br from-[#E81A7F] via-pink-400 to-amber-300 shadow-xl group-hover:scale-105 transition-transform duration-500">
-                <div className="w-full h-full rounded-full overflow-hidden border-4 border-white bg-slate-100">
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+              {/* Avatar with smooth 3D halo */}
+              <div className={`relative rounded-full overflow-hidden mb-4 border-4 border-white shadow-xl bg-slate-100 group-hover:scale-105 transition-transform duration-500 ${
+                columns === 2 ? 'w-36 h-36 sm:w-44 sm:h-44' : 'w-24 h-24 sm:w-28 sm:h-28'
+              }`}>
+                <img 
+                  src={member.avatar} 
+                  alt={member.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Department Tag */}
@@ -143,6 +172,28 @@ export const OurTeamPage: React.FC = () => {
                 {member.bio}
               </p>
 
+              {/* Social Links */}
+              <div className="flex items-center gap-2 pt-3 border-t border-slate-100 w-full justify-center text-slate-400">
+                {member.linkedin && (
+                  <a 
+                    href={member.linkedin} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                )}
+                {member.email && (
+                  <a 
+                    href={`mailto:${member.email}`}
+                    className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+
               {/* Admin direct edit trigger */}
               {isAdmin && (
                 <div className="w-full pt-3 mt-2 border-t border-dashed border-slate-200">
@@ -151,7 +202,7 @@ export const OurTeamPage: React.FC = () => {
                     className="w-full py-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
-                    <span>Sửa & Cập Nhật Ảnh</span>
+                    <span>Edit & Update Photo</span>
                   </button>
                 </div>
               )}
