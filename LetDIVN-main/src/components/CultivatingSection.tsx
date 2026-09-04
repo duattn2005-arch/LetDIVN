@@ -8,10 +8,10 @@ interface CultivatingSectionProps {
 
 const TILES: { key: string; view: string; label: string; defaultImage: string }[] = [
   {
-    key: 'whoWeAre',
-    view: 'who-we-are',
-    label: 'Who We Are',
-    defaultImage: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=1000&auto=format&fit=crop&q=80',
+    key: 'news',
+    view: 'news',
+    label: 'News',
+    defaultImage: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1000&auto=format&fit=crop&q=80',
   },
   {
     key: 'whatWeDo',
