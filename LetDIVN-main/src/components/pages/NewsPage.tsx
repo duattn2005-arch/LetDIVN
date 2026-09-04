@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
-import { Calendar, User, Eye, ArrowRight, ArrowLeft, Share2, Sparkles, Plus, Edit3, Trash2, Search, CheckCircle2, Clock } from 'lucide-react';
+import { Calendar, User, Eye, ArrowRight, ArrowLeft, Share2, Sparkles, Plus, Edit3, Trash2, Search, CheckCircle2, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ArticleEditorModal } from '../ArticleEditorModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -19,6 +19,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   const [search, setSearch] = useState<string>('');
   const [newsList, setNewsList] = useState<NewsArticle[]>([]);
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ARTICLES_PER_PAGE = 9;
 
   // Editor Modal states
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -49,6 +51,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     const unsub = dbService.subscribe(refreshNews);
     return () => unsub();
   }, []);
+
+  // Jump back to page 1 whenever the visible set changes shape, so a filter
+  // or search never leaves the view stranded on a now-empty later page.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCat, search]);
 
   const handleDeleteArticle = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -89,6 +97,10 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     const matchesSearch = n.title.toLowerCase().includes(search.toLowerCase()) || n.summary.toLowerCase().includes(search.toLowerCase());
     return matchesCat && matchesSearch;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredNews.length / ARTICLES_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedNews = filteredNews.slice((safePage - 1) * ARTICLES_PER_PAGE, safePage * ARTICLES_PER_PAGE);
 
   const pendingCount = newsList.filter(n => n.status === 'Pending').length;
 
@@ -171,7 +183,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
         {/* News Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredNews.map(item => {
+          {paginatedNews.map(item => {
             const isPending = item.status === 'Pending';
 
             return (
@@ -267,6 +279,42 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             );
           })}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-1.5 pt-4">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                type="button"
+                onClick={() => setCurrentPage(page)}
+                className={`w-9 h-9 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  page === safePage
+                    ? 'bg-[#E81A7F] text-white shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 border border-slate-200'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
       </div>
 

@@ -8,7 +8,8 @@ import {
   ContactMessage,
   UserProfile,
   MediaVideo,
-  WhatWeDoItem
+  WhatWeDoItem,
+  MediaCoverageEntry
 } from '../types';
 
 type Listener = () => void;
@@ -242,6 +243,21 @@ class DatabaseService {
   }
   public async deleteWhatWeDo(id: string): Promise<boolean> {
     await this.mutate(`/what-we-do/${encodeURIComponent(id)}`, 'DELETE');
+    return true;
+  }
+
+  // --- MEDIA COVERAGE (Media On Us page) ---
+  public getMediaCoverage(): Promise<MediaCoverageEntry[]> {
+    return this.get('/media-coverage');
+  }
+  public addMediaCoverage(item: Omit<MediaCoverageEntry, 'id'>): Promise<MediaCoverageEntry> {
+    return this.mutate('/media-coverage', 'POST', item);
+  }
+  public updateMediaCoverage(item: MediaCoverageEntry): Promise<MediaCoverageEntry> {
+    return this.mutate(`/media-coverage/${encodeURIComponent(item.id)}`, 'PUT', item);
+  }
+  public async deleteMediaCoverage(id: string): Promise<boolean> {
+    await this.mutate(`/media-coverage/${encodeURIComponent(id)}`, 'DELETE');
     return true;
   }
 

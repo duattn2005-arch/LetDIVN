@@ -23,6 +23,7 @@ import { OurPartnersPage } from './components/pages/OurPartnersPage';
 import { ProjectsPage } from './components/pages/ProjectsPage';
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage';
 import { NewsPage } from './components/pages/NewsPage';
+import { MediaOnUsPage } from './components/pages/MediaOnUsPage';
 import { FullGalleryPage } from './components/pages/FullGalleryPage';
 import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
@@ -159,7 +160,7 @@ export function AppContent() {
         )}
 
         {activeView === 'media-on-us' && (
-          <NewsPage initialCategory="Media On Us" />
+          <MediaOnUsPage />
         )}
 
         {activeView === 'gallery' && (

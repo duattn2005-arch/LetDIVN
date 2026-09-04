@@ -72,6 +72,12 @@ db.exec(`
     data TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS media_coverage (
+    id TEXT PRIMARY KEY,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    data TEXT NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS site_content (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL

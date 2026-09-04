@@ -15,6 +15,7 @@ const ALLOWED_EXT: Record<string, string> = {
   'image/jpeg': '.jpg',
   'image/webp': '.webp',
   'image/gif': '.gif',
+  'application/pdf': '.pdf',
 };
 
 const storage = multer.diskStorage({
@@ -29,7 +30,7 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (!ALLOWED_EXT[file.mimetype]) return cb(new Error('Chỉ hỗ trợ PNG, JPG, JPEG, WEBP, GIF'));
+    if (!ALLOWED_EXT[file.mimetype]) return cb(new Error('Chỉ hỗ trợ PNG, JPG, JPEG, WEBP, GIF, PDF'));
     cb(null, true);
   },
 });

@@ -86,6 +86,18 @@ export interface Partner {
   scale?: number; // Zoom / Scale percentage (e.g. 100, 120, 80)
 }
 
+// One row on the "Media On Us" page — a year/campaign's press-coverage
+// summary, linking out to a PDF listing the actual articles/segments
+// (matches how the org already tracks this offline, one PDF per campaign).
+export interface MediaCoverageEntry {
+  id: string;
+  title: string; // e.g. "World Cleanup Day 2019" — doubles as the button label
+  image: string;
+  articleCount: number;
+  segmentCount: number;
+  pdfUrl: string;
+}
+
 export interface GalleryItem {
   id: string;
   title: string;

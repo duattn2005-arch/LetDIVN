@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo } from '../db/collections.js';
+import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -167,6 +167,21 @@ router.put('/what-we-do/:id', requireAdmin, (req, res) => {
 });
 router.delete('/what-we-do/:id', requireAdmin, (req, res) => {
   whatWeDo.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
+// --- Media Coverage (Media On Us page) ---
+router.get('/media-coverage', (req, res) => res.json(mediaCoverage.getAll()));
+router.post('/media-coverage', requireAdmin, (req, res) => {
+  res.json(mediaCoverage.insert(req.body, { sortOrder: -1 })); // new entries lead the list
+});
+router.put('/media-coverage/:id', requireAdmin, (req, res) => {
+  const updated = mediaCoverage.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
+  res.json(updated);
+});
+router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
+  mediaCoverage.delete(String(req.params.id));
   res.json({ ok: true });
 });
 
