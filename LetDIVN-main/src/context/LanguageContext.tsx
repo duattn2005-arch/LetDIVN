@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 export type Language = 'vi' | 'en' | 'fr' | 'ja' | 'ko' | 'zh' | 'de' | 'es';
 
@@ -1537,36 +1537,25 @@ export const translations = {
 
 interface LanguageContextType {
   language: Language;
-  setLanguage: (lang: Language) => void;
   t: typeof translations['vi'];
-  currentLangInfo: LanguageInfo;
-  supportedLanguages: LanguageInfo[];
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+// Locked to English site-wide — the language switcher UI was removed per
+// request ("bỏ ngôn ngữ đi chuyển hết sang tiếng anh, không có ngôn ngữ khác
+// nữa"). `language` is kept as a real piece of context state (rather than
+// deleting it and the `Language` union) since dozens of components still do
+// `language === 'vi' ? ... : ...` for their own copy — those checks simply
+// always take the non-Vietnamese branch now. Also means useAutoTranslate's
+// early-return for 'vi' never fires, so admin-entered content (which is
+// mostly typed in Vietnamese) now gets auto-translated to English everywhere.
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('letdoit_language') as Language;
-    return saved && (translations as any)[saved] ? saved : 'vi';
-  });
-
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('letdoit_language', lang);
-  };
-
-  const t = (translations as any)[language] || translations['vi'];
-  const currentLangInfo = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0];
+  const language: Language = 'en';
+  const t = translations[language];
 
   return (
-    <LanguageContext.Provider value={{
-      language,
-      setLanguage,
-      t,
-      currentLangInfo,
-      supportedLanguages: SUPPORTED_LANGUAGES
-    }}>
+    <LanguageContext.Provider value={{ language, t }}>
       {children}
     </LanguageContext.Provider>
   );
