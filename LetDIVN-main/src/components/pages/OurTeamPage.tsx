@@ -119,7 +119,7 @@ export const OurTeamPage: React.FC = () => {
           {team.map((member) => (
             <TiltCard
               key={member.id}
-              className="p-6 border border-white/80 shadow-md hover:shadow-2xl flex flex-col items-center text-center relative group"
+              className="border border-white/80 shadow-md hover:shadow-2xl flex flex-col text-center relative group bg-white"
             >
               {/* Admin quick actions overlay buttons */}
               {isAdmin && (
@@ -141,71 +141,74 @@ export const OurTeamPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Avatar with smooth 3D halo */}
-              <div className={`relative rounded-full overflow-hidden mb-4 border-4 border-white shadow-xl bg-slate-100 group-hover:scale-105 transition-transform duration-500 ${
-                columns === 2 ? 'w-36 h-36 sm:w-44 sm:h-44' : 'w-24 h-24 sm:w-28 sm:h-28'
-              }`}>
-                <img 
-                  src={member.avatar} 
+              {/* Large full-bleed photo */}
+              <div className={`relative w-full overflow-hidden bg-slate-100 ${columns === 2 ? 'aspect-[4/3]' : 'aspect-square'}`}>
+                <img
+                  src={member.avatar}
                   alt={member.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
-              {/* Department Tag */}
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#E81A7F] bg-pink-50 border border-pink-100 px-3 py-0.5 rounded-full mb-2">
-                {member.department}
-              </span>
+              {/* Text content */}
+              <div className="p-5 sm:p-6 flex flex-col items-center flex-grow">
+                {/* Department Tag */}
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#E81A7F] bg-pink-50 border border-pink-100 px-3 py-0.5 rounded-full mb-2">
+                  {member.department}
+                </span>
 
-              {/* Name */}
-              <h3 className="text-base sm:text-lg font-black text-slate-900 line-clamp-1 mb-1">
-                {member.name}
-              </h3>
+                {/* Name */}
+                <h3 className="text-base sm:text-lg font-black text-slate-900 line-clamp-1 mb-1">
+                  {member.name}
+                </h3>
 
-              {/* Role */}
-              <div className="text-xs font-bold text-slate-700 line-clamp-1 mb-3">
-                {member.role}
-              </div>
-
-              {/* Bio */}
-              <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 mb-5 flex-grow">
-                {member.bio}
-              </p>
-
-              {/* Social Links */}
-              <div className="flex items-center gap-2 pt-3 border-t border-slate-100 w-full justify-center text-slate-400">
-                {member.linkedin && (
-                  <a 
-                    href={member.linkedin} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                )}
-                {member.email && (
-                  <a 
-                    href={`mailto:${member.email}`}
-                    className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
-                  >
-                    <Mail className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
-
-              {/* Admin direct edit trigger */}
-              {isAdmin && (
-                <div className="w-full pt-3 mt-2 border-t border-dashed border-slate-200">
-                  <button
-                    onClick={() => handleEdit(member)}
-                    className="w-full py-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit & Update Photo</span>
-                  </button>
+                {/* Role */}
+                <div className="text-xs font-bold text-slate-700 line-clamp-1 mb-3">
+                  {member.role}
                 </div>
-              )}
+
+                {/* Bio */}
+                {member.bio && (
+                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 mb-5 flex-grow">
+                    {member.bio}
+                  </p>
+                )}
+
+                {/* Social Links */}
+                <div className="flex items-center gap-2 pt-3 mt-auto border-t border-slate-100 w-full justify-center text-slate-400">
+                  {member.linkedin && (
+                    <a
+                      href={member.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
+                    >
+                      <Linkedin className="w-4 h-4" />
+                    </a>
+                  )}
+                  {member.email && (
+                    <a
+                      href={`mailto:${member.email}`}
+                      className="p-2 hover:text-[#E81A7F] hover:bg-pink-50 rounded-full transition-colors"
+                    >
+                      <Mail className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+
+                {/* Admin direct edit trigger */}
+                {isAdmin && (
+                  <div className="w-full pt-3 mt-2 border-t border-dashed border-slate-200">
+                    <button
+                      onClick={() => handleEdit(member)}
+                      className="w-full py-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit & Update Photo</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </TiltCard>
           ))}
         </div>
