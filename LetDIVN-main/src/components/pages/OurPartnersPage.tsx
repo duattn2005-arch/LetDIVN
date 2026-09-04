@@ -157,7 +157,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
               onClick={onBecomePartner}
               className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm px-8 py-3 rounded-full shadow-lg transition-all cursor-pointer"
             >
-              <EditableText contentKey="ourPartners.becomePartnerBtn" defaultValue={t.becomePartnerBtn} as="span" />
+              <EditableText contentKey="ourPartners.becomePartnerBtn" defaultValue="Become a Partner" as="span" />
             </button>
 
             {isAdmin && (
@@ -166,16 +166,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                 className="inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>
-                  {language === 'vi' ? 'Thêm Đối Tác / Nhà Tài Trợ' : 
-                   language === 'ja' ? 'パートナーを追加' : 
-                   language === 'fr' ? 'Ajouter un Partenaire' : 
-                   language === 'zh' ? '添加合作伙伴' : 
-                   language === 'ko' ? '파트너 추가' : 
-                   language === 'de' ? 'Partner hinzufügen' : 
-                   language === 'es' ? 'Agregar Socio' : 
-                   '+ Add Partner / Sponsor'}
-                </span>
+                <span>Add Partner / Sponsor</span>
               </button>
             )}
           </div>
@@ -186,13 +177,13 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
           <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-2 text-slate-700 font-bold">
               <Move className="w-4 h-4 text-[#E81A7F]" />
-              <span>🖐 Kéo thả bất kỳ logo nào để đổi vị trí</span>
+              <span>🖐 Drag and drop any logo to reposition it</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-5">
               {/* Global Zoom Slider */}
               <div className="flex items-center gap-2">
-                <span className="text-slate-600 font-semibold">🔍 Thu phóng tất cả:</span>
+                <span className="text-slate-600 font-semibold">🔍 Zoom all:</span>
                 <input
                   type="range"
                   min="70"
@@ -207,7 +198,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
 
               {/* Grid Column Selector */}
               <div className="flex items-center gap-1.5">
-                <span className="text-slate-600 font-semibold">Số cột:</span>
+                <span className="text-slate-600 font-semibold">Columns:</span>
                 {[3, 4, 5, 6].map(col => (
                   <button
                     key={col}
@@ -265,7 +256,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                           e.stopPropagation();
                           handleMove(p.id, 'left');
                         }}
-                        title="Di chuyển sang trái"
+                        title="Move left"
                         className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                       >
                         <ArrowLeft className="w-3.5 h-3.5" />
@@ -281,7 +272,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                           e.stopPropagation();
                           handleMove(p.id, 'right');
                         }}
-                        title="Di chuyển sang phải"
+                        title="Move right"
                         className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                       >
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -296,7 +287,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleScaleDelta(p.id, 10);
                       }}
-                      title="Phóng to logo (+10%)"
+                      title="Zoom in logo (+10%)"
                       className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                     >
                       <ZoomIn className="w-3.5 h-3.5" />
@@ -310,7 +301,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleScaleDelta(p.id, -10);
                       }}
-                      title="Thu nhỏ logo (-10%)"
+                      title="Zoom out logo (-10%)"
                       className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                     >
                       <ZoomOut className="w-3.5 h-3.5" />
@@ -352,7 +343,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                     href={p.website || '#'}
                     target={p.website ? "_blank" : undefined}
                     rel="noreferrer"
-                    title={`${p.name}${p.website ? ` (Nhấp để mở ${p.website})` : ''}`}
+                    title={`${p.name}${p.website ? ` (Click to open ${p.website})` : ''}`}
                     className="w-full h-full flex items-center justify-center p-2 cursor-pointer transition-transform duration-300 group-hover:scale-105"
                   >
                     <img
