@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { AboutSection } from './components/AboutSection';
 import { CultivatingSection } from './components/CultivatingSection';
+import { NewsSection } from './components/NewsSection';
 import { GallerySection } from './components/GallerySection';
 import { GetInvolvedSection } from './components/GetInvolvedSection';
 import { Footer } from './components/Footer';
@@ -104,6 +105,7 @@ export function AppContent() {
               onExploreMap={() => handleNavigate('map')}
             />
             <CultivatingSection onNavigate={handleNavigate} />
+            <NewsSection onViewAll={() => handleNavigate('news')} />
             <AboutSection
               onLearnMore={() => handleNavigate('who-we-are')}
             />
