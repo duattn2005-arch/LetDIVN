@@ -4,6 +4,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { AboutSection } from './components/AboutSection';
+import { CultivatingSection } from './components/CultivatingSection';
 import { GallerySection } from './components/GallerySection';
 import { GetInvolvedSection } from './components/GetInvolvedSection';
 import { Footer } from './components/Footer';
@@ -102,7 +103,8 @@ export function AppContent() {
               onExploreProjects={() => handleNavigate('projects')}
               onExploreMap={() => handleNavigate('map')}
             />
-            <AboutSection 
+            <CultivatingSection onNavigate={handleNavigate} />
+            <AboutSection
               onLearnMore={() => handleNavigate('who-we-are')}
             />
             <MediaVideosPage />
