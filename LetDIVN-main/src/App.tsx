@@ -29,6 +29,7 @@ import { FullGalleryPage } from './components/pages/FullGalleryPage';
 import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { CleanupMapPage } from './components/pages/CleanupMapPage';
+import { WorldCleanupDayPage } from './components/pages/WorldCleanupDayPage';
 import { ContactBubble } from './components/ContactBubble';
 import { AmbientBackground } from './components/AmbientBackground';
 
@@ -96,7 +97,7 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact', 'world-cleanup-day'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
@@ -137,6 +138,7 @@ export function AppContent() {
           <ProjectsPage
             onSelectProject={handleSelectProject}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
+            onOpenWorldCleanupDay={() => handleNavigate('world-cleanup-day')}
           />
         )}
 
@@ -173,6 +175,10 @@ export function AppContent() {
 
         {activeView === 'contact' && (
           <ContactPage />
+        )}
+
+        {activeView === 'world-cleanup-day' && (
+          <WorldCleanupDayPage onBack={() => handleNavigate('projects')} />
         )}
       </main>
 
