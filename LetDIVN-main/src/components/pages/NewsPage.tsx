@@ -258,7 +258,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   </div>
 
                   <div className="pt-4 space-y-2">
-                    <h3 className="font-bold text-base sm:text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors line-clamp-2 leading-snug">
+                    <h3 className="font-bold text-base sm:text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
                       {item.title}
                     </h3>
 

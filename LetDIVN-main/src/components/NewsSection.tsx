@@ -82,7 +82,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ onViewAll }) => {
                   <Calendar className="w-3 h-3 text-[#E81A7F]" />
                   {item.date}
                 </span>
-                <h3 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-[#E81A7F] transition-colors line-clamp-2 leading-snug">
+                <h3 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
                   {item.title}
                 </h3>
                 <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[#E81A7F] group-hover:translate-x-1 transition-transform">
