@@ -27,28 +27,30 @@ const MediaCoverageRow: React.FC<{
         className="w-full lg:w-2/5 aspect-3/2 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
       />
 
-      <div className="flex items-center gap-8 sm:gap-10">
-        <div className="text-center">
-          <div className="text-4xl sm:text-5xl font-black text-[#E81A7F] leading-none">{item.articleCount}</div>
-          <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1.5">Article</div>
+      <div className="flex-1 w-full flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10">
+        <div className="flex items-center justify-center gap-8 sm:gap-12">
+          <div className="text-center">
+            <div className="text-5xl sm:text-6xl font-black text-[#E81A7F] leading-none">{item.articleCount}</div>
+            <div className="text-sm sm:text-base text-slate-500 font-semibold mt-2">Article</div>
+          </div>
+          <div className="text-center">
+            <div className="text-5xl sm:text-6xl font-black text-orange-500 leading-none">{item.segmentCount}</div>
+            <div className="text-sm sm:text-base text-slate-500 font-semibold mt-2">Segment</div>
+          </div>
         </div>
-        <div className="text-center">
-          <div className="text-4xl sm:text-5xl font-black text-orange-500 leading-none">{item.segmentCount}</div>
-          <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1.5">Segment</div>
-        </div>
-      </div>
 
-      <div className="flex-1 flex flex-col items-center sm:items-start gap-1.5">
-        <a
-          href={item.pdfUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-md transition-all"
-        >
-          <FileText className="w-4 h-4" />
-          <span>{translatedTitle}</span>
-        </a>
-        <span className="text-xs text-slate-400 italic">Click to see media coverage on activities</span>
+        <div className="flex flex-col items-center lg:items-start gap-2">
+          <a
+            href={item.pdfUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-base px-7 py-3 rounded-full shadow-md transition-all"
+          >
+            <FileText className="w-5 h-5" />
+            <span>{translatedTitle}</span>
+          </a>
+          <span className="text-sm text-slate-400 italic">Click to see media coverage on activities</span>
+        </div>
       </div>
 
       {isAdmin && (
