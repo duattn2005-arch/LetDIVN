@@ -53,25 +53,6 @@ export const INITIAL_USERS: UserProfile[] = [
 
 export const INITIAL_EVENTS: CleanupEvent[] = [
   {
-    id: 'evt-wcd-2026',
-    title: 'World Cleanup Day 2026',
-    category: 'World Cleanup Day',
-    date: '2026-09-20',
-    time: '06:30 - 11:30',
-    location: 'Hanoi Opera House Square & Hoan Kiem Lake, Hanoi',
-    city: 'Hanoi',
-    coordinates: { lat: 21.0285, lng: 105.8542 },
-    image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=1000&auto=format&fit=crop&q=80',
-    bannerImage: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&auto=format&fit=crop&q=80',
-    description: 'Let\'s do it! Vietnam\'s biggest event of the year, bringing together over 5,000 volunteers to collect, sort, and recycle waste across all 63 provinces and cities nationwide.',
-    targetVolunteers: 5000,
-    registeredCount: 0,
-    trashCollectedKg: 8500,
-    status: 'Upcoming',
-    leader: 'Nguyen Van Hoang',
-    meetingPoint: 'Main gate of Hanoi Opera House, 1 Trang Tien Street'
-  },
-  {
     id: 'evt-green-ocean-danang',
     title: 'Green Ocean Campaign - Da Nang',
     category: 'Green Ocean Campaign',
