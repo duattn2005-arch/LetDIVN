@@ -64,6 +64,8 @@ export interface NewsArticle {
   author: string;
   date: string;
   image: string;
+  /** Extra photos shown in the article body, below the content — order matters. */
+  images?: string[];
   source?: string;
   sourceUrl?: string;
   views: number;

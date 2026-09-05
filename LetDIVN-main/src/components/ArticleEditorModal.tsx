@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Sparkles, Save, AlertCircle, Calendar, User, Globe, CheckCircle2 } from 'lucide-react';
+import { X, FileText, Sparkles, Save, AlertCircle, Calendar, User, Globe, CheckCircle2, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 import { NewsArticle } from '../types';
 import { dbService } from '../services/dbService';
 import { ImageUploadWidget } from './ImageUploadWidget';
@@ -24,9 +24,11 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
   const [category, setCategory] = useState<NewsArticle['category']>('News');
   const [summary, setSummary] = useState('');
   const [content, setContent] = useState('');
-  const [author, setAuthor] = useState(user?.name || 'Ban Biên Tập Let\'s do it! Vietnam');
+  const [author, setAuthor] = useState(user?.name || 'Let\'s do it! Vietnam Editorial Team');
   const [date, setDate] = useState('');
   const [image, setImage] = useState('');
+  const [images, setImages] = useState<string[]>([]);
+  const [newImageDraft, setNewImageDraft] = useState('');
   const [source, setSource] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
   const [featured, setFeatured] = useState(false);
@@ -41,6 +43,8 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setAuthor(articleToEdit.author);
       setDate(articleToEdit.date);
       setImage(articleToEdit.image);
+      setImages(articleToEdit.images || []);
+      setNewImageDraft('');
       setSource(articleToEdit.source || '');
       setSourceUrl(articleToEdit.sourceUrl || '');
       setFeatured(articleToEdit.featured || false);
@@ -49,9 +53,11 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setCategory('News');
       setSummary('');
       setContent('');
-      setAuthor(user?.name || 'Ban Biên Tập Let\'s do it! Vietnam');
+      setAuthor(user?.name || 'Let\'s do it! Vietnam Editorial Team');
       setDate(new Date().toISOString().split('T')[0]);
       setImage('https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80');
+      setImages([]);
+      setNewImageDraft('');
       setSource('');
       setSourceUrl('');
       setFeatured(false);
@@ -61,22 +67,42 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
 
   if (!isOpen) return null;
 
+  const handleAddImage = () => {
+    if (!newImageDraft.trim()) return;
+    setImages((prev) => [...prev, newImageDraft.trim()]);
+    setNewImageDraft('');
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleMoveImage = (index: number, direction: 'up' | 'down') => {
+    setImages((prev) => {
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+      const updated = [...prev];
+      [updated[index], updated[targetIndex]] = [updated[targetIndex], updated[index]];
+      return updated;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError('Vui lòng nhập tiêu đề bài viết.');
+      setError('Please enter the article title.');
       return;
     }
     if (!summary.trim()) {
-      setError('Vui lòng nhập tóm tắt bài viết.');
+      setError('Please enter the article summary.');
       return;
     }
     if (!content.trim()) {
-      setError('Vui lòng nhập nội dung chi tiết bài viết.');
+      setError('Please enter the article content.');
       return;
     }
     if (!image.trim()) {
-      setError('Vui lòng tải lên ảnh minh họa cho bài viết.');
+      setError('Please upload a cover image for the article.');
       return;
     }
 
@@ -101,6 +127,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
         author,
         date,
         image,
+        images,
         source,
         sourceUrl,
         featured,
@@ -116,6 +143,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
         author,
         date,
         image,
+        images,
         source,
         sourceUrl,
         featured,
@@ -124,7 +152,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
     }
 
     if (!isAdmin) {
-      alert('Bài viết của bạn đã được gửi thành công!\n\nBài viết đang ở trạng thái "Chờ duyệt" và sẽ hiển thị công khai trên website ngay khi Quản trị viên (Admin) phê duyệt.');
+      alert('Your article has been submitted successfully!\n\nThe article is currently "Pending" and will appear publicly on the website as soon as an Administrator (Admin) approves it.');
     }
 
     if (onSaved) onSaved(saved);
@@ -147,10 +175,10 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black">
-                {articleToEdit ? 'Chỉnh Sửa Bài Viết' : (isAdmin ? 'Tạo Bài Viết Mới (Admin)' : 'Đăng Bài Viết Mới')}
+                {articleToEdit ? 'Edit Article' : (isAdmin ? 'Create New Article (Admin)' : 'Submit a New Article')}
               </h3>
               <p className="text-xs text-slate-400">
-                {!isAdmin && !articleToEdit ? 'Bài viết sẽ được Quản Trị Viên kiểm duyệt trước khi hiển thị' : 'Quản lý và xuất bản nội dung tin tức, truyền thông'}
+                {!isAdmin && !articleToEdit ? 'The article will be reviewed by an Administrator before it appears' : 'Manage and publish news and media content'}
               </p>
             </div>
           </div>
@@ -176,31 +204,31 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Tiêu đề bài viết <span className="text-red-500">*</span>
+                Article Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="VD: Phóng sự VTV: Ngày Hội Dọn Rác Thế Giới 2026..."
+                placeholder="e.g., VTV Feature: World Cleanup Day 2026..."
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F]"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Chuyên mục <span className="text-red-500">*</span>
+                Category <span className="text-red-500">*</span>
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as any)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F]"
               >
-                <option value="Media On Us">Media On Us (Báo chí/VTV)</option>
-                <option value="News">News (Bản tin hoạt động)</option>
-                <option value="Press Release">Press Release (Thông cáo báo chí)</option>
-                <option value="Impact Story">Impact Story (Câu chuyện truyền cảm hứng)</option>
+                <option value="Media On Us">Media On Us (Press/TV)</option>
+                <option value="News">News (Activity updates)</option>
+                <option value="Press Release">Press Release</option>
+                <option value="Impact Story">Impact Story</option>
               </select>
             </div>
           </div>
@@ -209,21 +237,89 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
           <ImageUploadWidget
             currentImageUrl={image}
             onImageSelected={(val) => setImage(val)}
-            label="Ảnh bìa bài viết (Banner minh họa)"
-            aspectRatioLabel="Tỉ lệ 16:9 khuyên dùng"
+            label="Article Cover Image (Banner)"
+            aspectRatioLabel="16:9 ratio recommended"
           />
+
+          {/* Additional Images (shown in the article body, reorderable) */}
+          <div className="space-y-3">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              Additional Images (shown below the article content)
+            </label>
+
+            {images.length > 0 && (
+              <div className="space-y-2">
+                {images.map((url, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
+                  >
+                    <img src={url} alt={`Extra ${index + 1}`} className="w-16 h-12 object-cover rounded-lg shrink-0" />
+                    <span className="flex-1 text-xs text-slate-500 dark:text-slate-400 truncate">{url}</span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleMoveImage(index, 'up')}
+                        disabled={index === 0}
+                        title="Move up"
+                        className="p-1.5 text-slate-500 hover:text-[#E81A7F] hover:bg-white dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMoveImage(index, 'down')}
+                        disabled={index === images.length - 1}
+                        title="Move down"
+                        className="p-1.5 text-slate-500 hover:text-[#E81A7F] hover:bg-white dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        title="Remove"
+                        className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-white dark:hover:bg-slate-700 rounded-lg cursor-pointer transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <ImageUploadWidget
+                  currentImageUrl={newImageDraft}
+                  onImageSelected={(val) => setNewImageDraft(val)}
+                  label=""
+                  placeholderText="Upload or paste a URL, then click Add"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleAddImage}
+                disabled={!newImageDraft.trim()}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0"
+              >
+                Add
+              </button>
+            </div>
+          </div>
 
           {/* Summary */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Đoạn tóm tắt mở đầu (Sapo) <span className="text-red-500">*</span>
+              Opening Summary (Lede) <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={2}
               required
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              placeholder="Tóm tắt ngắn 1-2 câu nội dung chính của phóng sự hoặc bài viết..."
+              placeholder="A brief 1-2 sentence summary of the main content of the feature or article..."
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F]"
             ></textarea>
           </div>
@@ -231,14 +327,14 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
           {/* Full Content */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Nội dung chi tiết bài viết <span className="text-red-500">*</span>
+              Full Article Content <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={6}
               required
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Nội dung đầy đủ của bài viết..."
+              placeholder="The full content of the article..."
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm leading-relaxed focus:outline-hidden focus:border-[#E81A7F]"
             ></textarea>
           </div>
@@ -247,7 +343,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Tác giả / Người biên tập
+                Author / Editor
               </label>
               <input
                 type="text"
@@ -259,7 +355,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Ngày đăng bài
+                Publish Date
               </label>
               <input
                 type="date"
@@ -271,13 +367,13 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Đơn vị nguồn (VTV1, Tuổi Trẻ...)
+                Source Outlet (VTV1, Tuoi Tre...)
               </label>
               <input
                 type="text"
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                placeholder="VD: VTV1 Phóng sự"
+                placeholder="e.g., VTV1 Feature"
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
               />
             </div>
@@ -285,7 +381,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Liên kết bài báo gốc (tùy chọn)
+              Original Article Link (optional)
             </label>
             <input
               type="url"
@@ -305,7 +401,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
               className="w-4 h-4 text-[#E81A7F] rounded"
             />
             <label htmlFor="featured-checkbox" className="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
-              Đánh dấu bài viết nổi bật (Hiển thị ưu tiên ở đầu trang)
+              Mark as featured article (displays with priority at the top of the page)
             </label>
           </div>
 
@@ -316,14 +412,14 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
               onClick={onClose}
               className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              Hủy bỏ
+              Cancel
             </button>
             <button
               type="submit"
               className="px-6 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              <span>{articleToEdit ? 'Lưu Thay Đổi' : 'Xuất Bản Bài Viết'}</span>
+              <span>{articleToEdit ? 'Save Changes' : 'Publish Article'}</span>
             </button>
           </div>
         </form>

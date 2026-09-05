@@ -167,6 +167,16 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                 {selectedArticle.content}
               </div>
 
+              {selectedArticle.images && selectedArticle.images.length > 0 && (
+                <div className="space-y-4">
+                  {selectedArticle.images.map((url, index) => (
+                    <div key={index} className="rounded-2xl overflow-hidden shadow-md">
+                      <img src={url} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {selectedArticle.sourceUrl && (
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                   <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
