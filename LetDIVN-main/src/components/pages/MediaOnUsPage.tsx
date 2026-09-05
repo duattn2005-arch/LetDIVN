@@ -20,21 +20,21 @@ const MediaCoverageRow: React.FC<{
   const translatedTitle = useAutoTranslate(item.title);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-6 py-6 border-b border-slate-100 last:border-0">
+    <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 py-8 border-b border-slate-100 last:border-0">
       <img
         src={item.image}
         alt={translatedTitle}
-        className="w-full sm:w-40 h-28 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
+        className="w-full sm:w-72 md:w-80 h-48 md:h-52 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
       />
 
       <div className="flex items-center gap-8 sm:gap-10">
         <div className="text-center">
-          <div className="text-3xl sm:text-4xl font-black text-[#E81A7F] leading-none">{item.articleCount}</div>
-          <div className="text-xs text-slate-500 font-semibold mt-1">Article</div>
+          <div className="text-4xl sm:text-5xl font-black text-[#E81A7F] leading-none">{item.articleCount}</div>
+          <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1.5">Article</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl sm:text-4xl font-black text-orange-500 leading-none">{item.segmentCount}</div>
-          <div className="text-xs text-slate-500 font-semibold mt-1">Segment</div>
+          <div className="text-4xl sm:text-5xl font-black text-orange-500 leading-none">{item.segmentCount}</div>
+          <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1.5">Segment</div>
         </div>
       </div>
 
@@ -116,7 +116,7 @@ export const MediaOnUsPage: React.FC = () => {
 
   return (
     <div className="py-16 bg-white min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
 
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <EditableText
