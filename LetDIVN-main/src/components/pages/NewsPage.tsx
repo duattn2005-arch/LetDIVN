@@ -257,7 +257,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                     )}
                   </div>
 
-                  <div className="pt-4 pb-1 px-1 space-y-2.5">
+                  <div className="pt-5 pb-2 px-4 space-y-3">
                     <h3 className="font-bold text-base sm:text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
                       {item.title}
                     </h3>
@@ -273,7 +273,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   </div>
                 </div>
 
-                <div className="pt-2 px-1 pb-1">
+                <div className="pt-2 px-4 pb-5">
                   <span className="text-sm font-bold text-emerald-600 group-hover:underline">
                     <EditableText contentKey="newsPage.readMoreBtn" defaultValue={t.newsPageReadMoreBtn} as="span" /> »
                   </span>
