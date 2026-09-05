@@ -9,6 +9,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
+// Permanent redirects for campaign events that now have their own info page
+// — old /projects/<id>/ links should never resolve to the generic
+// schedule template again, even before the SPA's JS loads.
+const LEGACY_PROJECT_REDIRECTS: Record<string, string> = {
+  'evt-wcd-2026': '/world-cleanup-day/',
+  'evt-env-day-hcm': '/environmental-day/',
+  'evt-green-ocean-danang': '/green-ocean-campaign/',
+};
+app.get('/projects/:id', (req, res, next) => {
+  const target = LEGACY_PROJECT_REDIRECTS[req.params.id];
+  if (target) {
+    res.redirect(301, target);
+    return;
+  }
+  next();
+});
+
 // Google Sheets API routes (same handlers used by `npm run dev`).
 app.use((req, res, next) => googleSheetsMiddleware(req, res, next));
 
