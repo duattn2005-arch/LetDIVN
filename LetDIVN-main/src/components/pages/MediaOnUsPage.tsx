@@ -20,11 +20,11 @@ const MediaCoverageRow: React.FC<{
   const translatedTitle = useAutoTranslate(item.title);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 py-8 border-b border-slate-100 last:border-0">
+    <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 py-8 border-b border-slate-100 last:border-0">
       <img
         src={item.image}
         alt={translatedTitle}
-        className="w-full sm:w-72 md:w-80 h-48 md:h-52 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
+        className="w-full lg:w-[420px] h-56 sm:h-72 lg:h-[280px] rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
       />
 
       <div className="flex items-center gap-8 sm:gap-10">
