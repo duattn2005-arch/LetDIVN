@@ -7,6 +7,7 @@ import { ArticleEditorModal } from '../ArticleEditorModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
+import { TiltCard } from '../TiltCard';
 
 interface NewsPageProps {
   initialCategory?: 'All' | 'Media On Us' | 'News';
@@ -196,10 +197,10 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             const isPending = item.status === 'Pending';
 
             return (
-              <article
+              <TiltCard
                 key={item.id}
                 onClick={() => setSelectedArticle(item)}
-                className={`bg-white ${isPending ? 'ring-2 ring-amber-300/60 bg-amber-50/20 rounded-2xl' : ''} flex flex-col justify-between group cursor-pointer relative`}
+                className={`${isPending ? 'ring-2 ring-amber-300/60 bg-amber-50/20' : ''} flex flex-col justify-between group cursor-pointer`}
               >
                 <div>
                   <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
@@ -278,7 +279,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                     <EditableText contentKey="newsPage.readMoreBtn" defaultValue={t.newsPageReadMoreBtn} as="span" /> »
                   </span>
                 </div>
-              </article>
+              </TiltCard>
             );
           })}
         </div>

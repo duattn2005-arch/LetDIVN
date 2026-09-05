@@ -4,6 +4,7 @@ import { dbService } from '../services/dbService';
 import { NewsArticle } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { EditableText } from './EditableText';
+import { TiltCard } from './TiltCard';
 
 interface NewsSectionProps {
   onViewAll: () => void;
@@ -65,10 +66,10 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ onViewAll }) => {
         ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {articles.map((item) => (
-            <article
+            <TiltCard
               key={item.id}
               onClick={onViewAll}
-              className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer group"
+              className="cursor-pointer group"
             >
               <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
                 <img
@@ -90,7 +91,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ onViewAll }) => {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </div>
-            </article>
+            </TiltCard>
           ))}
         </div>
         )}
