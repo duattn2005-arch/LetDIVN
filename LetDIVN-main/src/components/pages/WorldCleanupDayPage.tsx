@@ -77,8 +77,8 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           <div className="rounded-2xl overflow-hidden aspect-4/3 bg-slate-100 order-1 lg:order-2">
             <EditableImage
               contentKey="wcd.block2.image"
-              defaultValue="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000&auto=format&fit=crop&q=80"
-              alt="Volunteers planning a cleanup route"
+              defaultValue="https://images.unsplash.com/photo-1616680214084-22670de1bc82?w=1000&auto=format&fit=crop&q=80"
+              alt="A team of volunteers gathered together before a beach cleanup"
               wrapperClassName="w-full h-full"
               className="w-full h-full object-cover"
             />
@@ -114,8 +114,8 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           <div className="rounded-2xl overflow-hidden aspect-4/3 bg-slate-100">
             <EditableImage
               contentKey="wcd.block3.image"
-              defaultValue="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1000&auto=format&fit=crop&q=80"
-              alt="Volunteers taking a photo together"
+              defaultValue="https://images.unsplash.com/photo-1618521715147-29e4b97e2ebd?w=1000&auto=format&fit=crop&q=80"
+              alt="A group of volunteers celebrating together after a cleanup"
               wrapperClassName="w-full h-full"
               className="w-full h-full object-cover"
             />
@@ -141,8 +141,8 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           <div className="rounded-2xl overflow-hidden aspect-4/3 bg-slate-100 order-1 lg:order-2">
             <EditableImage
               contentKey="wcd.block4.image"
-              defaultValue="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1000&auto=format&fit=crop&q=80"
-              alt="Volunteer walking along a cleanup route"
+              defaultValue="https://images.unsplash.com/photo-1617953141905-b27fb1f17d88?w=1000&auto=format&fit=crop&q=80"
+              alt="Many volunteers spread across a beach picking up trash together"
               wrapperClassName="w-full h-full"
               className="w-full h-full object-cover"
             />
@@ -154,8 +154,8 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           <div className="rounded-2xl overflow-hidden aspect-4/3 bg-slate-100">
             <EditableImage
               contentKey="wcd.gallery1"
-              defaultValue="https://images.unsplash.com/photo-1528190336454-13cd56b45b5a?w=1000&auto=format&fit=crop&q=80"
-              alt="Volunteers resting together"
+              defaultValue="https://images.unsplash.com/photo-1565803974275-dccd2f933cbb?w=1000&auto=format&fit=crop&q=80"
+              alt="Volunteers picking up trash bags on a beach"
               wrapperClassName="w-full h-full"
               className="w-full h-full object-cover"
             />
@@ -163,8 +163,8 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           <div className="rounded-2xl overflow-hidden aspect-4/3 bg-slate-100">
             <EditableImage
               contentKey="wcd.gallery2"
-              defaultValue="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1000&auto=format&fit=crop&q=80"
-              alt="Volunteers loading collected waste"
+              defaultValue="https://images.unsplash.com/photo-1639390325187-98c9534805e7?w=1000&auto=format&fit=crop&q=80"
+              alt="Volunteers sorting through a large pile of collected waste"
               wrapperClassName="w-full h-full"
               className="w-full h-full object-cover"
             />
