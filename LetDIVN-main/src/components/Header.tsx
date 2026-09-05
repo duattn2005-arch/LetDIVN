@@ -67,12 +67,14 @@ export const Header: React.FC<HeaderProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const projectItems = [
-    { title: t.projectWcd, id: 'evt-wcd-2026', view: 'world-cleanup-day' },
-    { title: t.projectEnvDay, id: 'evt-env-day-hcm', view: 'environmental-day' },
-    { title: t.projectGreenOcean, id: 'evt-green-ocean-danang', view: 'green-ocean-campaign' },
-    { title: t.projectYoungWildlife, id: 'evt-wildlife-catba', view: 'project-detail' },
-    { title: t.projectWorkshop, id: 'evt-workshop-zerowaste', view: 'project-detail' }
+  // Projects dropdown: purely informational campaign pages — registration
+  // and schedule tracking lives under Other -> Join As Volunteer instead.
+  const projectItems: { title: string; view: string }[] = [
+    { title: t.projectWcd, view: 'world-cleanup-day' },
+    { title: t.projectEnvDay, view: 'environmental-day' },
+    { title: t.projectGreenOcean, view: 'green-ocean-campaign' },
+    { title: t.projectYoungWildlife, view: 'young-conservationists' },
+    { title: t.projectWorkshop, view: 'community-workshop' },
   ];
 
   return (
@@ -240,6 +242,17 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="absolute top-full left-0 mt-1.5 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-[100] animate-in fade-in-50 slide-in-from-top-2 duration-150">
                   <button
                     onClick={() => {
+                      onNavigate('projects');
+                      setOtherDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-[#E81A7F] hover:bg-pink-50/60 font-bold transition-colors cursor-pointer flex items-center justify-between"
+                  >
+                    <EditableText contentKey="header.otherJoinVolunteer" defaultValue="Join As Volunteer" as="span" />
+                    <span className="text-[10px] font-bold">→</span>
+                  </button>
+                  <div className="border-t border-slate-100 my-1"></div>
+                  <button
+                    onClick={() => {
                       onNavigate('media-on-us');
                       setOtherDropdownOpen(false);
                     }}
@@ -289,7 +302,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
                 title={t.navProject}
                 className={`shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all cursor-pointer ${
-                  currentView === 'projects' || currentView === 'project-detail'
+                  projectItems.some((item) => item.view === currentView)
                     ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}
@@ -305,28 +318,21 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                   {projectItems.map((item) => (
                     <button
-                      key={item.id}
+                      key={item.view}
                       onClick={() => {
-                        onNavigate(item.view, item.view === 'project-detail' ? item.id : undefined);
+                        onNavigate(item.view);
                         setProjectsDropdownOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60 font-semibold transition-colors cursor-pointer flex items-center justify-between"
+                      className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-between ${
+                        currentView === item.view
+                          ? 'text-[#E81A7F] bg-pink-50'
+                          : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60'
+                      }`}
                     >
                       <span className="truncate pr-2">• {item.title}</span>
                       <span className="text-[10px] text-pink-500 font-bold shrink-0">→</span>
                     </button>
                   ))}
-                  <div className="border-t border-slate-100 mt-1.5 pt-1.5 px-2">
-                    <button
-                      onClick={() => {
-                        onNavigate('projects');
-                        setProjectsDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-xs font-bold text-[#E81A7F] hover:bg-pink-50 rounded-xl transition-colors cursor-pointer"
-                    >
-                      {t.viewAllProjects}
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -501,6 +507,12 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="pt-2 border-t border-slate-100">
               <div className="text-xs font-bold text-slate-400 px-3 uppercase">{t.navOther}</div>
               <button
+                onClick={() => { onNavigate('projects'); setMobileMenuOpen(false); }}
+                className="w-full text-left px-5 py-1.5 text-xs text-[#E81A7F] font-bold hover:underline"
+              >
+                • <EditableText contentKey="header.otherJoinVolunteer" defaultValue="Join As Volunteer" as="span" />
+              </button>
+              <button
                 onClick={() => { onNavigate('media-on-us'); setMobileMenuOpen(false); }}
                 className="w-full text-left px-5 py-1.5 text-xs text-slate-700 hover:text-[#E81A7F]"
               >
@@ -523,13 +535,13 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Projects in Mobile */}
             <div className="pt-2 border-t border-slate-100">
               <div className="text-xs font-bold text-slate-400 px-3 uppercase">{t.navProject}</div>
-              {projectItems.map(p => (
+              {projectItems.map((item) => (
                 <button
-                  key={p.id}
-                  onClick={() => { onNavigate(p.view, p.view === 'project-detail' ? p.id : undefined); setMobileMenuOpen(false); }}
+                  key={item.view}
+                  onClick={() => { onNavigate(item.view); setMobileMenuOpen(false); }}
                   className="w-full text-left px-5 py-1.5 text-xs text-slate-700 hover:text-[#E81A7F]"
                 >
-                  • {p.title}
+                  • {item.title}
                 </button>
               ))}
             </div>

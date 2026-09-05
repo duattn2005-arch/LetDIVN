@@ -32,6 +32,8 @@ import { CleanupMapPage } from './components/pages/CleanupMapPage';
 import { WorldCleanupDayPage } from './components/pages/WorldCleanupDayPage';
 import { EnvironmentalDayPage } from './components/pages/EnvironmentalDayPage';
 import { GreenOceanCampaignPage } from './components/pages/GreenOceanCampaignPage';
+import { YoungConservationistsPage } from './components/pages/YoungConservationistsPage';
+import { CommunityWorkshopPage } from './components/pages/CommunityWorkshopPage';
 import { ContactBubble } from './components/ContactBubble';
 import { AmbientBackground } from './components/AmbientBackground';
 
@@ -54,6 +56,8 @@ const VIEW_TO_PATH: Record<string, string> = {
   'world-cleanup-day': '/world-cleanup-day/',
   'environmental-day': '/environmental-day/',
   'green-ocean-campaign': '/green-ocean-campaign/',
+  'young-conservationists': '/young-conservationists/',
+  'community-workshop': '/community-workshop/',
 };
 
 // Campaign events with their own dedicated info page — /projects/<id>/ for
@@ -174,7 +178,7 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact', 'world-cleanup-day', 'environmental-day', 'green-ocean-campaign'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact', 'world-cleanup-day', 'environmental-day', 'green-ocean-campaign', 'young-conservationists', 'community-workshop'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
@@ -269,6 +273,14 @@ export function AppContent() {
 
         {activeView === 'green-ocean-campaign' && (
           <GreenOceanCampaignPage onBack={() => handleNavigate('projects')} />
+        )}
+
+        {activeView === 'young-conservationists' && (
+          <YoungConservationistsPage onBack={() => handleNavigate('projects')} />
+        )}
+
+        {activeView === 'community-workshop' && (
+          <CommunityWorkshopPage onBack={() => handleNavigate('projects')} />
         )}
       </main>
 
