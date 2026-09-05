@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
 import { Calendar, Eye, ArrowLeft, Share2, Sparkles, Plus, Edit3, Trash2, Search, CheckCircle2, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -90,6 +89,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     setIsEditorOpen(true);
   };
 
+  const openArticle = (article: NewsArticle) => {
+    setSelectedArticle(article);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const visibleNews = newsList.filter(n => {
     if (isAdmin) return true;
     return n.status !== 'Pending';
@@ -107,10 +111,124 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
   const pendingCount = newsList.filter(n => n.status === 'Pending').length;
 
+  if (selectedArticle) {
+    const otherArticles = visibleNews.filter((a) => a.id !== selectedArticle.id).slice(0, 6);
+
+    return (
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+            {/* Main article content */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setSelectedArticle(null)}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <EditableText contentKey="newsPage.backToListBtn" defaultValue={t.newsPageBackToListBtn} as="span" />
+                </button>
+
+                {isAdmin && (
+                  <button
+                    onClick={(e) => handleOpenEdit(e, selectedArticle)}
+                    className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit this article</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div className="inline-block bg-[#E81A7F] text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full">
+                  {categoryMap[selectedArticle.category] || selectedArticle.category}
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
+                  {selectedArticle.title}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                  <span>📅 {selectedArticle.date}</span>
+                  <span>👤 {selectedArticle.author}</span>
+                  {selectedArticle.source && <span>📰 <EditableText contentKey="newsPage.sourceLabel" defaultValue={t.newsPageSourceLabel} as="span" /> {selectedArticle.source}</span>}
+                </div>
+              </div>
+
+              <div className="aspect-16/9 rounded-2xl overflow-hidden shadow-md">
+                <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full h-full object-cover" />
+              </div>
+
+              <div className="p-4 bg-pink-50/50 rounded-2xl border border-pink-100/60 text-sm font-semibold text-slate-700 leading-relaxed italic">
+                "{selectedArticle.summary}"
+              </div>
+
+              <div className="text-base text-slate-700 leading-relaxed space-y-4 whitespace-pre-line">
+                {selectedArticle.content}
+              </div>
+
+              {selectedArticle.sourceUrl && (
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
+                  <a
+                    href={selectedArticle.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#E81A7F] font-bold hover:underline"
+                  >
+                    {selectedArticle.source || <EditableText contentKey="newsPage.defaultSourceLabel" defaultValue={t.newsPageDefaultSourceLabel} as="span" />} →
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Sidebar: other articles */}
+            <div className="lg:col-span-1 space-y-4">
+              <h3 className="text-lg font-black text-slate-900">Recent Articles</h3>
+              <div className="space-y-4">
+                {otherArticles.map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => openArticle(a)}
+                    className="w-full text-left bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all cursor-pointer group"
+                  >
+                    <div className="aspect-16/10 overflow-hidden bg-slate-900">
+                      <img
+                        src={a.image}
+                        alt={a.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <h4 className="font-bold text-sm text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
+                        {a.title}
+                      </h4>
+                      <span className="text-xs font-bold text-emerald-600">Read More »</span>
+                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100">{a.date}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Article Editor Modal */}
+        <ArticleEditorModal
+          isOpen={isEditorOpen}
+          onClose={() => setIsEditorOpen(false)}
+          articleToEdit={articleToEdit}
+          onSaved={refreshNews}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
+
         <div className="text-center max-w-4xl mx-auto space-y-4">
           {selectedCat === 'Media On Us' ? (
             <EditableText
@@ -199,7 +317,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             return (
               <TiltCard
                 key={item.id}
-                onClick={() => setSelectedArticle(item)}
+                onClick={() => openArticle(item)}
                 className={`${isPending ? 'ring-2 ring-amber-300/60 bg-amber-50/20' : ''} flex flex-col justify-between group cursor-pointer`}
               >
                 <div>
@@ -331,76 +449,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
         onSaved={refreshNews}
       />
 
-      {/* Article Detail View Modal */}
-      {selectedArticle && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[999999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div 
-            className="relative bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 p-6 sm:p-8 space-y-6 animate-in zoom-in-95 duration-200 my-8"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <button
-                onClick={() => setSelectedArticle(null)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <EditableText contentKey="newsPage.backToListBtn" defaultValue={t.newsPageBackToListBtn} as="span" />
-              </button>
-
-              {isAdmin && (
-                <button
-                  onClick={(e) => handleOpenEdit(e, selectedArticle)}
-                  className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit this article</span>
-                </button>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <div className="inline-block bg-[#E81A7F] text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full">
-                {categoryMap[selectedArticle.category] || selectedArticle.category}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
-                {selectedArticle.title}
-              </h2>
-              <div className="flex items-center gap-4 text-xs text-slate-500">
-                <span>📅 {selectedArticle.date}</span>
-                <span>👤 {selectedArticle.author}</span>
-                {selectedArticle.source && <span>📰 <EditableText contentKey="newsPage.sourceLabel" defaultValue={t.newsPageSourceLabel} as="span" /> {selectedArticle.source}</span>}
-              </div>
-            </div>
-
-            <div className="aspect-16/9 rounded-2xl overflow-hidden shadow-md">
-              <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full h-full object-cover" />
-            </div>
-
-            <div className="p-4 bg-pink-50/50 rounded-2xl border border-pink-100/60 text-xs font-semibold text-slate-700 leading-relaxed italic">
-              "{selectedArticle.summary}"
-            </div>
-
-            <div className="text-sm text-slate-700 leading-relaxed space-y-4 whitespace-pre-line border-t border-slate-100 pt-4">
-              {selectedArticle.content}
-            </div>
-
-            {selectedArticle.sourceUrl && (
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
-                <a
-                  href={selectedArticle.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[#E81A7F] font-bold hover:underline"
-                >
-                  {selectedArticle.source || <EditableText contentKey="newsPage.defaultSourceLabel" defaultValue={t.newsPageDefaultSourceLabel} as="span" />} →
-                </a>
-              </div>
-            )}
-          </div>
-        </div>,
-        document.body
-      )}
     </div>
   );
 };
