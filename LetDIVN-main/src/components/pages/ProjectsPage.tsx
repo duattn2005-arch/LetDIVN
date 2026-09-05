@@ -11,12 +11,16 @@ interface ProjectsPageProps {
   onSelectProject: (id: string) => void;
   onRegisterVolunteer: (eventId?: string) => void;
   onOpenWorldCleanupDay: () => void;
+  onOpenEnvironmentalDay: () => void;
+  onOpenGreenOceanCampaign: () => void;
 }
 
 export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   onSelectProject,
   onRegisterVolunteer,
   onOpenWorldCleanupDay,
+  onOpenEnvironmentalDay,
+  onOpenGreenOceanCampaign,
 }) => {
   const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
@@ -157,6 +161,34 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
               className="shrink-0 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md transition-all cursor-pointer"
             >
               About World Cleanup Day
+            </button>
+          </div>
+        )}
+
+        {selectedCategory === 'Environmental Day' && (
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <p className="text-sm text-slate-600">
+              Want to learn more about our Environmental Day campaign?
+            </p>
+            <button
+              onClick={onOpenEnvironmentalDay}
+              className="shrink-0 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md transition-all cursor-pointer"
+            >
+              About Environmental Day
+            </button>
+          </div>
+        )}
+
+        {selectedCategory === 'Green Ocean Campaign' && (
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <p className="text-sm text-slate-600">
+              Want to learn more about the Green Ocean Campaign?
+            </p>
+            <button
+              onClick={onOpenGreenOceanCampaign}
+              className="shrink-0 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md transition-all cursor-pointer"
+            >
+              About Green Ocean Campaign
             </button>
           </div>
         )}

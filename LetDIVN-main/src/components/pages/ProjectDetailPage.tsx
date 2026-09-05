@@ -13,6 +13,8 @@ interface ProjectDetailPageProps {
   onBack: () => void;
   onRegisterVolunteer: (eventId: string) => void;
   onOpenWorldCleanupDay: () => void;
+  onOpenEnvironmentalDay: () => void;
+  onOpenGreenOceanCampaign: () => void;
 }
 
 export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
@@ -20,6 +22,8 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
   onBack,
   onRegisterVolunteer,
   onOpenWorldCleanupDay,
+  onOpenEnvironmentalDay,
+  onOpenGreenOceanCampaign,
 }) => {
   const { isAdmin } = useAuth();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
@@ -151,6 +155,24 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                   className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer"
                 >
                   <span>Learn more about the World Cleanup Day movement</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {event.category === 'Environmental Day' && (
+                <button
+                  onClick={onOpenEnvironmentalDay}
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer"
+                >
+                  <span>Learn more about Environmental Day</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {event.category === 'Green Ocean Campaign' && (
+                <button
+                  onClick={onOpenGreenOceanCampaign}
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer"
+                >
+                  <span>Learn more about the Green Ocean Campaign</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </button>
               )}

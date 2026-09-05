@@ -30,6 +30,8 @@ import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { CleanupMapPage } from './components/pages/CleanupMapPage';
 import { WorldCleanupDayPage } from './components/pages/WorldCleanupDayPage';
+import { EnvironmentalDayPage } from './components/pages/EnvironmentalDayPage';
+import { GreenOceanCampaignPage } from './components/pages/GreenOceanCampaignPage';
 import { ContactBubble } from './components/ContactBubble';
 import { AmbientBackground } from './components/AmbientBackground';
 
@@ -50,6 +52,8 @@ const VIEW_TO_PATH: Record<string, string> = {
   videos: '/videos/',
   contact: '/contact/',
   'world-cleanup-day': '/world-cleanup-day/',
+  'environmental-day': '/environmental-day/',
+  'green-ocean-campaign': '/green-ocean-campaign/',
 };
 
 function pathForView(view: string, projectId?: string): string {
@@ -148,7 +152,7 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact', 'world-cleanup-day'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact', 'world-cleanup-day', 'environmental-day', 'green-ocean-campaign'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
@@ -190,6 +194,8 @@ export function AppContent() {
             onSelectProject={handleSelectProject}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
             onOpenWorldCleanupDay={() => handleNavigate('world-cleanup-day')}
+            onOpenEnvironmentalDay={() => handleNavigate('environmental-day')}
+            onOpenGreenOceanCampaign={() => handleNavigate('green-ocean-campaign')}
           />
         )}
 
@@ -206,6 +212,8 @@ export function AppContent() {
             onBack={() => handleNavigate('projects')}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
             onOpenWorldCleanupDay={() => handleNavigate('world-cleanup-day')}
+            onOpenEnvironmentalDay={() => handleNavigate('environmental-day')}
+            onOpenGreenOceanCampaign={() => handleNavigate('green-ocean-campaign')}
           />
         )}
 
@@ -231,6 +239,14 @@ export function AppContent() {
 
         {activeView === 'world-cleanup-day' && (
           <WorldCleanupDayPage onBack={() => handleNavigate('projects')} />
+        )}
+
+        {activeView === 'environmental-day' && (
+          <EnvironmentalDayPage onBack={() => handleNavigate('projects')} />
+        )}
+
+        {activeView === 'green-ocean-campaign' && (
+          <GreenOceanCampaignPage onBack={() => handleNavigate('projects')} />
         )}
       </main>
 
