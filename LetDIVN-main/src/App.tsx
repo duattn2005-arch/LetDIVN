@@ -33,9 +33,42 @@ import { WorldCleanupDayPage } from './components/pages/WorldCleanupDayPage';
 import { ContactBubble } from './components/ContactBubble';
 import { AmbientBackground } from './components/AmbientBackground';
 
+// Keeps the address bar in sync with the current view — so pages are
+// bookmarkable/shareable/refreshable and the back/forward buttons work,
+// matching a normal (non-SPA) site instead of staying on a single URL.
+const VIEW_TO_PATH: Record<string, string> = {
+  home: '/',
+  'who-we-are': '/who-we-are/',
+  'what-we-do': '/what-we-do/',
+  'our-team': '/our-team/',
+  'our-partners': '/our-partners/',
+  projects: '/projects/',
+  map: '/cleanup-map/',
+  news: '/news/',
+  'media-on-us': '/media-on-us/',
+  gallery: '/gallery/',
+  videos: '/videos/',
+  contact: '/contact/',
+  'world-cleanup-day': '/world-cleanup-day/',
+};
+
+function pathForView(view: string, projectId?: string): string {
+  if (view === 'project-detail' && projectId) return `/projects/${encodeURIComponent(projectId)}/`;
+  return VIEW_TO_PATH[view] || '/';
+}
+
+function parseLocation(): { view: string; projectId?: string } {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  if (path === '/') return { view: 'home' };
+  const projectMatch = path.match(/^\/projects\/([^/]+)$/);
+  if (projectMatch) return { view: 'project-detail', projectId: decodeURIComponent(projectMatch[1]) };
+  const entry = Object.entries(VIEW_TO_PATH).find(([, p]) => p.replace(/\/+$/, '') === path);
+  return { view: entry ? entry[0] : 'home' };
+}
+
 export function AppContent() {
-  const [activeView, setActiveView] = useState<string>('home');
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
+  const [activeView, setActiveView] = useState<string>(() => parseLocation().view);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => parseLocation().projectId || 'evt-wcd-2026');
 
   // Modals state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -51,16 +84,35 @@ export function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeView]);
 
-  const handleNavigate = (view: string, extraId?: string) => {
-    if (view === 'project-detail' && extraId) {
-      setSelectedProjectId(extraId);
-      setActiveView('project-detail');
-    } else if (view.startsWith('project:')) {
-      const pId = view.replace('project:', '');
-      setSelectedProjectId(pId);
-      setActiveView('project-detail');
-    } else {
+  // Browser back/forward buttons: re-sync state from the URL instead of
+  // navigating (pushState already put it there).
+  useEffect(() => {
+    const onPopState = () => {
+      const { view, projectId } = parseLocation();
+      if (projectId) setSelectedProjectId(projectId);
       setActiveView(view);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const handleNavigate = (view: string, extraId?: string) => {
+    let nextView = view;
+    let nextProjectId: string | undefined;
+
+    if (view === 'project-detail' && extraId) {
+      nextProjectId = extraId;
+    } else if (view.startsWith('project:')) {
+      nextProjectId = view.replace('project:', '');
+      nextView = 'project-detail';
+    }
+
+    if (nextProjectId) setSelectedProjectId(nextProjectId);
+    setActiveView(nextView);
+
+    const path = pathForView(nextView, nextProjectId);
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
     }
   };
 
@@ -75,8 +127,7 @@ export function AppContent() {
   };
 
   const handleSelectProject = (projectId: string) => {
-    setSelectedProjectId(projectId);
-    setActiveView('project-detail');
+    handleNavigate('project-detail', projectId);
   };
 
   return (
