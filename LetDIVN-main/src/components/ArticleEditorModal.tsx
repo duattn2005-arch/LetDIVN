@@ -13,6 +13,16 @@ interface ArticleEditorModalProps {
   onSaved?: (article: NewsArticle) => void;
 }
 
+// The editor keeps a stable, locally-unique `_key` per block so React can
+// track each row across reorders (an index-based key would make React
+// reuse/misattribute the wrong <textarea>/<img> when two blocks swap
+// places). Stripped again in handleSubmit before saving.
+type EditableBlock = NewsContentBlock & { _key: number };
+let blockKeySeq = 0;
+const nextBlockKey = () => ++blockKeySeq;
+const withKeys = (blocks: NewsContentBlock[]): EditableBlock[] =>
+  blocks.map((b) => ({ ...b, _key: nextBlockKey() }));
+
 // Reconstructs a block list for articles saved before contentBlocks existed,
 // so editing an old article doesn't lose its text or any images added via
 // the earlier (images[]-only) version of this feature.
@@ -33,7 +43,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<NewsArticle['category']>('News');
   const [summary, setSummary] = useState('');
-  const [contentBlocks, setContentBlocks] = useState<NewsContentBlock[]>([{ type: 'text', value: '' }]);
+  const [contentBlocks, setContentBlocks] = useState<EditableBlock[]>(() => withKeys([{ type: 'text', value: '' }]));
   const [newBlockImageDraft, setNewBlockImageDraft] = useState('');
   const [author, setAuthor] = useState(user?.name || 'Let\'s do it! Vietnam Editorial Team');
   const [date, setDate] = useState('');
@@ -48,7 +58,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setTitle(articleToEdit.title);
       setCategory(articleToEdit.category);
       setSummary(articleToEdit.summary);
-      setContentBlocks(blocksFromLegacyArticle(articleToEdit));
+      setContentBlocks(withKeys(blocksFromLegacyArticle(articleToEdit)));
       setNewBlockImageDraft('');
       setAuthor(articleToEdit.author);
       setDate(articleToEdit.date);
@@ -60,7 +70,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setTitle('');
       setCategory('News');
       setSummary('');
-      setContentBlocks([{ type: 'text', value: '' }]);
+      setContentBlocks(withKeys([{ type: 'text', value: '' }]));
       setNewBlockImageDraft('');
       setAuthor(user?.name || 'Let\'s do it! Vietnam Editorial Team');
       setDate(new Date().toISOString().split('T')[0]);
@@ -75,16 +85,16 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
   if (!isOpen) return null;
 
   const updateTextBlock = (index: number, value: string) => {
-    setContentBlocks((prev) => prev.map((b, i) => (i === index ? { type: 'text', value } : b)));
+    setContentBlocks((prev) => prev.map((b, i) => (i === index ? { ...b, type: 'text', value } : b)));
   };
 
   const addTextBlock = () => {
-    setContentBlocks((prev) => [...prev, { type: 'text', value: '' }]);
+    setContentBlocks((prev) => [...prev, { type: 'text', value: '', _key: nextBlockKey() }]);
   };
 
   const addImageBlock = () => {
     if (!newBlockImageDraft.trim()) return;
-    setContentBlocks((prev) => [...prev, { type: 'image', value: newBlockImageDraft.trim() }]);
+    setContentBlocks((prev) => [...prev, { type: 'image', value: newBlockImageDraft.trim(), _key: nextBlockKey() }]);
     setNewBlockImageDraft('');
   };
 
@@ -142,7 +152,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       category,
       summary,
       content: plainTextContent,
-      contentBlocks,
+      contentBlocks: contentBlocks.map(({ _key, ...block }) => block),
       author,
       date,
       image,
@@ -272,7 +282,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
             <div className="space-y-2.5">
               {contentBlocks.map((block, index) => (
                 <div
-                  key={index}
+                  key={block._key}
                   className="flex items-start gap-2 p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
                 >
                   <div className="pt-1.5 text-slate-400 shrink-0">
