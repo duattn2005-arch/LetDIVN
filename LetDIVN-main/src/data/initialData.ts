@@ -53,43 +53,6 @@ export const INITIAL_USERS: UserProfile[] = [
 
 export const INITIAL_EVENTS: CleanupEvent[] = [
   {
-    id: 'evt-green-ocean-danang',
-    title: 'Green Ocean Campaign - Da Nang',
-    category: 'Green Ocean Campaign',
-    date: '2026-07-15',
-    time: '05:30 - 09:30',
-    location: 'My Khe Beach & Son Tra Peninsula',
-    city: 'Da Nang',
-    coordinates: { lat: 16.0544, lng: 108.2435 },
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000&auto=format&fit=crop&q=80',
-    bannerImage: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1200&auto=format&fit=crop&q=80',
-    description: 'Collecting ocean plastic waste, protecting coral reef ecosystems, and raising awareness among fishermen and coastal tourists about reducing single-use plastics.',
-    targetVolunteers: 1200,
-    registeredCount: 0,
-    trashCollectedKg: 3200,
-    status: 'Upcoming',
-    leader: 'Tran Minh Tri',
-    meetingPoint: 'Bien Dong Park, Vo Nguyen Giap Street, Son Tra'
-  },
-  {
-    id: 'evt-env-day-hcm',
-    title: 'World Environment Day 2026 - Ho Chi Minh City',
-    category: 'Environmental Day',
-    date: '2026-06-05',
-    time: '07:00 - 11:00',
-    location: 'Tao Dan Park & Along Nhieu Loc - Thi Nghe Canal',
-    city: 'Ho Chi Minh City',
-    coordinates: { lat: 10.7769, lng: 106.6924 },
-    image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1000&auto=format&fit=crop&q=80',
-    description: 'A campaign to clean up public spaces, restore the canal banks, and launch a Zero Waste Life movement.',
-    targetVolunteers: 2500,
-    registeredCount: 0,
-    trashCollectedKg: 5400,
-    status: 'Upcoming',
-    leader: 'Tran Thi Mai Linh',
-    meetingPoint: 'Central area of Tao Dan Park, Truong Dinh Street, District 1'
-  },
-  {
     id: 'evt-wildlife-catba',
     title: 'Wildlife Conservation & Cleanup at Cat Ba National Park',
     category: 'Wildlife & Nature',
