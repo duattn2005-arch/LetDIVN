@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Sparkles, Save, AlertCircle, Calendar, User, Globe, CheckCircle2, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
-import { NewsArticle } from '../types';
+import { X, FileText, Save, AlertCircle, ArrowUp, ArrowDown, Trash2, Plus, Image as ImageIcon, Type } from 'lucide-react';
+import { NewsArticle, NewsContentBlock } from '../types';
 import { dbService } from '../services/dbService';
 import { ImageUploadWidget } from './ImageUploadWidget';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,16 @@ interface ArticleEditorModalProps {
   onSaved?: (article: NewsArticle) => void;
 }
 
+// Reconstructs a block list for articles saved before contentBlocks existed,
+// so editing an old article doesn't lose its text or any images added via
+// the earlier (images[]-only) version of this feature.
+const blocksFromLegacyArticle = (article: NewsArticle): NewsContentBlock[] => {
+  if (article.contentBlocks && article.contentBlocks.length > 0) return article.contentBlocks;
+  const blocks: NewsContentBlock[] = [{ type: 'text', value: article.content }];
+  (article.images || []).forEach((url) => blocks.push({ type: 'image', value: url }));
+  return blocks;
+};
+
 export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
   isOpen,
   onClose,
@@ -23,12 +33,11 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<NewsArticle['category']>('News');
   const [summary, setSummary] = useState('');
-  const [content, setContent] = useState('');
+  const [contentBlocks, setContentBlocks] = useState<NewsContentBlock[]>([{ type: 'text', value: '' }]);
+  const [newBlockImageDraft, setNewBlockImageDraft] = useState('');
   const [author, setAuthor] = useState(user?.name || 'Let\'s do it! Vietnam Editorial Team');
   const [date, setDate] = useState('');
   const [image, setImage] = useState('');
-  const [images, setImages] = useState<string[]>([]);
-  const [newImageDraft, setNewImageDraft] = useState('');
   const [source, setSource] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
   const [featured, setFeatured] = useState(false);
@@ -39,12 +48,11 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setTitle(articleToEdit.title);
       setCategory(articleToEdit.category);
       setSummary(articleToEdit.summary);
-      setContent(articleToEdit.content);
+      setContentBlocks(blocksFromLegacyArticle(articleToEdit));
+      setNewBlockImageDraft('');
       setAuthor(articleToEdit.author);
       setDate(articleToEdit.date);
       setImage(articleToEdit.image);
-      setImages(articleToEdit.images || []);
-      setNewImageDraft('');
       setSource(articleToEdit.source || '');
       setSourceUrl(articleToEdit.sourceUrl || '');
       setFeatured(articleToEdit.featured || false);
@@ -52,12 +60,11 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setTitle('');
       setCategory('News');
       setSummary('');
-      setContent('');
+      setContentBlocks([{ type: 'text', value: '' }]);
+      setNewBlockImageDraft('');
       setAuthor(user?.name || 'Let\'s do it! Vietnam Editorial Team');
       setDate(new Date().toISOString().split('T')[0]);
       setImage('https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80');
-      setImages([]);
-      setNewImageDraft('');
       setSource('');
       setSourceUrl('');
       setFeatured(false);
@@ -67,18 +74,26 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleAddImage = () => {
-    if (!newImageDraft.trim()) return;
-    setImages((prev) => [...prev, newImageDraft.trim()]);
-    setNewImageDraft('');
+  const updateTextBlock = (index: number, value: string) => {
+    setContentBlocks((prev) => prev.map((b, i) => (i === index ? { type: 'text', value } : b)));
   };
 
-  const handleRemoveImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+  const addTextBlock = () => {
+    setContentBlocks((prev) => [...prev, { type: 'text', value: '' }]);
   };
 
-  const handleMoveImage = (index: number, direction: 'up' | 'down') => {
-    setImages((prev) => {
+  const addImageBlock = () => {
+    if (!newBlockImageDraft.trim()) return;
+    setContentBlocks((prev) => [...prev, { type: 'image', value: newBlockImageDraft.trim() }]);
+    setNewBlockImageDraft('');
+  };
+
+  const removeBlock = (index: number) => {
+    setContentBlocks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const moveBlock = (index: number, direction: 'up' | 'down') => {
+    setContentBlocks((prev) => {
       const targetIndex = direction === 'up' ? index - 1 : index + 1;
       if (targetIndex < 0 || targetIndex >= prev.length) return prev;
       const updated = [...prev];
@@ -97,8 +112,13 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setError('Please enter the article summary.');
       return;
     }
-    if (!content.trim()) {
-      setError('Please enter the article content.');
+    const plainTextContent = contentBlocks
+      .filter((b) => b.type === 'text')
+      .map((b) => b.value.trim())
+      .filter(Boolean)
+      .join('\n\n');
+    if (!plainTextContent) {
+      setError('Please enter at least one paragraph of article content.');
       return;
     }
     if (!image.trim()) {
@@ -109,46 +129,34 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
     const slug = title
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[̀-ͯ]/g, '')
       .replace(/đ/g, 'd')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
     const articleStatus: NewsArticle['status'] = isAdmin ? 'Published' : (articleToEdit ? articleToEdit.status : 'Pending');
 
+    const payload = {
+      title,
+      slug,
+      category,
+      summary,
+      content: plainTextContent,
+      contentBlocks,
+      author,
+      date,
+      image,
+      source,
+      sourceUrl,
+      featured,
+      status: articleStatus
+    };
+
     let saved: NewsArticle;
     if (articleToEdit) {
-      saved = await dbService.updateNews(articleToEdit.id, {
-        title,
-        slug,
-        category,
-        summary,
-        content,
-        author,
-        date,
-        image,
-        images,
-        source,
-        sourceUrl,
-        featured,
-        status: articleStatus
-      });
+      saved = await dbService.updateNews(articleToEdit.id, payload);
     } else {
-      saved = await dbService.addNews({
-        title,
-        slug,
-        category,
-        summary,
-        content,
-        author,
-        date,
-        image,
-        images,
-        source,
-        sourceUrl,
-        featured,
-        status: articleStatus
-      });
+      saved = await dbService.addNews(payload);
     }
 
     if (!isAdmin) {
@@ -159,11 +167,9 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return typeof document !== 'undefined' ? createPortal(
     <div className="fixed inset-0 z-[999999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div 
+      <div
         className="relative bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
@@ -241,74 +247,6 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
             aspectRatioLabel="16:9 ratio recommended"
           />
 
-          {/* Additional Images (shown in the article body, reorderable) */}
-          <div className="space-y-3">
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-              Additional Images (shown below the article content)
-            </label>
-
-            {images.length > 0 && (
-              <div className="space-y-2">
-                {images.map((url, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
-                  >
-                    <img src={url} alt={`Extra ${index + 1}`} className="w-16 h-12 object-cover rounded-lg shrink-0" />
-                    <span className="flex-1 text-xs text-slate-500 dark:text-slate-400 truncate">{url}</span>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleMoveImage(index, 'up')}
-                        disabled={index === 0}
-                        title="Move up"
-                        className="p-1.5 text-slate-500 hover:text-[#E81A7F] hover:bg-white dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                      >
-                        <ArrowUp className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleMoveImage(index, 'down')}
-                        disabled={index === images.length - 1}
-                        title="Move down"
-                        className="p-1.5 text-slate-500 hover:text-[#E81A7F] hover:bg-white dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                      >
-                        <ArrowDown className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(index)}
-                        title="Remove"
-                        className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-white dark:hover:bg-slate-700 rounded-lg cursor-pointer transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex items-end gap-2">
-              <div className="flex-1">
-                <ImageUploadWidget
-                  currentImageUrl={newImageDraft}
-                  onImageSelected={(val) => setNewImageDraft(val)}
-                  label=""
-                  placeholderText="Upload or paste a URL, then click Add"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={handleAddImage}
-                disabled={!newImageDraft.trim()}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-
           {/* Summary */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -324,19 +262,95 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
             ></textarea>
           </div>
 
-          {/* Full Content */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Full Article Content <span className="text-red-500">*</span>
+          {/* Article Body: freely-ordered paragraph and image blocks */}
+          <div className="space-y-3">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              Article Body <span className="text-red-500">*</span>
+              <span className="font-normal text-slate-400"> — add paragraphs and images in any order</span>
             </label>
-            <textarea
-              rows={6}
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="The full content of the article..."
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm leading-relaxed focus:outline-hidden focus:border-[#E81A7F]"
-            ></textarea>
+
+            <div className="space-y-2.5">
+              {contentBlocks.map((block, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-2 p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
+                >
+                  <div className="pt-1.5 text-slate-400 shrink-0">
+                    {block.type === 'text' ? <Type className="w-4 h-4" /> : <ImageIcon className="w-4 h-4" />}
+                  </div>
+
+                  {block.type === 'text' ? (
+                    <textarea
+                      rows={3}
+                      value={block.value}
+                      onChange={(e) => updateTextBlock(index, e.target.value)}
+                      placeholder="Write a paragraph..."
+                      className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm leading-relaxed focus:outline-hidden focus:border-[#E81A7F]"
+                    />
+                  ) : (
+                    <img src={block.value} alt={`Block ${index + 1}`} className="flex-1 max-w-40 h-20 object-cover rounded-lg" />
+                  )}
+
+                  <div className="flex flex-col items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => moveBlock(index, 'up')}
+                      disabled={index === 0}
+                      title="Move up"
+                      className="p-1.5 text-slate-500 hover:text-[#E81A7F] hover:bg-white dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveBlock(index, 'down')}
+                      disabled={index === contentBlocks.length - 1}
+                      title="Move down"
+                      className="p-1.5 text-slate-500 hover:text-[#E81A7F] hover:bg-white dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeBlock(index)}
+                      title="Remove"
+                      className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-white dark:hover:bg-slate-700 rounded-lg cursor-pointer transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={addTextBlock}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add Paragraph
+              </button>
+
+              <div className="flex-1 min-w-50">
+                <ImageUploadWidget
+                  currentImageUrl={newBlockImageDraft}
+                  onImageSelected={(val) => setNewBlockImageDraft(val)}
+                  label=""
+                  placeholderText="Upload or paste an image URL, then click Add Image"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={addImageBlock}
+                disabled={!newBlockImageDraft.trim()}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add Image
+              </button>
+            </div>
           </div>
 
           {/* Author, Date, Source */}
@@ -428,5 +442,3 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
     document.body
   ) : null;
 };
-
-

@@ -163,18 +163,36 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                 "{selectedArticle.summary}"
               </div>
 
-              <div className="text-base text-slate-700 leading-relaxed space-y-4 whitespace-pre-line">
-                {selectedArticle.content}
-              </div>
-
-              {selectedArticle.images && selectedArticle.images.length > 0 && (
-                <div className="space-y-4">
-                  {selectedArticle.images.map((url, index) => (
-                    <div key={index} className="rounded-2xl overflow-hidden shadow-md">
-                      <img src={url} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
-                    </div>
-                  ))}
+              {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
+                <div className="space-y-6">
+                  {selectedArticle.contentBlocks.map((block, index) =>
+                    block.type === 'text' ? (
+                      <p key={index} className="text-base text-slate-700 leading-relaxed whitespace-pre-line">
+                        {block.value}
+                      </p>
+                    ) : (
+                      <div key={index} className="rounded-2xl overflow-hidden shadow-md">
+                        <img src={block.value} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
+                      </div>
+                    )
+                  )}
                 </div>
+              ) : (
+                <>
+                  <div className="text-base text-slate-700 leading-relaxed space-y-4 whitespace-pre-line">
+                    {selectedArticle.content}
+                  </div>
+
+                  {selectedArticle.images && selectedArticle.images.length > 0 && (
+                    <div className="space-y-4">
+                      {selectedArticle.images.map((url, index) => (
+                        <div key={index} className="rounded-2xl overflow-hidden shadow-md">
+                          <img src={url} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
 
               {selectedArticle.sourceUrl && (

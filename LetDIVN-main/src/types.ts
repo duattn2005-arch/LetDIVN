@@ -54,6 +54,11 @@ export interface CleanupEvent {
   schedule?: { time: string; activity: string }[];
 }
 
+/** One paragraph or one image, in the order they should appear in the article body. */
+export type NewsContentBlock =
+  | { type: 'text'; value: string }
+  | { type: 'image'; value: string };
+
 export interface NewsArticle {
   id: string;
   title: string;
@@ -61,10 +66,15 @@ export interface NewsArticle {
   category: 'Media On Us' | 'News' | 'Press Release' | 'Impact Story';
   summary: string;
   content: string;
+  /** Body as freely-orderable text/image blocks. When present, takes over
+   *  rendering from `content`/`images` (kept for older articles / plain-text
+   *  consumers like search). */
+  contentBlocks?: NewsContentBlock[];
   author: string;
   date: string;
   image: string;
-  /** Extra photos shown in the article body, below the content — order matters. */
+  /** Legacy: extra photos shown after the content, for articles saved before
+   *  contentBlocks existed. */
   images?: string[];
   source?: string;
   sourceUrl?: string;
