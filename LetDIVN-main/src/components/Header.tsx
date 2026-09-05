@@ -68,11 +68,11 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const projectItems = [
-    { title: t.projectWcd, id: 'evt-wcd-2026' },
-    { title: t.projectEnvDay, id: 'evt-env-day-hcm' },
-    { title: t.projectGreenOcean, id: 'evt-green-ocean-danang' },
-    { title: t.projectYoungWildlife, id: 'evt-wildlife-catba' },
-    { title: t.projectWorkshop, id: 'evt-workshop-zerowaste' }
+    { title: t.projectWcd, id: 'evt-wcd-2026', view: 'world-cleanup-day' },
+    { title: t.projectEnvDay, id: 'evt-env-day-hcm', view: 'environmental-day' },
+    { title: t.projectGreenOcean, id: 'evt-green-ocean-danang', view: 'green-ocean-campaign' },
+    { title: t.projectYoungWildlife, id: 'evt-wildlife-catba', view: 'project-detail' },
+    { title: t.projectWorkshop, id: 'evt-workshop-zerowaste', view: 'project-detail' }
   ];
 
   return (
@@ -307,7 +307,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <button
                       key={item.id}
                       onClick={() => {
-                        onNavigate('project-detail', item.id);
+                        onNavigate(item.view, item.view === 'project-detail' ? item.id : undefined);
                         setProjectsDropdownOpen(false);
                       }}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60 font-semibold transition-colors cursor-pointer flex items-center justify-between"
@@ -526,7 +526,7 @@ export const Header: React.FC<HeaderProps> = ({
               {projectItems.map(p => (
                 <button
                   key={p.id}
-                  onClick={() => { onNavigate('project-detail', p.id); setMobileMenuOpen(false); }}
+                  onClick={() => { onNavigate(p.view, p.view === 'project-detail' ? p.id : undefined); setMobileMenuOpen(false); }}
                   className="w-full text-left px-5 py-1.5 text-xs text-slate-700 hover:text-[#E81A7F]"
                 >
                   • {p.title}
