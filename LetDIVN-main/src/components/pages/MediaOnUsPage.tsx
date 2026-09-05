@@ -24,7 +24,7 @@ const MediaCoverageRow: React.FC<{
       <img
         src={item.image}
         alt={translatedTitle}
-        className="w-full lg:w-[420px] h-56 sm:h-72 lg:h-[280px] rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
+        className="w-full lg:w-2/5 aspect-3/2 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
       />
 
       <div className="flex items-center gap-8 sm:gap-10">
@@ -116,7 +116,7 @@ export const MediaOnUsPage: React.FC = () => {
 
   return (
     <div className="py-16 bg-white min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
 
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <EditableText
