@@ -154,6 +154,7 @@ export function AppContent() {
             projectId={selectedProjectId}
             onBack={() => handleNavigate('projects')}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
+            onOpenWorldCleanupDay={() => handleNavigate('world-cleanup-day')}
           />
         )}
 

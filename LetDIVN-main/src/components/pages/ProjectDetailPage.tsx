@@ -12,12 +12,14 @@ interface ProjectDetailPageProps {
   projectId: string;
   onBack: () => void;
   onRegisterVolunteer: (eventId: string) => void;
+  onOpenWorldCleanupDay: () => void;
 }
 
 export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
   projectId,
   onBack,
   onRegisterVolunteer,
+  onOpenWorldCleanupDay,
 }) => {
   const { isAdmin } = useAuth();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
@@ -143,6 +145,15 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
               <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
                 {event.description}
               </p>
+              {event.category === 'World Cleanup Day' && (
+                <button
+                  onClick={onOpenWorldCleanupDay}
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer"
+                >
+                  <span>Learn more about the World Cleanup Day movement</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             {/* Schedule & Meeting Point */}
