@@ -20,15 +20,15 @@ const MediaCoverageRow: React.FC<{
   const translatedTitle = useAutoTranslate(item.title);
 
   return (
-    <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 py-8 border-b border-slate-100 last:border-0">
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 py-8 border-b border-slate-100 last:border-0">
       <img
         src={item.image}
         alt={translatedTitle}
-        className="w-full lg:w-2/5 aspect-3/2 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
+        className="w-full lg:w-[420px] aspect-3/2 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-100"
       />
 
-      <div className="flex-1 w-full flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10">
-        <div className="flex items-center justify-center gap-8 sm:gap-12">
+      <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-16">
+        <div className="flex items-center gap-8 sm:gap-12">
           <div className="text-center">
             <div className="text-5xl sm:text-6xl font-black text-[#E81A7F] leading-none">{item.articleCount}</div>
             <div className="text-sm sm:text-base text-slate-500 font-semibold mt-2">Article</div>
@@ -39,7 +39,7 @@ const MediaCoverageRow: React.FC<{
           </div>
         </div>
 
-        <div className="flex flex-col items-center lg:items-start gap-2">
+        <div className="flex flex-col items-center sm:items-start gap-2">
           <a
             href={item.pdfUrl}
             target="_blank"
