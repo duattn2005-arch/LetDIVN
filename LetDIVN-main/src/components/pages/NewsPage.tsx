@@ -18,6 +18,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState<string>('');
   const [newsList, setNewsList] = useState<NewsArticle[]>([]);
+  const [newsLoaded, setNewsLoaded] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const ARTICLES_PER_PAGE = 9;
@@ -39,6 +40,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   const refreshNews = () => {
     dbService.getNews().then((updated) => {
       setNewsList(updated);
+      setNewsLoaded(true);
       setSelectedArticle((current) => {
         if (!current) return current;
         return updated.find((a) => a.id === current.id) || current;
@@ -184,6 +186,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
         </div>
 
         {/* News Grid */}
+        {!newsLoaded ? (
+          <div className="text-center text-sm text-slate-400 py-16">Loading articles...</div>
+        ) : filteredNews.length === 0 ? (
+          <div className="text-center text-sm text-slate-400 py-16">No articles match this filter yet.</div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {paginatedNews.map(item => {
             const isPending = item.status === 'Pending';
@@ -275,6 +282,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             );
           })}
         </div>
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (

@@ -12,6 +12,7 @@ interface NewsSectionProps {
 export const NewsSection: React.FC<NewsSectionProps> = ({ onViewAll }) => {
   const { isAdmin } = useAuth();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const refresh = () => {
@@ -21,12 +22,17 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ onViewAll }) => {
           .sort((a, b) => (a.date < b.date ? 1 : -1))
           .slice(0, 6);
         setArticles(published);
+        setLoaded(true);
       });
     };
     refresh();
     const unsub = dbService.subscribe(refresh);
     return unsub;
   }, []);
+
+  // Nothing to fetch yet — avoid flashing a false "no articles" message
+  // before the request has even resolved.
+  if (!loaded) return null;
 
   if (articles.length === 0 && !isAdmin) return null;
 
