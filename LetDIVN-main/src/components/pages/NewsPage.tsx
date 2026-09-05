@@ -132,15 +132,17 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             multiline
           />
 
-          {/* Add Article Button */}
+          {/* Add Article Button (Admin only) */}
           <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
-            <button
-              onClick={handleOpenCreate}
-              className="px-5 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span><EditableText contentKey="newsPage.addArticleBtn" defaultValue={t.newsPageAddArticleBtn} as="span" /></span>
-            </button>
+            {isAdmin && (
+              <button
+                onClick={handleOpenCreate}
+                className="px-5 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              >
+                <Plus className="w-4 h-4" />
+                <span><EditableText contentKey="newsPage.addArticleBtn" defaultValue={t.newsPageAddArticleBtn} as="span" /></span>
+              </button>
+            )}
 
             {isAdmin && pendingCount > 0 && (
               <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold px-3.5 py-2.5 rounded-full animate-pulse">
