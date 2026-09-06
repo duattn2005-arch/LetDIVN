@@ -73,8 +73,8 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-21/9 bg-slate-900">
           <EditableImage
             contentKey="whoWeAre.bannerImage"
-            defaultValue="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=2000&auto=format&fit=crop&q=90"
-            alt="Let's do it Vietnam Volunteer Group"
+            defaultValue="/images/who-we-are/banner.jpg"
+            alt="The Let's Do It Hanoi team at World Cleanup Day 2023"
             wrapperClassName="w-full h-full"
             className="w-full h-full object-cover"
           />
@@ -171,8 +171,8 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-21/9 bg-slate-900">
           <EditableImage
             contentKey="whoWeAre.midImage"
-            defaultValue="https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=2000&auto=format&fit=crop&q=90"
-            alt="Let's do it Vietnam volunteers at a cleanup event"
+            defaultValue="/images/who-we-are/mid.jpg"
+            alt="Volunteers at the Green Living Festival"
             wrapperClassName="w-full h-full"
             className="w-full h-full object-cover"
           />

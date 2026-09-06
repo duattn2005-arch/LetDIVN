@@ -620,7 +620,7 @@ export const INITIAL_WHO_WE_ARE: WhoWeAreItem[] = [
     id: 'wwa-1',
     title: 'Where It All Began',
     content: 'Let’s Do It Vietnam began as part of the global Let’s Do It World movement, which originated in Estonia in 2008 with a massive cleanup event that inspired millions worldwide. Recognizing the urgent need for action in Vietnam, a group of passionate environmentalists and community leaders established Let’s Do It Vietnam in 2015.',
-    image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=1000&auto=format&fit=crop&q=80',
+    image: '/images/who-we-are/began.jpg',
     layout: 'image-left',
     order: 1
   },
@@ -628,7 +628,7 @@ export const INITIAL_WHO_WE_ARE: WhoWeAreItem[] = [
     id: 'wwa-2',
     title: "Let's Do It Vietnam Today",
     content: 'Since its inception, Let’s Do It Vietnam has grown exponentially, organizing nationwide cleanup events, educational workshops, and awareness campaigns to combat waste and promote environmental sustainability. The organization has mobilized thousands of volunteers, collaborated with local governments, businesses, and schools, and played a pivotal role in shaping a greener future for Vietnam. Through relentless dedication and community engagement, Let\'s Do It Vietnam continues to inspire positive change and environmental stewardship across the country.',
-    image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1000&auto=format&fit=crop&q=80',
+    image: '/what-we-do-wcd.jpg',
     layout: 'image-right',
     order: 2
   }
