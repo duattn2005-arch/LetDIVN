@@ -94,10 +94,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const visibleNews = newsList.filter(n => {
-    if (isAdmin) return true;
-    return n.status !== 'Pending';
-  });
+  const visibleNews = newsList
+    .filter(n => {
+      if (isAdmin) return true;
+      return n.status !== 'Pending';
+    })
+    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
   const filteredNews = visibleNews.filter(n => {
     const matchesCat = selectedCat === 'All' || n.category === selectedCat;
@@ -157,10 +159,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
               <div className="aspect-16/9 rounded-2xl overflow-hidden shadow-md">
                 <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="p-4 bg-pink-50/50 rounded-2xl border border-pink-100/60 text-sm font-semibold text-slate-700 leading-relaxed italic">
-                "{selectedArticle.summary}"
               </div>
 
               {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
