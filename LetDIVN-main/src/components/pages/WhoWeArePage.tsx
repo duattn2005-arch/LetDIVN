@@ -67,10 +67,10 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
 
   return (
     <div className="py-10 sm:py-16 bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 sm:space-y-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
 
         {/* 1. Top Full Banner Image */}
-        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-21/9 bg-slate-900">
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-4/1 bg-slate-900">
           <EditableImage
             contentKey="whoWeAre.bannerImage"
             defaultValue="/images/who-we-are/banner.jpg"
@@ -105,7 +105,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         </div>
 
         {/* 3. 3 Core Values (Clean, Natural, Authentic) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 max-w-5xl mx-auto text-center pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 max-w-5xl mx-auto text-center bg-slate-50 rounded-3xl border border-slate-100 p-6 sm:p-10">
           {/* Clean */}
           <div className="space-y-3 px-4 flex flex-col items-center">
             <div className="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shadow-xs">
@@ -168,7 +168,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         </div>
 
         {/* 3b. Wide Community Photo */}
-        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-21/9 bg-slate-900">
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-4/1 bg-slate-900">
           <EditableImage
             contentKey="whoWeAre.midImage"
             defaultValue="/images/who-we-are/mid.jpg"
@@ -179,7 +179,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         </div>
 
         {/* 4. Promoting Sustainability and Community Action */}
-        <div className="text-center max-w-4xl mx-auto space-y-4 pt-6 sm:pt-10">
+        <div className="text-center max-w-4xl mx-auto space-y-4 bg-slate-50 rounded-3xl border border-slate-100 p-6 sm:p-10">
           <EditableText
             contentKey="whoWeAre.section2Title"
             defaultValue="Promoting Sustainability and Community Action"
@@ -210,7 +210,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         </div>
 
         {/* 5. Dynamic Story / Article Sections */}
-        <div className="space-y-16 sm:space-y-24 max-w-6xl mx-auto">
+        <div className="space-y-10 sm:space-y-14 max-w-6xl mx-auto">
           {items.map((item) => {
             const isImageLeft = item.layout !== 'image-right';
 
