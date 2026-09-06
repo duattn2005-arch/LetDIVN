@@ -31,7 +31,7 @@ export const WorldCleanupDayPage: React.FC = () => {
             defaultValue="World Cleanup Day has now been added to the official United Nations Calendar of International Days & Weeks from 2024 onwards! This presents even greater opportunities to unite tens of millions participants in cross-sector cooperation, bringing citizens, governments, and organisations together to tackle the global mismanaged waste crisis and to help create a new, more sustainable and waste-free world. Join us on 20 September this year and every year!"
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-[800px] mx-auto"
+            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-[800px] mx-auto text-pretty"
           />
         </div>
 
@@ -100,7 +100,7 @@ export const WorldCleanupDayPage: React.FC = () => {
               as="p"
               multiline
               resizable
-              className="text-sm sm:text-base text-slate-600 leading-relaxed"
+              className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance"
             />
             <EditableText
               contentKey="wcd.fromNowText2"
@@ -108,7 +108,7 @@ export const WorldCleanupDayPage: React.FC = () => {
               as="p"
               multiline
               resizable
-              className="text-sm sm:text-base text-slate-600 leading-relaxed"
+              className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance"
             />
           </div>
 

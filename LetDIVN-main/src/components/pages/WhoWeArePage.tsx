@@ -93,7 +93,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
             defaultValue="We’re a diverse group of people, all bound together by something even bigger than collecting trash: working together to engage the Vietnam communities and share our passion for the beauty of the natural world."
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto"
+            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto text-balance"
           />
 
           {isAdmin && (
@@ -191,7 +191,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
             defaultValue="Let’s Do It Vietnam is a vibrant and dedicated organization committed to environmental sustainability and community action. As part of the global Let’s Do It World movement, we focus on addressing waste management issues, promoting recycling, and fostering a cleaner, greener Vietnam. Our activities range from large-scale cleanup events to educational campaigns, engaging volunteers and communities across the country."
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-4xl mx-auto"
+            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-4xl mx-auto text-pretty"
           />
 
           {/* Admin Add New Section Button */}

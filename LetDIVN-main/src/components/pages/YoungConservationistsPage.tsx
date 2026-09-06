@@ -35,7 +35,7 @@ export const YoungConservationistsPage: React.FC = () => {
 Although YCSW is not directly organized by Let's Do It Vietnam, a significant number of its members actively participate in operating and managing the project. Their contributions help drive impactful actions and foster a strong conservation mindset among young people."
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="text-sm sm:text-base text-slate-600 leading-relaxed text-pretty"
           />
         </div>
 
