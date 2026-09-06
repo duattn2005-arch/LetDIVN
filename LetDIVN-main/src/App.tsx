@@ -219,9 +219,6 @@ export function AppContent() {
           <ProjectsPage
             onSelectProject={handleSelectProject}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
-            onOpenWorldCleanupDay={() => handleNavigate('world-cleanup-day')}
-            onOpenEnvironmentalDay={() => handleNavigate('environmental-day')}
-            onOpenGreenOceanCampaign={() => handleNavigate('green-ocean-campaign')}
           />
         )}
 

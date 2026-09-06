@@ -10,22 +10,15 @@ import { EditableText } from '../EditableText';
 interface ProjectsPageProps {
   onSelectProject: (id: string) => void;
   onRegisterVolunteer: (eventId?: string) => void;
-  onOpenWorldCleanupDay: () => void;
-  onOpenEnvironmentalDay: () => void;
-  onOpenGreenOceanCampaign: () => void;
 }
 
 export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   onSelectProject,
   onRegisterVolunteer,
-  onOpenWorldCleanupDay,
-  onOpenEnvironmentalDay,
-  onOpenGreenOceanCampaign,
 }) => {
   const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   // Modal states
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -62,15 +55,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
     }
   };
 
-  const categories = [
-    'All',
-    'World Cleanup Day',
-    'Green Ocean Campaign',
-    'Environmental Day',
-    'Young Conservationists',
-    'Community Workshop'
-  ];
-
   const categoryMap: Record<string, string> = {
     'All': t.projectsAllCategoryLabel,
     'World Cleanup Day': t.projectWcd,
@@ -84,11 +68,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   const visibleEvents = events.filter(e => {
     if (isAdmin) return true;
     return e.status !== 'Pending';
-  });
-
-  const filteredEvents = visibleEvents.filter(e => {
-    if (selectedCategory === 'All') return true;
-    return e.category === selectedCategory;
   });
 
   const pendingCount = events.filter(e => e.status === 'Pending').length;
@@ -134,68 +113,9 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
           </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                selectedCategory === cat
-                  ? 'bg-[#E81A7F] text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              {categoryMap[cat] || cat}
-            </button>
-          ))}
-        </div>
-
-        {selectedCategory === 'World Cleanup Day' && (
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-            <p className="text-sm text-slate-600">
-              Want to learn more about the global World Cleanup Day movement?
-            </p>
-            <button
-              onClick={onOpenWorldCleanupDay}
-              className="shrink-0 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md transition-all cursor-pointer"
-            >
-              About World Cleanup Day
-            </button>
-          </div>
-        )}
-
-        {selectedCategory === 'Environmental Day' && (
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-            <p className="text-sm text-slate-600">
-              Want to learn more about our Environmental Day campaign?
-            </p>
-            <button
-              onClick={onOpenEnvironmentalDay}
-              className="shrink-0 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md transition-all cursor-pointer"
-            >
-              About Environmental Day
-            </button>
-          </div>
-        )}
-
-        {selectedCategory === 'Green Ocean Campaign' && (
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-            <p className="text-sm text-slate-600">
-              Want to learn more about the Green Ocean Campaign?
-            </p>
-            <button
-              onClick={onOpenGreenOceanCampaign}
-              className="shrink-0 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-md transition-all cursor-pointer"
-            >
-              About Green Ocean Campaign
-            </button>
-          </div>
-        )}
-
         {/* Event Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredEvents.map(evt => {
+          {visibleEvents.map(evt => {
             const isPending = evt.status === 'Pending';
 
             return (
