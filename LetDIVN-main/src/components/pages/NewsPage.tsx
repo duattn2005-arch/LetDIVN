@@ -158,14 +158,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                 </div>
               </div>
 
-              <ClickToChangeImage
-                src={selectedArticle.image}
-                alt={selectedArticle.title}
-                wrapperClassName="aspect-16/9 rounded-2xl overflow-hidden shadow-md"
-                className="w-full h-full object-cover"
-                onChange={(url) => dbService.updateNews(selectedArticle.id, { image: url })}
-              />
-
               {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
                 <div className="space-y-6">
                   {selectedArticle.contentBlocks.map((block, index) =>
