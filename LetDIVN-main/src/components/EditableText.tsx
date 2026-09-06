@@ -373,31 +373,26 @@ export const EditableText: React.FC<EditableTextProps> = ({
               ))}
             </div>
 
-            <div className="flex items-center gap-0.5 bg-white border border-purple-300 rounded-lg p-0.5">
-              {([
-                { value: '', label: 'Default' },
-                { value: '12px', label: '12' },
-                { value: '14px', label: '14' },
-                { value: '16px', label: '16' },
-                { value: '20px', label: '20' },
-                { value: '24px', label: '24' },
-                { value: '32px', label: '32' },
-                { value: '48px', label: '48' },
-              ] as const).map(({ value, label }) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => setDraftFontSize(draftFontSize === value ? '' : value)}
-                  title={value ? `Font size: ${label}px` : 'Default font size'}
-                  className={`px-1.5 py-1 rounded-md cursor-pointer transition-colors text-[11px] font-bold ${
-                    draftFontSize === value
-                      ? 'bg-purple-600 text-white'
-                      : 'text-purple-700 hover:bg-purple-100'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
+            <div
+              className="flex items-center gap-1 bg-white border border-purple-300 rounded-lg pl-2 pr-1 py-0.5"
+              title="Type any font size in pixels, or pick one from the list"
+            >
+              <input
+                type="number"
+                min={1}
+                max={300}
+                value={draftFontSize ? parseFloat(draftFontSize) || '' : ''}
+                onChange={(e) => setDraftFontSize(e.target.value ? `${e.target.value}px` : '')}
+                list={`fontSizeSuggestions-${contentKey}`}
+                placeholder="Default"
+                className="w-11 text-[11px] font-bold text-purple-700 placeholder:text-purple-300 placeholder:font-semibold outline-none"
+              />
+              <span className="text-[10px] text-purple-400 font-semibold">px</span>
+              <datalist id={`fontSizeSuggestions-${contentKey}`}>
+                {[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72].map((n) => (
+                  <option key={n} value={n} />
+                ))}
+              </datalist>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
