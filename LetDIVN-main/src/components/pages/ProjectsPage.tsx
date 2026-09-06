@@ -57,10 +57,12 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   };
 
   // For regular visitors, only show approved events (not Pending).
-  const visibleEvents = events.filter(e => {
-    if (isAdmin) return true;
-    return e.status !== 'Pending';
-  });
+  const visibleEvents = events
+    .filter(e => {
+      if (isAdmin) return true;
+      return e.status !== 'Pending';
+    })
+    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
   const pendingCount = events.filter(e => e.status === 'Pending').length;
 
