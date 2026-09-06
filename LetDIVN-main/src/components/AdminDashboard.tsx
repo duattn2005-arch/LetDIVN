@@ -993,9 +993,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                   <div key={evt.id} className="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start mb-2">
-                        <span className="bg-pink-950 text-pink-300 border border-pink-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
-                          {evt.category}
-                        </span>
                         <span className="text-xs text-slate-400 font-mono">{evt.date} • {evt.time}</span>
                       </div>
                       <h5 className="font-bold text-base text-white">{evt.title}</h5>

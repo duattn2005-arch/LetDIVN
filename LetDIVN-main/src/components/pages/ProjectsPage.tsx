@@ -55,15 +55,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
     }
   };
 
-  const categoryMap: Record<string, string> = {
-    'All': t.projectsAllCategoryLabel,
-    'World Cleanup Day': t.projectWcd,
-    'Green Ocean Campaign': t.projectGreenOcean,
-    'Environmental Day': t.projectEnvDay,
-    'Young Conservationists': t.projectYoungWildlife,
-    'Community Workshop': t.projectWorkshop
-  };
-
   // For regular visitors, only show approved events (not Pending).
   const visibleEvents = events.filter(e => {
     if (isAdmin) return true;
@@ -160,10 +151,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                       alt={evt.title} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 bg-[#E81A7F] text-white text-[10px] font-bold uppercase px-3 py-1 rounded-full shadow-xs">
-                      {categoryMap[evt.category] || evt.category}
-                    </div>
-
                     {isPending ? (
                       <div className="absolute bottom-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                         <Clock className="w-3 h-3" />
