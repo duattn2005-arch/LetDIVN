@@ -60,15 +60,6 @@ const VIEW_TO_PATH: Record<string, string> = {
   'community-workshop': '/community-workshop/',
 };
 
-// Campaign events with their own dedicated info page — /projects/<id>/ for
-// these redirects to the info page's own URL instead of the generic
-// event-detail (schedule) template.
-const PROJECT_ID_TO_INFO_VIEW: Record<string, string> = {
-  'evt-wcd-2026': 'world-cleanup-day',
-  'evt-env-day-hcm': 'environmental-day',
-  'evt-green-ocean-danang': 'green-ocean-campaign',
-};
-
 function pathForView(view: string, projectId?: string): string {
   if (view === 'project-detail' && projectId) return `/projects/${encodeURIComponent(projectId)}/`;
   return VIEW_TO_PATH[view] || '/';
@@ -79,16 +70,7 @@ function parseLocation(): { view: string; projectId?: string } {
   if (path === '/') return { view: 'home' };
   const projectMatch = path.match(/^\/projects\/([^/]+)$/);
   if (projectMatch) {
-    const projectId = decodeURIComponent(projectMatch[1]);
-    const infoView = PROJECT_ID_TO_INFO_VIEW[projectId];
-    if (infoView) {
-      // Old/shared link to a campaign that now has its own page — swap the
-      // URL itself over rather than just rendering different content at
-      // the legacy path, so it stops appearing bookmarkable/shareable.
-      window.history.replaceState({}, '', pathForView(infoView));
-      return { view: infoView };
-    }
-    return { view: 'project-detail', projectId };
+    return { view: 'project-detail', projectId: decodeURIComponent(projectMatch[1]) };
   }
   const entry = Object.entries(VIEW_TO_PATH).find(([, p]) => p.replace(/\/+$/, '') === path);
   return { view: entry ? entry[0] : 'home' };
@@ -128,9 +110,7 @@ export function AppContent() {
     let nextView = view;
     let nextProjectId: string | undefined;
 
-    if (view === 'project-detail' && extraId && PROJECT_ID_TO_INFO_VIEW[extraId]) {
-      nextView = PROJECT_ID_TO_INFO_VIEW[extraId];
-    } else if (view === 'project-detail' && extraId) {
+    if (view === 'project-detail' && extraId) {
       nextProjectId = extraId;
     } else if (view.startsWith('project:')) {
       nextProjectId = view.replace('project:', '');
