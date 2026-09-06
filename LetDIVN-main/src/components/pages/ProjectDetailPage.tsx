@@ -12,18 +12,12 @@ interface ProjectDetailPageProps {
   projectId: string;
   onBack: () => void;
   onRegisterVolunteer: (eventId: string) => void;
-  onOpenWorldCleanupDay: () => void;
-  onOpenEnvironmentalDay: () => void;
-  onOpenGreenOceanCampaign: () => void;
 }
 
 export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
   projectId,
   onBack,
   onRegisterVolunteer,
-  onOpenWorldCleanupDay,
-  onOpenEnvironmentalDay,
-  onOpenGreenOceanCampaign,
 }) => {
   const { isAdmin } = useAuth();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
@@ -38,7 +32,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
     return () => unsubscribe();
   }, []);
 
-  const event = events.find(e => e.id === projectId) || events[0];
+  const event = events.find(e => e.id === projectId);
 
   // Leaflet map setup for specific project
   useEffect(() => {
@@ -92,7 +86,20 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
     }
   }, [event]);
 
-  if (!event) return null;
+  if (!event) {
+    return (
+      <div className="py-24 bg-white text-center">
+        <p className="text-sm text-slate-500 mb-4">This campaign could not be found.</p>
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Project List</span>
+        </button>
+      </div>
+    );
+  }
 
   const percent = Math.min(100, Math.round((event.registeredCount / event.targetVolunteers) * 100));
 
@@ -131,9 +138,6 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
           
           <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
-            <div className="inline-block bg-[#E81A7F] text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full">
-              {event.category}
-            </div>
             <h1 className="text-2xl sm:text-4xl font-black">{event.title}</h1>
             <p className="text-xs sm:text-sm text-slate-200">{event.location}</p>
           </div>
@@ -149,33 +153,6 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
               <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
                 {event.description}
               </p>
-              {event.category === 'World Cleanup Day' && (
-                <button
-                  onClick={onOpenWorldCleanupDay}
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer"
-                >
-                  <span>Learn more about the World Cleanup Day movement</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </button>
-              )}
-              {event.category === 'Environmental Day' && (
-                <button
-                  onClick={onOpenEnvironmentalDay}
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer"
-                >
-                  <span>Learn more about Environmental Day</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </button>
-              )}
-              {event.category === 'Green Ocean Campaign' && (
-                <button
-                  onClick={onOpenGreenOceanCampaign}
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer"
-                >
-                  <span>Learn more about the Green Ocean Campaign</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </button>
-              )}
             </div>
 
             {/* Schedule & Meeting Point */}

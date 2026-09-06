@@ -78,7 +78,7 @@ function parseLocation(): { view: string; projectId?: string } {
 
 export function AppContent() {
   const [activeView, setActiveView] = useState<string>(() => parseLocation().view);
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => parseLocation().projectId || 'evt-wcd-2026');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => parseLocation().projectId || '');
 
   // Modals state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -214,9 +214,6 @@ export function AppContent() {
             projectId={selectedProjectId}
             onBack={() => handleNavigate('projects')}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
-            onOpenWorldCleanupDay={() => handleNavigate('world-cleanup-day')}
-            onOpenEnvironmentalDay={() => handleNavigate('environmental-day')}
-            onOpenGreenOceanCampaign={() => handleNavigate('green-ocean-campaign')}
           />
         )}
 

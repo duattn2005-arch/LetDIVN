@@ -705,16 +705,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     markersRef.current = {};
 
     events.forEach(evt => {
-      let coords = evt.coordinates || { lat: 21.0285, lng: 105.8542 };
-      if (evt.id === 'evt-green-ocean-danang') {
-        coords = { lat: 16.1083, lng: 108.2778 }; // Bán đảo Sơn Trà Đà Nẵng
-      } else if (evt.id === 'evt-env-day-hcm') {
-        coords = { lat: 10.7769, lng: 106.6924 };
-      } else if (evt.id === 'evt-wildlife-catba') {
-        coords = { lat: 20.8000, lng: 106.9961 };
-      } else if (evt.id === 'evt-wcd-2026') {
-        coords = { lat: 21.0245, lng: 105.8576 };
-      }
+      const coords = evt.coordinates || { lat: 21.0285, lng: 105.8542 };
 
       const isSelected = activeEvent?.id === evt.id;
       const isPending = evt.status === 'Pending';
@@ -793,14 +784,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
   const handleFlyToEvent = (evt: CleanupEvent) => {
     setActiveEvent(evt);
-    let coords = evt.coordinates || { lat: 21.0285, lng: 105.8542 };
-    if (evt.id === 'evt-green-ocean-danang') {
-      coords = { lat: 16.1083, lng: 108.2778 }; // Bán đảo Sơn Trà Đà Nẵng
-    } else if (evt.id === 'evt-env-day-hcm') {
-      coords = { lat: 10.7769, lng: 106.6924 };
-    } else if (evt.id === 'evt-wildlife-catba') {
-      coords = { lat: 20.8000, lng: 106.9961 };
-    }
+    const coords = evt.coordinates || { lat: 21.0285, lng: 105.8542 };
 
     mapInstanceRef.current?.flyTo([coords.lat, coords.lng], 15, { duration: 1.2 });
     setMobileTab('map');
@@ -1221,9 +1205,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-[9px] font-extrabold uppercase bg-pink-500/20 text-[#FF4D9E] px-2 py-0.5 rounded-full">
-                      {activeEvent.category}
-                    </span>
                     <span className="text-[10px] text-slate-400 font-bold ml-auto">
                       📍 {activeEvent.city}
                     </span>
