@@ -295,12 +295,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
 
                 <div className="p-6 pt-0 flex gap-2">
                   <button
-                    onClick={() => onSelectProject(evt.id)}
-                    className="flex-1 py-2.5 border border-slate-300 hover:border-slate-400 text-slate-700 font-bold text-xs rounded-full transition-colors cursor-pointer text-center"
-                  >
-                    <EditableText contentKey="projects.viewDetailsBtn" defaultValue={t.projectsDetailBtn} as="span" />
-                  </button>
-                  <button
                     onClick={() => onRegisterVolunteer(evt.id)}
                     className="flex-1 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs py-2.5 rounded-full shadow-md transition-colors cursor-pointer text-center"
                   >
