@@ -8,7 +8,7 @@ export const YoungConservationistsPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Full-bleed banner */}
-      <div className="w-full aspect-3/1 bg-slate-100 overflow-hidden">
+      <div className="w-full aspect-4/1 bg-slate-100 overflow-hidden">
         <EditableImage
           contentKey="ycsw.banner"
           defaultValue="/images/young-conservationists/banner.jpg"

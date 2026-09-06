@@ -7,7 +7,7 @@ export const WorldCleanupDayPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Hero banner: full-bleed, no rounding/border/shadow/overlay text */}
-      <div className="w-full aspect-3/1 bg-slate-100 overflow-hidden">
+      <div className="w-full aspect-4/1 bg-slate-100 overflow-hidden">
         <EditableImage
           contentKey="wcd.banner"
           defaultValue="/images/world-cleanup-day/banner.jpg"
