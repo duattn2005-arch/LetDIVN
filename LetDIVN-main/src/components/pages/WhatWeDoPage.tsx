@@ -103,6 +103,7 @@ const WhatWeDoActivityCard: React.FC<{
               defaultValue={translatedDesc}
               as="p"
               multiline
+              resizable
             />
           </div>
 
@@ -193,6 +194,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
               contentKey="whatWeDo.differenceSubtitle"
               defaultValue={language === 'vi' ? "Dưới đây là cách chúng tôi tạo nên sự khác biệt:" : "Here’s how we make a difference:"}
               as="p"
+              resizable
               className="text-sm sm:text-base text-slate-500 font-semibold"
             />
           </div>
@@ -239,25 +241,25 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">1</div>
               <EditableText contentKey="whatWeDo.step1Title" defaultValue="Khảo sát điểm đen" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step1Desc" defaultValue="Đo đạc diện tích & phân loại loại hình rác ô nhiễm" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step1Desc" defaultValue="Đo đạc diện tích & phân loại loại hình rác ô nhiễm" as="p" resizable className="text-xs text-slate-400 mt-1" />
             </div>
 
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">2</div>
               <EditableText contentKey="whatWeDo.step2Title" defaultValue="Huy động tình nguyện" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step2Desc" defaultValue="Mở cổng đăng ký & trang bị bảo hộ chuyên dụng" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step2Desc" defaultValue="Mở cổng đăng ký & trang bị bảo hộ chuyên dụng" as="p" resizable className="text-xs text-slate-400 mt-1" />
             </div>
 
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">3</div>
               <EditableText contentKey="whatWeDo.step3Title" defaultValue="Ra quân & Phân loại" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step3Desc" defaultValue="Thu gom & phân loại nhựa, rác hữu cơ, rác độc hại" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step3Desc" defaultValue="Thu gom & phân loại nhựa, rác hữu cơ, rác độc hại" as="p" resizable className="text-xs text-slate-400 mt-1" />
             </div>
 
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">4</div>
               <EditableText contentKey="whatWeDo.step4Title" defaultValue="Bàn giao & Tái chế" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step4Desc" defaultValue="Cân đo khối lượng & chuyển giao nhà máy xử lý" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step4Desc" defaultValue="Cân đo khối lượng & chuyển giao nhà máy xử lý" as="p" resizable className="text-xs text-slate-400 mt-1" />
             </div>
           </div>
 

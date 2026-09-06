@@ -68,6 +68,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenDbAdmin }) => 
               defaultValue={t.footerDesc}
               as="p"
               multiline
+              resizable
               className="text-sm text-slate-500 max-w-sm leading-relaxed"
             />
 

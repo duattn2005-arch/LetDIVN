@@ -69,6 +69,7 @@ export const ContactPage: React.FC = () => {
             as="p"
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
             multiline
+            resizable
           />
         </div>
 

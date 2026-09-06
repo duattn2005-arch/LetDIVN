@@ -837,7 +837,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             </span>
             <div>
               <EditableText contentKey="cleanupMap.title" defaultValue={t.mapTitle || (language === 'vi' ? "Bản Đồ Địa Lý Toàn Quốc" : "Nationwide Cleanup Spot Map")} as="h1" className="text-base sm:text-lg font-black text-white leading-tight" />
-              <EditableText contentKey="cleanupMap.subtitle" defaultValue={t.mapSubtitle || (language === 'vi' ? "Tìm kiếm bất kỳ địa điểm, trường học, bệnh viện hay địa danh nào để định vị trực tiếp trên bản đồ." : "Search any place, school, hospital or landmark to locate directly on the map.")} as="p" multiline className="text-[11px] text-slate-400" />
+              <EditableText contentKey="cleanupMap.subtitle" defaultValue={t.mapSubtitle || (language === 'vi' ? "Tìm kiếm bất kỳ địa điểm, trường học, bệnh viện hay địa danh nào để định vị trực tiếp trên bản đồ." : "Search any place, school, hospital or landmark to locate directly on the map.")} as="p" multiline resizable className="text-[11px] text-slate-400" />
             </div>
           </div>
 

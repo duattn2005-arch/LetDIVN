@@ -58,6 +58,7 @@ export const MediaVideosPage: React.FC = () => {
             defaultValue={t.videosPageSubtitle}
             as="p"
             multiline
+            resizable
             className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
           />
 

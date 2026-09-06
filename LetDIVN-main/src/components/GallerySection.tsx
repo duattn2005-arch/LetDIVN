@@ -39,6 +39,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onViewAllGallery
             contentKey="gallery.subtitle"
             defaultValue={t.gallerySubtitle}
             as="p"
+            resizable
             className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xl mx-auto"
           />
         </div>

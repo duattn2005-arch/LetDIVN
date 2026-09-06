@@ -38,6 +38,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
             contentKey="getInvolved.subtitle"
             defaultValue={t.getInvolvedSubtitle}
             as="p"
+            resizable
             className="text-xs sm:text-sm text-slate-600 leading-relaxed"
           />
         </div>
