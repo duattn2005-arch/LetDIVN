@@ -36,7 +36,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
             contentKey="wcd.title"
             defaultValue="20 September – World Cleanup Day"
             as="h2"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#e91e63] tracking-tight leading-tight"
+            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight"
           />
           <EditableText
             contentKey="wcd.intro"
@@ -50,7 +50,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
         {/* Zig-zag content, pure white background */}
         <div className="max-w-7xl mx-auto">
           {/* Block 1: image left, text right */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-14">
             <div className="aspect-4/3 bg-slate-100">
               <EditableImage
                 contentKey="wcd.block1.image"
@@ -70,7 +70,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           </div>
 
           {/* Block 2 (reversed): text left, image right */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-14">
             <div className="space-y-4 order-2 lg:order-1">
               <EditableText
                 contentKey="wcd.block2.text1"
@@ -104,7 +104,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
               contentKey="wcd.fromNowTitle"
               defaultValue="From Now and Forever"
               as="h2"
-              className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#e91e63] tracking-tight"
+              className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight"
             />
             <EditableText
               contentKey="wcd.fromNowText1"
@@ -125,7 +125,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           </div>
 
           {/* Block 3: image left, text right */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-14">
             <div className="aspect-4/3 bg-slate-100">
               <EditableImage
                 contentKey="wcd.block3.image"
@@ -145,7 +145,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           </div>
 
           {/* Block 4 (reversed): text left, image right */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-14">
             <EditableText
               contentKey="wcd.block4.text"
               defaultValue="We are the very definition of unity in civic society, transcending traditional barriers to cooperation and bringing together global corporations and national governments. Our movement includes every nationality, age group, gender identity, and religious affiliation. We now act as a focal point for collective intelligence, raising awareness of the challenges our environment faces."
