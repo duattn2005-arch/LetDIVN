@@ -186,6 +186,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
               defaultValue={language === 'vi' ? "Tại Let’s Do It! Vietnam, sứ mệnh của chúng tôi là biến đất nước tươi đẹp của chúng ta thành một nơi trong lành, xanh sạch và đáng sống hơn." : "At Let’s Do It! Vietnam, we’re on a mission to transform our beautiful country into a cleaner, greener haven."}
               as="p"
               multiline
+              resizable
               className="text-base sm:text-lg text-slate-700 font-medium leading-relaxed max-w-3xl mx-auto"
             />
             <EditableText
