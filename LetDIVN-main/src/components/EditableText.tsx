@@ -226,10 +226,23 @@ export const EditableText: React.FC<EditableTextProps> = ({
             }
           : {}),
         ...(align ? { textAlign: align as React.CSSProperties['textAlign'] } : {}),
+        // Letting words hyphenate gives justify more break points per line,
+        // so it can fill the line by hyphenating instead of only stretching
+        // the gaps between whole words.
+        ...(align === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto' } : {}),
         // An admin-set width makes this a shrunk block centered in its
         // parent — the surrounding layout no longer dictates its width.
         ...(resizable && width ? { maxWidth: width, marginLeft: 'auto', marginRight: 'auto' } : {}),
         ...(fontSize ? { fontSize } : {}),
+        // Justify stretches inter-word spacing to fill the FULL line width —
+        // fine at a normal reading measure, but the wider the line the more
+        // dramatic (and uneven-looking) that stretch becomes, especially for
+        // short paragraphs that don't naturally fill a very wide box. Capping
+        // justified text at a classic ~65-character reading column keeps it
+        // legible and evenly spaced no matter how wide the block itself is
+        // resized to — the box can still be dragged wide, the text just stays
+        // centered in a sane column inside it.
+        ...(align === 'justify' ? { maxWidth: '65ch', marginLeft: 'auto', marginRight: 'auto' } : {}),
       }
     : undefined;
 
@@ -282,6 +295,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
+            ...(draftAlign === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto' } : {}),
             ...(draftFontSize ? { fontSize: draftFontSize } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
