@@ -156,11 +156,8 @@ export function AppContent() {
     setIsVolunteerModalOpen(true);
   };
 
-  // "Details" (map popup) and campaign clicks in the registration hub no
-  // longer open the generic project-detail schedule page — they go to the
-  // same Join As Volunteer list instead.
-  const handleSelectProject = () => {
-    handleNavigate('projects');
+  const handleSelectProject = (projectId: string) => {
+    handleNavigate('project-detail', projectId);
   };
 
   return (
