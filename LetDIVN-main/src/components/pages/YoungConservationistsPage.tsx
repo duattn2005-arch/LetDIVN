@@ -117,7 +117,7 @@ Participants joined five interactive online training sessions on Zoom, equipping
             multiline
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6"
           />
-          <div className="space-y-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
             {['act2-1', 'act2-2', 'act2-3', 'act2-4', 'act2-5'].map((k) => (
               <div key={k} className="rounded-2xl overflow-hidden aspect-[7/2] bg-slate-100">
                 <EditableImage
