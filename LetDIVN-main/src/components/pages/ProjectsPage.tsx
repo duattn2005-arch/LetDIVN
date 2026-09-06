@@ -177,9 +177,8 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                   </div>
 
                   <div className="p-6 space-y-4">
-                    <h3 
-                      onClick={() => onSelectProject(evt.id)}
-                      className="font-black text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors cursor-pointer line-clamp-2"
+                    <h3
+                      className="font-black text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors line-clamp-2"
                     >
                       {evt.title}
                     </h3>
