@@ -1244,16 +1244,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
                   <div className="flex items-center gap-2 mt-3">
                     <a
-                      href={`#project-${activeEvent.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onSelectProject(activeEvent.id);
-                      }}
-                      className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center inline-block"
-                    >
-                      <EditableText contentKey="cleanupMap.viewProjectBtn" defaultValue={language === 'vi' ? "Xem Dự Án" : "View Project"} as="span" />
-                    </a>
-                    <a
                       href={`#register-${activeEvent.id}`}
                       onClick={(e) => {
                         e.preventDefault();
