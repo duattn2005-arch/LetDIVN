@@ -268,7 +268,10 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
                   </div>
 
                   {/* Text Column */}
-                  <div className={`lg:col-span-6 space-y-4 ${isImageLeft ? '' : 'lg:col-start-1'}`}>
+                  <div
+                    className={`lg:col-span-6 space-y-4 ${isImageLeft ? '' : 'lg:col-start-1'}`}
+                    style={{ textAlign: item.textAlign || 'left' }}
+                  >
                     <h3 className="text-2xl sm:text-3xl font-bold text-[#E81A7F] tracking-tight">
                       {item.title}
                     </h3>

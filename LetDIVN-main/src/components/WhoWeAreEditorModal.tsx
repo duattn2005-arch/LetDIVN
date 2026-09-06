@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, Check } from 'lucide-react';
+import { X, Sparkles, Check, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
 import { WhoWeAreItem } from '../types';
 import { ImageUploadWidget } from './ImageUploadWidget';
 
@@ -21,6 +21,7 @@ export const WhoWeAreEditorModal: React.FC<WhoWeAreEditorModalProps> = ({
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
   const [layout, setLayout] = useState<'image-left' | 'image-right'>('image-left');
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right' | 'justify'>('left');
 
   useEffect(() => {
     if (itemToEdit) {
@@ -28,11 +29,13 @@ export const WhoWeAreEditorModal: React.FC<WhoWeAreEditorModalProps> = ({
       setContent(itemToEdit.content || '');
       setImage(itemToEdit.image || '');
       setLayout(itemToEdit.layout || 'image-left');
+      setTextAlign(itemToEdit.textAlign || 'left');
     } else {
       setTitle('');
       setContent('');
       setImage('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1000&auto=format&fit=crop&q=80');
       setLayout('image-left');
+      setTextAlign('left');
     }
   }, [itemToEdit, isOpen]);
 
@@ -55,6 +58,7 @@ export const WhoWeAreEditorModal: React.FC<WhoWeAreEditorModalProps> = ({
       content: content.trim(),
       image: image.trim() || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1000&auto=format&fit=crop&q=80',
       layout,
+      textAlign,
     };
 
     onSave(payload as any);
@@ -127,6 +131,33 @@ export const WhoWeAreEditorModal: React.FC<WhoWeAreEditorModalProps> = ({
                   >
                     <span>Text Left — Image Right 🖼️</span>
                   </button>
+                </div>
+              </div>
+
+              {/* Text Alignment */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Text Alignment</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {([
+                    { value: 'left', Icon: AlignLeft, label: 'Left' },
+                    { value: 'center', Icon: AlignCenter, label: 'Center' },
+                    { value: 'right', Icon: AlignRight, label: 'Right' },
+                    { value: 'justify', Icon: AlignJustify, label: 'Justify' },
+                  ] as const).map(({ value, Icon, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setTextAlign(value)}
+                      title={label}
+                      className={`py-2.5 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                        textAlign === value
+                          ? 'border-[#E81A7F] bg-pink-50 text-[#E81A7F] ring-2 ring-[#E81A7F]/20'
+                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </button>
+                  ))}
                 </div>
               </div>
 

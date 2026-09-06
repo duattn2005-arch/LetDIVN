@@ -108,7 +108,10 @@ export const CampaignSections: React.FC<CampaignSectionsProps> = ({ page }) => {
                       loading="lazy"
                     />
                   </div>
-                  <div className={isImageLeft ? '' : 'order-2 lg:order-1'}>
+                  <div
+                    className={isImageLeft ? '' : 'order-2 lg:order-1'}
+                    style={{ textAlign: section.textAlign || 'left' }}
+                  >
                     <h3 className="text-xl sm:text-2xl font-black text-[#E81A7F] tracking-tight mb-3">
                       {section.title}
                     </h3>

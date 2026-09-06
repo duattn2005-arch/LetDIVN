@@ -185,6 +185,7 @@ export interface WhoWeAreItem {
   content: string;
   image: string;
   layout?: 'image-left' | 'image-right';
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
   order?: number;
 }
 
@@ -199,6 +200,7 @@ export interface CampaignSection {
   content: string;
   image: string;
   layout?: 'image-left' | 'image-right';
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
 }
 
 
