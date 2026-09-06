@@ -146,6 +146,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
             contentKey="ourPartners.subtitle"
             defaultValue="Working with strong partners can make a significant impact."
             as="p"
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
           />
           <EditableText
@@ -153,6 +154,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
             defaultValue="We collaborate with local communities, schools, and businesses to organize large-scale clean-up campaigns. We partners with companies to promote sustainable practices within their operations."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto [text-wrap:balance]"
           />
 

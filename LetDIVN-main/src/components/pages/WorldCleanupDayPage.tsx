@@ -31,6 +31,7 @@ export const WorldCleanupDayPage: React.FC = () => {
             defaultValue="World Cleanup Day has now been added to the official United Nations Calendar of International Days & Weeks from 2024 onwards! This presents even greater opportunities to unite tens of millions participants in cross-sector cooperation, bringing citizens, governments, and organisations together to tackle the global mismanaged waste crisis and to help create a new, more sustainable and waste-free world. Join us on 20 September this year and every year!"
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-[800px] mx-auto text-pretty"
           />
         </div>
@@ -53,6 +54,7 @@ export const WorldCleanupDayPage: React.FC = () => {
               defaultValue="Since 2018, World Cleanup Day has become the biggest civic movement in human history, uniting 211 countries and territories – which includes 95% of UN-listed countries – across the world, and 91 million volunteers, equal to 1.1% of global population – all striving to create a cleaner planet."
               as="p"
               multiline
+              resizable
               className="text-sm sm:text-base text-slate-600 leading-relaxed"
             />
           </div>
@@ -65,6 +67,7 @@ export const WorldCleanupDayPage: React.FC = () => {
                 defaultValue="World Cleanup Day harnesses the power of people around the world to achieve incredible things by joining together."
                 as="p"
                 multiline
+                resizable
                 className="text-sm sm:text-base text-slate-600 leading-relaxed"
               />
               <EditableText
@@ -72,6 +75,7 @@ export const WorldCleanupDayPage: React.FC = () => {
                 defaultValue="Its beauty lies in cooperation and collaboration: building bridges between otherwise disparate communities – and including all levels and sectors of society – from citizens to businesses, to governments."
                 as="p"
                 multiline
+                resizable
                 className="text-sm sm:text-base text-slate-600 leading-relaxed"
               />
             </div>
@@ -128,6 +132,7 @@ export const WorldCleanupDayPage: React.FC = () => {
               defaultValue="World Cleanup Day has since grown into a global movement across almost every nation and territory on the planet, with millions of volunteers and a strong network of charismatic leaders. The simple act of cleaning has become a force that binds together people and groups that would otherwise never dream of working towards the same goal."
               as="p"
               multiline
+              resizable
               className="text-sm sm:text-base text-slate-600 leading-relaxed"
             />
           </div>

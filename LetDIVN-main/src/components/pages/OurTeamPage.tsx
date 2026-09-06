@@ -72,6 +72,7 @@ export const OurTeamPage: React.FC = () => {
             defaultValue={t.ourTeamDesc}
             as="p"
             multiline
+            resizable
             className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
           />
 
@@ -223,6 +224,7 @@ export const OurTeamPage: React.FC = () => {
             defaultValue={t.ourTeamJoinDesc}
             as="p"
             multiline
+            resizable
             className="text-sm text-slate-600 leading-relaxed"
           />
           <a

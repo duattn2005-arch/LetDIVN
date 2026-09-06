@@ -67,6 +67,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
               contentKey="greenocean.eyebrow"
               defaultValue="Tackle marine litter issues"
               as="p"
+              resizable
               className="text-sm sm:text-base font-bold text-[#FEAC13] uppercase tracking-wide"
             />
             <EditableText
@@ -80,6 +81,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
               defaultValue='In order to raise the awareness of Vietnam local community in coastal cities and support adopting eco-friendly lifestyles, we run "Green Ocean" campaign in Nam Dinh (Vietnam) with several activities aiming at secondary school students, resident group leaders and young emerging leaders. Our vision is that marine litter issues in coastal cities will be minimized, when trash will be collected and sent to proper recycling places.'
               as="p"
               multiline
+              resizable
               className="text-sm sm:text-base text-slate-600 leading-relaxed text-pretty"
             />
           </div>
@@ -120,6 +122,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
             defaultValue="Increasing marine waste issues have been the hottest problems in Vietnam. However, these issues in coastal areas have not been paid enough attention. Nam Dinh is a typical coastal province facing these issues, especially in seaside areas because of the flow of major rivers and because people usually throw trash directly into the sea."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6"
           />
           <PhotoGrid prefix="background" keys={['intro1', 'intro2', 'intro3']} alt="Marine litter along the Nam Dinh coastline" />
@@ -138,6 +141,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
             defaultValue={'With over 3-year experience in raising people\'s awareness of trash issues in Hanoi, Let\'s Do It! Hanoi – a member of Let\'s Do It! World Network will launch "Green Ocean Campaign" in Nam Dinh Province in September 2021. Our vision is to minimize marine litter issues in coastal provinces and local residents will start adopting eco-friendly lifestyles.'}
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed"
           />
         </div>
@@ -180,6 +184,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
               defaultValue="Indirect target audience: local residents in 2 coastal districts – 451,776 people"
               as="p"
               multiline
+              resizable
               className="text-xs text-slate-500 leading-relaxed mt-4 italic"
             />
           </div>
@@ -235,6 +240,7 @@ During the Covid-19 outbreak in Vietnam from August 2021 to March 2022, all acti
 Therefore, we have to wait until the Covid-19 situation is under control so that we can continue our activities."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed"
           />
         </div>
@@ -288,6 +294,7 @@ Therefore, we have to wait until the Covid-19 situation is under control so that
               defaultValue={desc}
               as="p"
               multiline
+              resizable
               className="text-xs sm:text-sm text-slate-200 leading-relaxed"
             />
           </div>

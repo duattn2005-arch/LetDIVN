@@ -41,6 +41,7 @@ export const CommunityWorkshopPage: React.FC = () => {
             defaultValue="The Community Workshop is part of a broader initiative aimed at environmental protection and sustainability. These workshops are organized under the umbrella of the global Let's Do It! World movement, which focuses on tackling environmental issues through community-driven efforts."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed text-pretty"
           />
         </div>
@@ -124,6 +125,7 @@ export const CommunityWorkshopPage: React.FC = () => {
               defaultValue={desc}
               as="p"
               multiline
+              resizable
               className="text-xs sm:text-sm text-slate-200 leading-relaxed"
             />
           </div>

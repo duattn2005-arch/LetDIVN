@@ -132,6 +132,7 @@ export const MediaOnUsPage: React.FC = () => {
             defaultValue="We are delighted to have received enthusiastic and proactive support from the press network in Vietnam. We firmly believe that achieving significant goals is possible only with community support through the influence of the press and social media."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
           />
 

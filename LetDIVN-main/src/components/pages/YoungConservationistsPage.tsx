@@ -35,6 +35,7 @@ export const YoungConservationistsPage: React.FC = () => {
 Although YCSW is not directly organized by Let's Do It Vietnam, a significant number of its members actively participate in operating and managing the project. Their contributions help drive impactful actions and foster a strong conservation mindset among young people."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed text-pretty"
           />
         </div>
@@ -57,6 +58,7 @@ Although YCSW is not directly organized by Let's Do It Vietnam, a significant nu
 A select 24 participants earned a field trip experience through a short film competition, amplifying their voices for conservation. Driven by U.S. exchange alumni, the program fosters a passionate, informed community dedicated to protecting endangered species and shaping a sustainable future."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed"
           />
         </div>
@@ -76,6 +78,7 @@ A select 24 participants earned a field trip experience through a short film com
 Held at the American Center (Ngoc Khanh, Ba Dinh, Ha Noi), the event inspired attendees to take action in protecting endangered species and contributing to a sustainable future."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -115,6 +118,7 @@ Held at the American Center (Ngoc Khanh, Ba Dinh, Ha Noi), the event inspired at
 Participants joined five interactive online training sessions on Zoom, equipping themselves with knowledge and skills to drive meaningful conservation efforts."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -147,6 +151,7 @@ Participants joined five interactive online training sessions on Zoom, equipping
 From 35 submitted films, the top 10 productions were chosen for the final pitching round. The selected filmmakers earned their place in an immersive field experience, putting their passion into action at Cuc Phuong National Park."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -184,6 +189,7 @@ From 35 submitted films, the top 10 productions were chosen for the final pitchi
             defaultValue="As one of the last activities in the program, this activity was built for young people to visit and experience wildlife rescue and conservation centers, including Save Vietnam's Wildlife, the Endangered Primate Rescue Center, the Turtle Conservation Center, and Ninh Binh Bear Sanctuary."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-8"
           />
 
@@ -231,6 +237,7 @@ From 35 submitted films, the top 10 productions were chosen for the final pitchi
                 defaultValue={text}
                 as="p"
                 multiline
+                resizable
                 className="text-sm sm:text-base text-slate-600 leading-relaxed mb-4"
               />
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -256,6 +263,7 @@ From 35 submitted films, the top 10 productions were chosen for the final pitchi
 Beyond training, the program strengthened connections among alumni in Vietnam's wildlife and environmental sectors. With nearly 3,500 applications, the overwhelming interest underscores public engagement and youth commitment to conservation."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed"
           />
         </div>
@@ -309,6 +317,7 @@ Beyond training, the program strengthened connections among alumni in Vietnam's 
               defaultValue={desc}
               as="p"
               multiline
+              resizable
               className="text-xs sm:text-sm text-slate-200 leading-relaxed"
             />
           </div>

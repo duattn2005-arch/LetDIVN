@@ -62,6 +62,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 defaultValue={t.heroSlide1Desc}
                 as="p"
                 multiline
+                resizable
                 className="mt-2.5 sm:mt-3 text-xs sm:text-base text-slate-900 font-semibold max-w-4xl mx-auto leading-relaxed"
               />
 
@@ -140,6 +141,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   defaultValue={t.heroSlide2Desc}
                   as="p"
                   multiline
+                  resizable
                   className="mt-4 text-base sm:text-lg text-slate-200 font-normal leading-relaxed max-w-2xl"
                 />
 

@@ -290,6 +290,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             as="p"
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
             multiline
+            resizable
           />
 
           {/* Add Article Button (Admin only) */}

@@ -24,6 +24,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
             defaultValue="We’re a diverse group of people, all bound together by something even bigger than collecting trash: working together to engage the Vietnam communities and share our passion for the beauty of the natural world."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto"
           />
         </div>
@@ -46,6 +47,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
               defaultValue="We take pride in engaging with beauty and its power to ignite inspiration."
               as="p"
               multiline
+              resizable
               className="text-xs sm:text-sm text-slate-600 leading-relaxed"
             />
           </div>
@@ -66,6 +68,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
               defaultValue="We draw inspiration from the unparalleled beauty of the natural world and promote its integration into our constructed surroundings."
               as="p"
               multiline
+              resizable
               className="text-xs sm:text-sm text-slate-600 leading-relaxed"
             />
           </div>
@@ -86,6 +89,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
               defaultValue="Embracing our identity, we proudly showcase our passion as a local, ethical, imperfect, and authentic entity."
               as="p"
               multiline
+              resizable
               className="text-xs sm:text-sm text-slate-600 leading-relaxed"
             />
           </div>
@@ -104,6 +108,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
             defaultValue="Let’s Do It Vietnam is a vibrant and dedicated organization committed to environmental sustainability and community action. As part of the global Let’s Do It World movement, we focus on addressing waste management issues, promoting recycling, and fostering a cleaner, greener Vietnam. Our activities range from large-scale cleanup events to educational campaigns, engaging volunteers and communities across the country."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-4xl mx-auto"
           />
 

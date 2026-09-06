@@ -35,6 +35,7 @@ Getting hands dirty, nurturing growth. Pausing to absorb its beauty and draw ins
 And thus, we are forming alliances with like-minded individuals who share our passion."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed text-pretty"
           />
         </div>
@@ -55,6 +56,7 @@ And thus, we are forming alliances with like-minded individuals who share our pa
             defaultValue="Our focus is on blending the boundaries between nature and urban development, inviting nature into the city to influence how we design our urban environments. We are particularly enthusiastic about projects that incorporate elements such as native plants, trash sorting, and diverse environmental activities into our collaborations."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed"
           />
         </div>
@@ -92,6 +94,7 @@ And thus, we are forming alliances with like-minded individuals who share our pa
             defaultValue="We offer a range of programs and initiatives designed to bring nature closer to everyone. For those interested in sustainable living, our urban workshops teach the basics of green lifestyle, even in small spaces. Our guided nature walks tour provide a deeper appreciation for the Eco-friendly life that thrive in our region."
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed text-pretty"
           />
         </div>
@@ -167,6 +170,7 @@ And thus, we are forming alliances with like-minded individuals who share our pa
               defaultValue={desc}
               as="p"
               multiline
+              resizable
               className="text-xs sm:text-sm text-slate-200 leading-relaxed"
             />
           </div>

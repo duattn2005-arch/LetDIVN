@@ -80,6 +80,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
             defaultValue={t.projectsSubtitle}
             as="p"
             multiline
+            resizable
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
           />
 
