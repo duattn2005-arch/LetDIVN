@@ -24,7 +24,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
       <div className="py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#e91e63] transition-colors cursor-pointer mb-8 max-w-[1100px] mx-auto"
+          className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#e91e63] transition-colors cursor-pointer mb-8 max-w-7xl mx-auto"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Projects</span>
@@ -48,7 +48,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
         </div>
 
         {/* Zig-zag content, pure white background */}
-        <div className="max-w-[1100px] mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Block 1: image left, text right */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14">
             <div className="aspect-4/3 bg-slate-100">
@@ -140,6 +140,48 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
               multiline
               className="text-sm sm:text-base text-slate-600 leading-relaxed"
             />
+          </div>
+
+          {/* Block 4 (reversed): text left, image right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14">
+            <EditableText
+              contentKey="wcd.block4.text"
+              defaultValue="We are the very definition of unity in civic society, transcending traditional barriers to cooperation and bringing together global corporations and national governments. Our movement includes every nationality, age group, gender identity, and religious affiliation. We now act as a focal point for collective intelligence, raising awareness of the challenges our environment faces."
+              as="p"
+              multiline
+              className="text-sm sm:text-base text-slate-600 leading-relaxed order-2 lg:order-1"
+            />
+            <div className="aspect-4/3 bg-slate-100 order-1 lg:order-2">
+              <EditableImage
+                contentKey="wcd.block4.image"
+                defaultValue="/images/world-cleanup-day/block4-unity.jpg"
+                alt="A volunteer collecting trash on a city street"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Closing gallery row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="aspect-3/2 bg-slate-100">
+              <EditableImage
+                contentKey="wcd.gallery1"
+                defaultValue="/images/world-cleanup-day/gallery1.jpg"
+                alt="Volunteers holding World Cleanup Day merchandise"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="aspect-3/2 bg-slate-100">
+              <EditableImage
+                contentKey="wcd.gallery2"
+                defaultValue="/what-we-do-wcd.jpg"
+                alt="A large crowd of volunteers at World Cleanup Day"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </div>
