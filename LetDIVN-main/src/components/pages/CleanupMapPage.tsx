@@ -73,6 +73,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const [isSearchingSuggestions, setIsSearchingSuggestions] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchedPlaceName, setSearchedPlaceName] = useState<string | null>(null);
+  const [hasBoundaryDrawn, setHasBoundaryDrawn] = useState(false);
   const [mobileTab, setMobileTab] = useState<'map' | 'list'>('map');
 
   // Pinned location by user click
@@ -402,24 +403,12 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
             boundaryLayerRef.current = geoLayer;
             map.fitBounds(geoLayer.getBounds(), { padding: [40, 40], maxZoom: 16 });
+            setHasBoundaryDrawn(true);
           } else {
-            // Draw smooth fallback boundary polygon for the POI/location
-            const d = 0.015; // Closer box for specific school/building
-            const polygonPoints: [number, number][] = [
-              [lat + d, lng - d * 1.1],
-              [lat + d * 0.9, lng + d * 0.8],
-              [lat - d * 0.4, lng + d * 1.2],
-              [lat - d * 0.9, lng + d * 0.3],
-              [lat - d * 0.7, lng - d * 1.0]
-            ];
-            const fallbackPoly = L.polygon(polygonPoints, {
-              color: '#EF4444',
-              weight: 3.5,
-              dashArray: '8, 8',
-              fillColor: '#EF4444',
-              fillOpacity: 0.08
-            }).addTo(map);
-            boundaryLayerRef.current = fallbackPoly;
+            // No real boundary available from Nominatim for this place —
+            // skip drawing one rather than showing a made-up shape that
+            // doesn't match the actual area.
+            setHasBoundaryDrawn(false);
           }
 
           // Render a red search pin
@@ -515,23 +504,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
       boundaryLayerRef.current = geoLayer;
       map.fitBounds(geoLayer.getBounds(), { padding: [40, 40], maxZoom: 16 });
+      setHasBoundaryDrawn(true);
     } else {
-      const d = 0.015;
-      const polygonPoints: [number, number][] = [
-        [sug.lat + d, sug.lng - d * 1.1],
-        [sug.lat + d * 0.9, sug.lng + d * 0.8],
-        [sug.lat - d * 0.4, sug.lng + d * 1.2],
-        [sug.lat - d * 0.9, sug.lng + d * 0.3],
-        [sug.lat - d * 0.7, sug.lng - d * 1.0]
-      ];
-      const fallbackPoly = L.polygon(polygonPoints, {
-        color: '#EF4444',
-        weight: 3.5,
-        dashArray: '8, 8',
-        fillColor: '#EF4444',
-        fillOpacity: 0.08
-      }).addTo(map);
-      boundaryLayerRef.current = fallbackPoly;
+      // No real boundary available for this suggestion — skip drawing one
+      // rather than showing a made-up shape that doesn't match the actual area.
+      setHasBoundaryDrawn(false);
     }
 
     if (newPinMarkerRef.current) {
@@ -792,28 +769,13 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       mapInstanceRef.current?.invalidateSize();
     }, 200);
     
-    // Draw boundary around the area
+    // No real boundary data for an event's location — clear any previous
+    // search boundary rather than drawing a made-up shape around it.
     if (boundaryLayerRef.current && mapInstanceRef.current) {
       mapInstanceRef.current.removeLayer(boundaryLayerRef.current);
       boundaryLayerRef.current = null;
     }
-
-    const d = 0.03;
-    const polygonPoints: [number, number][] = [
-      [coords.lat + d, coords.lng - d * 1.1],
-      [coords.lat + d * 0.9, coords.lng + d * 0.8],
-      [coords.lat - d * 0.4, coords.lng + d * 1.2],
-      [coords.lat - d * 0.9, coords.lng + d * 0.3],
-      [coords.lat - d * 0.7, coords.lng - d * 1.0]
-    ];
-    const poly = L.polygon(polygonPoints, {
-      color: '#EF4444',
-      weight: 3.5,
-      dashArray: '8, 8', // Red dashed line matching Screenshot 2
-      fillColor: '#EF4444',
-      fillOpacity: 0.08
-    }).addTo(mapInstanceRef.current!);
-    boundaryLayerRef.current = poly;
+    setHasBoundaryDrawn(false);
 
     setTimeout(() => {
       markersRef.current[evt.id]?.openPopup();
@@ -931,12 +893,14 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <div className="p-3 rounded-2xl bg-red-950/40 border border-red-500/50 text-white space-y-1">
                 <div className="flex items-center gap-1.5 text-red-400 font-extrabold text-xs">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  <EditableText contentKey="cleanupMap.locatingLabel" defaultValue={language === 'vi' ? "ĐANG ĐỊNH VỊ & KHOANH VÙNG:" : "LOCATING & DRAWING BOUNDARY:"} as="span" />
+                  <EditableText contentKey="cleanupMap.locatingLabel" defaultValue={hasBoundaryDrawn ? (language === 'vi' ? "ĐANG ĐỊNH VỊ & KHOANH VÙNG:" : "LOCATING & DRAWING BOUNDARY:") : (language === 'vi' ? "ĐÃ TÌM THẤY:" : "LOCATION FOUND:")} as="span" />
                 </div>
                 <div className="font-extrabold text-sm text-white">
                   📍 {searchedPlaceName}
                 </div>
-                <EditableText contentKey="cleanupMap.boundaryDrawnHint" defaultValue={language === 'vi' ? "Đã khoanh vùng ranh giới nét đứt màu đỏ trên bản đồ." : "The dashed red boundary has been drawn on the map."} as="div" multiline className="text-[10px] text-slate-400" />
+                {hasBoundaryDrawn && (
+                  <EditableText contentKey="cleanupMap.boundaryDrawnHint" defaultValue={language === 'vi' ? "Đã khoanh vùng ranh giới nét đứt màu đỏ trên bản đồ." : "The dashed red boundary has been drawn on the map."} as="div" multiline className="text-[10px] text-slate-400" />
+                )}
               </div>
             ) : (
               <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60 text-slate-400 text-xs">
