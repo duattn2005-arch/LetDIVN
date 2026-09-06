@@ -91,13 +91,19 @@ class DatabaseService {
   }
 
   public async setContent(key: string, value: string): Promise<void> {
-    await this.mutate(`/content/${encodeURIComponent(key)}`, 'PUT', { value });
+    // Patch the cache *before* notifying — components refreshing in response
+    // to their own save read this same cache synchronously-scheduled ahead
+    // of `notify()`'s callers, so patching after would leave their own
+    // change looking stale until some unrelated later mutation notified again.
+    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'PUT', body: JSON.stringify({ value }) });
     if (this.contentCache) this.contentCache[key] = value;
+    this.notify();
   }
 
   public async resetContent(key: string): Promise<void> {
-    await this.mutate(`/content/${encodeURIComponent(key)}`, 'DELETE');
+    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'DELETE' });
     if (this.contentCache) delete this.contentCache[key];
+    this.notify();
   }
 
   // --- EVENTS ---

@@ -41,6 +41,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const alignKey = `${contentKey}__align`;
   const colorsKey = `${contentKey}__colors`;
   const widthKey = `${contentKey}__width`;
+  const fontSizeKey = `${contentKey}__fontSize`;
 
   const parseColors = (raw: string): string[] => {
     try {
@@ -62,22 +63,26 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const [colors, setColors] = useState<string[]>([]);
   // Empty string = no admin override yet, render at its natural width.
   const [width, setWidth] = useState('');
+  // Empty string = no admin override yet, render at the className's own size.
+  const [fontSize, setFontSize] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const [draftColor, setDraftColor] = useState(color);
   const [draftAlign, setDraftAlign] = useState(align);
   const [draftColors, setDraftColors] = useState<string[]>(colors);
+  const [draftFontSize, setDraftFontSize] = useState(fontSize);
   const resizeElRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let cancelled = false;
     const refresh = async () => {
-      const [nextVal, nextColor, nextAlign, nextColorsRaw, nextWidth] = await Promise.all([
+      const [nextVal, nextColor, nextAlign, nextColorsRaw, nextWidth, nextFontSize] = await Promise.all([
         dbService.getContent(langSpecificKey, defaultValue),
         dbService.getContent(colorKey, ''),
         dbService.getContent(alignKey, ''),
         dbService.getContent(colorsKey, ''),
         resizable ? dbService.getContent(widthKey, '') : Promise.resolve(''),
+        dbService.getContent(fontSizeKey, ''),
       ]);
       if (cancelled) return;
       const nextColors = parseColors(nextColorsRaw);
@@ -86,12 +91,14 @@ export const EditableText: React.FC<EditableTextProps> = ({
       setAlign(nextAlign);
       setColors(nextColors);
       setWidth(nextWidth);
+      setFontSize(nextFontSize);
       setIsEditing((editing) => {
         if (!editing) {
           setDraft(nextVal);
           setDraftColor(nextColor);
           setDraftAlign(nextAlign);
           setDraftColors(nextColors);
+          setDraftFontSize(nextFontSize);
         }
         return editing;
       });
@@ -102,7 +109,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       cancelled = true;
       unsub();
     };
-  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, colorsKey, widthKey, resizable]);
+  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, colorsKey, widthKey, fontSizeKey, resizable]);
 
   // CSS `resize` mutates the element's own inline `style.width` as the admin
   // drags — just read that back once they let go and persist it.
@@ -123,6 +130,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       draftColor ? dbService.setContent(colorKey, draftColor) : dbService.resetContent(colorKey),
       draftAlign ? dbService.setContent(alignKey, draftAlign) : dbService.resetContent(alignKey),
       draftColors.length >= 2 ? dbService.setContent(colorsKey, JSON.stringify(draftColors)) : dbService.resetContent(colorsKey),
+      draftFontSize ? dbService.setContent(fontSizeKey, draftFontSize) : dbService.resetContent(fontSizeKey),
     ]);
     setIsEditing(false);
   };
@@ -132,6 +140,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraftColor(color);
     setDraftAlign(align);
     setDraftColors(colors);
+    setDraftFontSize(fontSize);
     setIsEditing(false);
   };
 
@@ -141,17 +150,20 @@ export const EditableText: React.FC<EditableTextProps> = ({
       dbService.resetContent(colorKey),
       dbService.resetContent(alignKey),
       dbService.resetContent(colorsKey),
+      dbService.resetContent(fontSizeKey),
       resizable ? dbService.resetContent(widthKey) : Promise.resolve(),
     ]);
     setDraft(defaultValue);
     setDraftColor('');
     setDraftAlign('');
     setDraftColors([]);
+    setDraftFontSize('');
     setValue(defaultValue);
     setColor('');
     setAlign('');
     setColors([]);
     setWidth('');
+    setFontSize('');
     setIsEditing(false);
   };
 
@@ -165,6 +177,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       setDraftColor(color);
       setDraftAlign(align);
       setDraftColors(colors);
+      setDraftFontSize(fontSize);
       setIsEditing(true);
     }
   };
@@ -174,6 +187,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraftColor(color);
     setDraftAlign(align);
     setDraftColors(colors);
+    setDraftFontSize(fontSize);
     setIsEditing(true);
   };
 
@@ -189,7 +203,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
   // Priority: 2+ custom "running colors" > single static color > (fall through
   // to the default built-in rainbow CSS class, when neither is set).
-  const displayStyle: React.CSSProperties | undefined = (colors.length >= 2 || color || align || (resizable && width))
+  const displayStyle: React.CSSProperties | undefined = (colors.length >= 2 || color || align || (resizable && width) || fontSize)
     ? {
         ...(colors.length >= 2
           ? {
@@ -215,6 +229,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
         // An admin-set width makes this a shrunk block centered in its
         // parent — the surrounding layout no longer dictates its width.
         ...(resizable && width ? { maxWidth: width, marginLeft: 'auto', marginRight: 'auto' } : {}),
+        ...(fontSize ? { fontSize } : {}),
       }
     : undefined;
 
@@ -267,6 +282,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
+            ...(draftFontSize ? { fontSize: draftFontSize } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
           title="Kéo góc dưới bên phải để chỉnh chiều rộng/chiều cao khung"
@@ -353,6 +369,32 @@ export const EditableText: React.FC<EditableTextProps> = ({
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-0.5 bg-white border border-purple-300 rounded-lg p-0.5">
+              {([
+                { value: '', label: 'Default' },
+                { value: '0.875rem', label: 'S' },
+                { value: '1rem', label: 'M' },
+                { value: '1.25rem', label: 'L' },
+                { value: '1.5rem', label: 'XL' },
+                { value: '2rem', label: '2XL' },
+                { value: '3rem', label: '3XL' },
+              ] as const).map(({ value, label }) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setDraftFontSize(draftFontSize === value ? '' : value)}
+                  title={value ? `Font size: ${label} (${value})` : 'Default font size'}
+                  className={`px-1.5 py-1 rounded-md cursor-pointer transition-colors text-[11px] font-bold ${
+                    draftFontSize === value
+                      ? 'bg-purple-600 text-white'
+                      : 'text-purple-700 hover:bg-purple-100'
+                  }`}
+                >
+                  {label}
                 </button>
               ))}
             </div>
