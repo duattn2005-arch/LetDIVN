@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EventEditorModal } from '../EventEditorModal';
 import { EditableText } from '../EditableText';
+import { isEventExpired } from '../../utils/eventUtils';
 
 interface ProjectsPageProps {
   onSelectProject: (id: string) => void;
@@ -108,6 +109,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {visibleEvents.map(evt => {
             const isPending = evt.status === 'Pending';
+            const isExpired = isEventExpired(evt.date);
 
             return (
               <div
@@ -155,6 +157,10 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                       <div className="absolute bottom-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         <span>{language === 'vi' ? 'Chờ Duyệt (Pending)' : 'Pending Review'}</span>
+                      </div>
+                    ) : isExpired ? (
+                      <div className="absolute bottom-3 left-3 bg-slate-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
+                        {language === 'vi' ? 'Đã hết hạn' : 'Expired'}
                       </div>
                     ) : (
                       <div className="absolute bottom-3 left-3 bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
@@ -208,9 +214,18 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                   </button>
                   <button
                     onClick={() => onRegisterVolunteer(evt.id)}
-                    className="flex-1 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs py-2.5 rounded-full shadow-md transition-colors cursor-pointer text-center"
+                    disabled={isExpired}
+                    className={`flex-1 font-bold text-xs py-2.5 rounded-full shadow-md transition-colors text-center ${
+                      isExpired
+                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                        : 'bg-[#E81A7F] hover:bg-[#D01370] text-white cursor-pointer'
+                    }`}
                   >
-                    <EditableText contentKey="projects.registerBtn" defaultValue={t.projectsJoinBtn} as="span" />
+                    {isExpired ? (
+                      <span>{language === 'vi' ? 'Đã hết hạn' : 'Expired'}</span>
+                    ) : (
+                      <EditableText contentKey="projects.registerBtn" defaultValue={t.projectsJoinBtn} as="span" />
+                    )}
                   </button>
                 </div>
               </div>

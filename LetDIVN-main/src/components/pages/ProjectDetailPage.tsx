@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { EventEditorModal } from '../EventEditorModal';
 import { EditableText } from '../EditableText';
 import { CleanupEvent } from '../../types';
+import { isEventExpired } from '../../utils/eventUtils';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -102,6 +103,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
   }
 
   const percent = Math.min(100, Math.round((event.registeredCount / event.targetVolunteers) * 100));
+  const isExpired = isEventExpired(event.date);
 
   return (
     <div className="py-12 bg-white">
@@ -284,9 +286,18 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
 
               <button
                 onClick={() => onRegisterVolunteer(event.id)}
-                className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm py-3.5 rounded-full shadow-lg transition-all cursor-pointer text-center"
+                disabled={isExpired}
+                className={`w-full font-bold text-sm py-3.5 rounded-full shadow-lg transition-all text-center ${
+                  isExpired
+                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    : 'bg-[#E81A7F] hover:bg-[#D01370] text-white cursor-pointer'
+                }`}
               >
-                <EditableText contentKey="projectDetail.registerBtn" defaultValue="Register to Join Now" as="span" />
+                {isExpired ? (
+                  <span>Event Expired</span>
+                ) : (
+                  <EditableText contentKey="projectDetail.registerBtn" defaultValue="Register to Join Now" as="span" />
+                )}
               </button>
 
 
