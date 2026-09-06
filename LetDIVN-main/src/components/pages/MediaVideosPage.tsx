@@ -46,7 +46,7 @@ export const MediaVideosPage: React.FC = () => {
     <div className="py-10 sm:py-14 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
-        <div className="text-center max-w-3xl mx-auto space-y-3">
+        <div className="text-center mx-auto space-y-3">
           <EditableText
             contentKey="videosPage.title"
             defaultValue={t.videosPageTitle}

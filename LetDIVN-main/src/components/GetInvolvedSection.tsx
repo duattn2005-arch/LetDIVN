@@ -24,7 +24,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
         
         {/* Title */}
-        <div className="text-center max-w-2xl mx-auto space-y-2.5">
+        <div className="text-center mx-auto space-y-2.5">
           <div className="flex justify-center">
             <GrowingTree size={48} variant="emerald" />
           </div>

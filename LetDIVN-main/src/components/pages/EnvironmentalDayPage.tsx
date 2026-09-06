@@ -21,7 +21,7 @@ export const EnvironmentalDayPage: React.FC = () => {
       <div className="py-10 sm:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Intro */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
+        <div className="text-center mx-auto space-y-4 mb-14">
           <EditableText
             contentKey="envday.title"
             defaultValue="Environmental Day"

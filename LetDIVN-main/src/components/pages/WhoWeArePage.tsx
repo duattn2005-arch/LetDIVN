@@ -81,7 +81,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         </div>
 
         {/* 2. WHO WE ARE Header & Intro */}
-        <div className="text-center max-w-4xl mx-auto space-y-5">
+        <div className="text-center mx-auto space-y-5">
           <EditableText
             contentKey="whoWeAre.mainTitle"
             defaultValue="WHO WE ARE"

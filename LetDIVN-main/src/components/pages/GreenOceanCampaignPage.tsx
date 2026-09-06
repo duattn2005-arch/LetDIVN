@@ -62,7 +62,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
       {/* Header on cream background */}
       <div className="bg-[#F8F6EA] py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-3 mb-6">
+          <div className="text-center mx-auto space-y-3 mb-6">
             <EditableText
               contentKey="greenocean.eyebrow"
               defaultValue="Tackle marine litter issues"

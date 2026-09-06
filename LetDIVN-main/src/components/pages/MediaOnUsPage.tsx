@@ -120,7 +120,7 @@ export const MediaOnUsPage: React.FC = () => {
     <div className="py-16 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
 
-        <div className="text-center max-w-3xl mx-auto space-y-4">
+        <div className="text-center mx-auto space-y-4">
           <EditableText
             contentKey="mediaOnUs.title"
             defaultValue={t.newsPageTitleMedia || 'Media on Us'}

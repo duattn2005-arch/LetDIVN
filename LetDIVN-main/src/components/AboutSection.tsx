@@ -12,7 +12,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
 
         {/* WHO WE ARE Header & Intro */}
-        <div className="text-center max-w-4xl mx-auto space-y-5">
+        <div className="text-center mx-auto space-y-5">
           <EditableText
             contentKey="whoWeAre.mainTitle"
             defaultValue="WHO WE ARE"
@@ -96,7 +96,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
         </div>
 
         {/* Promoting Sustainability and Community Action */}
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        <div className="text-center mx-auto space-y-4">
           <EditableText
             contentKey="whoWeAre.section2Title"
             defaultValue="Promoting Sustainability and Community Action"

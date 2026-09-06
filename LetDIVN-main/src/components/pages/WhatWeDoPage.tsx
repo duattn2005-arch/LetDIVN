@@ -173,7 +173,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
 
         {/* Header Title & Mission statement */}
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        <div className="text-center mx-auto space-y-4">
           <EditableText
             contentKey="whatWeDo.title"
             defaultValue={t.whatWeDoTitle || (language === 'vi' ? 'CHÚNG TÔI LÀM GÌ' : 'WHAT WE DO')}

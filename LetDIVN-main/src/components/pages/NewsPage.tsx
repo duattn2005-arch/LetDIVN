@@ -268,7 +268,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     <div className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        <div className="text-center mx-auto space-y-4">
           {selectedCat === 'Media On Us' ? (
             <EditableText
               contentKey="newsPage.titleMedia"
