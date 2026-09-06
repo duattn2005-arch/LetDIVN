@@ -51,7 +51,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
         <div className="max-w-7xl mx-auto">
           {/* Block 1: image left, text right */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-14">
-            <div className="aspect-4/3 bg-slate-100">
+            <div className="aspect-3/2 bg-slate-100">
               <EditableImage
                 contentKey="wcd.block1.image"
                 defaultValue="/images/world-cleanup-day/block1-since2018.jpg"
@@ -87,7 +87,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
                 className="text-sm sm:text-base text-slate-600 leading-relaxed"
               />
             </div>
-            <div className="aspect-4/3 bg-slate-100 order-1 lg:order-2">
+            <div className="aspect-3/2 bg-slate-100 order-1 lg:order-2">
               <EditableImage
                 contentKey="wcd.block2.image"
                 defaultValue="/images/world-cleanup-day/block2-cooperation.jpg"
@@ -126,7 +126,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
 
           {/* Block 3: image left, text right */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-14">
-            <div className="aspect-4/3 bg-slate-100">
+            <div className="aspect-3/2 bg-slate-100">
               <EditableImage
                 contentKey="wcd.block3.image"
                 defaultValue="/images/world-cleanup-day/block3-global-movement.jpg"
@@ -153,7 +153,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
               multiline
               className="text-sm sm:text-base text-slate-600 leading-relaxed order-2 lg:order-1"
             />
-            <div className="aspect-4/3 bg-slate-100 order-1 lg:order-2">
+            <div className="aspect-3/2 bg-slate-100 order-1 lg:order-2">
               <EditableImage
                 contentKey="wcd.block4.image"
                 defaultValue="/images/world-cleanup-day/block4-unity.jpg"
