@@ -87,7 +87,7 @@ export const WorldCleanupDayPage: React.FC = () => {
           </div>
 
           {/* Center: From Now and Forever */}
-          <div className="text-center space-y-4 mb-14">
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-14 bg-slate-50 rounded-3xl p-6 sm:p-10">
             <EditableText
               contentKey="wcd.fromNowTitle"
               defaultValue="From Now and Forever"

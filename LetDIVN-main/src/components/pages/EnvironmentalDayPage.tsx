@@ -60,7 +60,7 @@ And thus, we are forming alliances with like-minded individuals who share our pa
         </div>
 
         {/* Block 2: text left, image right */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="envday.block2.text"
             defaultValue="We are firm believers in ensuring that every individual in our community has the opportunity to embrace the wonders of nature on a daily basis. Whether it involves cultivating your own food, exploring the flora of the prairie, or seeking tranquility in a meditative garden, our goal is to enhance our community's accessibility to these enriching experiences."
@@ -80,7 +80,7 @@ And thus, we are forming alliances with like-minded individuals who share our pa
         </div>
 
         {/* Create Valuable Sustainable Lifestyle */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
+        <div className="text-center max-w-3xl mx-auto space-y-4 mb-14 bg-slate-50 rounded-3xl p-6 sm:p-10">
           <EditableText
             contentKey="envday.sustainableTitle"
             defaultValue="Create Valuable Sustainable Lifestyle"

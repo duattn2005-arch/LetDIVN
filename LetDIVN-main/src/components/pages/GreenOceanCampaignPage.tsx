@@ -90,7 +90,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Project objectives */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="greenocean.objectivesTitle"
             defaultValue="Project objectives"
@@ -108,7 +108,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
         </div>
 
         {/* Background */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="greenocean.backgroundTitle"
             defaultValue="Background"
@@ -126,7 +126,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
         </div>
 
         {/* Main activity and target audience */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="greenocean.mainActivityTitle"
             defaultValue="Main activity and Target Audience"
@@ -186,7 +186,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
         </div>
 
         {/* Environmental Education Program */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="greenocean.eduTitle"
             defaultValue="Environmental Education Program"
@@ -197,7 +197,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
         </div>
 
         {/* Eco-friendly Workshop */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="greenocean.workshopTitle"
             defaultValue="Eco-friendly Workshop for residential group leaders — Giao Thinh & Hai Dong"
@@ -208,7 +208,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
         </div>
 
         {/* Beach cleanup */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="greenocean.beachTitle"
             defaultValue="Beach cleanup"
@@ -219,7 +219,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
         </div>
 
         {/* Challenge */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="greenocean.challengeTitle"
             defaultValue="Challenge"

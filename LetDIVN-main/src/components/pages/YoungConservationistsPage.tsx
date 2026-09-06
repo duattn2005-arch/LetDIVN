@@ -62,7 +62,7 @@ A select 24 participants earned a field trip experience through a short film com
         </div>
 
         {/* Activity 1 */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="ycsw.activity1.title"
             defaultValue="Activity 1: Sharing session on wildlife conservation from a pangolin conservation expert"
@@ -101,7 +101,7 @@ Held at the American Center (Ngoc Khanh, Ba Dinh, Ha Noi), the event inspired at
         </div>
 
         {/* Activity 2 */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="ycsw.activity2.title"
             defaultValue="Activity 2: A series of five training sessions on nature and wildlife conservation"
@@ -133,7 +133,7 @@ Participants joined five interactive online training sessions on Zoom, equipping
         </div>
 
         {/* Activity 3 */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="ycsw.activity3.title"
             defaultValue="Activity 3: Communication contest for short film production about wildlife"
@@ -172,7 +172,7 @@ From 35 submitted films, the top 10 productions were chosen for the final pitchi
         </div>
 
         {/* Activity 4 */}
-        <div className="mb-14">
+        <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="ycsw.activity4.title"
             defaultValue="Activity 4: 5-day experience and volunteer in Cuc Phuong National Park"
