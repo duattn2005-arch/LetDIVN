@@ -38,9 +38,6 @@ export const CultivatingSection: React.FC<CultivatingSectionProps> = ({ onNaviga
     <section className="py-10 sm:py-14 relative z-10 border-b border-slate-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center space-y-2">
-          <div className="text-xs sm:text-sm font-bold uppercase tracking-widest text-slate-400">
-            Est. 2015
-          </div>
           <EditableText
             contentKey="cultivating.title"
             defaultValue="Cultivating the Beautiful in Vietnam"
