@@ -19,7 +19,7 @@ export const WorldCleanupDayPage: React.FC = () => {
 
       <div className="py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
         {/* Title & intro, centered */}
-        <div className="text-center max-w-[800px] mx-auto space-y-4 mb-14">
+        <div className="text-center mx-auto space-y-4 mb-14">
           <EditableText
             contentKey="wcd.title"
             defaultValue="20 September – World Cleanup Day"
@@ -31,7 +31,7 @@ export const WorldCleanupDayPage: React.FC = () => {
             defaultValue="World Cleanup Day has now been added to the official United Nations Calendar of International Days & Weeks from 2024 onwards! This presents even greater opportunities to unite tens of millions participants in cross-sector cooperation, bringing citizens, governments, and organisations together to tackle the global mismanaged waste crisis and to help create a new, more sustainable and waste-free world. Join us on 20 September this year and every year!"
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-[800px] mx-auto"
           />
         </div>
 
