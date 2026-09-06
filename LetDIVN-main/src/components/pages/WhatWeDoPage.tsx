@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, CheckCircle2, Plus, Edit3, Trash2, ArrowLeftRight } from 'lucide-react';
+import { CheckCircle2, Plus, Edit3, Trash2, ArrowLeftRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { dbService } from '../../services/dbService';
@@ -226,52 +226,6 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
               onDelete={handleDelete}
             />
           ))}
-        </div>
-
-        {/* Process Steps */}
-        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 space-y-8 shadow-2xl">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <EditableText contentKey="whatWeDo.processTitle" defaultValue="Quy Trình Một Chiến Dịch Dọn Rác Chuẩn Hóa" as="h2" className="text-2xl sm:text-3xl font-black" />
-            <p className="text-xs sm:text-sm text-slate-400">
-              <EditableText contentKey="whatWeDo.processSubtitlePrefix" defaultValue="Các bước thực hiện an toàn và khoa học của" as="span" /> <span className="whitespace-nowrap">Let's do it! Vietnam</span>
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-center">
-            <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-              <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">1</div>
-              <EditableText contentKey="whatWeDo.step1Title" defaultValue="Khảo sát điểm đen" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step1Desc" defaultValue="Đo đạc diện tích & phân loại loại hình rác ô nhiễm" as="p" className="text-xs text-slate-400 mt-1" />
-            </div>
-
-            <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-              <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">2</div>
-              <EditableText contentKey="whatWeDo.step2Title" defaultValue="Huy động tình nguyện" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step2Desc" defaultValue="Mở cổng đăng ký & trang bị bảo hộ chuyên dụng" as="p" className="text-xs text-slate-400 mt-1" />
-            </div>
-
-            <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-              <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">3</div>
-              <EditableText contentKey="whatWeDo.step3Title" defaultValue="Ra quân & Phân loại" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step3Desc" defaultValue="Thu gom & phân loại nhựa, rác hữu cơ, rác độc hại" as="p" className="text-xs text-slate-400 mt-1" />
-            </div>
-
-            <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-              <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">4</div>
-              <EditableText contentKey="whatWeDo.step4Title" defaultValue="Bàn giao & Tái chế" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step4Desc" defaultValue="Cân đo khối lượng & chuyển giao nhà máy xử lý" as="p" className="text-xs text-slate-400 mt-1" />
-            </div>
-          </div>
-
-          <div className="text-center pt-4">
-            <button
-              onClick={onExploreProjects}
-              className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm px-8 py-3.5 rounded-full shadow-lg hover:shadow-pink-500/25 transition-all inline-flex items-center gap-2 cursor-pointer hover:scale-105"
-            >
-              <EditableText contentKey="whatWeDo.ctaBtn" defaultValue={t.whatWeDoExploreProjectsBtn} as="span" />
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
         </div>
 
       </div>

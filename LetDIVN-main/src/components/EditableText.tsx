@@ -295,7 +295,11 @@ export const EditableText: React.FC<EditableTextProps> = ({
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
-            ...(draftAlign === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto' } : {}),
+            // Match the published result: justify only ever looks evenly
+            // spaced at a normal reading measure, so preview it capped the
+            // same way here — otherwise the edit box shows the raw, uncapped
+            // stretch this whole treatment exists to avoid.
+            ...(draftAlign === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto', maxWidth: '65ch', marginLeft: 'auto', marginRight: 'auto' } : {}),
             ...(draftFontSize ? { fontSize: draftFontSize } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
