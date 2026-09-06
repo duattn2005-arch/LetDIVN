@@ -4,7 +4,13 @@ import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { CampaignSections } from '../CampaignSections';
 
-const GALLERY_KEYS = ['photo1', 'photo2', 'photo3', 'photo4', 'photo5', 'photo6', 'photo7', 'photo8'];
+const COLLABORATORS = [
+  { slug: 'cbtw', name: 'Collaboration Betters The World (CBTW APAC)', count: 5 },
+  { slug: 'vietduc', name: 'Viet Duc High School', count: 12 },
+  { slug: 'ussh', name: 'University of Social Sciences and Humanities', count: 4 },
+  { slug: 'youth', name: 'Youth Volunteers and Team Member', count: 20 },
+  { slug: 'duonglieu', name: 'Duong Lieu Secondary School', count: 6 },
+];
 
 export const CommunityWorkshopPage: React.FC = () => {
   return (
@@ -39,17 +45,32 @@ export const CommunityWorkshopPage: React.FC = () => {
           />
         </div>
 
-        {/* Photo gallery */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          {GALLERY_KEYS.map((k) => (
-            <div key={k} className="rounded-2xl overflow-hidden aspect-4/3 bg-slate-100">
-              <EditableImage
-                contentKey={`workshop.${k}`}
-                defaultValue={`/images/community-workshop/${k}.jpg`}
-                alt="Community workshop activity"
-                wrapperClassName="w-full h-full"
-                className="w-full h-full object-cover"
-              />
+        {/* Collaborators & their photos */}
+        <div className="space-y-8">
+          {COLLABORATORS.map(({ slug, name, count }) => (
+            <div key={slug} className="bg-slate-50 rounded-3xl p-4 sm:p-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-[#E81A7F] shrink-0" />
+                <EditableText
+                  contentKey={`workshop.collab.${slug}.name`}
+                  defaultValue={name}
+                  as="h3"
+                  className="text-base sm:text-lg font-black text-slate-800"
+                />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                {Array.from({ length: count }, (_, i) => i + 1).map((n) => (
+                  <div key={n} className="rounded-xl overflow-hidden aspect-4/3 bg-slate-100">
+                    <EditableImage
+                      contentKey={`workshop.collab.${slug}.img${n}`}
+                      defaultValue={`/images/community-workshop/${slug}/img${n}.jpg`}
+                      alt={`${name} - photo ${n}`}
+                      wrapperClassName="w-full h-full"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
