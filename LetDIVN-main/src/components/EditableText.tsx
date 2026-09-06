@@ -234,15 +234,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
         // parent — the surrounding layout no longer dictates its width.
         ...(resizable && width ? { maxWidth: width, marginLeft: 'auto', marginRight: 'auto' } : {}),
         ...(fontSize ? { fontSize } : {}),
-        // Justify stretches inter-word spacing to fill the FULL line width —
-        // fine at a normal reading measure, but the wider the line the more
-        // dramatic (and uneven-looking) that stretch becomes, especially for
-        // short paragraphs that don't naturally fill a very wide box. Capping
-        // justified text at a classic ~65-character reading column keeps it
-        // legible and evenly spaced no matter how wide the block itself is
-        // resized to — the box can still be dragged wide, the text just stays
-        // centered in a sane column inside it.
-        ...(align === 'justify' ? { maxWidth: '65ch', marginLeft: 'auto', marginRight: 'auto' } : {}),
       }
     : undefined;
 
@@ -295,11 +286,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
-            // Match the published result: justify only ever looks evenly
-            // spaced at a normal reading measure, so preview it capped the
-            // same way here — otherwise the edit box shows the raw, uncapped
-            // stretch this whole treatment exists to avoid.
-            ...(draftAlign === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto', maxWidth: '65ch', marginLeft: 'auto', marginRight: 'auto' } : {}),
+            ...(draftAlign === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto' } : {}),
             ...(draftFontSize ? { fontSize: draftFontSize } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
