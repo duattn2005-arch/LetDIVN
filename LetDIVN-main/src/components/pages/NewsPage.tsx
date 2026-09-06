@@ -6,6 +6,7 @@ import { ArticleEditorModal } from '../ArticleEditorModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
+import { ClickToChangeImage } from '../ClickToChangeImage';
 import { TiltCard } from '../TiltCard';
 
 interface NewsPageProps {
@@ -157,9 +158,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                 </div>
               </div>
 
-              <div className="aspect-16/9 rounded-2xl overflow-hidden shadow-md">
-                <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full h-full object-cover" />
-              </div>
+              <ClickToChangeImage
+                src={selectedArticle.image}
+                alt={selectedArticle.title}
+                wrapperClassName="aspect-16/9 rounded-2xl overflow-hidden shadow-md"
+                className="w-full h-full object-cover"
+                onChange={(url) => dbService.updateNews(selectedArticle.id, { image: url })}
+              />
 
               {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
                 <div className="space-y-6">
@@ -169,9 +174,17 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                         {block.value}
                       </p>
                     ) : (
-                      <div key={index} className="rounded-2xl overflow-hidden shadow-md">
-                        <img src={block.value} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
-                      </div>
+                      <ClickToChangeImage
+                        key={index}
+                        src={block.value}
+                        alt={`${selectedArticle.title} - ${index + 1}`}
+                        wrapperClassName="rounded-2xl overflow-hidden shadow-md"
+                        className="w-full h-auto object-cover"
+                        onChange={(url) => {
+                          const updatedBlocks = selectedArticle.contentBlocks!.map((b, i) => (i === index ? { ...b, value: url } : b));
+                          dbService.updateNews(selectedArticle.id, { contentBlocks: updatedBlocks });
+                        }}
+                      />
                     )
                   )}
                 </div>
@@ -184,9 +197,17 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   {selectedArticle.images && selectedArticle.images.length > 0 && (
                     <div className="space-y-4">
                       {selectedArticle.images.map((url, index) => (
-                        <div key={index} className="rounded-2xl overflow-hidden shadow-md">
-                          <img src={url} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
-                        </div>
+                        <ClickToChangeImage
+                          key={index}
+                          src={url}
+                          alt={`${selectedArticle.title} - ${index + 1}`}
+                          wrapperClassName="rounded-2xl overflow-hidden shadow-md"
+                          className="w-full h-auto object-cover"
+                          onChange={(newUrl) => {
+                            const updatedImages = selectedArticle.images!.map((u, i) => (i === index ? newUrl : u));
+                            dbService.updateNews(selectedArticle.id, { images: updatedImages });
+                          }}
+                        />
                       ))}
                     </div>
                   )}
