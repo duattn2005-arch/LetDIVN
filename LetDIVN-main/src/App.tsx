@@ -264,23 +264,23 @@ export function AppContent() {
         )}
 
         {activeView === 'world-cleanup-day' && (
-          <WorldCleanupDayPage onBack={() => handleNavigate('projects')} />
+          <WorldCleanupDayPage />
         )}
 
         {activeView === 'environmental-day' && (
-          <EnvironmentalDayPage onBack={() => handleNavigate('projects')} />
+          <EnvironmentalDayPage />
         )}
 
         {activeView === 'green-ocean-campaign' && (
-          <GreenOceanCampaignPage onBack={() => handleNavigate('projects')} />
+          <GreenOceanCampaignPage />
         )}
 
         {activeView === 'young-conservationists' && (
-          <YoungConservationistsPage onBack={() => handleNavigate('projects')} />
+          <YoungConservationistsPage />
         )}
 
         {activeView === 'community-workshop' && (
-          <CommunityWorkshopPage onBack={() => handleNavigate('projects')} />
+          <CommunityWorkshopPage />
         )}
       </main>
 

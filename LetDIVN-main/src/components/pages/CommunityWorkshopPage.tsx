@@ -1,16 +1,12 @@
 import React from 'react';
-import { ArrowLeft, Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
+import { Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { CampaignSections } from '../CampaignSections';
 
-interface CommunityWorkshopPageProps {
-  onBack: () => void;
-}
-
 const GALLERY_KEYS = ['photo1', 'photo2', 'photo3', 'photo4', 'photo5', 'photo6', 'photo7', 'photo8'];
 
-export const CommunityWorkshopPage: React.FC<CommunityWorkshopPageProps> = ({ onBack }) => {
+export const CommunityWorkshopPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Full-bleed banner */}
@@ -26,14 +22,6 @@ export const CommunityWorkshopPage: React.FC<CommunityWorkshopPageProps> = ({ on
 
       <div className="py-10 sm:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Projects</span>
-        </button>
-
         {/* Intro */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
           <EditableText

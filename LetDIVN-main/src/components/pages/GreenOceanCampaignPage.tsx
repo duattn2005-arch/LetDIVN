@@ -1,12 +1,8 @@
 import React from 'react';
-import { ArrowLeft, CheckCircle2, Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
+import { CheckCircle2, Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { CampaignSections } from '../CampaignSections';
-
-interface GreenOceanCampaignPageProps {
-  onBack: () => void;
-}
 
 const OBJECTIVES = [
   'Raise public awareness and encourage local people of all age groups to take practical and positive actions towards zero-waste lifestyles and limit waste amount into the environment',
@@ -49,7 +45,7 @@ const PhotoGrid: React.FC<{ prefix: string; keys: string[]; alt: string }> = ({ 
   </div>
 );
 
-export const GreenOceanCampaignPage: React.FC<GreenOceanCampaignPageProps> = ({ onBack }) => {
+export const GreenOceanCampaignPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Full-bleed banner */}
@@ -66,14 +62,6 @@ export const GreenOceanCampaignPage: React.FC<GreenOceanCampaignPageProps> = ({ 
       {/* Header on cream background */}
       <div className="bg-[#F8F6EA] py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#44ACAC] transition-colors cursor-pointer mb-8"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Projects</span>
-          </button>
-
           <div className="text-center max-w-3xl mx-auto space-y-3 mb-6">
             <EditableText
               contentKey="greenocean.eyebrow"

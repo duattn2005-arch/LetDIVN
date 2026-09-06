@@ -1,14 +1,9 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { CampaignSections } from '../CampaignSections';
 
-interface WorldCleanupDayPageProps {
-  onBack: () => void;
-}
-
-export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack }) => {
+export const WorldCleanupDayPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Hero banner: full-bleed, no rounding/border/shadow/overlay text */}
@@ -23,14 +18,6 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
       </div>
 
       <div className="py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#e91e63] transition-colors cursor-pointer mb-8 max-w-7xl mx-auto"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Projects</span>
-        </button>
-
         {/* Title & intro, centered */}
         <div className="text-center max-w-[800px] mx-auto space-y-4 mb-14">
           <EditableText
