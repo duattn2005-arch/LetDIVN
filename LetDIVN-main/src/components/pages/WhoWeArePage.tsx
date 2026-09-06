@@ -66,11 +66,11 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
   };
 
   return (
-    <div className="py-10 sm:py-16 bg-white min-h-screen">
+    <div className="pt-4 sm:pt-6 pb-10 sm:pb-16 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
 
         {/* 1. Top Full Banner Image */}
-        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-4/1 bg-slate-900">
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-3/1 bg-slate-900">
           <EditableImage
             contentKey="whoWeAre.bannerImage"
             defaultValue="/images/who-we-are/banner.jpg"
@@ -168,7 +168,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
         </div>
 
         {/* 3b. Wide Community Photo */}
-        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-4/1 bg-slate-900">
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-slate-100 aspect-3/1 bg-slate-900">
           <EditableImage
             contentKey="whoWeAre.midImage"
             defaultValue="/images/who-we-are/mid.jpg"
