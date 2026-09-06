@@ -375,14 +375,18 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
     try {
       const nomRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=1`,
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
         { headers: { 'Accept-Language': 'vi' } }
       );
 
       if (nomRes.ok) {
         const data = await nomRes.json();
         if (data && data.length > 0) {
-          const item = data[0];
+          // Nominatim's top-ranked match for a place name is often a POI
+          // node rather than the administrative boundary relation, so it
+          // has no polygon. Prefer the first candidate that actually has
+          // one instead of always taking data[0].
+          const item = data.find((d: any) => d.geojson && (d.geojson.type === 'Polygon' || d.geojson.type === 'MultiPolygon')) || data[0];
           const lat = parseFloat(item.lat);
           const lng = parseFloat(item.lon);
           const displayName = item.display_name.split(',')[0];
