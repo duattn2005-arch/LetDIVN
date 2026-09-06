@@ -376,18 +376,19 @@ export const EditableText: React.FC<EditableTextProps> = ({
             <div className="flex items-center gap-0.5 bg-white border border-purple-300 rounded-lg p-0.5">
               {([
                 { value: '', label: 'Default' },
-                { value: '0.875rem', label: 'S' },
-                { value: '1rem', label: 'M' },
-                { value: '1.25rem', label: 'L' },
-                { value: '1.5rem', label: 'XL' },
-                { value: '2rem', label: '2XL' },
-                { value: '3rem', label: '3XL' },
+                { value: '12px', label: '12' },
+                { value: '14px', label: '14' },
+                { value: '16px', label: '16' },
+                { value: '20px', label: '20' },
+                { value: '24px', label: '24' },
+                { value: '32px', label: '32' },
+                { value: '48px', label: '48' },
               ] as const).map(({ value, label }) => (
                 <button
                   key={label}
                   type="button"
                   onClick={() => setDraftFontSize(draftFontSize === value ? '' : value)}
-                  title={value ? `Font size: ${label} (${value})` : 'Default font size'}
+                  title={value ? `Font size: ${label}px` : 'Default font size'}
                   className={`px-1.5 py-1 rounded-md cursor-pointer transition-colors text-[11px] font-bold ${
                     draftFontSize === value
                       ? 'bg-purple-600 text-white'
