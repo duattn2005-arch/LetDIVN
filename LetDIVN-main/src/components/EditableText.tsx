@@ -229,7 +229,16 @@ export const EditableText: React.FC<EditableTextProps> = ({
         // Letting words hyphenate gives justify more break points per line,
         // so it can fill the line by hyphenating instead of only stretching
         // the gaps between whole words.
-        ...(align === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto' } : {}),
+        //
+        // Several call sites also set `text-wrap: balance` (or `pretty`) in
+        // their own className for nicer default wrapping — but `balance`
+        // actively picks *shorter* line breaks to even out line lengths,
+        // which for justify means the shortened line still has to stretch
+        // to the full width, producing dramatically bigger gaps than a
+        // normal line break would. `pretty` doesn't have that failure mode
+        // and still improves the break points, so force it whenever this
+        // text is justified, overriding whatever the className requested.
+        ...(align === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto', textWrap: 'pretty' } : {}),
         // An admin-set width makes this a shrunk block centered in its
         // parent — the surrounding layout no longer dictates its width.
         ...(resizable && width ? { maxWidth: width, marginLeft: 'auto', marginRight: 'auto' } : {}),
@@ -286,7 +295,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
-            ...(draftAlign === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto' } : {}),
+            ...(draftAlign === 'justify' ? { hyphens: 'auto', WebkitHyphens: 'auto', textWrap: 'pretty' } : {}),
             ...(draftFontSize ? { fontSize: draftFontSize } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
