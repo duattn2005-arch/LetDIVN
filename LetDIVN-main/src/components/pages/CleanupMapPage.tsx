@@ -171,53 +171,53 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
       const queriesToTry = Array.from(new Set([searchQuery.trim(), normalizedQuery]));
 
-      for (const q of queriesToTry) {
+      // Fire all query variants in parallel instead of one-at-a-time so
+      // abbreviation expansion (e.g. "thpt") doesn't double the wait.
+      const nomResults = await Promise.all(queriesToTry.map(async (q) => {
         try {
           const nomRes = await fetch(
             `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=vn&format=json&addressdetails=1&limit=8&polygon_geojson=1`,
             { headers: { 'Accept-Language': 'vi,en' } }
           );
-          if (nomRes.ok) {
-            const data = await nomRes.json();
-            data.forEach((item: any) => {
-              const addr = item.address || {};
-              const mainName = item.name || 
-                addr.school || 
-                addr.hospital || 
-                addr.building || 
-                addr.amenity || 
-                addr.tourism || 
-                addr.road || 
-                addr.suburb || 
-                addr.quarter || 
-                addr.town || 
-                addr.city || 
-                item.display_name.split(',')[0];
-
-              const subAddress = item.display_name.replace(mainName + ', ', '').replace(mainName, '');
-              const lat = parseFloat(item.lat);
-              const lon = parseFloat(item.lon);
-
-              const exists = results.some(r => Math.abs(r.lat - lat) < 0.0005 && Math.abs(r.lng - lon) < 0.0005);
-              if (!exists) {
-                results.push({
-                  placeId: String(item.place_id),
-                  name: mainName,
-                  subAddress: subAddress || item.display_name,
-                  lat,
-                  lng: lon,
-                  geojson: item.geojson,
-                  type: item.type || item.class
-                });
-              }
-            });
-          }
+          if (nomRes.ok) return await nomRes.json();
         } catch (e) {
           console.warn('Nominatim suggestion error:', e);
         }
+        return [];
+      }));
 
-        if (results.length >= 6) break;
-      }
+      nomResults.flat().forEach((item: any) => {
+        const addr = item.address || {};
+        const mainName = item.name ||
+          addr.school ||
+          addr.hospital ||
+          addr.building ||
+          addr.amenity ||
+          addr.tourism ||
+          addr.road ||
+          addr.suburb ||
+          addr.quarter ||
+          addr.town ||
+          addr.city ||
+          item.display_name.split(',')[0];
+
+        const subAddress = item.display_name.replace(mainName + ', ', '').replace(mainName, '');
+        const lat = parseFloat(item.lat);
+        const lon = parseFloat(item.lon);
+
+        const exists = results.some(r => Math.abs(r.lat - lat) < 0.0005 && Math.abs(r.lng - lon) < 0.0005);
+        if (!exists && results.length < 6) {
+          results.push({
+            placeId: String(item.place_id),
+            name: mainName,
+            subAddress: subAddress || item.display_name,
+            lat,
+            lng: lon,
+            geojson: item.geojson,
+            type: item.type || item.class
+          });
+        }
+      });
 
       // Secondary Photon Komoot Geocoder for fast small village/hamlet/street search
       if (results.length < 5) {
@@ -256,7 +256,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       setSuggestions(results);
       setShowSuggestions(results.length > 0);
       setIsSearchingSuggestions(false);
-    }, 250);
+    }, 120);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -866,7 +866,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)] bg-slate-950 select-none overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-140px)] bg-slate-950 select-none overflow-hidden">
       
       {/* Top Map Header & Controls Bar */}
       <div className="bg-slate-900/95 border-b border-slate-800 px-4 sm:px-6 md:px-8 py-2.5 backdrop-blur-md sticky top-0 z-30 shadow-lg w-full">
@@ -1243,6 +1243,12 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                   </p>
 
                   <div className="flex items-center gap-2 mt-3">
+                    <button
+                      onClick={() => onSelectProject(activeEvent.id)}
+                      className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center border border-slate-600"
+                    >
+                      <EditableText contentKey="cleanupMap.detailsBtn" defaultValue={language === 'vi' ? "Xem Chi Tiết" : "View Details"} as="span" />
+                    </button>
                     <a
                       href={`#register-${activeEvent.id}`}
                       onClick={(e) => {
