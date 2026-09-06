@@ -99,7 +99,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           </div>
 
           {/* Center: From Now and Forever */}
-          <div className="text-center max-w-[800px] mx-auto space-y-4 mb-14">
+          <div className="text-center space-y-4 mb-14">
             <EditableText
               contentKey="wcd.fromNowTitle"
               defaultValue="From Now and Forever"
@@ -111,6 +111,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
               defaultValue="This year's event takes place on Friday 20 September following our addition to the UN Calendar of International Days!"
               as="p"
               multiline
+              resizable
               className="text-sm sm:text-base text-slate-600 leading-relaxed"
             />
             <EditableText
@@ -118,6 +119,7 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
               defaultValue="We aim to activate 5% of the world's population that will catalyse lasting societal change in behaviour around mismanaged waste"
               as="p"
               multiline
+              resizable
               className="text-sm sm:text-base text-slate-600 leading-relaxed"
             />
           </div>

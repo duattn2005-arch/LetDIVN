@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Edit3, Check, X, Palette, AlignLeft, AlignCenter, AlignRight, AlignJustify, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Edit3, Check, X, Palette, AlignLeft, AlignCenter, AlignRight, AlignJustify, RotateCcw, MoveHorizontal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { dbService } from '../services/dbService';
@@ -15,6 +15,13 @@ interface EditableTextProps {
   multiline?: boolean;
   /** Custom renderer, e.g. to keep the value inside an <a href="mailto:..."> */
   render?: (value: string) => React.ReactNode;
+  /**
+   * Lets an admin drag a handle to set how wide this block is allowed to
+   * grow before wrapping — e.g. deciding whether a paragraph reads as one
+   * short line or wraps to two. Off by default so the hundreds of existing
+   * call sites keep rendering exactly as before; opt in per call site.
+   */
+  resizable?: boolean;
 }
 
 export const EditableText: React.FC<EditableTextProps> = ({
@@ -24,6 +31,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
   className = '',
   multiline = false,
   render,
+  resizable = false,
 }) => {
   const { isAdmin } = useAuth();
   const { language } = useLanguage();
@@ -32,6 +40,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const colorKey = `${contentKey}__color`;
   const alignKey = `${contentKey}__align`;
   const colorsKey = `${contentKey}__colors`;
+  const widthKey = `${contentKey}__width`;
 
   const parseColors = (raw: string): string[] => {
     try {
@@ -51,20 +60,24 @@ export const EditableText: React.FC<EditableTextProps> = ({
   // through. Empty means "use the default built-in rainbow (or the single
   // static `color` above, if one is set)".
   const [colors, setColors] = useState<string[]>([]);
+  // Empty string = no admin override yet, render at its natural width.
+  const [width, setWidth] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const [draftColor, setDraftColor] = useState(color);
   const [draftAlign, setDraftAlign] = useState(align);
   const [draftColors, setDraftColors] = useState<string[]>(colors);
+  const resizeElRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let cancelled = false;
     const refresh = async () => {
-      const [nextVal, nextColor, nextAlign, nextColorsRaw] = await Promise.all([
+      const [nextVal, nextColor, nextAlign, nextColorsRaw, nextWidth] = await Promise.all([
         dbService.getContent(langSpecificKey, defaultValue),
         dbService.getContent(colorKey, ''),
         dbService.getContent(alignKey, ''),
         dbService.getContent(colorsKey, ''),
+        resizable ? dbService.getContent(widthKey, '') : Promise.resolve(''),
       ]);
       if (cancelled) return;
       const nextColors = parseColors(nextColorsRaw);
@@ -72,6 +85,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       setColor(nextColor);
       setAlign(nextAlign);
       setColors(nextColors);
+      setWidth(nextWidth);
       setIsEditing((editing) => {
         if (!editing) {
           setDraft(nextVal);
@@ -88,7 +102,17 @@ export const EditableText: React.FC<EditableTextProps> = ({
       cancelled = true;
       unsub();
     };
-  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, colorsKey]);
+  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, colorsKey, widthKey, resizable]);
+
+  // CSS `resize` mutates the element's own inline `style.width` as the admin
+  // drags — just read that back once they let go and persist it.
+  const handleResizeMouseUp = () => {
+    const el = resizeElRef.current;
+    if (el && el.style.width) {
+      dbService.setContent(widthKey, el.style.width);
+      setWidth(el.style.width);
+    }
+  };
 
   const handleSave = async () => {
     // An accidentally-cleared field must fall back to the default text, not
@@ -117,6 +141,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       dbService.resetContent(colorKey),
       dbService.resetContent(alignKey),
       dbService.resetContent(colorsKey),
+      resizable ? dbService.resetContent(widthKey) : Promise.resolve(),
     ]);
     setDraft(defaultValue);
     setDraftColor('');
@@ -126,6 +151,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setColor('');
     setAlign('');
     setColors([]);
+    setWidth('');
     setIsEditing(false);
   };
 
@@ -163,7 +189,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
   // Priority: 2+ custom "running colors" > single static color > (fall through
   // to the default built-in rainbow CSS class, when neither is set).
-  const displayStyle: React.CSSProperties | undefined = (colors.length >= 2 || color || align)
+  const displayStyle: React.CSSProperties | undefined = (colors.length >= 2 || color || align || (resizable && width))
     ? {
         ...(colors.length >= 2
           ? {
@@ -186,6 +212,9 @@ export const EditableText: React.FC<EditableTextProps> = ({
             }
           : {}),
         ...(align ? { textAlign: align as React.CSSProperties['textAlign'] } : {}),
+        // An admin-set width makes this a shrunk block centered in its
+        // parent — the surrounding layout no longer dictates its width.
+        ...(resizable && width ? { maxWidth: width, marginLeft: 'auto', marginRight: 'auto' } : {}),
       }
     : undefined;
 
@@ -459,7 +488,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     );
   }
 
-  return (
+  const editableTag = (
     <Tag
       className={`group/edit relative whitespace-pre-line cursor-text ${className}`}
       style={displayStyle}
@@ -469,6 +498,23 @@ export const EditableText: React.FC<EditableTextProps> = ({
       {resolvedValue}
       {editBtn}
     </Tag>
+  );
+
+  if (!resizable) {
+    return editableTag;
+  }
+
+  return (
+    <div
+      ref={resizeElRef as React.RefObject<HTMLDivElement>}
+      onMouseUp={handleResizeMouseUp}
+      style={{ width: width || undefined, maxWidth: '100%', resize: 'horizontal', overflow: 'auto' }}
+      className="group/resize relative mx-auto border border-dashed border-transparent hover:border-purple-300 rounded"
+      title="Kéo góc dưới bên phải để chỉnh độ rộng của đoạn văn này"
+    >
+      {editableTag}
+      <MoveHorizontal className="hidden group-hover/resize:block absolute -bottom-0.5 -right-0.5 w-3 h-3 text-purple-500 pointer-events-none" />
+    </div>
   );
 };
 
