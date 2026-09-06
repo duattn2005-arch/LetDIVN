@@ -31,6 +31,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
 import { VIETNAM_PROVINCES_DATA } from '../../data/vietnamAdministrativeData';
+import { isEventExpired } from '../../utils/eventUtils';
 
 interface CleanupMapPageProps {
   onSelectProject: (id: string) => void;
@@ -690,6 +691,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
       const isSelected = activeEvent?.id === evt.id;
       const isPending = evt.status === 'Pending';
+      const isExpired = isEventExpired(evt.date);
 
       const customIcon = L.divIcon({
         className: 'custom-map-marker',
@@ -725,6 +727,10 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <div class="absolute top-2 right-2 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
                 ${language === 'vi' ? 'Chờ duyệt' : 'Pending'}
               </div>
+            ` : isExpired ? `
+              <div class="absolute top-2 right-2 bg-slate-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">
+                ${language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+              </div>
             ` : ''}
           </div>
 
@@ -748,9 +754,15 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             <button onclick="window.__selectProject('${evt.id}')" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
               ${language === 'vi' ? 'Chi Tiết' : 'Details'}
             </button>
-            <button onclick="window.__registerVolunteer('${evt.id}')" class="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
-              ${language === 'vi' ? 'Đăng Ký' : 'Register'}
-            </button>
+            ${isExpired ? `
+              <button disabled class="flex-1 py-2 bg-slate-200 text-slate-400 font-bold text-xs rounded-xl text-center cursor-not-allowed">
+                ${language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+              </button>
+            ` : `
+              <button onclick="window.__registerVolunteer('${evt.id}')" class="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
+                ${language === 'vi' ? 'Đăng Ký' : 'Register'}
+              </button>
+            `}
           </div>
         </div>
       `;
@@ -923,6 +935,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             {events.map(evt => {
               const isSelected = activeEvent?.id === evt.id;
               const isPending = evt.status === 'Pending';
+              const isExpired = isEventExpired(evt.date);
 
               return (
                 <div
@@ -946,6 +959,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                       <div className="flex items-center gap-1.5 mb-1">
                         {isPending && (
                           <EditableText contentKey="cleanupMap.pendingBadge" defaultValue={language === 'vi' ? "Chờ duyệt" : "Pending"} as="span" className="text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-md" />
+                        )}
+                        {!isPending && isExpired && (
+                          <span className="text-[9px] font-black uppercase bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded-md">{language === 'vi' ? 'Đã hết hạn' : 'Expired'}</span>
                         )}
                         <span className="text-[10px] text-slate-400 font-bold ml-auto">
                           📍 {evt.city}
@@ -1192,16 +1208,22 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                     >
                       <EditableText contentKey="cleanupMap.detailsBtn" defaultValue={language === 'vi' ? "Xem Chi Tiết" : "View Details"} as="span" />
                     </button>
-                    <a
-                      href={`#register-${activeEvent.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onRegisterVolunteer(activeEvent.id);
-                      }}
-                      className="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center inline-block"
-                    >
-                      <EditableText contentKey="cleanupMap.registerBtn" defaultValue={language === 'vi' ? "Đăng Ký Tham Gia" : "Register to Join"} as="span" />
-                    </a>
+                    {isEventExpired(activeEvent.date) ? (
+                      <span className="flex-1 py-2 bg-slate-800 text-slate-500 font-bold text-xs rounded-xl text-center cursor-not-allowed">
+                        {language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+                      </span>
+                    ) : (
+                      <a
+                        href={`#register-${activeEvent.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onRegisterVolunteer(activeEvent.id);
+                        }}
+                        className="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center inline-block"
+                      >
+                        <EditableText contentKey="cleanupMap.registerBtn" defaultValue={language === 'vi' ? "Đăng Ký Tham Gia" : "Register to Join"} as="span" />
+                      </a>
+                    )}
                   </div>
                 </div>
 

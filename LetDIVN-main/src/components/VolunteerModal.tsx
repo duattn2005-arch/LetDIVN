@@ -6,6 +6,7 @@ import { dbService } from '../services/dbService';
 import { CleanupEvent } from '../types';
 import { saveToGoogleSheet, getGoogleAppsScriptUrl } from '../services/googleSheetsService';
 import { sendNotificationEmail } from '../services/emailService';
+import { isEventExpired } from '../utils/eventUtils';
 
 interface VolunteerModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   selectedEventId
 }) => {
   const [events, setEvents] = useState<CleanupEvent[]>([]);
+  const availableEvents = events.filter(e => !isEventExpired(e.date));
   const currentYear = new Date().getFullYear();
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [eventId, setEventId] = useState(selectedEventId || events[0]?.id || '');
+  const [eventId, setEventId] = useState(selectedEventId || availableEvents[0]?.id || '');
   const [birthYear, setBirthYear] = useState<string>('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>(['Hậu cần & Phân loại rác']);
   const [customRole, setCustomRole] = useState('');
@@ -65,8 +67,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     if (isOpen) {
       if (selectedEventId) {
         setEventId(selectedEventId);
-      } else if (events.length > 0) {
-        setEventId(events[0].id);
+      } else if (availableEvents.length > 0) {
+        setEventId(availableEvents[0].id);
       }
       resetFormState();
       setIsSuccess(false);
@@ -274,7 +276,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
                 onChange={(e) => setEventId(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:outline-hidden focus:border-[#E81A7F]"
               >
-                {events.map((evt) => (
+                {availableEvents.map((evt) => (
                   <option key={evt.id} value={evt.id}>
                     {evt.title} ({evt.city} - {evt.date})
                   </option>
