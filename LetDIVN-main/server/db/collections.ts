@@ -11,6 +11,7 @@ import type {
   WhatWeDoItem,
   MediaCoverageEntry,
   WhoWeAreItem,
+  CampaignSection,
 } from '../../src/types.js';
 
 export const events = makeCollection<CleanupEvent>({ table: 'events', idPrefix: 'evt', order: 'created_desc' });
@@ -29,3 +30,9 @@ export const videos = makeCollection<MediaVideo>({ table: 'videos', idPrefix: 'v
 export const whatWeDo = makeCollection<WhatWeDoItem>({ table: 'what_we_do', idPrefix: 'wwd', order: 'sort_order' });
 export const mediaCoverage = makeCollection<MediaCoverageEntry>({ table: 'media_coverage', idPrefix: 'media', order: 'sort_order' });
 export const whoWeAre = makeCollection<WhoWeAreItem>({ table: 'who_we_are', idPrefix: 'wwa', order: 'sort_order' });
+export const campaignSections = makeCollection<CampaignSection>({
+  table: 'campaign_sections',
+  idPrefix: 'sec',
+  order: 'created_asc',
+  extraColumn: { name: 'page', getValue: (item) => item.page },
+});

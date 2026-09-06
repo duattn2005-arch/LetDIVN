@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
+import { CampaignSections } from '../CampaignSections';
 
 interface WorldCleanupDayPageProps {
   onBack: () => void;
@@ -187,6 +188,8 @@ export const WorldCleanupDayPage: React.FC<WorldCleanupDayPageProps> = ({ onBack
           </div>
         </div>
       </div>
+
+      <CampaignSections page="world-cleanup-day" />
     </div>
   );
 };

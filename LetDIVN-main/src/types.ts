@@ -188,4 +188,17 @@ export interface WhoWeAreItem {
   order?: number;
 }
 
+/** Admin-addable image+text block appended to a campaign info page (World
+ * Cleanup Day, Environmental Day, ...). Same shape as WhoWeAreItem, scoped
+ * to one page via `page` (e.g. 'world-cleanup-day') so every campaign page
+ * can share one collection instead of five near-identical ones. */
+export interface CampaignSection {
+  id: string;
+  page: string;
+  title: string;
+  content: string;
+  image: string;
+  layout?: 'image-left' | 'image-right';
+}
+
 

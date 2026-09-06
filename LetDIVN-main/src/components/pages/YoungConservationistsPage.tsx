@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
+import { CampaignSections } from '../CampaignSections';
 
 interface YoungConservationistsPageProps {
   onBack: () => void;
@@ -183,6 +184,8 @@ Beyond training, the program strengthened connections among alumni in Vietnam's 
         </div>
       </div>
       </div>
+
+      <CampaignSections page="young-conservationists" />
 
       {/* 4-column value strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

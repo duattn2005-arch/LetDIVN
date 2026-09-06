@@ -10,7 +10,8 @@ import {
   MediaVideo,
   WhatWeDoItem,
   WhoWeAreItem,
-  MediaCoverageEntry
+  MediaCoverageEntry,
+  CampaignSection
 } from '../types';
 
 type Listener = () => void;
@@ -252,6 +253,21 @@ class DatabaseService {
   }
   public async deleteWhoWeAre(id: string): Promise<boolean> {
     await this.mutate(`/who-we-are/${encodeURIComponent(id)}`, 'DELETE');
+    return true;
+  }
+
+  // --- CAMPAIGN SECTIONS (admin-added blocks on campaign info pages) ---
+  public getCampaignSections(page: string): Promise<CampaignSection[]> {
+    return this.get(`/campaign-sections?page=${encodeURIComponent(page)}`);
+  }
+  public addCampaignSection(item: Omit<CampaignSection, 'id'>): Promise<CampaignSection> {
+    return this.mutate('/campaign-sections', 'POST', item);
+  }
+  public updateCampaignSection(item: CampaignSection): Promise<CampaignSection> {
+    return this.mutate(`/campaign-sections/${encodeURIComponent(item.id)}`, 'PUT', item);
+  }
+  public async deleteCampaignSection(id: string): Promise<boolean> {
+    await this.mutate(`/campaign-sections/${encodeURIComponent(id)}`, 'DELETE');
     return true;
   }
 

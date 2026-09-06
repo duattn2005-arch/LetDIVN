@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage, whoWeAre } from '../db/collections.js';
+import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage, whoWeAre, campaignSections } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -198,6 +198,26 @@ router.put('/who-we-are/:id', requireAdmin, (req, res) => {
 });
 router.delete('/who-we-are/:id', requireAdmin, (req, res) => {
   whoWeAre.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
+// --- Campaign Sections (admin-added blocks on World Cleanup Day, Environmental
+// Day, Green Ocean Campaign, Young Conservationists, Community Workshop) ---
+router.get('/campaign-sections', (req, res) => {
+  const all = campaignSections.getAll();
+  const page = req.query.page;
+  res.json(page ? all.filter((s) => s.page === page) : all);
+});
+router.post('/campaign-sections', requireAdmin, (req, res) => {
+  res.json(campaignSections.insert(req.body));
+});
+router.put('/campaign-sections/:id', requireAdmin, (req, res) => {
+  const updated = campaignSections.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Item not found' });
+  res.json(updated);
+});
+router.delete('/campaign-sections/:id', requireAdmin, (req, res) => {
+  campaignSections.delete(String(req.params.id));
   res.json({ ok: true });
 });
 

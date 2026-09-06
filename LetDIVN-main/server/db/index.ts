@@ -84,6 +84,14 @@ db.exec(`
     data TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS campaign_sections (
+    id TEXT PRIMARY KEY,
+    page TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    data TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_campaign_sections_page ON campaign_sections(page);
+
   CREATE TABLE IF NOT EXISTS site_content (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL

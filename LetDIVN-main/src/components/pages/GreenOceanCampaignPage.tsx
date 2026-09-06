@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, CheckCircle2, Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
+import { CampaignSections } from '../CampaignSections';
 
 interface GreenOceanCampaignPageProps {
   onBack: () => void;
@@ -251,6 +252,8 @@ Therefore, we have to wait until the Covid-19 situation is under control so that
         </div>
       </div>
       </div>
+
+      <CampaignSections page="green-ocean-campaign" />
 
       {/* 4-column value strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

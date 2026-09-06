@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
+import { CampaignSections } from '../CampaignSections';
 
 interface EnvironmentalDayPageProps {
   onBack: () => void;
@@ -130,6 +131,8 @@ And thus, we are forming alliances with like-minded individuals who share our pa
         </div>
       </div>
       </div>
+
+      <CampaignSections page="environmental-day" />
 
       {/* 4-column value strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

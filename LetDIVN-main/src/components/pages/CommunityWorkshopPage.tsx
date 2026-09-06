@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
+import { CampaignSections } from '../CampaignSections';
 
 interface CommunityWorkshopPageProps {
   onBack: () => void;
@@ -66,6 +67,8 @@ export const CommunityWorkshopPage: React.FC<CommunityWorkshopPageProps> = ({ on
         </div>
       </div>
       </div>
+
+      <CampaignSections page="community-workshop" />
 
       {/* 4-column value strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
