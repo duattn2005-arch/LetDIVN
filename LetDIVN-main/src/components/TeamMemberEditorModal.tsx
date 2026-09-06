@@ -182,17 +182,21 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
             <label className="block text-xs font-bold text-slate-700 mb-1">
               Phòng Ban / Khối
             </label>
-            <select
+            <input
+              type="text"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
-              className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] bg-white cursor-pointer"
-            >
-              <option value="Ban Điều Hành">Ban Điều Hành</option>
-              <option value="Ban Truyền Thông & Sự Kiện">Ban Truyền Thông & Sự Kiện</option>
-              <option value="Ban Đối Ngoại & Tài Trợ">Ban Đối Ngoại & Tài Trợ</option>
-              <option value="Ban Hậu Cần & Điều Phối Rác Thải">Ban Hậu Cần & Điều Phối Rác Thải</option>
-              <option value="Điều Phối Viên Tỉnh / Thành">Điều Phối Viên Tỉnh / Thành</option>
-            </select>
+              list="department-suggestions"
+              placeholder="VD: Ban Điều Hành"
+              className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
+            />
+            <datalist id="department-suggestions">
+              <option value="Ban Điều Hành" />
+              <option value="Ban Truyền Thông & Sự Kiện" />
+              <option value="Ban Đối Ngoại & Tài Trợ" />
+              <option value="Ban Hậu Cần & Điều Phối Rác Thải" />
+              <option value="Điều Phối Viên Tỉnh / Thành" />
+            </datalist>
           </div>
 
           <div>
