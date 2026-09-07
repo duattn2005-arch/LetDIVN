@@ -1003,7 +1003,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 <Search className="w-5 h-5 text-slate-500 shrink-0" />
                 <input
                   type="text"
-                  placeholder={language === 'vi' ? "Tìm vị trí (vd: THPT Giao Thủy, Bán đảo Sơn Trà...)" : "Search a place (e.g. a school, hospital, landmark...)"}
+                  placeholder={language === 'vi' ? "Tìm vị trí (vd: THPT Giao Thủy, Bán đảo Sơn Trà...)" : "Search a place (e.g. Giao Thuy, Nam Dinh...)"}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => {
