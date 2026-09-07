@@ -341,6 +341,38 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     };
   };
 
+  // Looks up a real administrative boundary polygon for a place name, trying
+  // progressively shorter comma-separated variants (see the note in
+  // applyLocationSearchAndBoundary below). Used as a fallback whenever we
+  // have coordinates for a place but no polygon was attached to it directly
+  // — e.g. a suggestion that matched a POI (school, hospital...) rather than
+  // the administrative area itself still often has a real boundary under
+  // the same place name.
+  const fetchBoundaryGeojson = async (query: string): Promise<any | null> => {
+    const parts = query.split(',').map((p) => p.trim()).filter(Boolean);
+    const queryVariants = Array.from(
+      new Set(Array.from({ length: parts.length }, (_, i) => parts.slice(0, parts.length - i).join(', ')))
+    );
+    for (const variant of queryVariants) {
+      try {
+        const nomRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(variant + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        if (nomRes.ok) {
+          const result = await nomRes.json();
+          const withPolygon = Array.isArray(result)
+            ? result.find((d: any) => d.geojson && (d.geojson.type === 'Polygon' || d.geojson.type === 'MultiPolygon'))
+            : null;
+          if (withPolygon) return withPolygon.geojson;
+        }
+      } catch {
+        // try the next (shorter) variant
+      }
+    }
+    return null;
+  };
+
   // Fly to exact location & draw red dashed boundary matching screenshot 2
   const applyLocationSearchAndBoundary = async (query: string, customLat?: number, customLng?: number) => {
     const map = mapInstanceRef.current;
@@ -496,8 +528,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
     map.flyTo([sug.lat, sug.lng], 16, { duration: 1.2 });
 
-    if (sug.geojson && (sug.geojson.type === 'Polygon' || sug.geojson.type === 'MultiPolygon')) {
-      const geoLayer = L.geoJSON(sug.geojson, {
+    const drawBoundary = (geojson: any) => {
+      const geoLayer = L.geoJSON(geojson, {
         style: {
           color: '#EF4444',
           weight: 3.5,
@@ -510,10 +542,20 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       boundaryLayerRef.current = geoLayer;
       map.fitBounds(geoLayer.getBounds(), { padding: [40, 40], maxZoom: 16 });
       setHasBoundaryDrawn(true);
+    };
+
+    if (sug.geojson && (sug.geojson.type === 'Polygon' || sug.geojson.type === 'MultiPolygon')) {
+      drawBoundary(sug.geojson);
     } else {
-      // No real boundary available for this suggestion — skip drawing one
-      // rather than showing a made-up shape that doesn't match the actual area.
+      // This particular suggestion (often a POI like a school or hospital)
+      // has no boundary of its own — fall back to looking one up by name
+      // before giving up, rather than immediately assuming none exists.
       setHasBoundaryDrawn(false);
+      fetchBoundaryGeojson(sug.name).then((geojson) => {
+        if (geojson && boundaryLayerRef.current === null) {
+          drawBoundary(geojson);
+        }
+      });
     }
 
     if (newPinMarkerRef.current) {
