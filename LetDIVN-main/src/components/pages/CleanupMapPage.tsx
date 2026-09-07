@@ -104,9 +104,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
   // Expose global modal triggers for Leaflet popups
   useEffect(() => {
-    (window as any).__openCreateSpotModal = () => {
-      setIsEditorOpen(true);
-    };
     (window as any).__selectProject = (id: string) => {
       onSelectProject(id);
     };
@@ -120,7 +117,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     };
 
     return () => {
-      delete (window as any).__openCreateSpotModal;
       delete (window as any).__selectProject;
       delete (window as any).__registerVolunteer;
       delete (window as any).__approveEvent;
@@ -441,26 +437,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           const marker = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
           newPinMarkerRef.current = marker;
 
-          marker.bindPopup(`
-            <div class="p-2.5 font-sans max-w-xs text-slate-900">
-              <div class="flex items-center gap-1.5 text-red-600 font-extrabold text-xs mb-1">
-                <span>📍</span> <span>${language === 'vi' ? 'VỊ TRÍ ĐÃ TÌM THẤY' : 'LOCATION FOUND'}</span>
-              </div>
-              <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
-                ${displayName}
-              </div>
-              <div class="text-xs text-slate-600 mb-2 leading-relaxed">
-                ${item.display_name}
-              </div>
-              <div class="text-[10px] text-slate-500 mb-3">
-                ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${lat.toFixed(5)}, ${lng.toFixed(5)}
-              </div>
-              <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
-                ${language === 'vi' ? 'Đăng Bài & Điểm Rác Tại Vị Trí Này' : 'Post a Cleanup Spot At This Location'}
-              </button>
-            </div>
-          `).openPopup();
-
           setPinnedLocation({
             lat,
             lng,
@@ -540,26 +516,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     const marker = L.marker([sug.lat, sug.lng], { icon: pinIcon }).addTo(map);
     newPinMarkerRef.current = marker;
 
-    marker.bindPopup(`
-      <div class="p-2.5 font-sans max-w-xs text-slate-900">
-        <div class="flex items-center gap-1.5 text-red-600 font-extrabold text-xs mb-1">
-          <span>📍</span> <span>${language === 'vi' ? 'VỊ TRÍ ĐÃ TÌM THẤY' : 'LOCATION FOUND'}</span>
-        </div>
-        <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
-          ${sug.name}
-        </div>
-        <div class="text-xs text-slate-600 mb-2 leading-relaxed">
-          ${sug.subAddress}
-        </div>
-        <div class="text-[10px] text-slate-500 mb-3">
-          ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${sug.lat.toFixed(5)}, ${sug.lng.toFixed(5)}
-        </div>
-        <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
-          ${language === 'vi' ? 'Đăng Bài & Điểm Rác Tại Vị Trí Này' : 'Post a Cleanup Spot At This Location'}
-        </button>
-      </div>
-    `).openPopup();
-
     setPinnedLocation({
       lat: sug.lat,
       lng: sug.lng,
@@ -628,28 +584,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
         const newMarker = L.marker([lat, lng], { icon: newPinIcon }).addTo(map);
         newPinMarkerRef.current = newMarker;
-
-        const popupContent = `
-          <div class="p-2 font-sans max-w-xs text-slate-900">
-            <div class="flex items-center gap-1.5 text-emerald-600 font-extrabold text-xs mb-1">
-              <span>📍</span> <span>${languageRef.current === 'vi' ? 'ĐÃ GHIM ĐỊA ĐIỂM MỚI' : 'NEW LOCATION PINNED'}</span>
-            </div>
-            <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
-              ${geo.placeName}
-            </div>
-            <div class="text-xs text-slate-600 mb-1 leading-relaxed">
-              ${geo.address}
-            </div>
-            <div class="text-[10px] text-slate-500 mb-3">
-              ${languageRef.current === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${lat.toFixed(5)}, ${lng.toFixed(5)}
-            </div>
-            <button onclick="window.__openCreateSpotModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center flex items-center justify-center gap-1">
-              <span>${languageRef.current === 'vi' ? 'Đăng Bài & Ảnh Điểm Rác Tại Đây' : 'Post a Cleanup Spot & Photo Here'}</span>
-            </button>
-          </div>
-        `;
-
-        newMarker.bindPopup(popupContent, { maxWidth: 320 }).openPopup();
       });
 
       setTimeout(() => {

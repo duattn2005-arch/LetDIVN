@@ -35,7 +35,6 @@ import { GreenOceanCampaignPage } from './components/pages/GreenOceanCampaignPag
 import { YoungConservationistsPage } from './components/pages/YoungConservationistsPage';
 import { CommunityWorkshopPage } from './components/pages/CommunityWorkshopPage';
 import { ContactBubble } from './components/ContactBubble';
-import { AmbientBackground } from './components/AmbientBackground';
 
 // Keeps the address bar in sync with the current view — so pages are
 // bookmarkable/shareable/refreshable and the back/forward buttons work,
@@ -142,9 +141,6 @@ export function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 text-slate-800 antialiased font-sans relative selection:bg-[#E81A7F] selection:text-white">
-      {/* 3D Ambient Particle & Ecological Environment Elements */}
-      <AmbientBackground />
-
       {/* Global Header */}
       <Header
         activeView={activeView}
