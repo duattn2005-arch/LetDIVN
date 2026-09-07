@@ -19,6 +19,7 @@ import usersRoutes from './routes/users.js';
 import adminsRoutes from './routes/admins.js';
 import statsRoutes from './routes/stats.js';
 import uploadRoutes from './routes/upload.js';
+import geocodeRoutes from './routes/geocode.js';
 
 seedIfEmpty();
 
@@ -35,3 +36,4 @@ apiRouter.use(usersRoutes);
 apiRouter.use(adminsRoutes);
 apiRouter.use(statsRoutes);
 apiRouter.use(uploadRoutes);
+apiRouter.use(geocodeRoutes);

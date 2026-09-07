@@ -38,31 +38,13 @@ interface CleanupMapPageProps {
   onRegisterVolunteer: (eventId?: string) => void;
 }
 
-// Nominatim's usage policy caps public API use at ~1 request/second per
-// client. This page can easily fire several requests within that window
-// (live suggestions while typing, then a boundary lookup the moment a
-// suggestion is clicked), which gets silently 403'd/rate-limited with no
-// visible error — the search or boundary just quietly does nothing. Every
-// Nominatim call in this file goes through this queue instead of a bare
-// fetch() so they're always spaced out, no matter how fast the user acts.
-let nominatimQueue: Promise<void> = Promise.resolve();
-let lastNominatimCallAt = 0;
-const NOMINATIM_MIN_INTERVAL_MS = 550;
-
-function fetchNominatim(url: string, options?: RequestInit): Promise<Response> {
-  const run = async (): Promise<Response> => {
-    const wait = Math.max(0, lastNominatimCallAt + NOMINATIM_MIN_INTERVAL_MS - Date.now());
-    if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
-    lastNominatimCallAt = Date.now();
-    // Temporary diagnostic logging — remove once boundary-drawing is confirmed reliable.
-    const res = await fetch(url, options);
-    console.log('[Nominatim]', res.status, url);
-    return res;
-  };
-  const result = nominatimQueue.then(run, run);
-  nominatimQueue = result.then(() => undefined, () => undefined);
-  return result;
-}
+// Geocoding goes through our own /api/geocode/* endpoints instead of
+// calling nominatim.openstreetmap.org directly from the browser — some
+// visitors' browsers/networks (ad blockers, certain ISPs) can't reach that
+// domain at all, which silently broke search/boundary drawing with no
+// visible error. The server proxies the request (see server/routes/geocode.ts)
+// and also handles Nominatim's ~1 request/second usage-policy pacing in one
+// shared place instead of duplicating that per browser tab.
 
 type MapLayer = 'streets' | 'satellite' | 'carto';
 
@@ -193,9 +175,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       // abbreviation expansion (e.g. "thpt") doesn't double the wait.
       const nomResults = await Promise.all(queriesToTry.map(async (q) => {
         try {
-          const nomRes = await fetchNominatim(
-            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=vn&format=json&addressdetails=1&limit=8&polygon_geojson=1`,
-            { headers: { 'Accept-Language': 'en,vi' } }
+          const nomRes = await fetch(
+            `/api/geocode/search?q=${encodeURIComponent(q)}&addressdetails=1&limit=8&polygon=1`
           );
           if (nomRes.ok) return await nomRes.json();
         } catch (e) {
@@ -319,9 +300,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         const specificName = bdc.locality || bdc.lookupSource || '';
 
         try {
-          const nomRes = await fetchNominatim(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-            { headers: { 'Accept-Language': 'en' } }
+          const nomRes = await fetch(
+            `/api/geocode/reverse?lat=${lat}&lon=${lng}`
           );
           if (nomRes.ok) {
             const nom = await nomRes.json();
@@ -381,30 +361,22 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     );
     for (const variant of queryVariants) {
       try {
-        console.log('[fetchBoundaryGeojson] trying variant:', variant);
-        const nomRes = await fetchNominatim(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(variant + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
-          { headers: { 'Accept-Language': 'en' } }
+        const nomRes = await fetch(
+          `/api/geocode/search?q=${encodeURIComponent(variant + ', Vietnam')}&polygon=1&limit=5`
         );
         if (nomRes.ok) {
           const result = await nomRes.json();
-          console.log('[fetchBoundaryGeojson] results for', variant, ':', Array.isArray(result) ? result.length : result);
           const withPolygon = Array.isArray(result)
             ? result.find((d: any) => d.geojson && (d.geojson.type === 'Polygon' || d.geojson.type === 'MultiPolygon'))
             : null;
           if (withPolygon) {
-            console.log('[fetchBoundaryGeojson] found polygon for', variant);
             return withPolygon.geojson;
           }
-          console.log('[fetchBoundaryGeojson] no polygon among results for', variant);
-        } else {
-          console.log('[fetchBoundaryGeojson] non-ok response for', variant, nomRes.status);
         }
-      } catch (err) {
-        console.log('[fetchBoundaryGeojson] error for', variant, err);
+      } catch {
+        // try the next (shorter) variant
       }
     }
-    console.log('[fetchBoundaryGeojson] exhausted all variants, returning null');
     return null;
   };
 
@@ -435,9 +407,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     try {
       let data: any[] = [];
       for (const variant of queryVariants) {
-        const nomRes = await fetchNominatim(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(variant + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
-          { headers: { 'Accept-Language': 'en' } }
+        const nomRes = await fetch(
+          `/api/geocode/search?q=${encodeURIComponent(variant + ', Vietnam')}&polygon=1&limit=5`
         );
         if (nomRes.ok) {
           const result = await nomRes.json();
@@ -579,7 +550,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       setHasBoundaryDrawn(true);
     };
 
-    console.log('[handleSelectSuggestion] sug:', sug.name, 'has own geojson:', !!sug.geojson, sug.geojson?.type);
     if (sug.geojson && (sug.geojson.type === 'Polygon' || sug.geojson.type === 'MultiPolygon')) {
       drawBoundary(sug.geojson);
     } else {
@@ -588,7 +558,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       // before giving up, rather than immediately assuming none exists.
       setHasBoundaryDrawn(false);
       fetchBoundaryGeojson(sug.name).then((geojson) => {
-        console.log('[handleSelectSuggestion] fallback result:', !!geojson, 'boundaryLayerRef still null:', boundaryLayerRef.current === null);
         if (geojson && boundaryLayerRef.current === null) {
           drawBoundary(geojson);
         }
