@@ -47,14 +47,17 @@ interface CleanupMapPageProps {
 // fetch() so they're always spaced out, no matter how fast the user acts.
 let nominatimQueue: Promise<void> = Promise.resolve();
 let lastNominatimCallAt = 0;
-const NOMINATIM_MIN_INTERVAL_MS = 1100;
+const NOMINATIM_MIN_INTERVAL_MS = 550;
 
 function fetchNominatim(url: string, options?: RequestInit): Promise<Response> {
   const run = async (): Promise<Response> => {
     const wait = Math.max(0, lastNominatimCallAt + NOMINATIM_MIN_INTERVAL_MS - Date.now());
     if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
     lastNominatimCallAt = Date.now();
-    return fetch(url, options);
+    // Temporary diagnostic logging — remove once boundary-drawing is confirmed reliable.
+    const res = await fetch(url, options);
+    console.log('[Nominatim]', res.status, url);
+    return res;
   };
   const result = nominatimQueue.then(run, run);
   nominatimQueue = result.then(() => undefined, () => undefined);
@@ -378,21 +381,30 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     );
     for (const variant of queryVariants) {
       try {
+        console.log('[fetchBoundaryGeojson] trying variant:', variant);
         const nomRes = await fetchNominatim(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(variant + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
           { headers: { 'Accept-Language': 'en' } }
         );
         if (nomRes.ok) {
           const result = await nomRes.json();
+          console.log('[fetchBoundaryGeojson] results for', variant, ':', Array.isArray(result) ? result.length : result);
           const withPolygon = Array.isArray(result)
             ? result.find((d: any) => d.geojson && (d.geojson.type === 'Polygon' || d.geojson.type === 'MultiPolygon'))
             : null;
-          if (withPolygon) return withPolygon.geojson;
+          if (withPolygon) {
+            console.log('[fetchBoundaryGeojson] found polygon for', variant);
+            return withPolygon.geojson;
+          }
+          console.log('[fetchBoundaryGeojson] no polygon among results for', variant);
+        } else {
+          console.log('[fetchBoundaryGeojson] non-ok response for', variant, nomRes.status);
         }
-      } catch {
-        // try the next (shorter) variant
+      } catch (err) {
+        console.log('[fetchBoundaryGeojson] error for', variant, err);
       }
     }
+    console.log('[fetchBoundaryGeojson] exhausted all variants, returning null');
     return null;
   };
 
@@ -567,6 +579,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       setHasBoundaryDrawn(true);
     };
 
+    console.log('[handleSelectSuggestion] sug:', sug.name, 'has own geojson:', !!sug.geojson, sug.geojson?.type);
     if (sug.geojson && (sug.geojson.type === 'Polygon' || sug.geojson.type === 'MultiPolygon')) {
       drawBoundary(sug.geojson);
     } else {
@@ -575,6 +588,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       // before giving up, rather than immediately assuming none exists.
       setHasBoundaryDrawn(false);
       fetchBoundaryGeojson(sug.name).then((geojson) => {
+        console.log('[handleSelectSuggestion] fallback result:', !!geojson, 'boundaryLayerRef still null:', boundaryLayerRef.current === null);
         if (geojson && boundaryLayerRef.current === null) {
           drawBoundary(geojson);
         }
