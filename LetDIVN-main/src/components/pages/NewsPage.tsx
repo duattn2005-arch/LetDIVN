@@ -8,6 +8,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
 import { ClickToChangeImage } from '../ClickToChangeImage';
 import { TiltCard } from '../TiltCard';
+import { formatDate } from '../../utils/eventUtils';
 
 interface NewsPageProps {
   initialCategory?: 'All' | 'Media On Us' | 'News';
@@ -152,7 +153,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   {selectedArticle.title}
                 </h1>
                 <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                  <span>📅 {selectedArticle.date}</span>
+                  <span>📅 {formatDate(selectedArticle.date)}</span>
                   <span>👤 {selectedArticle.author}</span>
                   {selectedArticle.source && <span>📰 <EditableText contentKey="newsPage.sourceLabel" defaultValue={t.newsPageSourceLabel} as="span" /> {selectedArticle.source}</span>}
                 </div>
@@ -244,7 +245,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                         {a.title}
                       </h4>
                       <span className="text-xs font-bold text-emerald-600">Read More »</span>
-                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100">{a.date}</div>
+                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100">{formatDate(a.date)}</div>
                     </div>
                   </button>
                 ))}
@@ -423,7 +424,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
                     <span className="flex items-center gap-1 text-xs text-slate-400">
                       <Calendar className="w-3 h-3 text-[#E81A7F]" />
-                      {item.date}
+                      {formatDate(item.date)}
                     </span>
 
                     <p className="text-sm text-slate-500 line-clamp-3 leading-relaxed">

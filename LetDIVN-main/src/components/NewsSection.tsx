@@ -5,6 +5,7 @@ import { NewsArticle } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { EditableText } from './EditableText';
 import { TiltCard } from './TiltCard';
+import { formatDate } from '../utils/eventUtils';
 
 interface NewsSectionProps {
   onViewAll: () => void;
@@ -81,7 +82,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ onViewAll }) => {
               <div className="p-5 sm:p-6 space-y-2">
                 <span className="flex items-center gap-1 text-[11px] text-slate-400">
                   <Calendar className="w-3 h-3 text-[#E81A7F]" />
-                  {item.date}
+                  {formatDate(item.date)}
                 </span>
                 <h3 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
                   {item.title}

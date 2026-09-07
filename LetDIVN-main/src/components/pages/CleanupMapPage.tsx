@@ -31,7 +31,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
 import { VIETNAM_PROVINCES_DATA } from '../../data/vietnamAdministrativeData';
-import { isEventExpired } from '../../utils/eventUtils';
+import { isEventExpired, formatDate } from '../../utils/eventUtils';
 
 interface CleanupMapPageProps {
   onSelectProject: (id: string) => void;
@@ -743,7 +743,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <span>📍</span> <span class="truncate">${evt.location} (${evt.city})</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <span>📅</span> <span>${evt.date} • ${evt.time}</span>
+              <span>📅</span> <span>${formatDate(evt.date)} • ${evt.time}</span>
             </div>
             <div class="flex items-center gap-1.5 text-emerald-600 font-bold">
               <span>👥</span> <span>${language === 'vi' ? `Đã có ${evt.registeredCount || 0} người đăng ký tham gia` : `${evt.registeredCount || 0} people already registered`}</span>
@@ -977,7 +977,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                       </p>
 
                       <div className="mt-2 flex items-center justify-between text-[11px]">
-                        <span className="text-slate-400 font-medium">📅 {evt.date}</span>
+                        <span className="text-slate-400 font-medium">📅 {formatDate(evt.date)}</span>
                         <span className="text-emerald-400 font-bold">👥 {evt.registeredCount || 0} {language === 'vi' ? 'ĐK' : 'reg.'}</span>
                       </div>
                     </div>

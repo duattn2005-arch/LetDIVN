@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EventEditorModal } from '../EventEditorModal';
 import { EditableText } from '../EditableText';
-import { isEventExpired } from '../../utils/eventUtils';
+import { isEventExpired, formatDate } from '../../utils/eventUtils';
 
 interface ProjectsPageProps {
   onSelectProject: (id: string) => void;
@@ -186,7 +186,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     <div className="space-y-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5 text-[#E81A7F]" />
-                        <span>{evt.date} ({evt.time})</span>
+                        <span>{formatDate(evt.date)} ({evt.time})</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="w-3.5 h-3.5 text-[#E81A7F]" />

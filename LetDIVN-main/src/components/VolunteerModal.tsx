@@ -6,7 +6,7 @@ import { dbService } from '../services/dbService';
 import { CleanupEvent } from '../types';
 import { saveToGoogleSheet, getGoogleAppsScriptUrl } from '../services/googleSheetsService';
 import { sendNotificationEmail } from '../services/emailService';
-import { isEventExpired } from '../utils/eventUtils';
+import { isEventExpired, formatDate } from '../utils/eventUtils';
 
 interface VolunteerModalProps {
   isOpen: boolean;
@@ -278,7 +278,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
               >
                 {availableEvents.map((evt) => (
                   <option key={evt.id} value={evt.id}>
-                    {evt.title} ({evt.city} - {evt.date})
+                    {evt.title} ({evt.city} - {formatDate(evt.date)})
                   </option>
                 ))}
               </select>

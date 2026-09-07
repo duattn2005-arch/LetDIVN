@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { EventEditorModal } from '../EventEditorModal';
 import { EditableText } from '../EditableText';
 import { CleanupEvent } from '../../types';
-import { isEventExpired } from '../../utils/eventUtils';
+import { isEventExpired, formatDate } from '../../utils/eventUtils';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -278,7 +278,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
               </div>
 
               <div className="space-y-3 text-xs text-slate-600 pt-3 border-t border-slate-200">
-                <div>📅 <strong><EditableText contentKey="projectDetail.dateLabel" defaultValue="Date:" as="span" /></strong> {event.date}</div>
+                <div>📅 <strong><EditableText contentKey="projectDetail.dateLabel" defaultValue="Date:" as="span" /></strong> {formatDate(event.date)}</div>
                 <div>⏰ <strong><EditableText contentKey="projectDetail.timeLabel" defaultValue="Time:" as="span" /></strong> {event.time}</div>
                 <div>📍 <strong><EditableText contentKey="projectDetail.locationLabel" defaultValue="Location:" as="span" /></strong> {event.location}</div>
                 <div>👤 <strong><EditableText contentKey="projectDetail.leaderLabel" defaultValue="Team Lead:" as="span" /></strong> {event.leader}</div>
