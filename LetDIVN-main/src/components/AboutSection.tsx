@@ -8,7 +8,7 @@ interface AboutSectionProps {
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
   return (
-    <section className="py-10 sm:py-14 relative z-10 border-b border-slate-200/50 select-none">
+    <section className="py-6 sm:py-10 relative z-10 border-b border-slate-200/50 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
 
         {/* WHO WE ARE Header & Intro */}

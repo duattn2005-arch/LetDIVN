@@ -24,14 +24,14 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onViewAllGallery
   }, []);
 
   return (
-    <section className="py-10 sm:py-14 relative z-10 border-b border-slate-200/50 select-none">
+    <section className="py-6 sm:py-10 relative z-10 border-b border-slate-200/50 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center mx-auto mb-8 sm:mb-10 space-y-2.5">
           <EditableText
             contentKey="gallery.title"
-            defaultValue={t.galleryTitle || 'Thư Viện Hình Ảnh & Phóng Sự'}
+            defaultValue={t.galleryTitle || 'Photo & Media Gallery'}
             as="h2"
             className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight"
           />

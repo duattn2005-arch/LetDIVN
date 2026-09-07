@@ -17,7 +17,7 @@ export const WorldCleanupDayPage: React.FC = () => {
         />
       </div>
 
-      <div className="py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
+      <div className="py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
         {/* Title & intro, centered */}
         <div className="text-center mx-auto space-y-4 mb-14">
           <EditableText

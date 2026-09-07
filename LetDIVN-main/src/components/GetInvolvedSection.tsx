@@ -20,7 +20,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
   const { t } = useLanguage();
 
   return (
-    <section className="py-10 sm:py-14 relative z-10 border-b border-slate-200/50 select-none">
+    <section className="py-6 sm:py-10 relative z-10 border-b border-slate-200/50 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
         
         {/* Title */}
@@ -30,7 +30,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
           </div>
           <EditableText
             contentKey="getInvolved.title"
-            defaultValue={t.getInvolvedTitle || 'Cùng Chung Tay Hành Động'}
+            defaultValue={t.getInvolvedTitle || 'Get Involved Today'}
             as="h2"
             className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight"
           />
