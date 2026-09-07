@@ -38,6 +38,29 @@ interface CleanupMapPageProps {
   onRegisterVolunteer: (eventId?: string) => void;
 }
 
+// Nominatim's usage policy caps public API use at ~1 request/second per
+// client. This page can easily fire several requests within that window
+// (live suggestions while typing, then a boundary lookup the moment a
+// suggestion is clicked), which gets silently 403'd/rate-limited with no
+// visible error — the search or boundary just quietly does nothing. Every
+// Nominatim call in this file goes through this queue instead of a bare
+// fetch() so they're always spaced out, no matter how fast the user acts.
+let nominatimQueue: Promise<void> = Promise.resolve();
+let lastNominatimCallAt = 0;
+const NOMINATIM_MIN_INTERVAL_MS = 1100;
+
+function fetchNominatim(url: string, options?: RequestInit): Promise<Response> {
+  const run = async (): Promise<Response> => {
+    const wait = Math.max(0, lastNominatimCallAt + NOMINATIM_MIN_INTERVAL_MS - Date.now());
+    if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
+    lastNominatimCallAt = Date.now();
+    return fetch(url, options);
+  };
+  const result = nominatimQueue.then(run, run);
+  nominatimQueue = result.then(() => undefined, () => undefined);
+  return result;
+}
+
 type MapLayer = 'streets' | 'satellite' | 'carto';
 
 interface PinnedNewLocation {
@@ -167,7 +190,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       // abbreviation expansion (e.g. "thpt") doesn't double the wait.
       const nomResults = await Promise.all(queriesToTry.map(async (q) => {
         try {
-          const nomRes = await fetch(
+          const nomRes = await fetchNominatim(
             `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=vn&format=json&addressdetails=1&limit=8&polygon_geojson=1`,
             { headers: { 'Accept-Language': 'en,vi' } }
           );
@@ -293,7 +316,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         const specificName = bdc.locality || bdc.lookupSource || '';
 
         try {
-          const nomRes = await fetch(
+          const nomRes = await fetchNominatim(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
             { headers: { 'Accept-Language': 'en' } }
           );
@@ -355,7 +378,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     );
     for (const variant of queryVariants) {
       try {
-        const nomRes = await fetch(
+        const nomRes = await fetchNominatim(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(variant + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
           { headers: { 'Accept-Language': 'en' } }
         );
@@ -400,7 +423,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     try {
       let data: any[] = [];
       for (const variant of queryVariants) {
-        const nomRes = await fetch(
+        const nomRes = await fetchNominatim(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(variant + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
           { headers: { 'Accept-Language': 'en' } }
         );
@@ -1216,7 +1239,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 {pinnedLocation.address}
               </div>
               <div className="text-[10px] text-slate-400 mb-3">
-                Coordinates: ${pinnedLocation.lat.toFixed(5)}, ${pinnedLocation.lng.toFixed(5)} • ${pinnedLocation.city}
+                Coordinates: {pinnedLocation.lat.toFixed(5)}, {pinnedLocation.lng.toFixed(5)} • {pinnedLocation.city}
               </div>
 
               <button
