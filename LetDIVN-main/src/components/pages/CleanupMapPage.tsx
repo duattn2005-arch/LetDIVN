@@ -92,18 +92,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const boundaryLayerRef = useRef<L.Layer | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  // The Leaflet click handler below is registered once when the map is first
-  // created (empty deps — re-running that effect would recreate the map) and
-  // builds popup HTML as plain strings, so it can't just close over `language`
-  // — it would freeze at whatever language was active on page load. Read this
-  // ref instead so a later language switch is picked up on the next click.
-  const languageRef = useRef(language);
-  useEffect(() => {
-    languageRef.current = language;
-  }, [language]);
-
   // Expose global modal triggers for Leaflet popups
   useEffect(() => {
+    (window as any).__openCreateSpotModal = () => {
+      setIsEditorOpen(true);
+    };
     (window as any).__selectProject = (id: string) => {
       onSelectProject(id);
     };
@@ -112,11 +105,12 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     };
     (window as any).__approveEvent = async (id: string) => {
       await dbService.approveEvent(id);
-      alert(language === 'vi' ? 'Đã phê duyệt điểm dọn rác thành công!' : 'Cleanup spot approved successfully!');
+      alert('Cleanup spot approved successfully!');
       dbService.getEvents().then(setEvents);
     };
 
     return () => {
+      delete (window as any).__openCreateSpotModal;
       delete (window as any).__selectProject;
       delete (window as any).__registerVolunteer;
       delete (window as any).__approveEvent;
@@ -175,7 +169,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         try {
           const nomRes = await fetch(
             `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=vn&format=json&addressdetails=1&limit=8&polygon_geojson=1`,
-            { headers: { 'Accept-Language': 'vi,en' } }
+            { headers: { 'Accept-Language': 'en,vi' } }
           );
           if (nomRes.ok) return await nomRes.json();
         } catch (e) {
@@ -228,7 +222,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             if (data.features) {
               data.features.forEach((feat: any) => {
                 const props = feat.properties || {};
-                const name = props.name || props.street || props.city || (language === 'vi' ? 'Địa điểm' : 'Place');
+                const name = props.name || props.street || props.city || 'Location';
                 const sub = [props.street, props.district, props.city, props.country].filter(Boolean).join(', ');
                 const [lon, lat] = feat.geometry.coordinates;
 
@@ -237,7 +231,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                   results.push({
                     placeId: `photon-${props.osm_id || Math.random()}`,
                     name,
-                    subAddress: sub || (language === 'vi' ? 'Việt Nam' : 'Vietnam'),
+                    subAddress: sub || 'Vietnam',
                     lat,
                     lng: lon,
                     type: props.osm_value
@@ -263,12 +257,12 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const getTileUrl = (layer: MapLayer) => {
     switch (layer) {
       case 'satellite':
-        return 'https://mt1.google.com/vt/lyrs=y&hl=vi&x={x}&y={y}&z={z}';
+        return 'https://mt1.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}';
       case 'carto':
         return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
       case 'streets':
       default:
-        return 'https://mt1.google.com/vt/lyrs=m&hl=vi&x={x}&y={y}&z={z}';
+        return 'https://mt1.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}';
     }
   };
 
@@ -290,19 +284,18 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const fetchAddressFromCoords = async (lat: number, lng: number): Promise<{ placeName: string; address: string; city: string }> => {
     try {
       const bdcRes = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=vi`
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
       );
       if (bdcRes.ok) {
         const bdc = await bdcRes.json();
         const locality = bdc.locality || bdc.city || bdc.principalSubdivision || '';
-        const vietnamLabel = languageRef.current === 'vi' ? 'Việt Nam' : 'Vietnam';
-        const province = (bdc.principalSubdivision || vietnamLabel).replace(/Thành phố |Tỉnh |Quận /g, '');
+        const province = (bdc.principalSubdivision || 'Vietnam').replace(/Thành phố |Tỉnh |Quận /g, '');
         const specificName = bdc.locality || bdc.lookupSource || '';
 
         try {
           const nomRes = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-            { headers: { 'Accept-Language': 'vi' } }
+            { headers: { 'Accept-Language': 'en' } }
           );
           if (nomRes.ok) {
             const nom = await nomRes.json();
@@ -323,36 +316,28 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               addr.place ||
               addr.road;
 
-            const areaName = locality
-              ? (languageRef.current === 'vi' ? `Khu vực ${locality}` : `${locality} Area`)
-              : (languageRef.current === 'vi' ? 'Điểm dọn rác đã chọn' : 'Selected Cleanup Spot');
-            const placeNameResult = poi || specificName || areaName;
+            const placeNameResult = poi || specificName || (locality ? `${locality} Area` : 'Selected Cleanup Spot');
             const cleanAddress = nom.display_name || `${specificName ? specificName + ', ' : ''}${locality ? locality + ', ' : ''}${province}`;
             return {
               placeName: placeNameResult,
               address: cleanAddress,
-              city: province || vietnamLabel
+              city: province || 'Vietnam'
             };
           }
         } catch {}
 
-        const fallbackAreaName = locality
-          ? (languageRef.current === 'vi' ? `Khu vực ${locality}` : `${locality} Area`)
-          : (languageRef.current === 'vi' ? 'Điểm dọn rác mới' : 'New Cleanup Spot');
         return {
-          placeName: specificName || fallbackAreaName,
+          placeName: specificName || (locality ? `${locality} Area` : 'New Cleanup Spot'),
           address: `${locality ? locality + ', ' : ''}${province}`,
-          city: province || vietnamLabel
+          city: province || 'Vietnam'
         };
       }
     } catch {}
 
     return {
-      placeName: languageRef.current === 'vi'
-        ? `Điểm dọn (${lat.toFixed(4)}, ${lng.toFixed(4)})`
-        : `Cleanup Spot (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
-      address: `${languageRef.current === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
-      city: languageRef.current === 'vi' ? 'Việt Nam' : 'Vietnam'
+      placeName: `Cleanup Spot (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
+      address: `Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+      city: 'Vietnam'
     };
   };
 
@@ -370,14 +355,33 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
     setSearchedPlaceName(query);
 
-    try {
-      const nomRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
-        { headers: { 'Accept-Language': 'vi' } }
-      );
+    // Try the full query first, then progressively drop the trailing
+    // comma-separated qualifier (often an outdated district/province name —
+    // Vietnam's administrative boundaries have been merged/renamed since
+    // this data was entered, so "X, Old Province" can 404 in Nominatim even
+    // though "X" alone resolves fine).
+    const parts = query.split(',').map((p) => p.trim()).filter(Boolean);
+    const queryVariants = Array.from(
+      new Set(Array.from({ length: parts.length }, (_, i) => parts.slice(0, parts.length - i).join(', ')))
+    );
 
-      if (nomRes.ok) {
-        const data = await nomRes.json();
+    try {
+      let data: any[] = [];
+      for (const variant of queryVariants) {
+        const nomRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(variant + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=5`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        if (nomRes.ok) {
+          const result = await nomRes.json();
+          if (result && result.length > 0) {
+            data = result;
+            break;
+          }
+        }
+      }
+
+      {
         if (data && data.length > 0) {
           // Nominatim's top-ranked match for a place name is often a POI
           // node rather than the administrative boundary relation, so it
@@ -437,12 +441,32 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           const marker = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
           newPinMarkerRef.current = marker;
 
+          marker.bindPopup(`
+            <div class="p-2.5 font-sans max-w-xs text-slate-900">
+              <div class="flex items-center gap-1.5 text-red-600 font-extrabold text-xs mb-1">
+                <span>📍</span> <span>${language === 'vi' ? 'VỊ TRÍ ĐÃ TÌM THẤY' : 'LOCATION FOUND'}</span>
+              </div>
+              <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
+                ${displayName}
+              </div>
+              <div class="text-xs text-slate-600 mb-2 leading-relaxed">
+                ${item.display_name}
+              </div>
+              <div class="text-[10px] text-slate-500 mb-3">
+                ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+              </div>
+              <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
+                ${language === 'vi' ? 'Đăng Bài & Điểm Rác Tại Vị Trí Này' : 'Post a Cleanup Spot At This Location'}
+              </button>
+            </div>
+          `).openPopup();
+
           setPinnedLocation({
             lat,
             lng,
             placeName: displayName,
             address: item.display_name,
-            city: language === 'vi' ? 'Việt Nam' : 'Vietnam'
+            city: 'Vietnam'
           });
 
           return;
@@ -516,12 +540,32 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     const marker = L.marker([sug.lat, sug.lng], { icon: pinIcon }).addTo(map);
     newPinMarkerRef.current = marker;
 
+    marker.bindPopup(`
+      <div class="p-2.5 font-sans max-w-xs text-slate-900">
+        <div class="flex items-center gap-1.5 text-red-600 font-extrabold text-xs mb-1">
+          <span>📍</span> <span>${language === 'vi' ? 'VỊ TRÍ ĐÃ TÌM THẤY' : 'LOCATION FOUND'}</span>
+        </div>
+        <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
+          ${sug.name}
+        </div>
+        <div class="text-xs text-slate-600 mb-2 leading-relaxed">
+          ${sug.subAddress}
+        </div>
+        <div class="text-[10px] text-slate-500 mb-3">
+          ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${sug.lat.toFixed(5)}, ${sug.lng.toFixed(5)}
+        </div>
+        <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
+          ${language === 'vi' ? 'Đăng Bài & Điểm Rác Tại Vị Trí Này' : 'Post a Cleanup Spot At This Location'}
+        </button>
+      </div>
+    `).openPopup();
+
     setPinnedLocation({
       lat: sug.lat,
       lng: sug.lng,
       placeName: sug.name,
       address: sug.subAddress,
-      city: language === 'vi' ? 'Việt Nam' : 'Vietnam'
+      city: 'Vietnam'
     });
   };
 
@@ -573,7 +617,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 </svg>
               </div>
               <div class="absolute -bottom-2 bg-emerald-950 text-emerald-300 text-[10px] font-black px-2 py-0.5 rounded-full shadow border border-emerald-500 whitespace-nowrap">
-                ${languageRef.current === 'vi' ? 'Ghim Mới' : 'New Pin'}
+                New Pin
               </div>
             </div>
           `,
@@ -584,6 +628,28 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
         const newMarker = L.marker([lat, lng], { icon: newPinIcon }).addTo(map);
         newPinMarkerRef.current = newMarker;
+
+        const popupContent = `
+          <div class="p-2 font-sans max-w-xs text-slate-900">
+            <div class="flex items-center gap-1.5 text-emerald-600 font-extrabold text-xs mb-1">
+              <span>📍</span> <span>${language === 'vi' ? 'ĐÃ GHIM ĐỊA ĐIỂM MỚI' : 'NEW LOCATION PINNED'}</span>
+            </div>
+            <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
+              ${geo.placeName}
+            </div>
+            <div class="text-xs text-slate-600 mb-1 leading-relaxed">
+              ${geo.address}
+            </div>
+            <div class="text-[10px] text-slate-500 mb-3">
+              ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+            </div>
+            <button onclick="window.__openCreateSpotModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center flex items-center justify-center gap-1">
+              <span>${language === 'vi' ? 'Đăng Bài & Ảnh Điểm Rác Tại Đây' : 'Post a Cleanup Spot & Photo Here'}</span>
+            </button>
+          </div>
+        `;
+
+        newMarker.bindPopup(popupContent, { maxWidth: 320 }).openPopup();
       });
 
       setTimeout(() => {
@@ -640,7 +706,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             </div>
             ${isPending ? `
               <div class="absolute -top-2 -right-2 bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 py-0.2 rounded-full border border-white shadow">
-                ${language === 'vi' ? 'Chờ duyệt' : 'Pending'}
+                Pending Review
               </div>
             ` : ''}
           </div>
@@ -659,11 +725,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             <img src="${evt.image}" alt="${evt.title}" class="w-full h-full object-cover" />
             ${isPending ? `
               <div class="absolute top-2 right-2 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
-                ${language === 'vi' ? 'Chờ duyệt' : 'Pending'}
+                Pending Review
               </div>
             ` : isExpired ? `
               <div class="absolute top-2 right-2 bg-slate-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">
-                ${language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+                Expired
               </div>
             ` : ''}
           </div>
@@ -680,21 +746,21 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <span>📅</span> <span>${formatDate(evt.date)} • ${evt.time}</span>
             </div>
             <div class="flex items-center gap-1.5 text-emerald-600 font-bold">
-              <span>👥</span> <span>${language === 'vi' ? `Đã có ${evt.registeredCount || 0} người đăng ký tham gia` : `${evt.registeredCount || 0} people already registered`}</span>
+              <span>👥</span> <span>${evt.registeredCount || 0} people have registered</span>
             </div>
           </div>
 
           <div class="flex items-center gap-2">
             <button onclick="window.__selectProject('${evt.id}')" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
-              ${language === 'vi' ? 'Chi Tiết' : 'Details'}
+              Details
             </button>
             ${isExpired ? `
               <button disabled class="flex-1 py-2 bg-slate-200 text-slate-400 font-bold text-xs rounded-xl text-center cursor-not-allowed">
-                ${language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+                Expired
               </button>
             ` : `
               <button onclick="window.__registerVolunteer('${evt.id}')" class="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
-                ${language === 'vi' ? 'Đăng Ký' : 'Register'}
+                Register
               </button>
             `}
           </div>
@@ -707,7 +773,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         setActiveEvent(evt);
       });
     });
-  }, [events, activeEvent, isAdmin, language]);
+  }, [events, activeEvent, isAdmin]);
 
   const handleFlyToEvent = (evt: CleanupEvent) => {
     setActiveEvent(evt);
@@ -800,7 +866,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 mobileTab === 'map' ? 'bg-[#E81A7F] text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
-              🗺️ <EditableText contentKey="cleanupMap.mobileTabMap" defaultValue={language === 'vi' ? "Bản Đồ" : "Map"} as="span" />
+              🗺️ <EditableText contentKey="cleanupMap.mobileTabMap" defaultValue="Map" as="span" />
             </button>
             <button
               onClick={() => setMobileTab('list')}
@@ -808,7 +874,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 mobileTab === 'list' ? 'bg-[#E81A7F] text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
-              📋 <EditableText contentKey="cleanupMap.mobileTabList" defaultValue={language === 'vi' ? "Danh Sách Điểm" : "Spot List"} as="span" /> ({events.length})
+              📋 <EditableText contentKey="cleanupMap.mobileTabList" defaultValue="Spot List" as="span" /> ({events.length})
             </button>
           </div>
 
@@ -827,14 +893,14 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           <div className="p-4 border-b border-slate-800 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">
-                <EditableText contentKey="cleanupMap.locationLabel" defaultValue={language === 'vi' ? "Vị Trí Bản Đồ" : "Map Location"} as="span" />
+                <EditableText contentKey="cleanupMap.locationLabel" defaultValue="Map Location" as="span" />
               </span>
               {searchedPlaceName && (
                 <button
                   onClick={handleResetView}
                   className="text-[11px] font-bold text-pink-400 hover:text-pink-300 cursor-pointer"
                 >
-                  <EditableText contentKey="cleanupMap.clearBoundaryBtn" defaultValue={language === 'vi' ? "Xóa khoanh vùng" : "Clear boundary"} as="span" />
+                  <EditableText contentKey="cleanupMap.clearBoundaryBtn" defaultValue="Clear boundary" as="span" />
                 </button>
               )}
             </div>
@@ -843,18 +909,18 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <div className="p-3 rounded-2xl bg-red-950/40 border border-red-500/50 text-white space-y-1">
                 <div className="flex items-center gap-1.5 text-red-400 font-extrabold text-xs">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  <EditableText contentKey="cleanupMap.locatingLabel" defaultValue={hasBoundaryDrawn ? (language === 'vi' ? "ĐANG ĐỊNH VỊ & KHOANH VÙNG:" : "LOCATING & DRAWING BOUNDARY:") : (language === 'vi' ? "ĐÃ TÌM THẤY:" : "LOCATION FOUND:")} as="span" />
+                  <EditableText contentKey="cleanupMap.locatingLabel" defaultValue={hasBoundaryDrawn ? "LOCATING & OUTLINING BOUNDARY:" : "LOCATION FOUND:"} as="span" />
                 </div>
                 <div className="font-extrabold text-sm text-white">
                   📍 {searchedPlaceName}
                 </div>
                 {hasBoundaryDrawn && (
-                  <EditableText contentKey="cleanupMap.boundaryDrawnHint" defaultValue={language === 'vi' ? "Đã khoanh vùng ranh giới nét đứt màu đỏ trên bản đồ." : "The dashed red boundary has been drawn on the map."} as="div" multiline className="text-[10px] text-slate-400" />
+                  <EditableText contentKey="cleanupMap.boundaryDrawnHint" defaultValue="The boundary has been outlined with a red dashed line on the map." as="div" multiline className="text-[10px] text-slate-400" />
                 )}
               </div>
             ) : (
               <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60 text-slate-400 text-xs">
-                💡 <EditableText contentKey="cleanupMap.searchHint" defaultValue={language === 'vi' ? "Sử dụng thanh tìm kiếm phía trên bản đồ để tìm bất kỳ trường học, bệnh viện, tỉnh thành hoặc địa danh nào." : "Use the search bar above the map to find any school, hospital, province or landmark."} as="span" multiline />
+                💡 <EditableText contentKey="cleanupMap.searchHint" defaultValue="Use the search bar above the map to find any school, hospital, province, or landmark." as="span" multiline />
               </div>
             )}
           </div>
@@ -862,8 +928,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           {/* Cleanup Campaign Spots List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              <span><EditableText contentKey="cleanupMap.featuredSpotsLabel" defaultValue={language === 'vi' ? "Các Điểm Dọn Rác Nổi Bật" : "Featured Cleanup Spots"} as="span" /> ({events.length})</span>
-              <EditableText contentKey="cleanupMap.tapToZoomHint" defaultValue={language === 'vi' ? "Bấm để zoom tới" : "Tap to zoom in"} as="span" className="text-[10px] text-[#E81A7F] font-semibold" />
+              <span><EditableText contentKey="cleanupMap.featuredSpotsLabel" defaultValue="Featured Cleanup Spots" as="span" /> ({events.length})</span>
+              <EditableText contentKey="cleanupMap.tapToZoomHint" defaultValue="Tap to zoom in" as="span" className="text-[10px] text-[#E81A7F] font-semibold" />
             </div>
 
             {events.map(evt => {
@@ -892,10 +958,10 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-1">
                         {isPending && (
-                          <EditableText contentKey="cleanupMap.pendingBadge" defaultValue={language === 'vi' ? "Chờ duyệt" : "Pending"} as="span" className="text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-md" />
+                          <EditableText contentKey="cleanupMap.pendingBadge" defaultValue="Pending Review" as="span" className="text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-md" />
                         )}
                         {!isPending && isExpired && (
-                          <span className="text-[9px] font-black uppercase bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded-md">{language === 'vi' ? 'Đã hết hạn' : 'Expired'}</span>
+                          <span className="text-[9px] font-black uppercase bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded-md">Expired</span>
                         )}
                         <span className="text-[10px] text-slate-400 font-bold ml-auto">
                           📍 {evt.city}
@@ -912,7 +978,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
                       <div className="mt-2 flex items-center justify-between text-[11px]">
                         <span className="text-slate-400 font-medium">📅 {formatDate(evt.date)}</span>
-                        <span className="text-emerald-400 font-bold">👥 {evt.registeredCount || 0} {language === 'vi' ? 'ĐK' : 'reg.'}</span>
+                        <span className="text-emerald-400 font-bold">👥 {evt.registeredCount || 0} registered</span>
                       </div>
                     </div>
                   </div>
@@ -937,7 +1003,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 <Search className="w-5 h-5 text-slate-500 shrink-0" />
                 <input
                   type="text"
-                  placeholder={language === 'vi' ? "Tìm vị trí (vd: THPT Giao Thủy, Bán đảo Sơn Trà...)" : "Search a place (e.g. Giao Thuy, Nam Dinh...)"}
+                  placeholder="Search location (e.g., Giao Thuy...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => {
@@ -969,7 +1035,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 type="button"
                 onClick={() => applyLocationSearchAndBoundary(searchQuery)}
                 className="p-2 bg-[#E81A7F] hover:bg-[#D01370] text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
-                title={language === 'vi' ? "Tìm kiếm vị trí" : "Search location"}
+                title="Search location"
               >
                 <Navigation className="w-4 h-4" />
               </button>
@@ -979,7 +1045,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             {showSuggestions && suggestions.length > 0 && (
               <div className="mt-1.5 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 animate-in fade-in-50 zoom-in-95 duration-150 max-h-80 overflow-y-auto">
                 <div className="flex items-center justify-between gap-2 px-3.5 py-1 border-b border-slate-100">
-                  <EditableText contentKey="cleanupMap.suggestionsHeader" defaultValue={language === 'vi' ? "Gợi ý địa điểm & cơ sở" : "Place & facility suggestions"} as="div" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400" />
+                  <EditableText contentKey="cleanupMap.suggestionsHeader" defaultValue="Suggested places & facilities" as="div" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400" />
                   <button
                     type="button"
                     onClick={() => setShowSuggestions(false)}
@@ -1029,9 +1095,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                     ? 'bg-[#E81A7F] text-white shadow'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800'
                 }`}
-                title={language === 'vi' ? "Bản đồ đường phố Google Maps" : "Google Maps street view"}
+                title="Google Maps street map"
               >
-                <EditableText contentKey="cleanupMap.layerStreets" defaultValue={language === 'vi' ? "Đường phố" : "Streets"} as="span" />
+                <EditableText contentKey="cleanupMap.layerStreets" defaultValue="Streets" as="span" />
               </button>
               <button
                 onClick={() => setCurrentLayer('satellite')}
@@ -1040,9 +1106,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                     ? 'bg-[#E81A7F] text-white shadow'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800'
                 }`}
-                title={language === 'vi' ? "Bản đồ vệ tinh lai có tên đường" : "Hybrid satellite view with street names"}
+                title="Hybrid satellite map with street names"
               >
-                <EditableText contentKey="cleanupMap.layerSatellite" defaultValue={language === 'vi' ? "Vệ tinh" : "Satellite"} as="span" />
+                <EditableText contentKey="cleanupMap.layerSatellite" defaultValue="Satellite" as="span" />
               </button>
               <button
                 onClick={() => setCurrentLayer('carto')}
@@ -1051,9 +1117,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                     ? 'bg-[#E81A7F] text-white shadow'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800'
                 }`}
-                title={language === 'vi' ? "Bản đồ địa hình chuyên sâu (Topographic Terrain)" : "Detailed topographic terrain map"}
+                title="Detailed terrain map (Topographic Terrain)"
               >
-                <EditableText contentKey="cleanupMap.layerTerrain" defaultValue={language === 'vi' ? "Địa hình" : "Terrain"} as="span" />
+                <EditableText contentKey="cleanupMap.layerTerrain" defaultValue="Terrain" as="span" />
               </button>
             </div>
 
@@ -1062,14 +1128,14 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <button
                 onClick={handleZoomIn}
                 className="p-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
-                title={language === 'vi' ? "Phóng to (+)" : "Zoom in (+)"}
+                title="Zoom in (+)"
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
               <button
                 onClick={handleZoomOut}
                 className="p-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
-                title={language === 'vi' ? "Thu nhỏ (-)" : "Zoom out (-)"}
+                title="Zoom out (-)"
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
@@ -1077,7 +1143,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <button
                 onClick={handleResetView}
                 className="p-2.5 text-slate-300 hover:text-[#E81A7F] hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
-                title={language === 'vi' ? "Toàn cảnh Việt Nam" : "Reset to full Vietnam view"}
+                title="Full view of Vietnam"
               >
                 <Compass className="w-4 h-4" />
               </button>
@@ -1091,7 +1157,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-1.5 text-emerald-400 font-extrabold text-xs">
                   <span className="p-1 rounded-lg bg-emerald-500/20">📍</span>
-                  <EditableText contentKey="cleanupMap.pinnedLabel" defaultValue={language === 'vi' ? "ĐÃ CHỌN VỊ TRÍ GHIM" : "PINNED LOCATION SELECTED"} as="span" />
+                  <EditableText contentKey="cleanupMap.pinnedLabel" defaultValue="PINNED LOCATION SELECTED" as="span" />
                 </div>
                 <button
                   onClick={() => setPinnedLocation(null)}
@@ -1108,7 +1174,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 {pinnedLocation.address}
               </div>
               <div className="text-[10px] text-slate-400 mb-3">
-                {language === 'vi' ? 'Tọa độ' : 'Coordinates'}: {pinnedLocation.lat.toFixed(5)}, {pinnedLocation.lng.toFixed(5)} • {pinnedLocation.city}
+                Coordinates: ${pinnedLocation.lat.toFixed(5)}, ${pinnedLocation.lng.toFixed(5)} • ${pinnedLocation.city}
               </div>
 
               <button
@@ -1116,7 +1182,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
-                <EditableText contentKey="cleanupMap.pinnedSubmitBtn" defaultValue={language === 'vi' ? "Đăng Điểm Rác & Hình Ảnh Lên Vị Trí Này" : "Post Cleanup Spot & Photo At This Location"} as="span" />
+                <EditableText contentKey="cleanupMap.pinnedSubmitBtn" defaultValue="Submit Cleanup Spot & Photo at This Location" as="span" />
               </button>
             </div>
           )}
@@ -1149,11 +1215,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                       onClick={() => onSelectProject(activeEvent.id)}
                       className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center border border-slate-600"
                     >
-                      <EditableText contentKey="cleanupMap.detailsBtn" defaultValue={language === 'vi' ? "Xem Chi Tiết" : "View Details"} as="span" />
+                      <EditableText contentKey="cleanupMap.detailsBtn" defaultValue="View Details" as="span" />
                     </button>
                     {isEventExpired(activeEvent.date) ? (
                       <span className="flex-1 py-2 bg-slate-800 text-slate-500 font-bold text-xs rounded-xl text-center cursor-not-allowed">
-                        {language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+                        Expired
                       </span>
                     ) : (
                       <a
@@ -1164,7 +1230,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                         }}
                         className="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center inline-block"
                       >
-                        <EditableText contentKey="cleanupMap.registerBtn" defaultValue={language === 'vi' ? "Đăng Ký Tham Gia" : "Register to Join"} as="span" />
+                        <EditableText contentKey="cleanupMap.registerBtn" defaultValue="Register to Join" as="span" />
                       </a>
                     )}
                   </div>
@@ -1190,7 +1256,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         onClose={() => setIsEditorOpen(false)}
         onSaved={refreshEvents}
         initialCoordinates={pinnedLocation ? { lat: pinnedLocation.lat, lng: pinnedLocation.lng } : undefined}
-        initialTitle={pinnedLocation ? `${language === 'vi' ? 'Điểm Dọn Rác' : 'Cleanup Spot'}: ${pinnedLocation.placeName}` : ''}
+        initialTitle={pinnedLocation ? `Cleanup Spot: ${pinnedLocation.placeName}` : ''}
         initialLocation={pinnedLocation ? pinnedLocation.address : ''}
         initialCity={pinnedLocation ? pinnedLocation.city : ''}
       />
