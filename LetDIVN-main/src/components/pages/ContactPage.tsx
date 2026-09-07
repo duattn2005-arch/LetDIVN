@@ -53,13 +53,13 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="py-16 bg-white select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <div className="py-8 sm:py-12 bg-white select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
         <div className="text-center mx-auto space-y-4">
           <EditableText
             contentKey="contactPage.title"
-            defaultValue={t.navContactUs || 'Liên Hệ Với Chúng Tôi'}
+            defaultValue={t.navContactUs || 'Contact Us'}
             as="h1"
             className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
           />
@@ -118,7 +118,7 @@ export const ContactPage: React.FC = () => {
               />
               <EditableText
                 contentKey="contact.phone1"
-                defaultValue={t.contactPhone1Default || "035.872.6755 (Anh Sơn)"}
+                defaultValue={t.contactPhone1Default || "035.872.6755 (Mr. Son)"}
                 render={(value) => (
                   <a
                     href={`tel:${value.replace(/\D/g, '')}`}
@@ -140,7 +140,7 @@ export const ContactPage: React.FC = () => {
               />
               <EditableText
                 contentKey="contact.phone2"
-                defaultValue={t.contactPhone2Default || "0968.514.882 (Chị Tú)"}
+                defaultValue={t.contactPhone2Default || "0968.514.882 (Ms. Tu)"}
                 render={(value) => (
                   <a
                     href={`tel:${value.replace(/\D/g, '')}`}

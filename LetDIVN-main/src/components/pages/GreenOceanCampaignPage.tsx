@@ -60,7 +60,7 @@ export const GreenOceanCampaignPage: React.FC = () => {
       </div>
 
       {/* Header on cream background */}
-      <div className="bg-[#F8F6EA] py-10 sm:py-14">
+      <div className="bg-[#F8F6EA] py-6 sm:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mx-auto space-y-3 mb-6">
             <EditableText

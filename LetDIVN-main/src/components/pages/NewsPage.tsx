@@ -119,7 +119,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     const otherArticles = visibleNews.filter((a) => a.id !== selectedArticle.id).slice(0, 6);
 
     return (
-      <div className="py-16 bg-white">
+      <div className="py-8 sm:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
@@ -266,7 +266,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   }
 
   return (
-    <div className="py-16 bg-white">
+    <div className="py-8 sm:py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
         <div className="text-center mx-auto space-y-4">

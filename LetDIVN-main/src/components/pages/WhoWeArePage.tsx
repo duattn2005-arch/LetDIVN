@@ -66,7 +66,7 @@ export const WhoWeArePage: React.FC<{ onJoin?: () => void }> = () => {
   };
 
   return (
-    <div className="pt-4 sm:pt-6 pb-10 sm:pb-16 bg-white min-h-screen">
+    <div className="pt-4 sm:pt-6 pb-6 sm:pb-10 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
 
         {/* 1. Top Full Banner Image */}

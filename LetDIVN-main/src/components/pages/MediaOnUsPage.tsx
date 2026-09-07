@@ -117,7 +117,7 @@ export const MediaOnUsPage: React.FC = () => {
   };
 
   return (
-    <div className="py-16 bg-white min-h-screen">
+    <div className="py-8 sm:py-12 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
 
         <div className="text-center mx-auto space-y-4">

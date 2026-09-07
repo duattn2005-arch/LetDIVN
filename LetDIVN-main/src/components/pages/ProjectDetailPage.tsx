@@ -89,7 +89,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
 
   if (!event) {
     return (
-      <div className="py-24 bg-white text-center">
+      <div className="py-12 bg-white text-center">
         <p className="text-sm text-slate-500 mb-4">This campaign could not be found.</p>
         <button
           onClick={onBack}

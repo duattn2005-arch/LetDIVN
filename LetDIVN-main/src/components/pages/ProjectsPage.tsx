@@ -67,7 +67,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   const pendingCount = events.filter(e => e.status === 'Pending').length;
 
   return (
-    <div className="py-16 bg-white">
+    <div className="py-8 sm:py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         <div className="text-center mx-auto space-y-4">
