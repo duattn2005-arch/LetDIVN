@@ -1044,7 +1044,16 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             {/* Autocomplete Dropdown List (Exact match to Screenshot 2) */}
             {showSuggestions && suggestions.length > 0 && (
               <div className="mt-1.5 bg-white text-slate-900 rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 animate-in fade-in-50 zoom-in-95 duration-150 max-h-80 overflow-y-auto">
-                <EditableText contentKey="cleanupMap.suggestionsHeader" defaultValue={language === 'vi' ? "Gợi ý địa điểm & cơ sở" : "Place & facility suggestions"} as="div" className="px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-100" />
+                <div className="flex items-center justify-between gap-2 px-3.5 py-1 border-b border-slate-100">
+                  <EditableText contentKey="cleanupMap.suggestionsHeader" defaultValue={language === 'vi' ? "Gợi ý địa điểm & cơ sở" : "Place & facility suggestions"} as="div" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400" />
+                  <button
+                    type="button"
+                    onClick={() => setShowSuggestions(false)}
+                    className="p-0.5 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
                 {suggestions.map((sug) => (
                   <div
                     key={sug.placeId}
