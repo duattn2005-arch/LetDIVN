@@ -81,7 +81,7 @@ export const OurTeamPage: React.FC = () => {
             <div className="pt-2 flex items-center justify-center gap-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-full text-xs font-bold text-purple-700">
                 <ShieldCheck className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Chế độ Quản trị viên (Admin)' : 'Admin Management Mode'}</span>
+                <span>Admin Management Mode</span>
               </div>
               <button
                 id="admin-add-team-btn"
@@ -89,7 +89,7 @@ export const OurTeamPage: React.FC = () => {
                 className="btn-pill-3d inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-6 py-2.5 shadow-lg cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Thêm Thành Viên Mới' : 'Add New Member'}</span>
+                <span>Add New Member</span>
               </button>
               <div className="inline-flex items-center gap-1 bg-white border border-slate-200 rounded-full p-1 shadow-xs">
                 <button

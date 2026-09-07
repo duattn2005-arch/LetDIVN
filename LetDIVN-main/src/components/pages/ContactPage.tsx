@@ -25,7 +25,7 @@ export const ContactPage: React.FC = () => {
     e.preventDefault();
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone && cleanPhone.length !== 10) {
-      alert(language === 'vi' ? 'Số điện thoại phải có đúng 10 chữ số (VD: 0987654321)!' : 'Phone number must have exactly 10 digits!');
+      alert('Phone number must have exactly 10 digits!');
       return;
     }
 
@@ -218,7 +218,7 @@ export const ContactPage: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder={language === 'vi' ? 'Nguyễn Văn A' : language === 'ja' ? '山田 太郎' : language === 'ko' ? '홍길동' : language === 'zh' ? '张伟' : 'John Doe'}
+                      placeholder="John Doe"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
@@ -286,7 +286,7 @@ export const ContactPage: React.FC = () => {
                   <textarea
                     rows={4}
                     required
-                    placeholder={language === 'vi' ? 'Nhập nội dung bạn muốn gửi tới Let\'s do it! Vietnam...' : language === 'ja' ? 'メッセージを入力してください...' : 'Write your message...'}
+                    placeholder="Write your message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs leading-relaxed focus:outline-hidden focus:border-[#E81A7F]"

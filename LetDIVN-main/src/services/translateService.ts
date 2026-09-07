@@ -9,14 +9,7 @@ import { Language } from '../context/LanguageContext';
 // ever goes down or gets rate-limited, callers fall back to the original text
 // rather than breaking the page).
 const GOOGLE_LANG_CODE: Record<Language, string> = {
-  vi: 'vi',
   en: 'en',
-  fr: 'fr',
-  ja: 'ja',
-  ko: 'ko',
-  zh: 'zh-CN',
-  de: 'de',
-  es: 'es',
 };
 
 // In-memory cache only — translations are deterministic for a given
@@ -40,7 +33,6 @@ async function translateViaGoogle(text: string, targetLang: string): Promise<str
 export async function translateText(text: string, targetLanguage: Language): Promise<string> {
   const trimmed = text?.trim();
   if (!trimmed) return text;
-  if (targetLanguage === 'vi') return text;
 
   const targetLang = GOOGLE_LANG_CODE[targetLanguage] || targetLanguage;
   const cacheKey = `${targetLang}::${text}`;

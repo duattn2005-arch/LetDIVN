@@ -36,7 +36,7 @@ export const MediaVideosPage: React.FC = () => {
 
   const handleDeleteVideo = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    const confirmMsg = language === 'vi' ? 'Bạn có chắc chắn muốn xóa video này?' : 'Are you sure you want to delete this video?';
+    const confirmMsg = 'Are you sure you want to delete this video?';
     if (window.confirm(confirmMsg)) {
       dbService.deleteVideo(id);
     }

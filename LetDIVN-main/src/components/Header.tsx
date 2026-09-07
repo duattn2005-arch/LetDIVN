@@ -154,26 +154,16 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Nav Items: shown from xl (1280px), same as before — this is the
-              width the site is actually used at, so it must always be visible here
-              rather than falling back to the hamburger menu. To guarantee no
-              language can ever overlap the language/auth controls (translations
-              vary a lot in length — French runs much longer than Vietnamese),
-              each label has a capped max-width with ellipsis truncation instead of
-              relying on padding trims alone: the nav's total width is now bounded
-              regardless of translation length, so it can never push past its box.
-              Short labels (Vietnamese, English, ...) display in full since they
-              never reach their cap; only unusually long ones clip with "…". */}
-          <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-1 2xl:gap-2.5 text-[12px] xl:text-[13px] 2xl:text-[14px] font-semibold overflow-visible no-scrollbar mx-2 2xl:mx-4">
+          {/* Desktop Nav Items: Centered and well-spaced across the available width */}
+          <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-2 xl:gap-3.5 2xl:gap-5 text-[14px] xl:text-[15px] 2xl:text-[16px] font-semibold overflow-visible no-scrollbar mx-2 2xl:mx-4">
 
             {/* 1. Who We Are */}
             <button
               id="nav-who-we-are"
               onClick={() => onNavigate('who-we-are')}
-              title={t.navWhoWeAre}
-              className={`shrink-0 max-w-[118px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'who-we-are'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'who-we-are' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -184,10 +174,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-what-we-do"
               onClick={() => onNavigate('what-we-do')}
-              title={t.navWhatWeDo}
-              className={`shrink-0 max-w-[130px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'what-we-do'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'what-we-do' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -198,10 +187,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-team"
               onClick={() => onNavigate('our-team')}
-              title={t.navOurTeam}
-              className={`shrink-0 max-w-[82px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'our-team'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'our-team' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -212,10 +200,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-partners"
               onClick={() => onNavigate('our-partners')}
-              title={t.navOurPartners}
-              className={`shrink-0 max-w-[100px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'our-partners'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'our-partners' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -227,15 +214,14 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-other-dropdown-btn"
                 onClick={() => setOtherDropdownOpen(!otherDropdownOpen)}
-                title={t.navOther}
-                className={`shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all cursor-pointer ${
+                className={`shrink-0 flex items-center gap-1.5 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                   currentView === 'media-on-us' || currentView === 'news' || currentView === 'gallery' || currentView === 'videos'
                     ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}
               >
-                <span className="max-w-[70px] min-[1366px]:max-w-none truncate">{t.navOther}</span>
-                <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${otherDropdownOpen ? 'rotate-180' : ''}`} />
+                <span>{t.navOther}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${otherDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {otherDropdownOpen && (
@@ -295,20 +281,19 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* 6. Project Mega Dropdown (5 key campaigns) */}
+            {/* 6. Projects Dropdown (5 campaign info pages) */}
             <div className="relative shrink-0" ref={projectsRef}>
               <button
                 id="nav-projects-dropdown-btn"
                 onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
-                title={t.navProject}
-                className={`shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all cursor-pointer ${
+                className={`shrink-0 flex items-center gap-1.5 px-3.5 2xl:px-4.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                   projectItems.some((item) => item.view === currentView)
                     ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}
               >
-                <span className="max-w-[80px] min-[1366px]:max-w-none truncate">{t.navProject}</span>
-                <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${projectsDropdownOpen ? 'rotate-180' : ''}`} />
+                <span>{t.navProject}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${projectsDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {projectsDropdownOpen && (
@@ -337,27 +322,27 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* 7. Real Cleanup Map */}
+            {/* 7. Real Cleanup Map (Pin Icon Badge) */}
             <button
               id="nav-cleanup-map"
               onClick={() => onNavigate('map')}
               title={t.navMap}
-              className={`shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'map'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs'
+              className={`shrink-0 flex items-center gap-1.5 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'map' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/50 font-semibold'
               }`}
             >
-              <MapPin className="w-4.5 h-4.5 shrink-0 text-[#E81A7F]" />
-              <span className="max-w-[80px] min-[1366px]:max-w-none truncate">{t.navMap}</span>
+              <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
+              <span>{t.navMap}</span>
             </button>
 
           </nav>
 
           {/* Right Action Controls: Auth + Contact Us (language switcher removed — site is English-only now) */}
-          <div className="hidden xl:flex items-center space-x-2 2xl:space-x-3 shrink-0">
+          <div className="hidden xl:flex items-center space-x-2.5 2xl:space-x-4 shrink-0">
 
-            {/* Combined Single Auth Button (Đăng Ký / Đăng Nhập) */}
+            {/* Combined Single Auth Button (Register / Login) */}
             {!isAuthenticated ? (
               <button
                 id="header-auth-btn"

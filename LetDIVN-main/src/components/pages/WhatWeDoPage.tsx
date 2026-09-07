@@ -33,7 +33,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
   };
 
   const handleDelete = (id: string, title: string) => {
-    if (window.confirm(language === 'vi' ? `Bạn có chắc muốn xóa hoạt động "${title}" không?` : `Are you sure you want to delete "${title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       dbService.deleteWhatWeDo(id);
     }
   };
@@ -59,7 +59,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
         <div className="text-center mx-auto space-y-4">
           <EditableText
             contentKey="whatWeDo.title"
-            defaultValue={t.whatWeDoTitle || (language === 'vi' ? 'CHÚNG TÔI LÀM GÌ' : 'WHAT WE DO')}
+            defaultValue={t.whatWeDoTitle || 'WHAT WE DO'}
             as="h1"
             className="text-4xl sm:text-5xl font-black metallic-title tracking-tight uppercase"
           />
@@ -67,7 +67,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
           <div className="space-y-2 pt-1">
             <EditableText
               contentKey="whatWeDo.missionSubtitle"
-              defaultValue={language === 'vi' ? "Tại Let’s Do It! Vietnam, sứ mệnh của chúng tôi là biến đất nước tươi đẹp của chúng ta thành một nơi trong lành, xanh sạch và đáng sống hơn." : "At Let’s Do It! Vietnam, we’re on a mission to transform our beautiful country into a cleaner, greener haven."}
+              defaultValue="At Let’s Do It! Vietnam, we’re on a mission to transform our beautiful country into a cleaner, greener haven."
               as="p"
               multiline
               resizable
@@ -75,7 +75,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
             />
             <EditableText
               contentKey="whatWeDo.differenceSubtitle"
-              defaultValue={language === 'vi' ? "Dưới đây là cách chúng tôi tạo nên sự khác biệt:" : "Here’s how we make a difference:"}
+              defaultValue="Here’s how we make a difference:"
               as="p"
               resizable
               className="text-sm sm:text-base text-slate-500 font-semibold"
@@ -91,7 +91,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-emerald-500/50 hover:scale-[1.02]"
               >
                 <Plus className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Thêm Hoạt Động Mới (Ảnh & Chữ)' : 'Add New Activity (Image & Text)'}</span>
+                <span>Add New Activity (Image & Text)</span>
               </button>
             </div>
           )}

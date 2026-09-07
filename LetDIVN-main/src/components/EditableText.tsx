@@ -57,7 +57,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const [value, setValue] = useState(defaultValue);
   const [color, setColor] = useState('');
   const [align, setAlign] = useState('');
-  // Custom "chạy nhiều màu" set — 2+ hex colors the gradient animation cycles
+  // Custom "running colors" set — 2+ hex colors the gradient animation cycles
   // through. Empty means "use the default built-in rainbow (or the single
   // static `color` above, if one is set)".
   const [colors, setColors] = useState<string[]>([]);
@@ -258,25 +258,25 @@ export const EditableText: React.FC<EditableTextProps> = ({
     const lineCount = (draft || '').split('\n').length;
     const calcRows = Math.min(8, Math.max(2, lineCount));
     const PRESET_COLORS = [
-      { name: 'Đen', hex: '#0f172a' },
-      { name: 'Hồng', hex: '#E81A7F' },
-      { name: 'Xanh dương', hex: '#2563eb' },
-      { name: 'Xanh lá', hex: '#059669' },
-      { name: 'Đỏ', hex: '#dc2626' },
-      { name: 'Tím', hex: '#7c3aed' },
-      { name: 'Cam', hex: '#d97706' },
+      { name: 'Black', hex: '#0f172a' },
+      { name: 'Pink', hex: '#E81A7F' },
+      { name: 'Blue', hex: '#2563eb' },
+      { name: 'Green', hex: '#059669' },
+      { name: 'Red', hex: '#dc2626' },
+      { name: 'Purple', hex: '#7c3aed' },
+      { name: 'Orange', hex: '#d97706' },
     ];
-    // Colors available for the custom "chạy nhiều màu" mode — the same 8 stops
+    // Colors available for the custom "running colors" mode — the same 8 stops
     // the default built-in rainbow uses, so any subset still looks cohesive.
     const RUN_COLOR_PALETTE = [
-      { name: 'Hồng', hex: '#E81A7F' },
-      { name: 'Đỏ hồng', hex: '#FF0055' },
-      { name: 'Cam', hex: '#FF5E00' },
-      { name: 'Vàng', hex: '#FFB700' },
-      { name: 'Xanh lá', hex: '#00E676' },
-      { name: 'Xanh dương', hex: '#00B0FF' },
-      { name: 'Tím', hex: '#7C4DFF' },
-      { name: 'Hồng tím', hex: '#E040FB' },
+      { name: 'Pink', hex: '#E81A7F' },
+      { name: 'Rose', hex: '#FF0055' },
+      { name: 'Orange', hex: '#FF5E00' },
+      { name: 'Yellow', hex: '#FFB700' },
+      { name: 'Green', hex: '#00E676' },
+      { name: 'Blue', hex: '#00B0FF' },
+      { name: 'Purple', hex: '#7C4DFF' },
+      { name: 'Magenta', hex: '#E040FB' },
     ];
     const toggleRunColor = (hex: string) => {
       setDraftColor('');
@@ -291,7 +291,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={calcRows}
-          placeholder="Nhập nội dung... (Nhấn Enter để xuống dòng)"
+          placeholder="Enter content... (Press Enter for a new line)"
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
@@ -299,7 +299,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
             ...(draftFontSize ? { fontSize: draftFontSize } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
-          title="Kéo góc dưới bên phải để chỉnh chiều rộng/chiều cao khung"
+          title="Drag the bottom-right corner to resize the box"
         />
         <div className="flex items-center flex-wrap justify-between gap-1.5 mt-1.5">
           <div className="flex items-center flex-wrap gap-1.5">
@@ -312,9 +312,9 @@ export const EditableText: React.FC<EditableTextProps> = ({
                   ? 'bg-gradient-to-r from-pink-500 via-yellow-400 to-cyan-400 text-white shadow-xs border-transparent scale-105'
                   : 'bg-white border-purple-200 text-slate-700 hover:bg-purple-50'
               }`}
-              title="Bật hiệu ứng chữ chạy biến màu cầu vồng mặc định"
+              title="Enable the default rainbow color-shifting text effect"
             >
-              <span>🌈 Chạy màu mặc định</span>
+              <span>🌈 Default Flowing Color</span>
             </button>
 
             {/* Quick Color Swatches — one static color, disables running colors */}
@@ -324,7 +324,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
                   key={c.hex}
                   type="button"
                   onClick={() => { setDraftColor(c.hex); setDraftColors([]); }}
-                  title={`Chọn màu ${c.name} (${c.hex})`}
+                  title={`Choose ${c.name} (${c.hex})`}
                   className={`w-4 h-4 rounded-full transition-transform cursor-pointer border ${
                     draftColors.length === 0 && draftColor.toLowerCase() === c.hex.toLowerCase()
                       ? 'scale-125 ring-2 ring-purple-500 border-white shadow-xs'
@@ -338,7 +338,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
             {/* Custom Color Picker Input */}
             <label
               className="relative flex items-center gap-1 px-2 py-1 bg-white border border-purple-300 rounded-lg cursor-pointer hover:bg-purple-50"
-              title="Chọn mã màu tùy chỉnh bất kỳ"
+              title="Choose any custom color"
             >
               <Palette className="w-3.5 h-3.5 text-purple-700" />
               <span
@@ -358,18 +358,18 @@ export const EditableText: React.FC<EditableTextProps> = ({
                 type="button"
                 onClick={() => setDraftColor('')}
                 className="px-2 py-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
-                title="Bỏ màu tĩnh, quay về hiệu ứng chạy màu mặc định"
+                title="Remove the static color and return to the default flowing effect"
               >
-                Mặc định
+                Default
               </button>
             )}
 
             <div className="flex items-center gap-0.5 bg-white border border-purple-300 rounded-lg p-0.5">
               {([
-                { value: 'left', Icon: AlignLeft, label: 'Căn trái' },
-                { value: 'center', Icon: AlignCenter, label: 'Căn giữa' },
-                { value: 'right', Icon: AlignRight, label: 'Căn phải' },
-                { value: 'justify', Icon: AlignJustify, label: 'Căn đều 2 bên' },
+                { value: 'left', Icon: AlignLeft, label: 'Align left' },
+                { value: 'center', Icon: AlignCenter, label: 'Align center' },
+                { value: 'right', Icon: AlignRight, label: 'Align right' },
+                { value: 'justify', Icon: AlignJustify, label: 'Justify' },
               ] as const).map(({ value, Icon, label }) => (
                 <button
                   key={value}
@@ -414,28 +414,28 @@ export const EditableText: React.FC<EditableTextProps> = ({
               type="button"
               onClick={handleResetToOriginal}
               className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded-lg flex items-center gap-1 font-bold text-xs cursor-pointer"
-              title="Khôi phục lại bản dịch chuẩn của hệ thống"
+              title="Restore the system's default translation"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Khôi phục gốc</span>
+              <span>Restore Original</span>
             </button>
             <button
               type="button"
               onClick={handleSave}
               className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center gap-1 font-bold text-xs cursor-pointer shadow-xs"
-              title="Lưu"
+              title="Save"
             >
               <Check className="w-3.5 h-3.5" />
-              <span>Lưu</span>
+              <span>Save</span>
             </button>
             <button
               type="button"
               onClick={handleCancel}
               className="px-2.5 py-1 bg-slate-300 hover:bg-slate-400 text-slate-800 rounded-lg flex items-center gap-1 font-bold text-xs cursor-pointer"
-              title="Hủy"
+              title="Cancel"
             >
               <X className="w-3.5 h-3.5" />
-              <span>Hủy</span>
+              <span>Cancel</span>
             </button>
           </div>
         </div>
@@ -444,7 +444,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
         <div className="w-full flex flex-col gap-1.5 mt-2 pt-2 border-t border-purple-200">
           <div className="flex items-center justify-between flex-wrap gap-1">
             <span className="text-[10px] font-bold text-purple-800">
-              🎨 Chạy nhiều màu tùy chọn (chọn 2 → 8 màu, hoặc để trống dùng mặc định):
+              🎨 Custom running colors (pick 2 → 8 colors, or leave empty for the default):
             </span>
             <div className="flex items-center gap-1">
               <button
@@ -452,14 +452,14 @@ export const EditableText: React.FC<EditableTextProps> = ({
                 onClick={() => { setDraftColors(RUN_COLOR_PALETTE.map((c) => c.hex)); setDraftColor(''); }}
                 className="px-2 py-0.5 text-[10px] font-bold text-purple-700 hover:text-purple-900 hover:bg-purple-100 rounded-md cursor-pointer"
               >
-                Chọn tất cả
+                Select all
               </button>
               <button
                 type="button"
                 onClick={() => setDraftColors([])}
                 className="px-2 py-0.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md cursor-pointer"
               >
-                Bỏ chọn
+                Clear
               </button>
             </div>
           </div>
@@ -472,7 +472,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
                   key={c.hex}
                   type="button"
                   onClick={() => toggleRunColor(c.hex)}
-                  title={selected ? `Bỏ ${c.name} khỏi dải chạy màu` : `Thêm ${c.name} vào dải chạy màu`}
+                  title={selected ? `Remove ${c.name} from the running colors` : `Add ${c.name} to the running colors`}
                   className={`relative w-6 h-6 rounded-full border-2 cursor-pointer transition-transform ${
                     selected ? 'scale-110 border-white ring-2 ring-purple-500 shadow-xs' : 'border-slate-300 hover:scale-105'
                   }`}
@@ -488,11 +488,11 @@ export const EditableText: React.FC<EditableTextProps> = ({
             })}
           </div>
           {draftColors.length === 1 && (
-            <p className="text-[10px] text-amber-600 font-semibold">Chọn thêm ít nhất 1 màu nữa để chạy màu (1 màu sẽ hiển thị tĩnh).</p>
+            <p className="text-[10px] text-amber-600 font-semibold">Select at least 1 more color to enable the running effect (a single color will display statically).</p>
           )}
           {draftColors.length >= 2 && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-purple-700 font-semibold shrink-0">Xem trước ({draftColors.length} màu):</span>
+              <span className="text-[10px] text-purple-700 font-semibold shrink-0">Preview ({draftColors.length} colors):</span>
               <span
                 className="flex-1 h-2.5 rounded-full"
                 style={{ background: `linear-gradient(90deg, ${draftColors.join(', ')})` }}
@@ -519,8 +519,8 @@ export const EditableText: React.FC<EditableTextProps> = ({
           startEditing();
         }
       }}
-      title="Sửa nội dung (Admin)"
-      className="inline-flex ml-1.5 align-middle p-0.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full ring-1 ring-purple-300 cursor-pointer shadow-2xs transition-all hover:scale-110"
+      title="Edit content (Admin)"
+      className="hidden group-hover/edit:inline-flex ml-1.5 align-middle p-0.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded cursor-pointer shadow-2xs transition-all"
     >
       <Edit3 className="w-3 h-3" />
     </span>
@@ -532,7 +532,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
         className="group/edit inline-flex items-center gap-0.5 whitespace-pre-line cursor-text"
         style={displayStyle}
         onMouseUp={handleMouseUpToEdit}
-        title="Bôi đen chữ hoặc bấm bút chì để sửa"
+        title="Highlight text or click the pencil icon to edit"
       >
         {render(resolvedValue)}
         {editBtn}
@@ -545,7 +545,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       className={`group/edit relative whitespace-pre-line cursor-text ${className}`}
       style={displayStyle}
       onMouseUp={handleMouseUpToEdit}
-      title="Bôi đen chữ hoặc bấm bút chì để sửa"
+      title="Highlight text or click the pencil icon to edit"
     >
       {resolvedValue}
       {editBtn}
@@ -562,7 +562,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       onMouseUp={handleResizeMouseUp}
       style={{ width: width || undefined, maxWidth: '100%', resize: 'horizontal', overflow: 'auto' }}
       className="group/resize relative mx-auto border border-dashed border-transparent hover:border-purple-300 rounded"
-      title="Kéo góc dưới bên phải để chỉnh độ rộng của đoạn văn này"
+      title="Drag the bottom-right corner to set how wide this text can grow before wrapping"
     >
       {editableTag}
       <MoveHorizontal className="hidden group-hover/resize:block absolute -bottom-0.5 -right-0.5 w-3 h-3 text-purple-500 pointer-events-none" />

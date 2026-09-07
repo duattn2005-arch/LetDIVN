@@ -22,7 +22,7 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
   const [logo, setLogo] = useState('');
   const [scale, setScale] = useState<number>(100);
   const [tier, setTier] = useState<Partner['tier']>('Gold');
-  const [type, setType] = useState('Doanh Nghiệp Tiên Phong');
+  const [type, setType] = useState('Pioneering Enterprise');
   const [description, setDescription] = useState('');
   const [website, setWebsite] = useState('');
   const [joinedYear, setJoinedYear] = useState(2023);
@@ -34,7 +34,7 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
       setLogo(partnerToEdit.logo || '');
       setScale(partnerToEdit.scale || 100);
       setTier(partnerToEdit.tier || 'Gold');
-      setType(partnerToEdit.type || 'Doanh Nghiệp Tiên Phong');
+      setType(partnerToEdit.type || 'Pioneering Enterprise');
       setDescription(partnerToEdit.description || '');
       setWebsite(partnerToEdit.website || '');
       setJoinedYear(partnerToEdit.joinedYear || 2023);
@@ -43,7 +43,7 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
       setLogo('https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=300&auto=format&fit=crop&q=80');
       setScale(100);
       setTier('Gold');
-      setType('Doanh Nghiệp Tiên Phong');
+      setType('Pioneering Enterprise');
       setDescription('');
       setWebsite('');
       setJoinedYear(new Date().getFullYear());
@@ -56,11 +56,11 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError('Vui lòng nhập tên đối tác hoặc tổ chức.');
+      setError('Please enter the partner or organization name.');
       return;
     }
     if (!logo.trim()) {
-      setError('Vui lòng tải lên logo đối tác.');
+      setError('Please upload the partner logo.');
       return;
     }
 
@@ -109,10 +109,10 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
             </div>
             <div>
               <h3 className="text-xl font-bold">
-                {partnerToEdit ? 'Chỉnh Sửa Đối Tác' : 'Thêm Đối Tác / Nhà Tài Trợ Mới'}
+                {partnerToEdit ? 'Edit Partner' : 'Add New Partner / Sponsor'}
               </h3>
               <p className="text-xs text-slate-400">
-                Quản lý thông tin nhà tài trợ và đối tác chiến lược
+                Manage sponsor and strategic partner information
               </p>
             </div>
           </div>
@@ -137,15 +137,15 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
           {/* Logo Upload */}
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
             <ImageUploadWidget
-              label="Logo Doanh Nghiệp / Đối Tác *"
-              aspectRatioLabel="Khuyên dùng ảnh logo nền trắng/trong suốt (PNG, JPG, SVG)"
+              label="Business / Partner Logo *"
+              aspectRatioLabel="A logo on a white/transparent background is recommended (PNG, JPG, SVG)"
               currentImageUrl={logo}
               onImageSelected={(url) => setLogo(url)}
             />
 
             {/* Logo Zoom / Scale Slider */}
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between gap-3 text-xs">
-              <span className="font-bold text-slate-700">🔍 Kích thước logo (Thu phóng):</span>
+              <span className="font-bold text-slate-700">🔍 Logo Size (Zoom):</span>
               <div className="flex items-center gap-2 flex-1 max-w-[240px]">
                 <button
                   type="button"
@@ -177,14 +177,14 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Tên Tổ Chức / Doanh Nghiệp *
+              Organization / Business Name *
             </label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="VD: Vinamilk, Unilever Vietnam, UNDP..."
+              placeholder="e.g., Vinamilk, Unilever Vietnam, UNDP..."
               className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
             />
           </div>
@@ -192,23 +192,23 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Hạng Đối Tác (Tier)
+                Partner Tier
               </label>
               <select
                 value={tier}
                 onChange={(e) => setTier(e.target.value as Partner['tier'])}
                 className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] bg-white cursor-pointer"
               >
-                <option value="Diamond">Kim Cương (Diamond)</option>
-                <option value="Gold">Vàng (Gold)</option>
-                <option value="Silver">Bạc (Silver)</option>
-                <option value="Media">Bảo Trợ Truyền Thông (Media)</option>
+                <option value="Diamond">Diamond</option>
+                <option value="Gold">Gold</option>
+                <option value="Silver">Silver</option>
+                <option value="Media">Media Sponsor</option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Năm Bắt Đầu Đồng Hành
+                Year Partnership Began
               </label>
               <input
                 type="number"
@@ -223,26 +223,26 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Phân Loại Đối Tác
+              Partner Category
             </label>
             <input
               type="text"
               value={type}
               onChange={(e) => setType(e.target.value)}
-              placeholder="VD: Doanh Nghiệp Tiên Phong, Tổ Chức Phi Chính Phủ..."
+              placeholder="e.g., Pioneering Enterprise, Non-Governmental Organization..."
               className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F]"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Mô Tả Hợp Tác & Giá Trị Đóng Góp
+              Partnership Description & Contribution
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Mô tả sự hỗ trợ, tài trợ dụng cụ, vận chuyển rác tái chế..."
+              placeholder="Describe the support provided, equipment sponsorship, recyclable waste transport..."
               className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100 resize-y"
             />
           </div>
@@ -250,7 +250,7 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
               <Globe className="w-3.5 h-3.5 text-slate-400" />
-              <span>Website Chính Thức</span>
+              <span>Official Website</span>
             </label>
             <input
               type="url"
@@ -268,14 +268,14 @@ export const PartnerEditorModal: React.FC<PartnerEditorModalProps> = ({
               onClick={onClose}
               className="px-5 py-2.5 border border-slate-300 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
               className="px-6 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              <span>{partnerToEdit ? 'Lưu Thay Đổi' : 'Thêm Đối Tác'}</span>
+              <span>{partnerToEdit ? 'Save Changes' : 'Add Partner'}</span>
             </button>
           </div>
         </form>

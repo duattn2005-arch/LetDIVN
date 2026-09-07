@@ -1,6 +1,6 @@
 {
   "name": "Let's do it! Vietnam - World Cleanup Day",
-  "description": "Nền tảng chính thức của Let's do it! Vietnam - Ngày Hội Dọn Rác Thế Giới, kết nối tình nguyện viên, đối tác và hệ sinh thái quản lý dữ liệu môi trường.",
+  "description": "Official platform of Let's do it! Vietnam - World Cleanup Day, connecting volunteers, partners, and environmental data management ecosystem.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

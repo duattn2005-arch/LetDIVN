@@ -14,10 +14,10 @@ interface VolunteerModalProps {
   selectedEventId?: string;
 }
 
-export const VolunteerModal: React.FC<VolunteerModalProps> = ({
-  isOpen,
-  onClose,
-  selectedEventId
+export const VolunteerModal: React.FC<VolunteerModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  selectedEventId 
 }) => {
   const [events, setEvents] = useState<CleanupEvent[]>([]);
   const availableEvents = events.filter(e => !isEventExpired(e.date));
@@ -35,14 +35,14 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   const [address, setAddress] = useState('');
   const [eventId, setEventId] = useState(selectedEventId || availableEvents[0]?.id || '');
   const [birthYear, setBirthYear] = useState<string>('');
-  const [selectedSkills, setSelectedSkills] = useState<string[]>(['Hậu cần & Phân loại rác']);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(['Logistics & Waste Sorting']);
   const [customRole, setCustomRole] = useState('');
   const [notes, setNotes] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Năm sinh hợp lệ: từ 1920 đến (năm nay - 6), tương đương tối thiểu 6 tuổi
+  // Valid birth year range: from 1920 to (current year - 6)
   const yearNumber = parseInt(birthYear, 10);
   const minBirthYear = 1920;
   const maxBirthYear = currentYear - 6;
@@ -79,13 +79,13 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   if (!isOpen) return null;
 
   const skillOptions = [
-    'Hậu cần & Phân loại rác',
-    'Nhiếp ảnh & Quay phim truyền thông',
-    'Điều phối & Quản lý nhóm',
-    'Sơ cấp cứu & Y tế',
-    'Lái xe & Vận chuyển rác',
-    'Phiên dịch Tiếng Anh',
-    'Hoạt náo & Hướng dẫn viên sinh thái'
+    'Logistics & Waste Sorting',
+    'Photography & Media Production',
+    'Coordination & Team Management',
+    'First Aid & Medical Support',
+    'Driving & Waste Transport',
+    'English Interpretation',
+    'MC & Eco Tour Guide'
   ];
 
   const handleSkillToggle = (skill: string) => {
@@ -101,7 +101,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     setPhone(digitsOnly);
 
     if (digitsOnly.length > 0 && digitsOnly.length < 10) {
-      setPhoneError(`Số điện thoại phải có đúng 10 số (hiện có ${digitsOnly.length}/10 số)`);
+      setPhoneError(`Phone number must be exactly 10 digits (currently ${digitsOnly.length}/10 digits)`);
     } else {
       setPhoneError(null);
     }
@@ -118,27 +118,27 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   };
 
   /**
-   * Xử lý Submit Form:
-   * 1. Gom toàn bộ dữ liệu vào formData.
-   * 2. Lưu vào CSDL nội bộ (await để biết chắc đã lưu thành công hay chưa).
-   * 3. Gọi saveToGoogleSheet(formData) ngầm độc lập (KHÔNG DÙNG await, best-effort).
-   * 4. Hiện trạng thái thành công trong popup thay vì đóng popup ngay lập tức.
+   * Form submit handler:
+   * 1. Gather all data into formData.
+   * 2. Save to the internal database (awaited, so we know it actually succeeded).
+   * 3. Call saveToGoogleSheet(formData) independently in the background (best-effort, not awaited).
+   * 4. Show the success state in the popup instead of closing it immediately.
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
 
-    // 1. Kiểm tra ràng buộc số điện thoại (chính xác 10 số)
+    // 1. Validate the phone number constraint (exactly 10 digits)
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length !== 10) {
-      setPhoneError('Số điện thoại phải có đúng 10 chữ số (không được ít hơn hoặc nhiều hơn)!');
-      alert('⚠ Số điện thoại không hợp lệ!\nVui lòng nhập đúng 10 chữ số (VD: 0987654321).');
+      setPhoneError('Phone number must be exactly 10 digits (no more, no less)!');
+      alert('⚠ Invalid phone number!\nPlease enter exactly 10 digits (e.g., 0987654321).');
       return;
     }
 
-    // 2. Kiểm tra năm sinh
+    // 2. Validate birth year
     if (!isBirthYearValid) {
-      alert(`⚠ Năm sinh không hợp lệ!\nVui lòng nhập năm sinh từ ${minBirthYear} đến ${maxBirthYear}.`);
+      alert(`⚠ Invalid birth year!\nPlease enter a birth year between ${minBirthYear} and ${maxBirthYear}.`);
       return;
     }
 
@@ -150,12 +150,12 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
     const eventTitle = eventObj ? eventObj.title : 'World Cleanup Day 2026';
 
-    // Gom toàn bộ dữ liệu từ các ô nhập liệu
+    // Gather all data from the input fields
     const formData = {
       name: fullName.trim(),
       phone: cleanPhone,
       email: email.trim(),
-      city: address.trim() || 'Việt Nam',
+      city: address.trim() || 'Vietnam',
       birthYear: birthYear.trim(),
       project: eventTitle,
       skills: finalSkills
@@ -163,7 +163,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      // Lưu vào CSDL nội bộ — chờ kết quả thật để biết có lưu thành công hay không
+      // Save to the internal database — await the real result so we know
+      // whether it actually succeeded before showing a success state.
       await dbService.addVolunteer({
         fullName: formData.name,
         email: formData.email,
@@ -179,28 +180,28 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
         notes: notes.trim()
       });
 
-      // Lấy URL cấu hình Google Sheet Web App
+      // Get the configured Google Sheet Web App URL
       const eventSheetUrl = eventObj?.sheetUrl || '';
       const globalUrl = getGoogleAppsScriptUrl();
       const effectiveUrl = eventSheetUrl || globalUrl;
 
-      // Đồng bộ Google Sheet chạy ngầm, không chặn UI thành công (best-effort)
+      // Sync to Google Sheets in the background — best-effort, never blocks the success UI.
       saveToGoogleSheet(formData, effectiveUrl).catch((err) => {
         console.warn('Silent sheet sync:', err);
       });
 
-      // Gửi email xác nhận đăng ký cho tình nguyện viên, chạy ngầm (best-effort)
+      // Send a registration confirmation email in the background (best-effort).
       if (formData.email) {
         const eventWhen = eventObj ? `${eventObj.date} (${eventObj.time})` : '';
         const eventWhere = eventObj?.location || eventObj?.city || '';
         sendNotificationEmail(
           formData.email,
           formData.name,
-          `Xác nhận đăng ký tình nguyện viên - ${eventTitle}`,
-          `Xin chào ${formData.name}, bạn đã đăng ký thành công tham gia chiến dịch "${eventTitle}"` +
-            (eventWhen ? ` diễn ra vào ${eventWhen}` : '') +
-            (eventWhere ? ` tại ${eventWhere}` : '') +
-            `. Cảm ơn bạn đã đồng hành cùng Let's Do It! Vietnam. Chúng tôi sẽ báo cho bạn qua email này nếu lịch trình có thay đổi.`
+          `Volunteer registration confirmed - ${eventTitle}`,
+          `Hi ${formData.name}, you have successfully registered for the campaign "${eventTitle}"` +
+            (eventWhen ? ` happening on ${eventWhen}` : '') +
+            (eventWhere ? ` at ${eventWhere}` : '') +
+            `. Thank you for joining Let's Do It! Vietnam. We'll notify you by email if the schedule changes.`
         ).catch((err) => {
           console.warn('Silent registration email send failed:', err);
         });
@@ -212,7 +213,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
       setIsSuccess(true);
     } catch (err: any) {
-      alert(`⚠ Đăng ký thất bại!\n${err?.message || 'Có lỗi xảy ra, vui lòng thử lại.'}`);
+      alert(`⚠ Registration failed!\n${err?.message || 'Something went wrong, please try again.'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -231,17 +232,17 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
           <button
             onClick={handleCloseModal}
             className="absolute top-3.5 right-3.5 text-white/80 hover:text-white bg-black/20 hover:bg-black/40 rounded-full p-1.5 transition-colors cursor-pointer"
-            title="Đóng"
+            title="Close"
           >
             <X className="w-4 h-4" />
           </button>
-          
+
           <div className="inline-flex items-center gap-1.5 bg-white/20 px-3 py-0.5 rounded-full text-[11px] font-bold mb-1 backdrop-blur-xs">
             <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-            <span>Mạng Lưới Tình Nguyện Viên Toàn Quốc</span>
+            <span>Nationwide Volunteer Network</span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-black">Đăng Ký Tham Gia Dự Án</h3>
-          <p className="text-[11px] text-white/90">Thông tin sẽ tự động đồng bộ lên Google Sheets quản trị của Admin</p>
+          <h3 className="text-xl sm:text-2xl font-black">Register to Join a Project</h3>
+          <p className="text-[11px] text-white/90">Your information will automatically sync to the Admin's Google Sheets</p>
         </div>
 
         {/* Modal Scrollable Body */}
@@ -251,15 +252,15 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
               <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h4 className="text-xl font-black text-slate-900">Đăng Ký Thành Công!</h4>
+              <h4 className="text-xl font-black text-slate-900">Registration Successful!</h4>
               <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto">
-                Cảm ơn <strong>{fullName}</strong> đã đăng ký tham gia. Thông tin của bạn đã được lưu vào hệ thống và đồng bộ lên Google Sheets quản trị.
+                Thank you, <strong>{fullName}</strong>, for registering. Your information has been saved and synced to the Admin's Google Sheets.
               </p>
               <button
                 onClick={handleCloseModal}
                 className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-6 py-2.5 rounded-full cursor-pointer transition-colors"
               >
-                Đóng
+                Close
               </button>
             </div>
           ) : (
@@ -268,7 +269,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
             {/* Event selection */}
             <div>
               <label className="block text-xs font-bold text-slate-800 mb-1">
-                1. Chọn Dự Án / Chiến Dịch Tham Gia *
+                1. Select the Project / Campaign to Join *
               </label>
               <select
                 required
@@ -287,11 +288,11 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
             {/* Personal Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Họ và Tên *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
                 <input
                   type="text"
                   required
-                  placeholder="VD: Nguyễn Văn An"
+                  placeholder="e.g., Nguyen Van An"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:border-[#E81A7F]"
@@ -300,9 +301,9 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-slate-700">Số Điện Thoại (Đúng 10 số) *</label>
+                  <label className="block text-xs font-bold text-slate-700">Phone Number (exactly 10 digits) *</label>
                   <span className={`text-[10px] font-mono font-bold ${phone.length === 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    {phone.length}/10 số
+                    {phone.length}/10 digits
                   </span>
                 </div>
                 <input
@@ -312,7 +313,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
                   pattern="[0-9]{10}"
                   maxLength={10}
                   minLength={10}
-                  placeholder="VD: 0987654321"
+                  placeholder="e.g., 0987654321"
                   value={phone}
                   onChange={handlePhoneChange}
                   className={`w-full px-3.5 py-2 border rounded-xl text-xs sm:text-sm font-mono focus:outline-hidden transition-colors ${
@@ -334,7 +335,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Địa Chỉ Email *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
                 <input
                   type="email"
                   required
@@ -345,10 +346,10 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
                 />
               </div>
 
-              {/* Năm sinh */}
+              {/* Birth year */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Năm Sinh (4 số) *
+                  Birth Year (4 digits) *
                 </label>
                 <div className="relative">
                   <input
@@ -356,7 +357,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
                     required
                     min={minBirthYear}
                     max={maxBirthYear}
-                    placeholder="VD: 2004"
+                    placeholder="e.g., 2004"
                     value={birthYear}
                     onChange={handleBirthYearChange}
                     className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-900 font-mono focus:outline-hidden focus:border-[#E81A7F]"
@@ -364,7 +365,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
                 </div>
                 {!isBirthYearValid && birthYear.length === 4 && (
                   <p className="text-[10px] text-red-500 mt-1 font-medium">
-                    Năm sinh không hợp lệ (từ {minBirthYear} đến {maxBirthYear})
+                    Invalid birth year (must be between {minBirthYear} and {maxBirthYear})
                   </p>
                 )}
               </div>
@@ -372,11 +373,11 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
             {/* Address */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Địa Chỉ / Tỉnh Thành Phố *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Address / City *</label>
               <input
                 type="text"
                 required
-                placeholder="VD: Quận Cầu Giấy, Hà Nội hoặc TP. Hồ Chí Minh"
+                placeholder="e.g., Cau Giay District, Hanoi or Ho Chi Minh City"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:border-[#E81A7F]"
@@ -386,7 +387,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
             {/* Skills checklist */}
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Kỹ năng hoặc vai trò bạn muốn tham gia:
+                Skills or roles you'd like to help with:
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs">
                 {skillOptions.map((skill) => (
@@ -410,7 +411,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
               <div className="mt-2">
                 <input
                   type="text"
-                  placeholder="Vai trò / Kỹ năng khác (nếu có)..."
+                  placeholder="Other role / skill (if any)..."
                   value={customRole}
                   onChange={(e) => setCustomRole(e.target.value)}
                   className="w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
@@ -420,9 +421,9 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
             {/* Notes */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Ghi Chú / Lời Nhắn Thêm (nếu có)</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Notes / Additional Message (optional)</label>
               <textarea
-                placeholder="VD: Tôi có thể hỗ trợ chuẩn bị nước uống và loa kéo..."
+                placeholder="e.g., I can help prepare drinking water and a PA speaker..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
@@ -435,7 +436,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
               disabled={isSubmitting || (phone.length > 0 && phone.length !== 10)}
               className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm py-3 rounded-2xl shadow-lg hover:shadow-pink-500/25 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <span>{isSubmitting ? 'Đang Gửi...' : 'Xác Nhận Đăng Ký Tình Nguyện Viên'}</span>
+              <span>{isSubmitting ? 'Submitting...' : 'Confirm Volunteer Registration'}</span>
               <Send className="w-4 h-4" />
             </button>
           </form>

@@ -35,7 +35,7 @@ export const FullGalleryPage: React.FC = () => {
 
   const handleDeleteItem = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm(language === 'vi' ? 'Bạn có chắc chắn muốn xóa bức ảnh này khỏi thư viện?' : 'Are you sure you want to delete this photo?')) {
+    if (window.confirm('Are you sure you want to delete this photo?')) {
       dbService.deleteGalleryItem(id);
       if (selectedImage?.id === id) {
         setSelectedImage(null);

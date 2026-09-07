@@ -10,10 +10,10 @@ import { sendNotificationEmail } from '../services/emailService';
 // Fields that matter enough to a registered volunteer's plans that changing
 // them should trigger an email — pure copy/description edits don't.
 const SCHEDULE_FIELDS: Array<{ key: 'date' | 'time' | 'location' | 'meetingPoint'; label: string }> = [
-  { key: 'date', label: 'Ngày diễn ra' },
-  { key: 'time', label: 'Giờ diễn ra' },
-  { key: 'location', label: 'Địa điểm' },
-  { key: 'meetingPoint', label: 'Điểm tập trung' },
+  { key: 'date', label: 'Date' },
+  { key: 'time', label: 'Time' },
+  { key: 'location', label: 'Location' },
+  { key: 'meetingPoint', label: 'Meeting point' },
 ];
 
 // Best-effort — never blocks or fails the admin's save if an email bounces.
@@ -26,11 +26,11 @@ function notifyVolunteersOfScheduleChange(event: CleanupEvent, changedLabels: st
         sendNotificationEmail(
           v.email,
           v.fullName,
-          `Thông báo thay đổi lịch trình - ${event.title}`,
-          `Xin chào ${v.fullName}, chiến dịch "${event.title}" mà bạn đã đăng ký tham gia vừa được cập nhật (${changedLabels.join(', ')}).\n\n` +
-            `Lịch trình mới:\nNgày: ${event.date}\nGiờ: ${event.time}\nĐịa điểm: ${event.location}` +
-            (event.meetingPoint ? `\nĐiểm tập trung: ${event.meetingPoint}` : '') +
-            `\n\nVui lòng lưu ý để sắp xếp tham gia đúng giờ. Cảm ơn bạn đã đồng hành cùng Let's Do It! Vietnam.`
+          `Schedule change notice - ${event.title}`,
+          `Hi ${v.fullName}, the campaign "${event.title}" you registered for has just been updated (${changedLabels.join(', ')}).\n\n` +
+            `New schedule:\nDate: ${event.date}\nTime: ${event.time}\nLocation: ${event.location}` +
+            (event.meetingPoint ? `\nMeeting point: ${event.meetingPoint}` : '') +
+            `\n\nPlease note this so you can join on time. Thank you for joining Let's Do It! Vietnam.`
         ).catch((err) => console.warn('Silent schedule-change email failed:', err));
       });
     })
@@ -64,20 +64,20 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
   const [date, setDate] = useState('2026-09-20');
   const [time, setTime] = useState('07:00 - 11:30');
   const [location, setLocation] = useState('');
-  const [city, setCity] = useState('Hà Nội');
+  const [city, setCity] = useState('Hanoi');
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
   const [targetVolunteers, setTargetVolunteers] = useState(500);
   const [status, setStatus] = useState<CleanupEvent['status']>('Upcoming');
-  const [leader, setLeader] = useState(user?.name || 'Nguyễn Văn An');
+  const [leader, setLeader] = useState(user?.name || 'Nguyen Van An');
   const [meetingPoint, setMeetingPoint] = useState('');
   const [scheduleItems, setScheduleItems] = useState<{ time: string; activity: string }[]>([
-    { time: '07:00', activity: 'Tập trung tại điểm hẹn, điểm danh và phát trang thiết bị' },
-    { time: '07:30', activity: 'Khởi động, phổ biến quy tắc an toàn và chia đội hình theo tuyến đường dọn rác' },
-    { time: '08:00 - 10:30', activity: 'Ra quân dọn rác, phân loại rác thải tái chế, rác hữu cơ và rác độc hại' },
-    { time: '11:00', activity: 'Tập kết rác tại xe chuyên dụng, cân đo tổng khối lượng, chụp ảnh kỷ niệm và bế mạc' }
+    { time: '07:00', activity: 'Gather at the meeting point, check in and distribute gear' },
+    { time: '07:30', activity: 'Warm-up, safety briefing, and team assignment by cleanup route' },
+    { time: '08:00 - 10:30', activity: 'Cleanup in progress, sorting recyclable, organic, and hazardous waste' },
+    { time: '11:00', activity: 'Load collected waste onto trucks, weigh the total, take group photos, and wrap up' }
   ]);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,30 +101,30 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
         setScheduleItems(eventToEdit.schedule);
       }
     } else {
-      setTitle(initialTitle || (initialLocation ? `Chiến dịch dọn rác tại ${initialLocation}` : ''));
+      setTitle(initialTitle || (initialLocation ? `Cleanup Campaign at ${initialLocation}` : ''));
       setCategory('World Cleanup Day');
       setDate('2026-09-20');
       setTime('07:00 - 11:30');
       setLocation(initialLocation || '');
-      setCity(initialCity || 'Hà Nội');
+      setCity(initialCity || 'Hanoi');
       setCoordinates(initialCoordinates || undefined);
-      
-      const autoMapUrl = initialCoordinates 
+
+      const autoMapUrl = initialCoordinates
         ? `https://www.google.com/maps/search/?api=1&query=${initialCoordinates.lat},${initialCoordinates.lng}`
         : '';
       setGoogleMapsUrl(autoMapUrl);
 
-      setDescription(initialLocation ? `Chiến dịch ra quân thu gom và phân loại rác thải tại khu vực ${initialLocation}.` : '');
+      setDescription(initialLocation ? `A cleanup and waste-sorting campaign in the ${initialLocation} area.` : '');
       setImage('https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80');
       setTargetVolunteers(100);
       setStatus(isAdmin ? 'Upcoming' : 'Pending');
-      setLeader(user?.name || 'Nguyễn Văn An');
-      setMeetingPoint(initialLocation ? `Cổng chính ${initialLocation}` : '');
+      setLeader(user?.name || 'Nguyen Van An');
+      setMeetingPoint(initialLocation ? `Main entrance of ${initialLocation}` : '');
       setScheduleItems([
-        { time: '07:00', activity: `Tập trung tại điểm hẹn: ${initialLocation || 'Điểm hẹn'}, điểm danh và phát trang thiết bị` },
-        { time: '07:30', activity: 'Khởi động, phổ biến quy tắc an toàn và chia đội hình theo tuyến đường dọn rác' },
-        { time: '08:00 - 10:30', activity: 'Ra quân dọn rác, phân loại rác thải tái chế, rác hữu cơ và rác độc hại' },
-        { time: '11:00', activity: 'Tập kết rác tại xe chuyên dụng, cân đo tổng khối lượng, chụp ảnh kỷ niệm và bế mạc' }
+        { time: '07:00', activity: `Gather at the meeting point: ${initialLocation || 'the meeting point'}, check in and distribute gear` },
+        { time: '07:30', activity: 'Warm-up, safety briefing, and team assignment by cleanup route' },
+        { time: '08:00 - 10:30', activity: 'Cleanup in progress, sorting recyclable, organic, and hazardous waste' },
+        { time: '11:00', activity: 'Load collected waste onto trucks, weigh the total, take group photos, and wrap up' }
       ]);
     }
     setError(null);
@@ -135,15 +135,15 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError('Vui lòng nhập tên chiến dịch.');
+      setError('Please enter a campaign name.');
       return;
     }
     if (!location.trim()) {
-      setError('Vui lòng nhập địa điểm dọn rác.');
+      setError('Please enter the cleanup location.');
       return;
     }
     if (!image.trim()) {
-      setError('Vui lòng tải ảnh minh họa cho chiến dịch.');
+      setError('Please upload a cover image for the campaign.');
       return;
     }
 
@@ -198,7 +198,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     }
 
     if (!isAdmin) {
-      alert('Chiến dịch / Điểm dọn rác của bạn đã được gửi thành công!\n\nBài viết đang ở trạng thái "Chờ duyệt" và sẽ hiển thị công khai trên bản đồ ngay khi Quản trị viên (Admin) phê duyệt.');
+      alert('Your campaign / cleanup spot has been submitted successfully!\n\nThe post is currently "Pending" and will appear publicly on the map as soon as an Administrator (Admin) approves it.');
     }
 
     if (onSaved) onSaved(saved);
@@ -220,10 +220,10 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black">
-                {eventToEdit ? 'Chỉnh Sửa Chiến Dịch Dọn Rác' : (isAdmin ? 'Thêm Chiến Dịch Mới (Admin)' : 'Đăng Ký Tạo Chiến Dịch Dọn Rác')}
+                {eventToEdit ? 'Edit Cleanup Campaign' : (isAdmin ? 'Add New Campaign (Admin)' : 'Register a New Cleanup Campaign')}
               </h3>
               <p className="text-xs text-slate-400">
-                {!isAdmin && !eventToEdit ? 'Bài viết sẽ được Quản Trị Viên kiểm duyệt trước khi hiển thị công khai' : 'Điều phối thông tin điểm dọn dẹp, số lượng TNV và phân loại rác'}
+                {!isAdmin && !eventToEdit ? 'The post will be reviewed by an Administrator before it appears publicly' : 'Coordinate cleanup spot details, volunteer targets, and waste sorting'}
               </p>
             </div>
           </div>
@@ -246,14 +246,14 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Tên chiến dịch / Sự kiện <span className="text-red-500">*</span>
+              Campaign / Event Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="VD: World Cleanup Day 2026 - Hà Nội"
+              placeholder="e.g., World Cleanup Day 2026 - Hanoi"
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F]"
             />
           </div>
@@ -261,33 +261,33 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
           <ImageUploadWidget
             currentImageUrl={image}
             onImageSelected={(val) => setImage(val)}
-            label="Ảnh bìa địa điểm chiến dịch"
-            aspectRatioLabel="Tỉ lệ 16:9 khuyên dùng"
+            label="Campaign Location Cover Image"
+            aspectRatioLabel="16:9 ratio recommended"
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Tỉnh / Thành phố
+                Province / City
               </label>
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
               >
-                <option value="Hà Nội">Hà Nội</option>
-                <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
-                <option value="Đà Nẵng">Đà Nẵng</option>
-                <option value="Hải Phòng">Hải Phòng</option>
-                <option value="Cần Thơ">Cần Thơ</option>
-                <option value="Khánh Hòa">Khánh Hòa</option>
-                <option value="Bình Định">Bình Định</option>
+                <option value="Hanoi">Hanoi</option>
+                <option value="Ho Chi Minh City">Ho Chi Minh City</option>
+                <option value="Da Nang">Da Nang</option>
+                <option value="Hai Phong">Hai Phong</option>
+                <option value="Can Tho">Can Tho</option>
+                <option value="Khanh Hoa">Khanh Hoa</option>
+                <option value="Binh Dinh">Binh Dinh</option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Ngày tổ chức
+                Event Date
               </label>
               <input
                 type="date"
@@ -299,7 +299,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Khung giờ
+                Time Window
               </label>
               <input
                 type="text"
@@ -314,27 +314,27 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Địa điểm dọn rác cụ thể
+                Specific Cleanup Location
               </label>
               <input
                 type="text"
                 required
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="VD: Cầu Long Biên, Bãi giữa Sông Hồng..."
+                placeholder="e.g., Long Bien Bridge, Red River Midstream Sandbar..."
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Điểm tập kết / Điểm đón
+                Meeting / Pickup Point
               </label>
               <input
                 type="text"
                 value={meetingPoint}
                 onChange={(e) => setMeetingPoint(e.target.value)}
-                placeholder="VD: Cổng Công viên Thống Nhất..."
+                placeholder="e.g., Thong Nhat Park Gate..."
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
               />
             </div>
@@ -344,29 +344,29 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
               <Globe className="w-3.5 h-3.5 text-[#E81A7F]" />
-              <span>Gắn Link Google Maps Vị Trí Điểm Dọn</span>
+              <span>Attach a Google Maps Link for the Cleanup Location</span>
             </label>
             <input
               type="url"
               value={googleMapsUrl}
               onChange={(e) => setGoogleMapsUrl(e.target.value)}
-              placeholder="VD: https://maps.app.goo.gl/... hoặc https://www.google.com/maps/search/?api=1&query=..."
+              placeholder="e.g., https://maps.app.goo.gl/... or https://www.google.com/maps/search/?api=1&query=..."
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
             />
             <p className="text-[10px] text-slate-400 mt-1">
-              Bạn có thể dán liên kết chia sẻ từ Google Maps để tình nguyện viên bấm vào chỉ đường trực tiếp.
+              You can paste a share link from Google Maps so volunteers can tap it for direct directions.
             </p>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Mô tả chi tiết hoạt động & yêu cầu
+              Detailed Activity Description & Requirements
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Mô tả kế hoạch dọn dẹp, phân loại rác tái chế..."
+              placeholder="Describe the cleanup plan, recyclable waste sorting..."
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm leading-relaxed focus:outline-hidden focus:border-[#E81A7F]"
             ></textarea>
           </div>
@@ -376,20 +376,20 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-[#E81A7F]" />
-                <span>Lịch Trình Chi Tiết (Nhập để Admin duyệt)</span>
+                <span>Detailed Schedule (Enter for Admin review)</span>
               </label>
               <button
                 type="button"
                 onClick={() => {
                   setScheduleItems([
                     ...scheduleItems,
-                    { time: '08:00', activity: 'Hoạt động tiếp theo...' }
+                    { time: '08:00', activity: 'Next activity...' }
                   ]);
                 }}
                 className="px-2.5 py-1 bg-pink-50 dark:bg-pink-950/40 text-[#E81A7F] hover:bg-pink-100 text-[11px] font-bold rounded-lg border border-pink-200 dark:border-pink-800 transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Thêm Mốc Giờ</span>
+                <span>Add Time Slot</span>
               </button>
             </div>
 
@@ -404,7 +404,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                       updated[idx].time = e.target.value;
                       setScheduleItems(updated);
                     }}
-                    placeholder="VD: 07:00 hoặc 08:00 - 10:30"
+                    placeholder="e.g., 07:00 or 08:00 - 10:30"
                     className="w-32 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-[#E81A7F] focus:outline-hidden focus:border-[#E81A7F]"
                   />
                   <input
@@ -415,7 +415,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                       updated[idx].activity = e.target.value;
                       setScheduleItems(updated);
                     }}
-                    placeholder="Nội dung hoạt động (VD: Tập trung điểm danh, ra quân dọn rác...)"
+                    placeholder="Activity description (e.g., Gather for check-in, begin cleanup...)"
                     className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-hidden focus:border-[#E81A7F]"
                   />
                   {scheduleItems.length > 1 && (
@@ -425,7 +425,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                         setScheduleItems(scheduleItems.filter((_, i) => i !== idx));
                       }}
                       className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                      title="Xóa mốc giờ này"
+                      title="Delete this time slot"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -438,7 +438,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Mục tiêu số lượng TNV
+                Target Number of Volunteers
               </label>
               <input
                 type="number"
@@ -451,7 +451,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Trưởng nhóm phụ trách
+                Team Leader
               </label>
               <input
                 type="text"
@@ -466,7 +466,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
             <div className="p-4 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold text-[#E81A7F]">
                 <ShieldAlert className="w-4 h-4" />
-                <span>Trạng Thái Kiểm Duyệt & Xuất Bản (Admin)</span>
+                <span>Review & Publish Status (Admin)</span>
               </div>
               <div className="flex items-center gap-3">
                 <label className="inline-flex items-center gap-2 text-xs font-medium cursor-pointer">
@@ -478,7 +478,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                     onChange={() => setStatus('Upcoming')}
                     className="text-[#E81A7F] focus:ring-[#E81A7F]"
                   />
-                  <span>Xuất bản trực tiếp (Upcoming)</span>
+                  <span>Publish live (Upcoming)</span>
                 </label>
                 <label className="inline-flex items-center gap-2 text-xs font-medium cursor-pointer">
                   <input
@@ -489,7 +489,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                     onChange={() => setStatus('Pending')}
                     className="text-[#E81A7F] focus:ring-[#E81A7F]"
                   />
-                  <span>Chờ duyệt (Pending)</span>
+                  <span>Pending review</span>
                 </label>
                 <label className="inline-flex items-center gap-2 text-xs font-medium cursor-pointer">
                   <input
@@ -500,7 +500,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                     onChange={() => setStatus('Completed')}
                     className="text-[#E81A7F] focus:ring-[#E81A7F]"
                   />
-                  <span>Đã hoàn thành</span>
+                  <span>Completed</span>
                 </label>
               </div>
             </div>
@@ -512,14 +512,14 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
               onClick={onClose}
               className="px-5 py-2.5 rounded-full border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
               className="px-6 py-2.5 rounded-full bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
-              <span>{eventToEdit ? 'Lưu Thay Đổi' : (isAdmin ? 'Tạo Chiến Dịch' : 'Gửi Bài Để Admin Duyệt')}</span>
+              <span>{eventToEdit ? 'Save Changes' : (isAdmin ? 'Create Campaign' : 'Submit for Admin Review')}</span>
             </button>
           </div>
         </form>

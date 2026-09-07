@@ -58,7 +58,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
   };
 
   const handleDelete = (partner: Partner) => {
-    if (window.confirm(language === 'vi' ? `Bạn có chắc chắn muốn xóa đối tác "${partner.name}"?` : `Are you sure you want to delete partner "${partner.name}"?`)) {
+    if (window.confirm(`Are you sure you want to delete partner "${partner.name}"?`)) {
       dbService.deletePartner(partner.id);
       loadPartners();
     }
@@ -321,7 +321,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleEdit(p);
                       }}
-                      title={language === 'vi' ? "Sửa logo & link" : "Edit logo & link"}
+                      title="Edit logo & link"
                       className="p-1 text-slate-700 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -335,7 +335,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleDelete(p);
                       }}
-                      title={language === 'vi' ? "Xóa đối tác" : "Delete partner"}
+                      title="Delete partner"
                       className="p-1 text-slate-700 hover:text-red-600 rounded transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

@@ -46,12 +46,12 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   const handleApprove = (id: string, title: string, e: React.MouseEvent) => {
     e.stopPropagation();
     dbService.approveEvent(id);
-    alert(language === 'vi' ? `Đã phê duyệt chiến dịch "${title}" thành công!` : `Approved campaign "${title}" successfully!`);
+    alert(`Approved campaign "${title}" successfully!`);
   };
 
   const handleDelete = (id: string, title: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm(language === 'vi' ? `Bạn có chắc chắn muốn xóa chiến dịch "${title}" không?` : `Are you sure you want to delete campaign "${title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete campaign "${title}"?`)) {
       dbService.deleteEvent(id);
     }
   };
@@ -102,7 +102,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
             {isAdmin && pendingCount > 0 && (
               <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold px-3.5 py-2.5 rounded-full animate-pulse">
                 <Clock className="w-4 h-4 text-amber-600" />
-                <span>{language === 'vi' ? `Có ${pendingCount} chiến dịch đang chờ duyệt!` : `${pendingCount} campaign(s) pending review!`}</span>
+                <span>{`${pendingCount} campaign(s) pending review!`}</span>
               </span>
             )}
           </div>
@@ -159,15 +159,15 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     {isPending ? (
                       <div className="absolute bottom-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        <span>{language === 'vi' ? 'Chờ Duyệt (Pending)' : 'Pending Review'}</span>
+                        <span>Pending Review</span>
                       </div>
                     ) : isExpired ? (
                       <div className="absolute bottom-3 left-3 bg-slate-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
-                        {language === 'vi' ? 'Đã hết hạn' : 'Expired'}
+                        Expired
                       </div>
                     ) : (
                       <div className="absolute bottom-3 left-3 bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
-                        {evt.status || (language === 'vi' ? 'Sắp diễn ra' : 'Upcoming')}
+                        {evt.status || 'Upcoming'}
                       </div>
                     )}
                   </div>
@@ -194,7 +194,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                       </div>
                       <div className="flex items-center gap-2">
                         <Users className="w-3.5 h-3.5 text-[#E81A7F]" />
-                        <span>{language === 'vi' ? `Đã có ${evt.registeredCount.toLocaleString()} / ${evt.targetVolunteers.toLocaleString()} tình nguyện viên` : `${evt.registeredCount.toLocaleString()} / ${evt.targetVolunteers.toLocaleString()} volunteers registered`}</span>
+                        <span>{`${evt.registeredCount.toLocaleString()} / ${evt.targetVolunteers.toLocaleString()} volunteers registered`}</span>
                       </div>
                     </div>
 
@@ -213,7 +213,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     onClick={() => onSelectProject(evt.id)}
                     className="flex-1 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-xs py-2.5 rounded-full transition-colors cursor-pointer text-center"
                   >
-                    <EditableText contentKey="projects.detailsBtn" defaultValue={language === 'vi' ? 'Xem Chi Tiết' : 'View Details'} as="span" />
+                    <EditableText contentKey="projects.detailsBtn" defaultValue="View Details" as="span" />
                   </button>
                   <button
                     onClick={() => onRegisterVolunteer(evt.id)}
@@ -225,7 +225,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     }`}
                   >
                     {isExpired ? (
-                      <span>{language === 'vi' ? 'Đã hết hạn' : 'Expired'}</span>
+                      <span>Expired</span>
                     ) : (
                       <EditableText contentKey="projects.registerBtn" defaultValue={t.projectsJoinBtn} as="span" />
                     )}

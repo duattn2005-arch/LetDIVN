@@ -64,7 +64,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
   const handleDeleteArticle = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm(language === 'vi' ? 'Bạn có chắc chắn muốn xóa bài viết này không?' : 'Are you sure you want to delete this article?')) {
+    if (window.confirm('Are you sure you want to delete this article?')) {
       await dbService.deleteNews(id);
       if (selectedArticle?.id === id) {
         setSelectedArticle(null);
@@ -76,7 +76,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   const handleApproveArticle = async (e: React.MouseEvent, article: NewsArticle) => {
     e.stopPropagation();
     await dbService.approveNews(article.id);
-    alert(language === 'vi' ? `Đã phê duyệt bài viết "${article.title}" thành công!` : `Article "${article.title}" approved successfully!`);
+    alert(`Article "${article.title}" approved successfully!`);
     refreshNews();
   };
 
@@ -309,7 +309,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             {isAdmin && pendingCount > 0 && (
               <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold px-3.5 py-2.5 rounded-full animate-pulse">
                 <Clock className="w-4 h-4 text-amber-600" />
-                <span>{language === 'vi' ? `Có ${pendingCount} bài viết đang chờ duyệt!` : `${pendingCount} article(s) pending review!`}</span>
+                <span>{`${pendingCount} article(s) pending review!`}</span>
               </span>
             )}
           </div>
@@ -336,7 +336,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder={language === 'vi' ? 'Tìm kiếm bài viết...' : language === 'ja' ? '記事を検索...' : 'Search articles...'}
+                placeholder="Search articles..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"

@@ -444,7 +444,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           marker.bindPopup(`
             <div class="p-2.5 font-sans max-w-xs text-slate-900">
               <div class="flex items-center gap-1.5 text-red-600 font-extrabold text-xs mb-1">
-                <span>📍</span> <span>${language === 'vi' ? 'VỊ TRÍ ĐÃ TÌM THẤY' : 'LOCATION FOUND'}</span>
+                <span>📍</span> <span>LOCATION FOUND</span>
               </div>
               <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
                 ${displayName}
@@ -453,10 +453,10 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 ${item.display_name}
               </div>
               <div class="text-[10px] text-slate-500 mb-3">
-                ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+                Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}
               </div>
               <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
-                ${language === 'vi' ? 'Đăng Bài & Điểm Rác Tại Vị Trí Này' : 'Post a Cleanup Spot At This Location'}
+                Post a Cleanup Spot At This Location
               </button>
             </div>
           `).openPopup();
@@ -543,7 +543,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     marker.bindPopup(`
       <div class="p-2.5 font-sans max-w-xs text-slate-900">
         <div class="flex items-center gap-1.5 text-red-600 font-extrabold text-xs mb-1">
-          <span>📍</span> <span>${language === 'vi' ? 'VỊ TRÍ ĐÃ TÌM THẤY' : 'LOCATION FOUND'}</span>
+          <span>📍</span> <span>LOCATION FOUND</span>
         </div>
         <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
           ${sug.name}
@@ -552,10 +552,10 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           ${sug.subAddress}
         </div>
         <div class="text-[10px] text-slate-500 mb-3">
-          ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${sug.lat.toFixed(5)}, ${sug.lng.toFixed(5)}
+          Coordinates: ${sug.lat.toFixed(5)}, ${sug.lng.toFixed(5)}
         </div>
         <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
-          ${language === 'vi' ? 'Đăng Bài & Điểm Rác Tại Vị Trí Này' : 'Post a Cleanup Spot At This Location'}
+          Post a Cleanup Spot At This Location
         </button>
       </div>
     `).openPopup();
@@ -632,7 +632,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         const popupContent = `
           <div class="p-2 font-sans max-w-xs text-slate-900">
             <div class="flex items-center gap-1.5 text-emerald-600 font-extrabold text-xs mb-1">
-              <span>📍</span> <span>${language === 'vi' ? 'ĐÃ GHIM ĐỊA ĐIỂM MỚI' : 'NEW LOCATION PINNED'}</span>
+              <span>📍</span> <span>NEW LOCATION PINNED</span>
             </div>
             <div class="font-extrabold text-sm text-slate-900 mb-1 leading-snug">
               ${geo.placeName}
@@ -641,10 +641,10 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               ${geo.address}
             </div>
             <div class="text-[10px] text-slate-500 mb-3">
-              ${language === 'vi' ? 'Tọa độ' : 'Coordinates'}: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+              Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}
             </div>
             <button onclick="window.__openCreateSpotModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center flex items-center justify-center gap-1">
-              <span>${language === 'vi' ? 'Đăng Bài & Ảnh Điểm Rác Tại Đây' : 'Post a Cleanup Spot & Photo Here'}</span>
+              <span>Post a Cleanup Spot & Photo Here</span>
             </button>
           </div>
         `;
@@ -836,8 +836,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <MapPin className="w-5 h-5" />
             </span>
             <div>
-              <EditableText contentKey="cleanupMap.title" defaultValue={t.mapTitle || (language === 'vi' ? "Bản Đồ Địa Lý Toàn Quốc" : "Nationwide Cleanup Spot Map")} as="h1" className="text-base sm:text-lg font-black text-white leading-tight" />
-              <EditableText contentKey="cleanupMap.subtitle" defaultValue={t.mapSubtitle || (language === 'vi' ? "Tìm kiếm bất kỳ địa điểm, trường học, bệnh viện hay địa danh nào để định vị trực tiếp trên bản đồ." : "Search any place, school, hospital or landmark to locate directly on the map.")} as="p" multiline resizable className="text-[11px] text-slate-400" />
+              <EditableText contentKey="cleanupMap.title" defaultValue={t.mapTitle || "Nationwide Cleanup Spot Map"} as="h1" className="text-base sm:text-lg font-black text-white leading-tight" />
+              <EditableText contentKey="cleanupMap.subtitle" defaultValue={t.mapSubtitle || "Search any place, school, hospital or landmark to locate directly on the map."} as="p" multiline resizable className="text-[11px] text-slate-400" />
             </div>
           </div>
 
@@ -851,7 +851,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
             >
               <Plus className="w-4 h-4" />
-              <span>{isAdmin ? (language === 'vi' ? 'Thêm Điểm Mới (Admin)' : 'Add New Spot (Admin)') : <EditableText contentKey="cleanupMap.addSpotBtn" defaultValue={language === 'vi' ? "Đăng Điểm Dọn Rác Mới" : "Report Cleanup Spot"} as="span" />}</span>
+              <span>{isAdmin ? 'Add New Spot (Admin)' : <EditableText contentKey="cleanupMap.addSpotBtn" defaultValue="Report Cleanup Spot" as="span" />}</span>
             </button>
           </div>
 
