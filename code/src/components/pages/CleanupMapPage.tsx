@@ -508,11 +508,38 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     });
   };
 
-  const handleSelectSuggestion = (sug: SearchSuggestion) => {
+  // The live-as-you-type autocomplete never retries Nominatim (that would slow
+  // down every keystroke), so a suggestion picked while Nominatim happened to
+  // be down carries no polygon. This looks up an accurate boundary on demand,
+  // right when the user commits to a specific suggestion — scoped to a small
+  // box around its own coordinates so it can't resolve to a same-named place
+  // elsewhere in the country.
+  const fetchAccurateBoundary = async (name: string, lat: number, lng: number): Promise<any | null> => {
+    const d = 0.5;
+    const viewbox = `${lng - d},${lat + d},${lng + d},${lat - d}`;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&countrycodes=vn&format=json&polygon_geojson=1&limit=1&viewbox=${viewbox}&bounded=1`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          return data?.[0]?.geojson ?? null;
+        }
+      } catch (err) {
+        console.warn(`Boundary lookup error (attempt ${attempt + 1}):`, err);
+        if (attempt === 0) await new Promise((r) => setTimeout(r, 400));
+      }
+    }
+    return null;
+  };
+
+  const handleSelectSuggestion = async (sug: SearchSuggestion) => {
     setSearchQuery(sug.name);
     setSearchedPlaceName(sug.name);
     setShowSuggestions(false);
-    
+
     const map = mapInstanceRef.current;
     if (!map) return;
 
@@ -523,8 +550,13 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
     map.flyTo([sug.lat, sug.lng], 16, { duration: 1.2 });
 
-    if (sug.geojson && (sug.geojson.type === 'Polygon' || sug.geojson.type === 'MultiPolygon')) {
-      const geoLayer = L.geoJSON(sug.geojson, {
+    let geojson = sug.geojson;
+    if (!geojson) {
+      geojson = await fetchAccurateBoundary(sug.name, sug.lat, sug.lng);
+    }
+
+    if (geojson && (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon')) {
+      const geoLayer = L.geoJSON(geojson, {
         style: {
           color: '#EF4444',
           weight: 3.5,
