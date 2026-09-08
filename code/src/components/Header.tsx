@@ -67,12 +67,15 @@ export const Header: React.FC<HeaderProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Navigate by category (not a hardcoded event id) so this always resolves
+  // to whichever live event currently has that category, however its id
+  // was generated.
   const projectItems = [
-    { title: t.projectWcd, id: 'evt-wcd-2026' },
-    { title: t.projectEnvDay, id: 'evt-env-day-hcm' },
-    { title: t.projectGreenOcean, id: 'evt-green-ocean-danang' },
-    { title: t.projectYoungWildlife, id: 'evt-wildlife-catba' },
-    { title: t.projectWorkshop, id: 'evt-workshop-zerowaste' }
+    { title: t.projectWcd, id: 'World Cleanup Day' },
+    { title: t.projectEnvDay, id: 'Environmental Day' },
+    { title: t.projectGreenOcean, id: 'Green Ocean Campaign' },
+    { title: t.projectYoungWildlife, id: 'Wildlife & Nature' },
+    { title: t.projectWorkshop, id: 'Workshop & Education' }
   ];
 
   return (

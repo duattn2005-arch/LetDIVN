@@ -33,7 +33,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
     return () => unsubscribe();
   }, []);
 
-  const event = events.find(e => e.id === projectId) || events[0];
+  const event = events.find(e => e.id === projectId) || events.find(e => e.category === projectId) || events[0];
 
   // Leaflet map setup for specific project
   useEffect(() => {
