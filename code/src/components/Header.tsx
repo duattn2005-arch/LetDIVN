@@ -302,17 +302,6 @@ export const Header: React.FC<HeaderProps> = ({
                       <span className="text-[10px] text-pink-500 font-bold shrink-0">→</span>
                     </button>
                   ))}
-                  <div className="border-t border-slate-100 mt-1.5 pt-1.5 px-2">
-                    <button
-                      onClick={() => {
-                        onNavigate('projects');
-                        setProjectsDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-xs font-bold text-[#E81A7F] hover:bg-pink-50 rounded-xl transition-colors cursor-pointer"
-                    >
-                      {t.viewAllProjects}
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
