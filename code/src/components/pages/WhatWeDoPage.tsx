@@ -116,7 +116,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
               key={item.id}
               className={`relative group ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}`}
             >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 md:grid-cols-[0.85fr_1.15fr] gap-10 items-center">
 
                 {/* Photo Column */}
                 <div className={isImageLeft ? 'order-1' : 'order-1 md:order-2'}>
@@ -124,7 +124,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
                     contentKey={`whatWeDo.${item.id}.img`}
                     defaultValue={item.image}
                     alt={item.title}
-                    wrapperClassName="aspect-4/3 p-2 bg-white border border-slate-200 shadow-lg rounded-sm"
+                    wrapperClassName="aspect-3/2 p-2 bg-white border border-slate-200 shadow-lg rounded-sm"
                     className="w-full h-full object-cover"
                   />
                 </div>
