@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import { PROJECT_STATIC_CONTENT } from '../data/projectStaticContent';
 import { EditableText } from './EditableText';
 import { EditableImage } from './EditableImage';
@@ -64,6 +65,63 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const bandBg = idx % 2 === 0 ? BAND_GRAY : 'transparent';
           const sectionKey = `${keyBase}.section${idx}`;
 
+          const galleryBlock = section.gallery && section.gallery.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mt-6">
+              {section.gallery.map((src, gi) => (
+                <EditableImage
+                  key={gi}
+                  contentKey={`${sectionKey}.gallery${gi}`}
+                  defaultValue={src}
+                  alt={section.heading || content.title}
+                  wrapperClassName="aspect-square bg-slate-900"
+                  className="w-full h-full object-cover"
+                />
+              ))}
+            </div>
+          );
+
+          // Two side-by-side sub-columns (e.g. "Main activities" | "Direct target audience")
+          if (section.columns && section.columns.length > 0) {
+            return (
+              <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                  {section.heading && (
+                    <EditableText
+                      contentKey={`${sectionKey}.heading`}
+                      defaultValue={section.heading}
+                      as="h3"
+                      className="block ref-heading text-xl sm:text-2xl text-left"
+                      render={(v) => <span style={{ color: BRAND_AMBER }}>{v}</span>}
+                    />
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {section.columns.map((col, ci) => (
+                      <div key={ci} className="space-y-2">
+                        {col.heading && (
+                          <EditableText
+                            contentKey={`${sectionKey}.col${ci}.heading`}
+                            defaultValue={col.heading}
+                            as="h4"
+                            className="ref-body font-semibold text-slate-800 text-left"
+                          />
+                        )}
+                        <ul className="space-y-1.5 text-left">
+                          {col.paragraphs.map((p, pi) => (
+                            <li key={pi} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
+                              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BRAND_AMBER }} />
+                              <EditableText contentKey={`${sectionKey}.col${ci}.p${pi}`} defaultValue={p} as="span" multiline />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                  {galleryBlock}
+                </div>
+              </div>
+            );
+          }
+
           const textBlock = (
             <div className="space-y-3 text-center">
               {section.heading && (
@@ -71,7 +129,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                   contentKey={`${sectionKey}.heading`}
                   defaultValue={section.heading}
                   as="h3"
-                  className="ref-heading text-xl sm:text-2xl text-left"
+                  className="block ref-heading text-xl sm:text-2xl text-left"
                   render={(v) => <span style={{ color: BRAND_AMBER }}>{v}</span>}
                 />
               )}
@@ -79,7 +137,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 <ul className="space-y-2 text-left">
                   {section.paragraphs.map((p, i) => (
                     <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
-                      <span style={{ color: BRAND_AMBER }} className="shrink-0">•</span>
+                      <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BRAND_AMBER }} />
                       <EditableText contentKey={`${sectionKey}.p${i}`} defaultValue={p} as="span" multiline />
                     </li>
                   ))}
@@ -103,6 +161,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
             return (
               <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">{textBlock}</div>
+                {galleryBlock && <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">{galleryBlock}</div>}
               </div>
             );
           }
@@ -125,6 +184,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 </div>
                 <div className={isImageLeft ? 'order-2' : 'order-2 md:order-1'}>{textBlock}</div>
               </div>
+              {galleryBlock && <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">{galleryBlock}</div>}
             </div>
           );
         })}

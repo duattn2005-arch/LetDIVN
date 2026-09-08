@@ -1,7 +1,16 @@
+export interface ProjectSubColumn {
+  heading?: string;
+  paragraphs: string[];
+}
+
 export interface ProjectSection {
   heading?: string;
   paragraphs: string[];
   image?: string;
+  /** A photo gallery grid shown under this section's text (e.g. an Elementor gallery widget on the source page). */
+  gallery?: string[];
+  /** Two side-by-side sub-blocks (e.g. "Main activities" | "Direct target audience" on the Green Ocean page). */
+  columns?: ProjectSubColumn[];
 }
 
 export interface ProjectStaticContent {
@@ -71,6 +80,14 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
         paragraphs: [
           'We offer a range of programs and initiatives designed to bring nature closer to everyone. For those interested in sustainable living, our urban workshops teach the basics of green lifestyle, even in small spaces. Our guided nature walks provide a deeper appreciation for the eco-friendly life that thrives in our region.',
         ],
+        gallery: [
+          '/images/projects/gallery/envday-g1.jpg',
+          '/images/projects/gallery/envday-g2.jpg',
+          '/images/projects/gallery/envday-g3.jpg',
+          '/images/projects/gallery/envday-g4.jpg',
+          '/images/projects/gallery/envday-g5.jpg',
+          '/images/projects/gallery/envday-g6.jpg',
+        ],
       },
     ],
   },
@@ -106,13 +123,78 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
         paragraphs: [
           'Increasing marine waste issues have been among the hottest problems in Vietnam. However, these issues in coastal areas have not been paid enough attention. Nam Dinh is a typical coastal province facing these issues, especially in seaside areas because of the flow of major rivers and because people usually throw trash directly into the sea.',
         ],
+        gallery: [
+          '/images/projects/gallery/goc-bg1.jpg',
+          '/images/projects/gallery/goc-bg2.jpg',
+          '/images/projects/gallery/goc-bg3.jpg',
+        ],
       },
       {
-        heading: 'Main Activity and Target Audience',
+        heading: 'Main activity and Target Audience',
         paragraphs: [
-          "With over 3 years of experience raising people's awareness of trash issues in Hanoi, Let's Do It! Hanoi – a member of the Let's Do It! World Network – launched the \"Green Ocean Campaign\" in Nam Dinh Province in September 2021. Our vision is to minimize marine litter issues in coastal provinces as local residents start adopting eco-friendly lifestyles.",
-          'Direct target audience (2,380 people): 2 Environmental Education Programs in 2 secondary schools (1 training session + 1 recycling STEM festival each), 2 workshops on eco-friendly lifestyles for residential group leaders, 1 cleanup activity for volunteers at 1 beach, and 1 online capacity-building workshop for young emerging leaders aged 15–22 (Nam Dinh Youth4Environment Program).',
-          'Breakdown: secondary students (2,000 people), residential group leaders (50 people), youth groups and volunteers (300 people), young emerging leaders (30 people). Indirect target audience: local residents in 2 coastal districts (451,776 people).',
+          "With over 3-year experience in raising people's awareness of trash issues in Hanoi, Let's Do It! Hanoi – a member of Let's Do It! World Network will launch \"Green Ocean Campaign\" in Nam Dinh Province in September 2021. Our vision is to minimize marine litter issues in coastal provinces and local residents will start adopting eco-friendly lifestyles.",
+        ],
+        columns: [
+          {
+            heading: 'Main activities',
+            paragraphs: [
+              '02 Environmental Education Programs in 02 secondary schools with 2 activities including 01 training session and 01 recycling STEM festival',
+              '02 Workshops of eco-friendly lifestyles for residential group leaders',
+              '01 cleanup activities for volunteers at 01 beach',
+              '01 online capacity-building workshop for young emerging leaders aged 15-22 (Nam Dinh Youth4Environment Program)',
+            ],
+          },
+          {
+            heading: 'Direct target audience (2,380 people)',
+            paragraphs: [
+              'Secondary students: 2,000 people',
+              'Residential group leaders: 50 people',
+              'Youth groups and volunteers: 300 people',
+              'Young emerging leaders: 30 people',
+              'Indirect target audience and Demographic: local residents in 2 coastal districts (451,776 people)',
+            ],
+          },
+        ],
+      },
+      {
+        heading: 'Environmental Education Program',
+        paragraphs: [],
+        gallery: [
+          '/images/projects/gallery/goc-edu1.jpg',
+          '/images/projects/gallery/goc-edu2.jpg',
+          '/images/projects/gallery/goc-edu3.jpg',
+          '/images/projects/gallery/goc-edu4.jpg',
+          '/images/projects/gallery/goc-edu5.jpg',
+          '/images/projects/gallery/goc-edu6.jpg',
+        ],
+      },
+      {
+        heading: 'Eco-friendly Workshop for residential group leaders',
+        paragraphs: [],
+        columns: [
+          { heading: 'Giao Thinh', paragraphs: [] },
+          { heading: 'Hai Dong', paragraphs: [] },
+        ],
+        gallery: [
+          '/images/projects/gallery/goc-gt1.jpg',
+          '/images/projects/gallery/goc-gt2.jpg',
+          '/images/projects/gallery/goc-gt3.jpg',
+          '/images/projects/gallery/goc-gt4.jpg',
+          '/images/projects/gallery/goc-hd1.jpg',
+          '/images/projects/gallery/goc-hd2.jpg',
+          '/images/projects/gallery/goc-hd3.jpg',
+          '/images/projects/gallery/goc-hd4.jpg',
+        ],
+      },
+      {
+        heading: 'Beach cleanup',
+        paragraphs: [],
+        gallery: [
+          '/images/projects/gallery/goc-beach1.jpg',
+          '/images/projects/gallery/goc-beach2.jpg',
+          '/images/projects/gallery/goc-beach3.jpg',
+          '/images/projects/gallery/goc-beach4.jpg',
+          '/images/projects/gallery/goc-beach5.jpg',
         ],
       },
       {
@@ -144,22 +226,37 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
         image: '/images/projects/ycsw-2.jpg',
       },
       {
-        heading: 'Activity 2: Five training sessions on nature and wildlife conservation',
+        heading: 'Activity 2: A series of five training sessions on nature and wildlife conservation',
         paragraphs: [
           'Following the kick-off event, YCSW launched its application process, selecting 800 passionate young individuals eager to protect nature and wildlife. Over 20 days, the program received 3,823 applications and 5,459 registrations, surpassing expectations by 5.4 times. Participants joined five interactive online training sessions on Zoom.',
         ],
+        gallery: [
+          '/images/projects/gallery/ycsw-a2-1.png',
+          '/images/projects/gallery/ycsw-a2-2.png',
+          '/images/projects/gallery/ycsw-a2-3.png',
+          '/images/projects/gallery/ycsw-a2-4.png',
+          '/images/projects/gallery/ycsw-a2-5.png',
+        ],
       },
       {
-        heading: 'Activity 3: Short film competition about wildlife',
+        heading: 'Activity 3: Communication contest for short film production about wildlife',
         paragraphs: [
           'To select 24 passionate young individuals for a 5-day volunteer experience at Cuc Phuong National Park, YCSW launched a wildlife-themed short film contest. From 35 submitted films, the top 10 productions were chosen for a final online pitching round, encouraging communities to reject wildlife trade and consumption.',
         ],
       },
       {
-        heading: 'Activity 4: 5-day experience and volunteering at Cuc Phuong National Park',
+        heading: 'Activity 4: 5-day experience and volunteer in Cuc Phuong National Park',
         paragraphs: [
           '24 young people visited and volunteered at wildlife rescue/conservation centers over five days: the Cuc Phuong National Park Museum, the Center for Save Vietnam Wildlife (small carnivores and pangolins), the Turtle Conservation Center, the Endangered Primate Rescue Center, and Ninh Binh Bear Sanctuary — cleaning enclosures, preparing food, planting a "bear bile plant garden", night firefly watching, camping, and a nearly 5-hour forest trek to Van Long Lagoon.',
           "Beyond training, the program strengthened connections among alumni in Vietnam's wildlife and environmental sectors, with nearly 3,500 applications underscoring strong youth commitment to conservation.",
+        ],
+        gallery: [
+          '/images/projects/gallery/ycsw-a4-1.jpg',
+          '/images/projects/gallery/ycsw-a4-2.jpg',
+          '/images/projects/gallery/ycsw-a4-3.jpg',
+          '/images/projects/gallery/ycsw-a4-4.jpg',
+          '/images/projects/gallery/ycsw-a4-5.jpg',
+          '/images/projects/gallery/ycsw-a4-6.jpg',
         ],
       },
     ],
