@@ -11,6 +11,8 @@ import { TakeActionStrip } from '../TakeActionStrip';
 
 interface NewsPageProps {
   initialCategory?: 'All' | 'Media On Us' | 'News';
+  /** Jump straight to this article's detail view (e.g. clicked from a homepage news card) instead of the list. */
+  initialArticleId?: string;
 }
 
 function formatDate(dateStr: string) {
@@ -19,7 +21,7 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) => {
+export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', initialArticleId }) => {
   const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
@@ -59,6 +61,20 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     const unsub = dbService.subscribe(refreshNews);
     return () => unsub();
   }, []);
+
+  // Deep-link into one article's detail view (e.g. clicked from a homepage
+  // news card). A ref tracks which id we've already applied so a later
+  // background refresh doesn't keep snapping the user back to it after
+  // they've clicked "Back to List".
+  const appliedArticleIdRef = React.useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!initialArticleId || appliedArticleIdRef.current === initialArticleId) return;
+    const found = newsList.find((a) => a.id === initialArticleId);
+    if (found) {
+      setSelectedArticle(found);
+      appliedArticleIdRef.current = initialArticleId;
+    }
+  }, [initialArticleId, newsList]);
 
   const handleDeleteArticle = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();

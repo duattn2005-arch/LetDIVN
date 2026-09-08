@@ -34,6 +34,7 @@ import { ContactBubble } from './components/ContactBubble';
 export function AppContent() {
   const [activeView, setActiveView] = useState<string>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
+  const [selectedNewsArticleId, setSelectedNewsArticleId] = useState<string | undefined>(undefined);
 
   // Modals state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -57,6 +58,9 @@ export function AppContent() {
       const pId = view.replace('project:', '');
       setSelectedProjectId(pId);
       setActiveView('project-detail');
+    } else if (view === 'news') {
+      setSelectedNewsArticleId(extraId);
+      setActiveView('news');
     } else {
       setActiveView(view);
     }
@@ -154,7 +158,7 @@ export function AppContent() {
         )}
 
         {activeView === 'news' && (
-          <NewsPage initialCategory="All" />
+          <NewsPage initialCategory="All" initialArticleId={selectedNewsArticleId} />
         )}
 
         {activeView === 'media-on-us' && (

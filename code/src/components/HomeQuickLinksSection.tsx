@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { Settings2 } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { NewsArticle } from '../types';
+import { useAuth } from '../context/AuthContext';
 import { EditableText } from './EditableText';
 import { EditableImage } from './EditableImage';
+import { SelectHomeNewsModal } from './SelectHomeNewsModal';
 
 const BRAND_PINK = '#F1138D';
+const SELECTION_KEY = 'home.quickLinks.selectedNews';
 
 const QUICK_LINKS = [
   { key: 'whoWeAre', label: 'Who We Are', image: '/images/home-quicklinks/who-we-are.jpg', view: 'who-we-are' },
@@ -23,16 +27,46 @@ function formatDate(dateStr: string) {
  * Full-bleed (edge-to-edge, no side margins) quick-links image grid + latest
  * News preview, mirrored from the top of letsdoitvietnam.org's homepage.
  */
-export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => void }> = ({ onNavigate }) => {
+export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraId?: string) => void }> = ({ onNavigate }) => {
+  const { isAdmin } = useAuth();
   const [latestNews, setLatestNews] = useState<NewsArticle[]>([]);
+  const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
 
-  useEffect(() => {
-    dbService.getNews().then((all) => {
-      const sorted = [...all]
+  const refreshNews = () => {
+    Promise.all([
+      dbService.getNews(),
+      dbService.getContent(SELECTION_KEY, ''),
+    ]).then(([all, raw]) => {
+      const published = [...all]
         .filter((n) => n.status !== 'Pending')
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      setLatestNews(sorted.slice(0, 6));
+
+      let selectedIds: string[] = [];
+      try {
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(parsed)) selectedIds = parsed;
+      } catch {
+        // ignore malformed override, fall back to auto below
+      }
+
+      if (selectedIds.length > 0) {
+        const manual = selectedIds
+          .map((id) => published.find((n) => n.id === id))
+          .filter((n): n is NewsArticle => !!n);
+        if (manual.length > 0) {
+          setLatestNews(manual);
+          return;
+        }
+      }
+
+      setLatestNews(published.slice(0, 6));
     });
+  };
+
+  useEffect(() => {
+    refreshNews();
+    const unsub = dbService.subscribe(refreshNews);
+    return () => unsub();
   }, []);
 
   return (
@@ -72,7 +106,7 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
 
       {latestNews.length > 0 && (
         <>
-          <div className="text-center px-4 mt-16">
+          <div className="text-center px-4 mt-16 space-y-2">
             <EditableText
               contentKey="home.quickLinks.newsTitle"
               defaultValue="News"
@@ -80,22 +114,32 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
               className="ref-heading text-3xl sm:text-4xl"
               render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
             />
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => setIsSelectModalOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#E81A7F] cursor-pointer"
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+                <span>Chọn bài viết hiển thị (Admin)</span>
+              </button>
+            )}
           </div>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-8 px-4 sm:px-8 lg:px-12">
             {latestNews.map((item) => (
               <div key={item.id} className="space-y-3">
-                <button onClick={() => onNavigate('news')} className="block w-full aspect-16/9 overflow-hidden bg-slate-900 cursor-pointer">
+                <button onClick={() => onNavigate('news', item.id)} className="block w-full aspect-16/9 overflow-hidden bg-slate-900 cursor-pointer">
                   <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                 </button>
                 <h3 className="ref-news-title text-base sm:text-lg leading-snug">
-                  <button onClick={() => onNavigate('news')} className="text-left cursor-pointer">
+                  <button onClick={() => onNavigate('news', item.id)} className="text-left cursor-pointer">
                     {item.title}
                   </button>
                 </h3>
                 <div className="ref-news-date text-xs">{formatDate(item.date)}</div>
                 <button
-                  onClick={() => onNavigate('news')}
+                  onClick={() => onNavigate('news', item.id)}
                   className="ref-news-readmore text-xs cursor-pointer"
                 >
                   Read More »
@@ -104,6 +148,14 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
             ))}
           </div>
         </>
+      )}
+
+      {isAdmin && (
+        <SelectHomeNewsModal
+          isOpen={isSelectModalOpen}
+          onClose={() => setIsSelectModalOpen(false)}
+          onSaved={refreshNews}
+        />
       )}
     </div>
   );
