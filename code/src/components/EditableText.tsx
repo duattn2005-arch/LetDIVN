@@ -334,12 +334,15 @@ export const EditableText: React.FC<EditableTextProps> = ({
     // heading above another heading) both set `display` — Tailwind emits the
     // flex-family utilities after the block-family ones in its stylesheet, so
     // `inline-flex` always wins the cascade regardless of class order in the
-    // string. Switch to the block-level `flex` when the caller asked for
-    // `block` so it actually stacks instead of silently staying inline.
+    // string. When the caller asked for `block`, use plain `block` (not
+    // `flex` — a flex box ignores `text-align` and defaults its content to
+    // the start edge, which silently breaks a `text-center` ancestor) so the
+    // wrapper both stacks onto its own line and still centers/aligns its
+    // text the normal way.
     const wantsBlock = /(^|\s)block(\s|$)/.test(className);
     return (
       <span
-        className={`group/edit ${wantsBlock ? 'flex' : 'inline-flex'} items-center gap-0.5 whitespace-pre-line cursor-text ${className}`}
+        className={`group/edit ${wantsBlock ? 'block' : 'inline-flex items-center gap-0.5'} whitespace-pre-line cursor-text ${className}`}
         style={displayStyle}
         onMouseUp={handleMouseUpToEdit}
         title="Bôi đen chữ hoặc bấm bút chì để sửa"

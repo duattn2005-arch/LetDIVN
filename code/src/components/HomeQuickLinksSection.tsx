@@ -37,13 +37,15 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
 
   return (
     <div className="bg-white py-12">
-      <EditableText
-        contentKey="home.quickLinks.title"
-        defaultValue="Cultivating the Beautiful in Vietnam"
-        as="h2"
-        className="ref-heading text-3xl sm:text-4xl text-center px-4"
-        render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
-      />
+      <div className="text-center px-4">
+        <EditableText
+          contentKey="home.quickLinks.title"
+          defaultValue="Cultivating the Beautiful in Vietnam"
+          as="h2"
+          className="ref-heading text-3xl sm:text-4xl"
+          render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
+        />
+      </div>
 
       <div className="mt-8 grid grid-cols-2 sm:grid-cols-4">
         {QUICK_LINKS.map((link) => (
@@ -70,13 +72,15 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
 
       {latestNews.length > 0 && (
         <>
-          <EditableText
-            contentKey="home.quickLinks.newsTitle"
-            defaultValue="News"
-            as="h2"
-            className="ref-heading text-3xl sm:text-4xl text-center px-4 mt-16"
-            render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
-          />
+          <div className="text-center px-4 mt-16">
+            <EditableText
+              contentKey="home.quickLinks.newsTitle"
+              defaultValue="News"
+              as="h2"
+              className="ref-heading text-3xl sm:text-4xl"
+              render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
+            />
+          </div>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-8 px-4 sm:px-8 lg:px-12">
             {latestNews.map((item) => (
