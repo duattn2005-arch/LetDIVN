@@ -32,6 +32,8 @@ export interface ProjectSection {
   closingBullets?: string[];
   /** Short lead-in line shown directly above closingBullets (e.g. "Key takeaways included:"). */
   closingBulletsLabel?: string;
+  /** Renders this section as a single left-aligned "icon + label" row instead of the normal heading/paragraph layout — e.g. each participating organization on the Community Workshop page is its own full-width alternating-band row, not a bulleted list. Ignores heading/paragraphs/image/gallery. */
+  personListItem?: string;
 }
 
 export interface ProjectStaticContent {
@@ -384,22 +386,16 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
     title: 'Community Workshop',
     sections: [
       {
+        band: 'white',
         paragraphs: [
           "The Community Workshop is part of a broader initiative aimed at environmental protection and sustainability. These workshops are organized under the umbrella of the global Let's Do It! World movement, which focuses on tackling environmental issues through community-driven efforts.",
         ],
-        image: '/images/projects/cw-1.jpg',
       },
-      {
-        heading: 'Participating Organizations',
-        paragraphs: [
-          'Collaboration Betters The World (CBTW APAC)',
-          'Viet Duc High School',
-          'University of Social Sciences and Humanities',
-          'Youth Volunteers and Team Members',
-          'Duong Lieu Secondary School',
-        ],
-        image: '/images/projects/cw-2.jpg',
-      },
+      { band: 'white', personListItem: 'Collaboration Betters The World (CBTW APAC)', paragraphs: [] },
+      { band: 'gray', personListItem: 'Viet Duc High school', paragraphs: [] },
+      { band: 'white', personListItem: 'University of Social Sciences and Humanities', paragraphs: [] },
+      { band: 'gray', personListItem: 'Youth Volunteers and Team Member', paragraphs: [] },
+      { band: 'white', personListItem: 'Duong Lieu Secondary School', paragraphs: [] },
     ],
   },
 };

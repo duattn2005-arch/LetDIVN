@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircleDot } from 'lucide-react';
+import { CircleDot, PersonStanding } from 'lucide-react';
 import { PROJECT_STATIC_CONTENT } from '../data/projectStaticContent';
 import { EditableText } from './EditableText';
 import { EditableImage } from './EditableImage';
@@ -126,6 +126,26 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                     ))}
                   </div>
                   {galleryBlock}
+                </div>
+              </div>
+            );
+          }
+
+          // A single "icon + label" row (e.g. each participating organization on
+          // the Community Workshop page) — its own full-width alternating band,
+          // not a bulleted list.
+          if (section.personListItem) {
+            return (
+              <div key={idx} style={{ backgroundColor: bandBg }} className="py-16">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+                  <PersonStanding className="w-6.5 h-6.5 shrink-0" style={{ color: BRAND_PINK }} />
+                  <EditableText
+                    contentKey={`${sectionKey}.personListItem`}
+                    defaultValue={section.personListItem}
+                    as="span"
+                    className="ref-body text-base"
+                    render={(v) => <span style={{ color: '#54595F' }}>{v}</span>}
+                  />
                 </div>
               </div>
             );
