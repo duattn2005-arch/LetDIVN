@@ -112,6 +112,20 @@ export const SelectHomeNewsModal: React.FC<SelectHomeNewsModalProps> = ({ isOpen
           )}
 
           <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-bold text-slate-500">
+                Tất cả bài viết ({allNews.length}){search && ` — đang lọc: ${filtered.length} kết quả`}
+              </span>
+              <div className="flex items-center gap-2 text-[11px] font-bold">
+                <button type="button" onClick={() => setSelectedIds(filtered.map((n) => n.id))} className="text-[#E81A7F] hover:underline cursor-pointer">
+                  Chọn tất cả
+                </button>
+                <span className="text-slate-300">|</span>
+                <button type="button" onClick={() => setSelectedIds([])} className="text-slate-500 hover:underline cursor-pointer">
+                  Bỏ chọn tất cả
+                </button>
+              </div>
+            </div>
             <div className="relative mb-2">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
@@ -122,7 +136,7 @@ export const SelectHomeNewsModal: React.FC<SelectHomeNewsModalProps> = ({ isOpen
                 className="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-hidden focus:border-[#E81A7F]"
               />
             </div>
-            <div className="space-y-1 max-h-64 overflow-y-auto border border-slate-100 rounded-xl p-1.5">
+            <div className="space-y-1 max-h-80 overflow-y-auto border border-slate-100 rounded-xl p-1.5">
               {filtered.map((a) => {
                 const checked = selectedIds.includes(a.id);
                 return (
