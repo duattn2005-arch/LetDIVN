@@ -85,12 +85,16 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
 
           return (
             <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
-              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div
+                className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-10 items-center ${
+                  isImageLeft ? 'md:grid-cols-[0.85fr_1.15fr]' : 'md:grid-cols-[1.15fr_0.85fr]'
+                }`}
+              >
                 <div className={isImageLeft ? 'order-1' : 'order-1 md:order-2'}>
                   <img
                     src={section.image}
                     alt={section.heading || content.title}
-                    className="w-full aspect-4/3 object-cover"
+                    className="w-full aspect-3/2 object-cover"
                   />
                 </div>
                 <div className={isImageLeft ? 'order-2' : 'order-2 md:order-1'}>{textBlock}</div>

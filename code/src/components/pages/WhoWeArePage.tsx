@@ -124,12 +124,12 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
 
       {/* Where It All Began: image left, text right, gray band */}
       <div className="bg-[#F2F2F2]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 grid grid-cols-1 md:grid-cols-[0.85fr_1.15fr] gap-10 items-center">
           <EditableImage
             contentKey="whoWeAre.sustainabilityImage"
             defaultValue="/images/who-we-are/sustainability.jpg"
             alt="Let's Do It Vietnam cleanup event"
-            wrapperClassName="aspect-3/2 bg-slate-900"
+            wrapperClassName="aspect-3/2 p-2 bg-white border border-slate-200 shadow-lg rounded-sm"
             className="w-full h-full object-cover"
           />
           <div className="space-y-3">
@@ -152,7 +152,7 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
       </div>
 
       {/* Let's Do It Vietnam Today: text left, image right, white background */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr] gap-10 items-center">
         <div className="space-y-3 order-2 md:order-1">
           <EditableText
             contentKey="whoWeAre.todayTitle"
@@ -173,7 +173,7 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
           contentKey="whoWeAre.todayImage"
           defaultValue="/images/who-we-are/today.jpg"
           alt="Let's Do It Vietnam volunteers today"
-          wrapperClassName="order-1 md:order-2 aspect-4/3 bg-slate-900"
+          wrapperClassName="order-1 md:order-2 aspect-3/2 p-2 bg-white border border-slate-200 shadow-lg rounded-sm"
           className="w-full h-full object-cover"
         />
       </div>
