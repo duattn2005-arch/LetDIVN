@@ -48,11 +48,20 @@ import {
   fetchDataFromSheets,
   syncAllVolunteersToGoogleSheets,
   clearAllVolunteersFromGoogleSheets,
+  deleteRowFromGoogleSheets,
   validateSheetUrl,
   getGoogleAppsScriptUrl,
   SheetVolunteerRow,
   DEFAULT_SPREADSHEET_ID
 } from '../services/googleSheetsService';
+
+/** Parses a registeredAt value (ISO string or a locale-formatted display string) into its day/month/year parts. */
+function parseDateParts(input?: string | number | Date): { day: number; month: number; year: number } | null {
+  if (!input) return null;
+  const d = new Date(input);
+  if (isNaN(d.getTime())) return null;
+  return { day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() };
+}
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -87,6 +96,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [cityFilter, setCityFilter] = useState('All');
+
+  // Date (day/month/year) filters — separate per tab since each filters a different data view
+  const [sheetDateDay, setSheetDateDay] = useState('All');
+  const [sheetDateMonth, setSheetDateMonth] = useState('All');
+  const [sheetDateYear, setSheetDateYear] = useState('All');
+  const [volDateDay, setVolDateDay] = useState('All');
+  const [volDateMonth, setVolDateMonth] = useState('All');
+  const [volDateYear, setVolDateYear] = useState('All');
+
+  // Per-row deletion in the Google Sheets tab
+  const [deletingRowKey, setDeletingRowKey] = useState<string | null>(null);
 
   // Modal forms for adding items
   const [isCreatingVolunteer, setIsCreatingVolunteer] = useState(false);
@@ -174,7 +194,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           eventName: v.eventName || '',
           skills: (Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')),
           status: v.status || 'Approved',
-          notes: v.notes || ''
+          notes: v.notes || '',
+          localId: v.id
         })));
       }
     } catch {
@@ -361,8 +382,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       eventName: v.eventName,
       skills: (v.skills || []).join(', '),
       status: v.status || 'Approved',
-      notes: v.notes || ''
+      notes: v.notes || '',
+      localId: v.id
     })));
+
+  // Distinct years present in the sheet data, newest first, for the year filter dropdown
+  const sheetYearOptions = Array.from(new Set(
+    displayRows.map((v: any) => parseDateParts(v.registeredAt)?.year).filter((y): y is number => !!y)
+  )).sort((a, b) => b - a);
+
+  const sheetFilteredRows = displayRows.filter((v: any) => {
+    const parts = parseDateParts(v.registeredAt);
+    const matchesDay = sheetDateDay === 'All' || (!!parts && parts.day === Number(sheetDateDay));
+    const matchesMonth = sheetDateMonth === 'All' || (!!parts && parts.month === Number(sheetDateMonth));
+    const matchesYear = sheetDateYear === 'All' || (!!parts && parts.year === Number(sheetDateYear));
+    return matchesDay && matchesMonth && matchesYear;
+  });
+
+  const clearSheetDateFilter = () => {
+    setSheetDateDay('All');
+    setSheetDateMonth('All');
+    setSheetDateYear('All');
+  };
+
+  const handleDeleteSheetRow = async (row: SheetVolunteerRow) => {
+    const key = row.sheetRowNumber ? `row-${row.sheetRowNumber}` : `local-${row.localId}`;
+    if (!window.confirm('Are you sure you want to delete this data row? This action cannot be undone.')) return;
+    setDeletingRowKey(key);
+    try {
+      if (row.sheetRowNumber) {
+        const res = await deleteRowFromGoogleSheets(row.sheetRowNumber, appScriptUrl);
+        if (!res.success) {
+          setSyncResultMsg({ text: `⚠ ${res.message}`, isError: true });
+          setTimeout(() => setSyncResultMsg(null), 5000);
+          return;
+        }
+      } else if (row.localId) {
+        await dbService.deleteVolunteer(row.localId);
+      }
+      await refreshData();
+    } finally {
+      setDeletingRowKey(null);
+    }
+  };
+
+  // Distinct years present in the volunteers list, newest first, for the year filter dropdown
+  const volYearOptions = Array.from(new Set(
+    volunteers.map(v => parseDateParts(v.registeredAt)?.year).filter((y): y is number => !!y)
+  )).sort((a, b) => b - a);
+
+  const clearVolDateFilter = () => {
+    setVolDateDay('All');
+    setVolDateMonth('All');
+    setVolDateYear('All');
+  };
 
   const filteredVolunteers = volunteers.filter(v => {
     const matchesSearch =
@@ -372,7 +445,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       v.eventName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'All' || v.status === statusFilter;
     const matchesCity = cityFilter === 'All' || v.city === cityFilter;
-    return matchesSearch && matchesStatus && matchesCity;
+    const dateParts = parseDateParts(v.registeredAt);
+    const matchesDay = volDateDay === 'All' || (!!dateParts && dateParts.day === Number(volDateDay));
+    const matchesMonth = volDateMonth === 'All' || (!!dateParts && dateParts.month === Number(volDateMonth));
+    const matchesYear = volDateYear === 'All' || (!!dateParts && dateParts.year === Number(volDateYear));
+    return matchesSearch && matchesStatus && matchesCity && matchesDay && matchesMonth && matchesYear;
   });
 
   if (!isOpen) return null;
@@ -587,6 +664,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                 </div>
               </div>
 
+              {/* Date (day/month/year) filter bar */}
+              <div className="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 flex flex-wrap items-center gap-2.5 shadow-md text-xs">
+                <div className="flex items-center gap-1.5 text-slate-300 font-bold shrink-0">
+                  <Filter className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Filter by date:</span>
+                </div>
+                <select
+                  value={sheetDateDay}
+                  onChange={(e) => setSheetDateDay(e.target.value)}
+                  className="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs font-semibold focus:outline-hidden focus:border-emerald-500"
+                >
+                  <option value="All">Day</option>
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                <select
+                  value={sheetDateMonth}
+                  onChange={(e) => setSheetDateMonth(e.target.value)}
+                  className="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs font-semibold focus:outline-hidden focus:border-emerald-500"
+                >
+                  <option value="All">Month</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={sheetDateYear}
+                  onChange={(e) => setSheetDateYear(e.target.value)}
+                  className="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs font-semibold focus:outline-hidden focus:border-emerald-500"
+                >
+                  <option value="All">Year</option>
+                  {sheetYearOptions.map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+                {(sheetDateDay !== 'All' || sheetDateMonth !== 'All' || sheetDateYear !== 'All') && (
+                  <button
+                    onClick={clearSheetDateFilter}
+                    className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>Clear filter</span>
+                  </button>
+                )}
+                <span className="text-[11px] text-slate-500 ml-auto font-mono">
+                  {sheetFilteredRows.length} / {displayRows.length} rows
+                </span>
+              </div>
+
               {syncResultMsg && (
                 <div className={`px-3.5 py-2 rounded-xl text-xs font-semibold ${syncResultMsg.isError
                   ? 'bg-red-950/60 text-red-300 border border-red-800'
@@ -631,23 +758,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[180px] text-center">
                           <span className="text-[10px] font-bold uppercase">Skills</span>
                         </th>
-                        <th className="py-2.5 px-3 text-center min-w-[110px]">
+                        <th className="py-2.5 px-3 border-r border-white/20 text-center min-w-[110px]">
                           <span className="text-[10px] font-bold uppercase">Status</span>
+                        </th>
+                        <th className="py-2.5 px-3 text-center w-16">
+                          <span className="text-[10px] font-bold uppercase">Actions</span>
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 font-mono text-[11px]">
-                      {displayRows.length === 0 ? (
+                      {sheetFilteredRows.length === 0 ? (
                         <tr>
-                          <td colSpan={10} className="py-12 text-center text-slate-500 font-sans">
-                            <div className="text-sm font-bold text-slate-700 mb-1">No rows in the spreadsheet yet</div>
-                            <p className="text-xs text-slate-400">When members register, new data rows will automatically appear here!</p>
+                          <td colSpan={11} className="py-12 text-center text-slate-500 font-sans">
+                            <div className="text-sm font-bold text-slate-700 mb-1">
+                              {displayRows.length === 0 ? 'No rows in the spreadsheet yet' : 'No rows match the selected date filter'}
+                            </div>
+                            <p className="text-xs text-slate-400">
+                              {displayRows.length === 0
+                                ? 'When members register, new data rows will automatically appear here!'
+                                : 'Try a different day, month, or year, or clear the filter.'}
+                            </p>
                           </td>
                         </tr>
                       ) : (
-                        displayRows.map((v, idx) => (
+                        sheetFilteredRows.map((v: any, idx: number) => {
+                          const rowKey = v.sheetRowNumber ? `row-${v.sheetRowNumber}` : `local-${v.localId ?? idx}`;
+                          const isDeleting = deletingRowKey === rowKey;
+                          return (
                           <tr
-                            key={idx}
+                            key={rowKey}
                             className={`hover:bg-emerald-50/70 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/90'}`}
                           >
                             {/* Unnamed column: (Admin) or row number */}
@@ -690,13 +829,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                               {v.skills}
                             </td>
                             {/* J: Status (rounded green "Approved" badge) */}
-                            <td className="py-2 px-3 text-center">
+                            <td className="py-2 px-3 border-r border-slate-200 text-center">
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-sans bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs inline-block">
                                 Approved
                               </span>
                             </td>
+                            {/* Actions: per-row delete */}
+                            <td className="py-2 px-3 text-center">
+                              <button
+                                onClick={() => handleDeleteSheetRow(v)}
+                                disabled={isDeleting}
+                                className="p-1.5 bg-red-100 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed text-red-600 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
+                                title="Delete this row"
+                              >
+                                {isDeleting ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </td>
                           </tr>
-                        ))
+                          );
+                        })
                       )}
                     </tbody>
                   </table>
@@ -802,6 +957,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                 </div>
               </div>
 
+              {/* Date (day/month/year) filter bar */}
+              <div className="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 flex flex-wrap items-center gap-2.5 shadow-md text-xs">
+                <div className="flex items-center gap-1.5 text-slate-300 font-bold shrink-0">
+                  <Filter className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Filter by date:</span>
+                </div>
+                <select
+                  value={volDateDay}
+                  onChange={(e) => setVolDateDay(e.target.value)}
+                  className="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs font-semibold focus:outline-hidden focus:border-emerald-500"
+                >
+                  <option value="All">Day</option>
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                <select
+                  value={volDateMonth}
+                  onChange={(e) => setVolDateMonth(e.target.value)}
+                  className="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs font-semibold focus:outline-hidden focus:border-emerald-500"
+                >
+                  <option value="All">Month</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={volDateYear}
+                  onChange={(e) => setVolDateYear(e.target.value)}
+                  className="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs font-semibold focus:outline-hidden focus:border-emerald-500"
+                >
+                  <option value="All">Year</option>
+                  {volYearOptions.map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+                {(volDateDay !== 'All' || volDateMonth !== 'All' || volDateYear !== 'All') && (
+                  <button
+                    onClick={clearVolDateFilter}
+                    className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>Clear filter</span>
+                  </button>
+                )}
+                <span className="text-[11px] text-slate-500 ml-auto font-mono">
+                  {filteredVolunteers.length} / {volunteers.length} volunteers
+                </span>
+              </div>
+
               <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
@@ -815,7 +1020,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800">
-                    {filteredVolunteers.map((v) => (
+                    {filteredVolunteers.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="py-6 px-4 text-center text-slate-500">
+                          No volunteers match the current search/date filter.
+                        </td>
+                      </tr>
+                    ) : filteredVolunteers.map((v) => (
                       <tr key={v.id} className="hover:bg-slate-800/40 transition-colors">
                         <td className="py-3 px-4 font-bold text-white">
                           <div>{v.fullName}</div>
