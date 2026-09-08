@@ -36,22 +36,42 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
         paragraphs: [
           'World Cleanup Day has now been added to the official United Nations Calendar of International Days & Weeks from 2024 onwards! This presents even greater opportunities to unite tens of millions of participants in cross-sector cooperation, bringing citizens, governments, and organisations together to tackle the global mismanaged waste crisis and to help create a new, more sustainable and waste-free world. Join us on 20 September this year and every year!',
         ],
-        image: '/images/projects/wcd-1.jpg',
       },
       {
         heading: 'Since 2018',
         paragraphs: [
           'Since 2018, World Cleanup Day has become the biggest civic movement in human history, uniting 211 countries and territories – which includes 95% of UN-listed countries – across the world, and 91 million volunteers, equal to 1.1% of the global population – all striving to create a cleaner planet.',
+        ],
+        image: '/images/projects/gallery/wcd-since1.jpg',
+      },
+      {
+        paragraphs: [
           'World Cleanup Day harnesses the power of people around the world to achieve incredible things by joining together. Its beauty lies in cooperation and collaboration: building bridges between otherwise disparate communities – and including all levels and sectors of society – from citizens to businesses, to governments.',
         ],
-        image: '/images/projects/wcd-2.jpg',
+        image: '/images/projects/gallery/wcd-since2.jpg',
       },
       {
         heading: 'From Now and Forever',
         paragraphs: [
           "This year's event takes place on Friday 20 September following our addition to the UN Calendar of International Days! We aim to activate 5% of the world's population that will catalyse lasting societal change in behaviour around mismanaged waste.",
+        ],
+      },
+      {
+        paragraphs: [
           'World Cleanup Day has since grown into a global movement across almost every nation and territory on the planet, with millions of volunteers and a strong network of charismatic leaders. The simple act of cleaning has become a force that binds together people and groups that would otherwise never dream of working towards the same goal.',
+        ],
+        image: '/images/projects/gallery/wcd-forever1.jpg',
+      },
+      {
+        paragraphs: [
           'We are the very definition of unity in civic society, transcending traditional barriers to cooperation and bringing together global corporations and national governments. Our movement includes every nationality, age group, gender identity, and religious affiliation. We now act as a focal point for collective intelligence, raising awareness of the challenges our environment faces.',
+        ],
+        image: '/images/projects/gallery/wcd-forever2.jpg',
+        gallery: [
+          '/images/projects/gallery/wcd-gal1.jpg',
+          '/images/projects/gallery/wcd-gal2.jpg',
+          '/images/projects/gallery/wcd-gal3.jpg',
+          '/images/projects/gallery/wcd-gal4.jpg',
         ],
       },
     ],
