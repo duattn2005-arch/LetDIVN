@@ -38,23 +38,23 @@ export const MediaOnUsPage: React.FC = () => {
           />
         </div>
 
-        <div className="max-w-5xl mx-auto space-y-10">
+        <div className="max-w-6xl mx-auto space-y-12">
           {MEDIA_ON_US_ENTRIES.map((entry) => (
-            <div key={entry.title} className="flex flex-wrap items-center gap-x-10 gap-y-4">
+            <div key={entry.title} className="flex flex-wrap items-center gap-x-12 gap-y-5">
               <img
                 src={entry.image}
                 alt={entry.title}
-                className="w-64 aspect-3/2 object-cover shrink-0"
+                className="w-96 aspect-3/2 object-cover shrink-0"
               />
 
-              <div className="w-16 text-center shrink-0">
-                <div className="text-4xl sm:text-5xl font-black" style={{ color: BRAND_PINK }}>{entry.articles}</div>
-                <div className="text-sm text-slate-500 mt-0.5">Article</div>
+              <div className="w-20 text-center shrink-0">
+                <div className="text-5xl sm:text-6xl font-black" style={{ color: BRAND_PINK }}>{entry.articles}</div>
+                <div className="text-base text-slate-500 mt-1">Article</div>
               </div>
 
-              <div className="w-16 text-center shrink-0">
-                <div className="text-4xl sm:text-5xl font-black text-orange-500">{entry.segments}</div>
-                <div className="text-sm text-slate-500 mt-0.5">Segment</div>
+              <div className="w-20 text-center shrink-0">
+                <div className="text-5xl sm:text-6xl font-black text-orange-500">{entry.segments}</div>
+                <div className="text-base text-slate-500 mt-1">Segment</div>
               </div>
 
               <a
@@ -64,12 +64,12 @@ export const MediaOnUsPage: React.FC = () => {
                 className="flex flex-col items-center gap-1.5 shrink-0"
               >
                 <span
-                  className="inline-flex items-center px-6 py-2.5 rounded-full text-white text-sm font-bold shadow-sm hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center px-8 py-3.5 rounded-full text-white text-base font-bold shadow-sm hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: BRAND_PINK }}
                 >
                   {entry.title}
                 </span>
-                <span className="ref-body text-xs italic text-slate-400">Click to see media coverage on activities</span>
+                <span className="ref-body text-sm italic text-slate-400">Click to see media coverage on activities</span>
               </a>
             </div>
           ))}
