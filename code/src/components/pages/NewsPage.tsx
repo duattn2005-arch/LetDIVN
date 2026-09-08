@@ -7,6 +7,8 @@ import { ArticleEditorModal } from '../ArticleEditorModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
+import { EditableImage } from '../EditableImage';
+import { TakeActionStrip } from '../TakeActionStrip';
 
 interface NewsPageProps {
   initialCategory?: 'All' | 'Media On Us' | 'News';
@@ -93,9 +95,19 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   const pendingCount = newsList.filter(n => n.status === 'Pending').length;
 
   return (
-    <div className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
+    <div className="bg-white">
+
+      {/* Full-width hero banner */}
+      <EditableImage
+        contentKey="newsPage.heroImage"
+        defaultValue="/images/news/hero.png"
+        alt="Collected waste"
+        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        className="w-full h-full object-cover"
+      />
+
+      <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+
         <div className="text-center max-w-4xl mx-auto space-y-4">
           {selectedCat === 'Media On Us' ? (
             <EditableText
@@ -269,6 +281,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
         </div>
 
       </div>
+
+      <TakeActionStrip contentKeyPrefix="newsPage" />
 
       {/* Article Editor Modal */}
       <ArticleEditorModal
