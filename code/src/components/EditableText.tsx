@@ -31,34 +31,40 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const langSpecificKey = language === 'vi' ? contentKey : `${contentKey}__${language}`;
   const colorKey = `${contentKey}__color`;
   const alignKey = `${contentKey}__align`;
+  const fontSizeKey = `${contentKey}__fontSize`;
 
   // `value` starts as defaultValue (known synchronously) so there's no flash
   // of blank content while the first fetch is in flight.
   const [value, setValue] = useState(defaultValue);
   const [color, setColor] = useState('');
   const [align, setAlign] = useState('');
+  const [fontSize, setFontSize] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const [draftColor, setDraftColor] = useState(color);
   const [draftAlign, setDraftAlign] = useState(align);
+  const [draftFontSize, setDraftFontSize] = useState(fontSize);
 
   useEffect(() => {
     let cancelled = false;
     const refresh = async () => {
-      const [nextVal, nextColor, nextAlign] = await Promise.all([
+      const [nextVal, nextColor, nextAlign, nextFontSize] = await Promise.all([
         dbService.getContent(langSpecificKey, defaultValue),
         dbService.getContent(colorKey, ''),
         dbService.getContent(alignKey, ''),
+        dbService.getContent(fontSizeKey, ''),
       ]);
       if (cancelled) return;
       setValue(nextVal);
       setColor(nextColor);
       setAlign(nextAlign);
+      setFontSize(nextFontSize);
       setIsEditing((editing) => {
         if (!editing) {
           setDraft(nextVal);
           setDraftColor(nextColor);
           setDraftAlign(nextAlign);
+          setDraftFontSize(nextFontSize);
         }
         return editing;
       });
@@ -69,7 +75,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       cancelled = true;
       unsub();
     };
-  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey]);
+  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, fontSizeKey]);
 
   const handleSave = async () => {
     // An accidentally-cleared field must fall back to the default text, not
@@ -79,6 +85,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       draft.trim() ? dbService.setContent(langSpecificKey, draft) : dbService.resetContent(langSpecificKey),
       draftColor ? dbService.setContent(colorKey, draftColor) : dbService.resetContent(colorKey),
       draftAlign ? dbService.setContent(alignKey, draftAlign) : dbService.resetContent(alignKey),
+      draftFontSize ? dbService.setContent(fontSizeKey, draftFontSize) : dbService.resetContent(fontSizeKey),
     ]);
     setIsEditing(false);
   };
@@ -87,6 +94,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraft(value);
     setDraftColor(color);
     setDraftAlign(align);
+    setDraftFontSize(fontSize);
     setIsEditing(false);
   };
 
@@ -95,13 +103,16 @@ export const EditableText: React.FC<EditableTextProps> = ({
       dbService.resetContent(langSpecificKey),
       dbService.resetContent(colorKey),
       dbService.resetContent(alignKey),
+      dbService.resetContent(fontSizeKey),
     ]);
     setDraft(defaultValue);
     setDraftColor('');
     setDraftAlign('');
+    setDraftFontSize('');
     setValue(defaultValue);
     setColor('');
     setAlign('');
+    setFontSize('');
     setIsEditing(false);
   };
 
@@ -114,6 +125,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       setDraft(value);
       setDraftColor(color);
       setDraftAlign(align);
+      setDraftFontSize(fontSize);
       setIsEditing(true);
     }
   };
@@ -122,6 +134,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraft(value);
     setDraftColor(color);
     setDraftAlign(align);
+    setDraftFontSize(fontSize);
     setIsEditing(true);
   };
 
@@ -135,7 +148,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
   const resolvedValue = (value && value.trim()) ? value : defaultValue;
 
-  const displayStyle: React.CSSProperties | undefined = (color || align)
+  const displayStyle: React.CSSProperties | undefined = (color || align || fontSize)
     ? {
         ...(color
           ? {
@@ -147,6 +160,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
             }
           : {}),
         ...(align ? { textAlign: align as React.CSSProperties['textAlign'] } : {}),
+        ...(fontSize ? { fontSize: `${fontSize}px` } : {}),
       }
     : undefined;
 
@@ -183,6 +197,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
+            ...(draftFontSize ? { fontSize: `${draftFontSize}px` } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
           title="Kéo góc dưới bên phải để chỉnh chiều rộng/chiều cao khung"
@@ -272,6 +287,21 @@ export const EditableText: React.FC<EditableTextProps> = ({
                 </button>
               ))}
             </div>
+
+            {/* Font Size */}
+            <select
+              value={draftFontSize}
+              onChange={(e) => setDraftFontSize(e.target.value)}
+              title="Cỡ chữ"
+              className="px-2 py-1 bg-white border border-purple-300 rounded-lg text-xs font-bold text-purple-700 cursor-pointer focus:outline-hidden focus:border-purple-500"
+            >
+              <option value="">Cỡ mặc định</option>
+              {[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 60, 72].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex items-center gap-1.5">
             <button
