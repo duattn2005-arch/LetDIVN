@@ -62,7 +62,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
         {content.sections.map((section, idx) => {
           const hasImage = !!section.image;
           const isImageLeft = idx % 2 === 0;
-          const isBulletList = section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160);
+          const isBulletList = section.bulletList ?? (section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160));
           const bandBg = idx % 2 === 0 ? BAND_GRAY : 'transparent';
           const sectionKey = `${keyBase}.section${idx}`;
 

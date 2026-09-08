@@ -11,6 +11,8 @@ export interface ProjectSection {
   gallery?: string[];
   /** Two side-by-side sub-blocks (e.g. "Main activities" | "Direct target audience" on the Green Ocean page). */
   columns?: ProjectSubColumn[];
+  /** Render `paragraphs` as a bulleted list (dot-circle icon) instead of plain paragraphs. Explicit, not inferred from length. */
+  bulletList?: boolean;
 }
 
 export interface ProjectStaticContent {
@@ -126,6 +128,7 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
       },
       {
         heading: 'Project objectives',
+        bulletList: true,
         paragraphs: [
           'Raise public awareness and encourage local people of all age groups to take practical and positive actions towards zero-waste lifestyles and limit waste amount into the environment',
           "Enhance students' creation, interest and promote STEM initiatives in environmental protection",
@@ -136,7 +139,6 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
           'Make cleanup a Culture, not just a Movement!',
           'Promote 9 Sustainable Development Goals (SDGs): 3, 6, 11, 12, 13, 14, 15, 16, 17',
         ],
-        image: '/images/projects/goc-2.jpg',
       },
       {
         heading: 'Background',
