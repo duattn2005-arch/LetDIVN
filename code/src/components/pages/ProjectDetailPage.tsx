@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { dbService } from '../../services/dbService';
-import { ProjectStaticContent } from '../ProjectStaticContent';
 import { CleanupEvent } from '../../types';
 import { slugify } from '../../utils/slug';
 import { Calendar, Clock, MapPin, Users, ArrowLeft } from 'lucide-react';
@@ -87,23 +86,39 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
     event.googleMapsUrl ||
     (event.coordinates ? `https://www.google.com/maps/search/?api=1&query=${event.coordinates.lat},${event.coordinates.lng}` : undefined);
 
+  const joinedPct = Math.min(100, Math.round((event.registeredCount / event.targetVolunteers) * 100));
+
   return (
-    <div className="bg-white">
-      <ProjectStaticContent category={event.category} />
+    <div className="bg-slate-50 min-h-screen py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Project List</span>
+        </button>
 
-      {/* Event logistics: when/where this specific campaign run happens and how to join it. */}
-      <div className="bg-slate-50 py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer mb-6"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Project List</span>
-          </button>
+        {/* Hero card: cover photo with the category badge and event title/location overlaid. */}
+        <div className="relative rounded-3xl overflow-hidden mb-8 shadow-lg bg-slate-900">
+          <img
+            src={event.image}
+            alt={event.title}
+            className="w-full h-64 sm:h-80 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
+            <span className="inline-block bg-[#E81A7F] text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+              {event.category}
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-black text-white leading-tight mb-1">{event.title}</h1>
+            <p className="text-sm sm:text-base text-white/90">{event.location}</p>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            <div className="lg:col-span-2 space-y-8">
+        {/* Event logistics: when/where this specific campaign run happens and how to join it. */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2 space-y-8">
               <div>
                 <h3 className="ref-heading text-xl sm:text-2xl text-slate-900 mb-3">Description &amp; Campaign Goals</h3>
                 <p className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed">{event.description}</p>
@@ -161,9 +176,10 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                 <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-2">
                   <div
                     className="bg-[#E81A7F] h-full rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(100, (event.registeredCount / event.targetVolunteers) * 100)}%` }}
+                    style={{ width: `${joinedPct}%` }}
                   />
                 </div>
+                <div className="text-right text-[11px] font-bold text-slate-400 mt-1">{joinedPct}% Joined</div>
               </div>
 
               <div className="space-y-2 text-sm text-slate-600 pt-3 border-t border-slate-100">
@@ -203,6 +219,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
           </div>
         </div>
       </div>
-    </div>
   );
 };
+
+
