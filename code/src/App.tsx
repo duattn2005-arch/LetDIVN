@@ -106,8 +106,11 @@ export function AppContent() {
   const goToProject = (projectId: string) => {
     setSelectedProjectId(projectId);
     setActiveView('project-detail');
-    const evt = events.find((e) => e.id === projectId);
-    window.history.pushState(null, '', `/${evt ? slugify(evt.city) : projectId}`);
+    // projectId may be an event id (from a project card) or a category name
+    // (from the Header's Projects dropdown, which navigates by category so
+    // it always resolves to whichever live event currently has it).
+    const evt = events.find((e) => e.id === projectId) || events.find((e) => e.category === projectId);
+    window.history.pushState(null, '', `/${evt ? slugify(evt.city) : slugify(projectId)}`);
   };
 
   const handleNavigate = (view: string, extraId?: string) => {
