@@ -63,9 +63,10 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const hasImage = !!section.image;
           const isImageLeft = idx % 2 === 0;
           const isBulletList = section.bulletList ?? (section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160));
-          // Reference site centers only the title-adjacent intro blurb (no heading of its own);
-          // every other body paragraph (under a heading, e.g. "Background") is left-aligned there.
-          const textAlign = section.heading ? 'text-left' : 'text-center';
+          // Reference site centers only the title-adjacent intro blurb (no heading of its own)
+          // and any title-style heading section; every other body paragraph (under a regular
+          // amber sub-heading, e.g. "Background") is left-aligned there.
+          const textAlign = !section.heading || section.headingAsTitle ? 'text-center' : 'text-left';
           const bandBg = idx % 2 === 0 ? BAND_GRAY : 'transparent';
           const sectionKey = `${keyBase}.section${idx}`;
 
@@ -133,8 +134,12 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                   contentKey={`${sectionKey}.heading`}
                   defaultValue={section.heading}
                   as="h3"
-                  className="block ref-heading text-xl sm:text-2xl text-left"
-                  render={(v) => <span style={{ color: BRAND_AMBER }}>{v}</span>}
+                  className={
+                    section.headingAsTitle
+                      ? 'block ref-heading text-3xl sm:text-4xl lg:text-[45px] text-center'
+                      : 'block ref-heading text-xl sm:text-2xl text-left'
+                  }
+                  render={(v) => <span style={{ color: section.headingAsTitle ? titleColor : BRAND_AMBER }}>{v}</span>}
                 />
               )}
               {isBulletList ? (

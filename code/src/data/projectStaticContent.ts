@@ -13,6 +13,8 @@ export interface ProjectSection {
   columns?: ProjectSubColumn[];
   /** Render `paragraphs` as a bulleted list (dot-circle icon) instead of plain paragraphs. Explicit, not inferred from length. */
   bulletList?: boolean;
+  /** Render `heading` like the page's main title (large, centered, title color) instead of the regular small amber sub-heading — matches mid-page "title-style" headings like World Cleanup Day's "From Now and Forever". */
+  headingAsTitle?: boolean;
 }
 
 export interface ProjectStaticContent {
@@ -40,7 +42,6 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
         ],
       },
       {
-        heading: 'Since 2018',
         paragraphs: [
           'Since 2018, World Cleanup Day has become the biggest civic movement in human history, uniting 211 countries and territories – which includes 95% of UN-listed countries – across the world, and 91 million volunteers, equal to 1.1% of the global population – all striving to create a cleaner planet.',
         ],
@@ -54,8 +55,10 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
       },
       {
         heading: 'From Now and Forever',
+        headingAsTitle: true,
         paragraphs: [
-          "This year's event takes place on Friday 20 September following our addition to the UN Calendar of International Days! We aim to activate 5% of the world's population that will catalyse lasting societal change in behaviour around mismanaged waste.",
+          "This year's event takes place on Friday 20 September following our addition to the UN Calendar of International Days!",
+          "We aim to activate 5% of the world's population that will catalyse lasting societal change in behaviour around mismanaged waste.",
         ],
       },
       {
