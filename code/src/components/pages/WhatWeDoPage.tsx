@@ -64,7 +64,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
         className="w-full h-full object-cover"
       />
 
-      <div className="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
         {/* Header Title & Mission statement */}
         <div className="text-center max-w-3xl mx-auto space-y-3">

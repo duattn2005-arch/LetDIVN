@@ -97,7 +97,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
       {/* Campaign intro content mirrored from the matching page on letsdoitvietnam.org */}
       <ProjectStaticContent category={event.category} />
 
-      <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
 
         {/* Top bar: Back Button & Admin Edit Button */}
         <div className="flex items-center justify-between">
