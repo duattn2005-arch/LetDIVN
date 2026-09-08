@@ -45,10 +45,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
   const refreshNews = () => {
     dbService.getNews().then((updated) => {
-      setNewsList(updated);
+      const sorted = [...updated].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setNewsList(sorted);
       setSelectedArticle((current) => {
         if (!current) return current;
-        return updated.find((a) => a.id === current.id) || current;
+        return sorted.find((a) => a.id === current.id) || current;
       });
     });
   };

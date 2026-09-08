@@ -26,7 +26,10 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
 
   useEffect(() => {
     dbService.getNews().then((all) => {
-      setLatestNews(all.filter((n) => n.status !== 'Pending').slice(0, 6));
+      const sorted = [...all]
+        .filter((n) => n.status !== 'Pending')
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setLatestNews(sorted.slice(0, 6));
     });
   }, []);
 
