@@ -563,48 +563,19 @@ export const INITIAL_GALLERY: GalleryItem[] = [
 export const INITIAL_TEAM: TeamMember[] = [
   {
     id: 'tm-01',
-    name: 'Nguyễn Văn Hoàng',
-    role: 'Chủ Tịch & Trưởng Ban Điều Hành Quốc Gia',
-    department: 'Ban Lãnh Đạo (National Board)',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
-    bio: 'Nhà hoạt động xã hội với 10 năm kinh nghiệm dẫn dắt các chiến dịch môi trường quy mô toàn quốc, đại diện Let\'s do it! Vietnam tại hội nghị WCD Toàn Cầu.',
-    linkedin: 'https://linkedin.com'
-  },
-  {
-    id: 'tm-02',
-    name: 'Trần Thị Mai Linh',
-    role: 'Giám Đốc Dự Án Khu Vực Miền Nam',
-    department: 'Ban Điều Phối Dự Án',
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80',
-    bio: 'Chuyên gia quản lý dự án phát triển bền vững, kết nối hơn 30 trường đại học và tổ chức thanh niên tại TP.HCM và các tỉnh Đồng Bằng Sông Cửu Long.',
-    facebook: 'https://facebook.com'
+    name: 'Nguyen Thi Cam Tu (TU)',
+    role: 'National Coordinator',
+    department: '',
+    avatar: '/images/our-team/cam-tu.jpg',
+    bio: ''
   },
   {
     id: 'tm-03',
-    name: 'Phạm Minh Trí',
-    role: 'Trưởng Ban Đối Ngoại & Tài Trợ Doanh Nghiệp',
-    department: 'Ban Hợp Tác & Tài Trợ',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-    bio: 'Kinh nghiệm 8 năm trong mảng CSR và ESG cho các tập đoàn đa quốc gia, phụ trách mở rộng mạng lưới nhà tài trợ cho Let\'s do it! Vietnam.',
-    linkedin: 'https://linkedin.com'
-  },
-  {
-    id: 'tm-04',
-    name: 'Đặng Ngọc Ánh',
-    role: 'Giám Đốc Truyền Thông & Marketing Xã Hội',
-    department: 'Ban Truyền Thông',
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80',
-    bio: 'Sáng tạo các chiến dịch viral tiếp cận hơn 5 triệu người trẻ trên mạng xã hội, thúc đẩy thói quen phân loại rác và lối sống xanh.',
-    facebook: 'https://facebook.com'
-  },
-  {
-    id: 'tm-05',
-    name: 'Lê Quốc Bảo',
-    role: 'Trưởng Ban Công Nghệ & Quản Trị Cơ Sở Dữ Liệu',
-    department: 'Ban Công Nghệ (Tech Team)',
-    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop&q=80',
-    bio: 'Kỹ sư phần mềm phát triển hệ thống bản đồ số hóa rác thải và nền tảng quản trị tình nguyện viên tự động cho tổ chức.',
-    linkedin: 'https://linkedin.com'
+    name: 'Nghiem Xuan Son (SON)',
+    role: 'Head of Communication and Media',
+    department: '',
+    avatar: '/images/our-team/xuan-son.png',
+    bio: ''
   }
 ];
 
