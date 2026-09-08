@@ -102,79 +102,82 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
           />
         </div>
 
-        {/* Promoting Sustainability and Community Action */}
-        <div className="space-y-6">
-          <div className="max-w-3xl mx-auto text-center space-y-3">
-            <EditableText
-              contentKey="whoWeAre.sustainabilityTitle"
-              defaultValue="Promoting Sustainability and Community Action"
-              as="h2"
-              className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight [text-wrap:balance]"
-              render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
-            />
-            <EditableText
-              contentKey="whoWeAre.sustainabilityDesc"
-              defaultValue="Let's Do It Vietnam is a vibrant and dedicated organization committed to environmental sustainability and community action. As part of the global Let's Do It World movement, we focus on addressing waste management issues, promoting recycling, and fostering a cleaner, greener Vietnam. Our activities range from large-scale cleanup events to educational campaigns, engaging volunteers and communities across the country."
-              as="p"
-              multiline
-              className="text-sm sm:text-base text-slate-600 leading-relaxed"
-            />
-          </div>
-          <EditableImage
-            contentKey="whoWeAre.sustainabilityImage"
-            defaultValue="/images/who-we-are/sustainability.jpg"
-            alt="Let's Do It Vietnam cleanup event"
-            wrapperClassName="rounded-3xl overflow-hidden shadow-2xl border border-slate-100 aspect-3/2 bg-slate-900"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Where It All Began */}
+        {/* Promoting Sustainability and Community Action (text only) */}
         <div className="max-w-3xl mx-auto text-center space-y-3">
           <EditableText
-            contentKey="whoWeAre.beganTitle"
-            defaultValue="Where It All Began"
+            contentKey="whoWeAre.sustainabilityTitle"
+            defaultValue="Promoting Sustainability and Community Action"
             as="h2"
             className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight [text-wrap:balance]"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
-            contentKey="whoWeAre.beganDesc"
-            defaultValue="Let's Do It Vietnam began as part of the global Let's Do It World movement, which originated in Estonia in 2008 with a massive cleanup event that inspired millions worldwide. Recognizing the urgent need for action in Vietnam, a group of passionate environmentalists and community leaders established Let's Do It Vietnam in 2015."
+            contentKey="whoWeAre.sustainabilityDesc"
+            defaultValue="Let's Do It Vietnam is a vibrant and dedicated organization committed to environmental sustainability and community action. As part of the global Let's Do It World movement, we focus on addressing waste management issues, promoting recycling, and fostering a cleaner, greener Vietnam. Our activities range from large-scale cleanup events to educational campaigns, engaging volunteers and communities across the country."
             as="p"
             multiline
             className="text-sm sm:text-base text-slate-600 leading-relaxed"
           />
         </div>
 
-        {/* Let's Do It Vietnam Today */}
-        <div className="space-y-6">
-          <div className="max-w-3xl mx-auto text-center space-y-3">
+      </div>
+
+      {/* Where It All Began: image left, text right, gray band */}
+      <div className="bg-[#F2F2F2]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <EditableImage
+            contentKey="whoWeAre.sustainabilityImage"
+            defaultValue="/images/who-we-are/sustainability.jpg"
+            alt="Let's Do It Vietnam cleanup event"
+            wrapperClassName="rounded-3xl overflow-hidden shadow-lg aspect-3/2 bg-slate-900"
+            className="w-full h-full object-cover"
+          />
+          <div className="space-y-3">
             <EditableText
-              contentKey="whoWeAre.todayTitle"
-              defaultValue="Let's Do It Vietnam Today"
+              contentKey="whoWeAre.beganTitle"
+              defaultValue="Where It All Began"
               as="h2"
               className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight [text-wrap:balance]"
               render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
             />
             <EditableText
-              contentKey="whoWeAre.todayDesc"
-              defaultValue="Since its inception, Let's Do It Vietnam has grown exponentially, organizing nationwide cleanup events, educational workshops, and awareness campaigns to combat waste and promote environmental sustainability. The organization has mobilized thousands of volunteers, collaborated with local governments, businesses, and schools, and played a pivotal role in shaping a greener future for Vietnam. Through relentless dedication and community engagement, Let's Do It Vietnam continues to inspire positive change and environmental stewardship across the country."
+              contentKey="whoWeAre.beganDesc"
+              defaultValue="Let's Do It Vietnam began as part of the global Let's Do It World movement, which originated in Estonia in 2008 with a massive cleanup event that inspired millions worldwide. Recognizing the urgent need for action in Vietnam, a group of passionate environmentalists and community leaders established Let's Do It Vietnam in 2015."
               as="p"
               multiline
               className="text-sm sm:text-base text-slate-600 leading-relaxed"
             />
           </div>
-          <EditableImage
-            contentKey="whoWeAre.todayImage"
-            defaultValue="/images/who-we-are/today.jpg"
-            alt="Let's Do It Vietnam volunteers today"
-            wrapperClassName="rounded-3xl overflow-hidden shadow-2xl border border-slate-100 aspect-4/3 bg-slate-900"
-            className="w-full h-full object-cover"
+        </div>
+      </div>
+
+      {/* Let's Do It Vietnam Today: text left, image right, white background */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div className="space-y-3 order-2 md:order-1">
+          <EditableText
+            contentKey="whoWeAre.todayTitle"
+            defaultValue="Let's Do It Vietnam Today"
+            as="h2"
+            className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight [text-wrap:balance]"
+            render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
+          />
+          <EditableText
+            contentKey="whoWeAre.todayDesc"
+            defaultValue="Since its inception, Let's Do It Vietnam has grown exponentially, organizing nationwide cleanup events, educational workshops, and awareness campaigns to combat waste and promote environmental sustainability. The organization has mobilized thousands of volunteers, collaborated with local governments, businesses, and schools, and played a pivotal role in shaping a greener future for Vietnam. Through relentless dedication and community engagement, Let's Do It Vietnam continues to inspire positive change and environmental stewardship across the country."
+            as="p"
+            multiline
+            className="text-sm sm:text-base text-slate-600 leading-relaxed"
           />
         </div>
-
+        <EditableImage
+          contentKey="whoWeAre.todayImage"
+          defaultValue="/images/who-we-are/today.jpg"
+          alt="Let's Do It Vietnam volunteers today"
+          wrapperClassName="order-1 md:order-2 rounded-3xl overflow-hidden shadow-lg aspect-4/3 bg-slate-900"
+          className="w-full h-full object-cover"
+        />
       </div>
+
     </div>
   );
 };

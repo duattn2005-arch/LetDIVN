@@ -100,14 +100,14 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
           {selectedCat === 'Media On Us' ? (
             <EditableText
               contentKey="newsPage.titleMedia"
-              defaultValue={t.newsPageTitleMedia || 'Báo Chí & Truyền Hình Về Chúng Tôi'}
+              defaultValue={t.newsPageTitleMedia || 'Press & TV Coverage About Us'}
               as="h1"
               className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
             />
           ) : (
             <EditableText
               contentKey="newsPage.titleDefault"
-              defaultValue={t.newsPageTitleDefault || 'Tin Tức & Hoạt Động Môi Trường'}
+              defaultValue={t.newsPageTitleDefault || 'News & Environmental Activities'}
               as="h1"
               className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
             />
@@ -211,23 +211,23 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                         {isPending && (
                           <button
                             onClick={(e) => handleApproveArticle(e, item)}
-                            title="Duyệt bài viết này ngay"
+                            title="Approve this article now"
                             className="px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-extrabold rounded-lg transition-all cursor-pointer flex items-center gap-1 shadow-sm"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Duyệt</span>
+                            <span>Approve</span>
                           </button>
                         )}
                         <button
                           onClick={(e) => handleOpenEdit(e, item)}
-                          title="Chỉnh sửa bài viết"
+                          title="Edit article"
                           className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={(e) => handleDeleteArticle(e, item.id)}
-                          title="Xóa bài viết"
+                          title="Delete article"
                           className="p-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -300,7 +300,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
-                  <span>Sửa bài này</span>
+                  <span>Edit this article</span>
                 </button>
               )}
             </div>

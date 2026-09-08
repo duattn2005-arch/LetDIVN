@@ -23,7 +23,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
           <div className="lg:col-span-5 space-y-4">
             <EditableText
               contentKey="about.title"
-              defaultValue={t.aboutTitle || "Phong Trào Let's do it! Vietnam"}
+              defaultValue={t.aboutTitle || "Let's do it! Vietnam Movement"}
               as="h2"
               className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight"
             />
@@ -54,7 +54,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
                 <EditableImage
                   contentKey="about.stat2.img"
                   defaultValue="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80"
-                  alt="Tình Nguyện Viên Tham Gia"
+                  alt="Volunteers Engaged"
                   wrapperClassName="absolute inset-0 w-full h-full"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
                 />
@@ -94,7 +94,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
                 <EditableImage
                   contentKey="about.stat3.img"
                   defaultValue="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&auto=format&fit=crop&q=90"
-                  alt="Chiến Dịch Đã Tổ Chức"
+                  alt="Campaigns Organized"
                   wrapperClassName="absolute inset-0 w-full h-full"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
                 />

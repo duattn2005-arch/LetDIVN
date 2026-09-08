@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 export type Language = 'vi' | 'en' | 'fr' | 'ja' | 'ko' | 'zh' | 'de' | 'es';
 
@@ -1546,17 +1546,12 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('letdoit_language') as Language;
-    return saved && (translations as any)[saved] ? saved : 'vi';
-  });
+  // English-only site: language switching is disabled, so this is a no-op kept
+  // only so components destructuring `setLanguage` don't need to change.
+  const language: Language = 'en';
+  const setLanguage = (_lang: Language) => {};
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('letdoit_language', lang);
-  };
-
-  const t = (translations as any)[language] || translations['vi'];
+  const t = translations['en'];
   const currentLangInfo = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   return (

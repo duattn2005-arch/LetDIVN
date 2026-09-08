@@ -143,7 +143,7 @@ export const ContactBubble: React.FC<ContactBubbleProps> = ({ onOpenContactPage 
                 <div>
                   <EditableText
                     contentKey="contactBubble.hotline1Label"
-                    defaultValue="Hotline (Mr. Sơn)"
+                    defaultValue="Hotline (Mr. Son)"
                     as="div"
                     className="font-bold text-xs text-slate-900 group-hover:text-emerald-600 transition-colors"
                   />
@@ -170,7 +170,7 @@ export const ContactBubble: React.FC<ContactBubbleProps> = ({ onOpenContactPage 
                 <div>
                   <EditableText
                     contentKey="contactBubble.hotline2Label"
-                    defaultValue="Hotline (Ms. Tú)"
+                    defaultValue="Hotline (Ms. Tu)"
                     as="div"
                     className="font-bold text-xs text-slate-900 group-hover:text-emerald-600 transition-colors"
                   />

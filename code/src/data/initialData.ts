@@ -640,33 +640,35 @@ export const INITIAL_VIDEOS: MediaVideo[] = [];
 export const INITIAL_WHAT_WE_DO: WhatWeDoItem[] = [
   {
     id: 'wwd-1',
-    badge: 'Chiến Dịch Toàn Cầu',
     title: 'World Cleanup Day',
     desc: 'Every year, we join hands with millions of volunteers across the globe on World Cleanup Day. Armed with gloves and determination, we clean up litter, plastic waste, and debris from streets, parks, and waterways. Together, we’re shaping a cleaner future for Vietnam.',
-    image: '/what-we-do-wcd.jpg',
+    image: '/images/what-we-do/wcd.jpg',
     layout: 'image-left',
-    highlights: ['5,000+ Tình nguyện viên mỗi năm', 'Thu gom 8,500+ kg rác', '63 Tỉnh thành toàn quốc'],
     order: 1
   },
   {
     id: 'wwd-2',
-    badge: 'Tập Huấn & Hội Thảo',
     title: 'Educational Campaigns',
     desc: 'Knowledge is power. We believe that informed citizens can drive change. Through workshops, seminars, and awareness campaigns, we educate people about waste management, recycling, and environmental conservation. Our goal? Empower individuals to take action and protect our planet.',
-    image: '/what-we-do-edu.jpg',
+    image: '/images/what-we-do/edu.jpg',
     layout: 'image-right',
-    highlights: ['Hội thảo lối sống bền vững', 'Tập huấn phân loại rác', 'Lan tỏa đến trường học & doanh nghiệp'],
     order: 2
   },
   {
     id: 'wwd-3',
-    badge: 'Kết Nối Cộng Đồng',
     title: 'Community Engagement',
-    desc: 'Our strength lies in our communities. We organize local cleanups, tree planting events, and collaborative projects that bring people together. By fostering a sense of responsibility and camaraderie, we inspire long-term sustainable habits.',
-    image: '/what-we-do-comm.jpg',
+    desc: 'Our strength lies in our communities. We organize local cleanup drives, tree-planting events, and eco-friendly initiatives. Whether it’s a beach cleanup or a neighborhood park restoration, we’re there, sleeves rolled up, making a tangible impact. Join us—it’s more fun when we clean up together!',
+    image: '/images/what-we-do/community.jpg',
     layout: 'image-left',
-    highlights: ['Hoạt động dọn rác khu dân cư', 'Trồng cây xanh đô thị', 'Thói quen sống không rác thải'],
     order: 3
+  },
+  {
+    id: 'wwd-4',
+    title: 'Sustainable Living',
+    desc: 'We’re passionate about sustainable lifestyles. From reducing single-use plastics to embracing eco-friendly alternatives, we advocate for conscious choices. By adopting sustainable practices, we contribute to the long-term well-being of our environment.',
+    image: '/images/what-we-do/sustainable.jpg',
+    layout: 'image-right',
+    order: 4
   }
 ];
 

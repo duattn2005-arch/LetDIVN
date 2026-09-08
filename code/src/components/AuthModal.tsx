@@ -86,7 +86,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       triggerSuccess();
       onClose();
     } catch (err: any) {
-      setError(err?.message || 'Đăng nhập Google thất bại. Vui lòng thử lại.');
+      setError(err?.message || 'Google sign-in failed. Please try again.');
     } finally {
       setSocialLoading(null);
     }
@@ -100,7 +100,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       triggerSuccess();
       onClose();
     } catch (err: any) {
-      setError(err?.message || 'Đăng nhập Facebook thất bại. Vui lòng thử lại.');
+      setError(err?.message || 'Facebook sign-in failed. Please try again.');
     } finally {
       setSocialLoading(null);
     }
@@ -115,7 +115,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       triggerSuccess();
       onClose();
     } catch (err: any) {
-      setError(err?.message || 'Đăng nhập thất bại.');
+      setError(err?.message || 'Sign-in failed.');
     } finally {
       setLoading(false);
     }
@@ -130,7 +130,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       triggerSuccess();
       onClose();
     } catch (err: any) {
-      setError(err?.message || 'Đăng ký không thành công. Vui lòng thử lại.');
+      setError(err?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       await requestPasswordReset(resetEmail);
       setView('forgot-reset');
     } catch (err: any) {
-      setError(err?.message || 'Không thể gửi mã xác nhận. Vui lòng thử lại.');
+      setError(err?.message || 'Could not send the verification code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -156,7 +156,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setLoading(true);
       setError(null);
       await resetPassword(resetEmail, resetCode, newPassword);
-      setResetSuccessMsg('Đặt lại mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.');
+      setResetSuccessMsg('Password reset successfully! Please sign in with your new password.');
       setResetCode('');
       setNewPassword('');
       setTimeout(() => {
@@ -166,7 +166,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         setResetSuccessMsg(null);
       }, 2000);
     } catch (err: any) {
-      setError(err?.message || 'Không thể đặt lại mật khẩu. Vui lòng thử lại.');
+      setError(err?.message || 'Could not reset the password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -196,20 +196,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
 
           <h3 className="text-2xl font-extrabold tracking-tight">
-            {view === 'forgot-request' && 'Quên Mật Khẩu'}
-            {view === 'forgot-reset' && 'Đặt Lại Mật Khẩu'}
-            {view === 'main' && (activeTab === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản Mới')}
+            {view === 'forgot-request' && 'Forgot Password'}
+            {view === 'forgot-reset' && 'Reset Password'}
+            {view === 'main' && (activeTab === 'login' ? 'Sign In' : 'Create New Account')}
           </h3>
           <p className="text-xs text-white/90 mt-1">
-            {view === 'forgot-request' && 'Nhập email đã đăng ký để nhận mã xác nhận'}
-            {view === 'forgot-reset' && `Nhập mã 6 chữ số vừa gửi tới ${resetEmail}`}
+            {view === 'forgot-request' && 'Enter your registered email to receive a verification code'}
+            {view === 'forgot-reset' && `Enter the 6-digit code just sent to ${resetEmail}`}
             {view === 'main' && (activeTab === 'login'
-              ? 'Chào mừng bạn quay trở lại với phong trào sống xanh'
-              : 'Đăng ký tài khoản để bắt đầu tham gia các chiến dịch')}
+              ? 'Welcome back to the green movement'
+              : 'Register an account to start joining campaigns')}
           </p>
         </div>
 
-        {/* Tab switcher: Đăng Nhập / Đăng Ký (hidden during forgot-password flow) */}
+        {/* Tab switcher: Sign In / Register (hidden during forgot-password flow) */}
         {view === 'main' && (
           <div className="flex border-b border-slate-100 bg-slate-50/80 p-1.5 gap-1">
             <button
@@ -221,7 +221,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
               }`}
             >
-              Đăng Nhập
+              Sign In
             </button>
             <button
               id="auth-tab-register"
@@ -232,7 +232,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
               }`}
             >
-              Đăng Ký
+              Register
             </button>
           </div>
         )}
@@ -245,13 +245,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <div className="flex-1">
                 <span>{error}</span>
-                {error.includes('chưa được đăng ký') && (
+                {error.includes('not registered') && (
                   <button
                     type="button"
                     onClick={() => { setView('main'); setActiveTab('register'); setError(null); }}
                     className="block font-bold text-[#E81A7F] hover:underline mt-1 cursor-pointer"
                   >
-                    👉 Bấm vào đây để Đăng Ký ngay
+                    👉 Click here to register now
                   </button>
                 )}
               </div>
@@ -271,7 +271,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <form onSubmit={handleRequestReset} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Địa chỉ Email đã đăng ký
+                  Registered Email Address
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -292,7 +292,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 disabled={loading}
                 className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm py-3 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
               >
-                <span>{loading ? 'Đang gửi mã...' : 'Gửi Mã Xác Nhận'}</span>
+                <span>{loading ? 'Sending code...' : 'Send Verification Code'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -302,7 +302,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer pt-1"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Quay lại đăng nhập</span>
+                <span>Back to sign in</span>
               </button>
             </form>
           )}
@@ -312,7 +312,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <form onSubmit={handleConfirmReset} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Mã xác nhận (6 chữ số)
+                  Verification Code (6 digits)
                 </label>
                 <div className="relative">
                   <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -332,14 +332,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Mật khẩu mới
+                  New Password
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    placeholder="Tối thiểu 6 ký tự..."
+                    placeholder="At least 6 characters..."
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
@@ -359,7 +359,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 disabled={loading}
                 className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm py-3 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
               >
-                <span>{loading ? 'Đang xác nhận...' : 'Đặt Lại Mật Khẩu'}</span>
+                <span>{loading ? 'Confirming...' : 'Reset Password'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -370,14 +370,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   className="flex items-center gap-1.5 font-bold text-slate-500 hover:text-slate-800 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Đổi email khác</span>
+                  <span>Use a different email</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleRequestReset({ preventDefault: () => {} } as React.FormEvent)}
                   className="font-bold text-[#E81A7F] hover:underline cursor-pointer"
                 >
-                  Gửi lại mã
+                  Resend code
                 </button>
               </div>
             </form>
@@ -399,7 +399,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
               </svg>
-              <span>{socialLoading === 'google' ? 'Đang kết nối Google...' : 'Đăng nhập với Google'}</span>
+              <span>{socialLoading === 'google' ? 'Connecting to Google...' : 'Sign in with Google'}</span>
               <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 ml-auto" />
             </button>
 
@@ -408,7 +408,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <div className="w-full border-t border-slate-200"></div>
               </div>
               <span className="relative bg-white px-3 text-[11px] font-bold uppercase text-slate-400">
-                Hoặc bằng tài khoản
+                Or with an account
               </span>
             </div>
           </div>
@@ -419,14 +419,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <form onSubmit={handleLoginSubmit} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Email hoặc Tên tài khoản
+                  Email or Username
                 </label>
                 <div className="relative">
                   <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     required
-                    placeholder="Nhập email hoặc tên tài khoản đã đăng ký..."
+                    placeholder="Enter your registered email or username..."
                     value={emailOrUsername}
                     onChange={(e) => setEmailOrUsername(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
@@ -437,14 +437,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label className="text-xs font-bold text-slate-700">
-                    Mật khẩu
+                    Password
                   </label>
                   <button
                     type="button"
                     onClick={() => { setView('forgot-request'); setResetEmail(emailOrUsername.includes('@') ? emailOrUsername : ''); setError(null); }}
                     className="text-[11px] text-[#E81A7F] hover:underline cursor-pointer font-semibold"
                   >
-                    Quên mật khẩu?
+                    Forgot password?
                   </button>
                 </div>
                 <div className="relative">
@@ -473,18 +473,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 disabled={loading}
                 className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm py-3 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
               >
-                <span>{loading ? 'Đang kiểm tra tài khoản...' : 'Đăng Nhập Ngay'}</span>
+                <span>{loading ? 'Checking account...' : 'Sign In Now'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <div className="pt-2 text-center text-xs text-slate-500">
-                <span>Chưa có tài khoản? </span>
+                <span>Don't have an account? </span>
                 <button
                   type="button"
                   onClick={() => { setActiveTab('register'); setError(null); }}
                   className="font-bold text-[#E81A7F] hover:underline cursor-pointer"
                 >
-                  Đăng ký ngay tại đây
+                  Register here now
                 </button>
               </div>
             </form>
@@ -495,14 +495,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <form onSubmit={handleRegisterSubmit} className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Họ và tên *
+                  Full Name *
                 </label>
                 <div className="relative">
                   <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     required
-                    placeholder="VD: Nguyễn Văn Nam"
+                    placeholder="e.g., Nguyen Van Nam"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
@@ -512,7 +512,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Địa chỉ Email (dùng để đăng nhập) *
+                  Email Address (used to sign in) *
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -529,7 +529,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Số điện thoại (tùy chọn)
+                  Phone Number (optional)
                 </label>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -545,14 +545,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Mật khẩu khởi tạo *
+                  Create a Password *
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    placeholder="Tối thiểu 6 ký tự..."
+                    placeholder="At least 6 characters..."
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
@@ -572,18 +572,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 disabled={loading}
                 className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm py-3 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
               >
-                <span>{loading ? 'Đang lưu tài khoản vào CSDL...' : 'Hoàn Tất Đăng Ký'}</span>
+                <span>{loading ? 'Saving your account...' : 'Complete Registration'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <div className="pt-2 text-center text-xs text-slate-500">
-                <span>Đã có tài khoản? </span>
+                <span>Already have an account? </span>
                 <button
                   type="button"
                   onClick={() => { setActiveTab('login'); setError(null); }}
                   className="font-bold text-[#E81A7F] hover:underline cursor-pointer"
                 >
-                  Đăng nhập tại đây
+                  Sign in here
                 </button>
               </div>
             </form>
@@ -596,5 +596,3 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     document.body
   ) : null;
 };
-
-

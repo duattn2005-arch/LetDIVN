@@ -59,7 +59,7 @@ export const ContactPage: React.FC = () => {
         <div className="text-center max-w-4xl mx-auto space-y-4">
           <EditableText
             contentKey="contactPage.title"
-            defaultValue={t.navContactUs || 'Liên Hệ Với Chúng Tôi'}
+            defaultValue={t.navContactUs || 'Contact Us'}
             as="h1"
             className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
           />
@@ -117,7 +117,7 @@ export const ContactPage: React.FC = () => {
               />
               <EditableText
                 contentKey="contact.phone1"
-                defaultValue={t.contactPhone1Default || "035.872.6755 (Anh Sơn)"}
+                defaultValue={t.contactPhone1Default || "035.872.6755 (Mr. Son)"}
                 render={(value) => (
                   <a
                     href={`tel:${value.replace(/\D/g, '')}`}
@@ -139,7 +139,7 @@ export const ContactPage: React.FC = () => {
               />
               <EditableText
                 contentKey="contact.phone2"
-                defaultValue={t.contactPhone2Default || "0968.514.882 (Chị Tú)"}
+                defaultValue={t.contactPhone2Default || "0968.514.882 (Ms. Tu)"}
                 render={(value) => (
                   <a
                     href={`tel:${value.replace(/\D/g, '')}`}
