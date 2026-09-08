@@ -54,6 +54,11 @@ export interface CleanupEvent {
   schedule?: { time: string; activity: string }[];
 }
 
+export interface NewsContentBlock {
+  type: 'text' | 'image';
+  value: string;
+}
+
 export interface NewsArticle {
   id: string;
   title: string;
@@ -61,6 +66,7 @@ export interface NewsArticle {
   category: 'Media On Us' | 'News' | 'Press Release' | 'Impact Story';
   summary: string;
   content: string;
+  contentBlocks?: NewsContentBlock[];
   author: string;
   date: string;
   image: string;

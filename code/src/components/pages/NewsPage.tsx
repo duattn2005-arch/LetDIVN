@@ -21,6 +21,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   const [search, setSearch] = useState<string>('');
   const [newsList, setNewsList] = useState<NewsArticle[]>([]);
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 6;
 
   // Editor Modal states
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -34,7 +36,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     'Impact Story': t.newsCatImpact
   };
 
-  const categories = ['All', 'News', 'Media On Us', 'Press Release', 'Impact Story'];
+  const categories = ['All', 'News', 'Press Release', 'Impact Story'];
 
   const refreshNews = () => {
     dbService.getNews().then((updated) => {
@@ -91,6 +93,17 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     const matchesSearch = n.title.toLowerCase().includes(search.toLowerCase()) || n.summary.toLowerCase().includes(search.toLowerCase());
     return matchesCat && matchesSearch;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredNews.length / PAGE_SIZE));
+  const pagedNews = filteredNews.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCat, search]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [totalPages, currentPage]);
 
   const pendingCount = newsList.filter(n => n.status === 'Pending').length;
 
@@ -183,7 +196,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
         {/* News Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredNews.map(item => {
+          {pagedNews.map(item => {
             const isPending = item.status === 'Pending';
 
             return (
@@ -280,6 +293,37 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
           })}
         </div>
 
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setCurrentPage(p)}
+                className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  currentPage === p ? 'bg-[#E81A7F] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
       </div>
 
       <TakeActionStrip contentKeyPrefix="newsPage" />
@@ -341,9 +385,26 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
               "{selectedArticle.summary}"
             </div>
 
-            <div className="text-sm text-slate-700 leading-relaxed space-y-4 whitespace-pre-line border-t border-slate-100 pt-4">
-              {selectedArticle.content}
-            </div>
+            {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
+              <div className="text-sm text-slate-700 leading-relaxed space-y-4 border-t border-slate-100 pt-4">
+                {selectedArticle.contentBlocks.map((block, i) =>
+                  block.type === 'image' ? (
+                    <img
+                      key={i}
+                      src={block.value}
+                      alt={selectedArticle.title}
+                      className="w-full rounded-2xl shadow-md"
+                    />
+                  ) : (
+                    <p key={i} className="whitespace-pre-line">{block.value}</p>
+                  )
+                )}
+              </div>
+            ) : (
+              <div className="text-sm text-slate-700 leading-relaxed space-y-4 whitespace-pre-line border-t border-slate-100 pt-4">
+                {selectedArticle.content}
+              </div>
+            )}
 
             {selectedArticle.sourceUrl && (
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
