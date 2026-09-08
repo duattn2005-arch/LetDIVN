@@ -169,7 +169,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => 
                 className="inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Add Partner / Sponsor</span>
+                <span>Add Partner / Sponsor</span>
               </button>
             </div>
           )}

@@ -86,7 +86,7 @@ export const OurTeamPage: React.FC = () => {
                 className="btn-pill-3d inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-6 py-2.5 shadow-lg cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>+ Add New Member</span>
+                <span>Add New Member</span>
               </button>
             </div>
           )}
