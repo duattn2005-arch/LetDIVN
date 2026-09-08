@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CircleDot } from 'lucide-react';
 import { PROJECT_STATIC_CONTENT } from '../data/projectStaticContent';
 import { EditableText } from './EditableText';
 import { EditableImage } from './EditableImage';
@@ -7,6 +7,7 @@ import { EditableImage } from './EditableImage';
 const BRAND_PINK = '#F1138D';
 const BRAND_AMBER = '#FEAC13';
 const BAND_GRAY = '#F2F2F2';
+const BULLET_BLUE = '#6EC1E4';
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
@@ -108,7 +109,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                         <ul className="space-y-1.5 text-left">
                           {col.paragraphs.map((p, pi) => (
                             <li key={pi} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
-                              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BRAND_AMBER }} />
+                              <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
                               <EditableText contentKey={`${sectionKey}.col${ci}.p${pi}`} defaultValue={p} as="span" multiline />
                             </li>
                           ))}
@@ -137,7 +138,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 <ul className="space-y-2 text-left">
                   {section.paragraphs.map((p, i) => (
                     <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
-                      <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BRAND_AMBER }} />
+                      <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
                       <EditableText contentKey={`${sectionKey}.p${i}`} defaultValue={p} as="span" multiline />
                     </li>
                   ))}
