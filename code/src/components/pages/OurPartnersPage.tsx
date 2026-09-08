@@ -2,32 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { Partner } from '../../types';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { 
-  Sparkles, 
-  Building2, 
-  ExternalLink, 
-  Handshake, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  ShieldCheck, 
-  Globe, 
-  ZoomIn, 
-  ZoomOut, 
-  ArrowLeft, 
-  ArrowRight, 
-  Move, 
-  Sliders,
-  RotateCcw
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  Globe,
+  ZoomIn,
+  ZoomOut,
+  ArrowLeft,
+  ArrowRight,
+  Move
 } from 'lucide-react';
 import { PartnerEditorModal } from '../PartnerEditorModal';
 import { EditableText } from '../EditableText';
+import { EditableImage } from '../EditableImage';
+import { TakeActionStrip } from '../TakeActionStrip';
 
-export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onBecomePartner }) => {
+const BRAND_PINK = '#F1138D';
+
+export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => {
   const { isAdmin } = useAuth();
-  const { t, language } = useLanguage();
-  const ourPartnersDescAfterBrand = (t.ourPartnersDesc || '').replace("Let's do it! Vietnam", '').trim();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -59,7 +53,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
   };
 
   const handleDelete = (partner: Partner) => {
-    if (window.confirm(language === 'vi' ? `Bạn có chắc chắn muốn xóa đối tác "${partner.name}"?` : `Are you sure you want to delete partner "${partner.name}"?`)) {
+    if (window.confirm(`Are you sure you want to delete partner "${partner.name}"?`)) {
       dbService.deletePartner(partner.id);
       loadPartners();
     }
@@ -133,52 +127,52 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
   };
 
   return (
-    <div className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+    <div className="bg-white">
+
+      {/* Full-width hero banner */}
+      <EditableImage
+        contentKey="ourPartners.heroImage"
+        defaultValue="/images/our-partners/hero.jpg"
+        alt="Let's Do It Vietnam volunteers"
+        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        className="w-full h-full object-cover"
+      />
+
+      <div className="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+
+        <div className="text-center max-w-3xl mx-auto space-y-3">
           <EditableText
             contentKey="ourPartners.title"
-            defaultValue={t.ourPartnersTitle || (language === 'vi' ? 'Đối Tác & Nhà Tài Trợ' : 'Our Partners & Sponsors')}
+            defaultValue="We Work With the Best Partners"
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight [text-wrap:balance]"
+            render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]">
-            <span className="whitespace-nowrap font-bold text-slate-800">Let's do it! Vietnam</span>{' '}
-            <EditableText
-              contentKey="ourPartners.subtitle"
-              defaultValue={ourPartnersDescAfterBrand || (language === 'vi' ? 'tự hào nhận được sự đồng hành, bảo trợ và tài trợ từ các tổ chức tiên phong.' : 'is proud to be accompanied and supported by visionary partners and sponsors.')}
-              as="span"
-            />
-          </p>
+          <EditableText
+            contentKey="ourPartners.subtitle"
+            defaultValue="Working with strong partners can make a significant impact."
+            as="p"
+            className="text-sm sm:text-base text-slate-600"
+          />
+          <EditableText
+            contentKey="ourPartners.desc"
+            defaultValue="We collaborate with local communities, schools, and businesses to organize large-scale clean-up campaigns. We partner with companies to promote sustainable practices within their operations."
+            as="p"
+            multiline
+            className="text-sm sm:text-base text-slate-600 leading-relaxed"
+          />
 
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={onBecomePartner}
-              className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm px-8 py-3 rounded-full shadow-lg transition-all cursor-pointer"
-            >
-              <EditableText contentKey="ourPartners.becomePartnerBtn" defaultValue={t.becomePartnerBtn} as="span" />
-            </button>
-
-            {isAdmin && (
+          {isAdmin && (
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={handleAddNew}
                 className="inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>
-                  {language === 'vi' ? 'Thêm Đối Tác / Nhà Tài Trợ' : 
-                   language === 'ja' ? 'パートナーを追加' : 
-                   language === 'fr' ? 'Ajouter un Partenaire' : 
-                   language === 'zh' ? '添加合作伙伴' : 
-                   language === 'ko' ? '파트너 추가' : 
-                   language === 'de' ? 'Partner hinzufügen' : 
-                   language === 'es' ? 'Agregar Socio' : 
-                   '+ Add Partner / Sponsor'}
-                </span>
+                <span>+ Add Partner / Sponsor</span>
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Interactive Resize & Drag-and-Drop Control Bar */}
@@ -186,13 +180,13 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
           <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-2 text-slate-700 font-bold">
               <Move className="w-4 h-4 text-[#E81A7F]" />
-              <span>🖐 Kéo thả bất kỳ logo nào để đổi vị trí</span>
+              <span>🖐 Drag any logo to reorder it</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-5">
               {/* Global Zoom Slider */}
               <div className="flex items-center gap-2">
-                <span className="text-slate-600 font-semibold">🔍 Thu phóng tất cả:</span>
+                <span className="text-slate-600 font-semibold">🔍 Zoom all:</span>
                 <input
                   type="range"
                   min="70"
@@ -207,7 +201,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
 
               {/* Grid Column Selector */}
               <div className="flex items-center gap-1.5">
-                <span className="text-slate-600 font-semibold">Số cột:</span>
+                <span className="text-slate-600 font-semibold">Columns:</span>
                 {[3, 4, 5, 6].map(col => (
                   <button
                     key={col}
@@ -265,7 +259,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                           e.stopPropagation();
                           handleMove(p.id, 'left');
                         }}
-                        title="Di chuyển sang trái"
+                        title="Move left"
                         className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                       >
                         <ArrowLeft className="w-3.5 h-3.5" />
@@ -281,7 +275,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                           e.stopPropagation();
                           handleMove(p.id, 'right');
                         }}
-                        title="Di chuyển sang phải"
+                        title="Move right"
                         className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                       >
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -296,7 +290,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleScaleDelta(p.id, 10);
                       }}
-                      title="Phóng to logo (+10%)"
+                      title="Zoom in logo (+10%)"
                       className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                     >
                       <ZoomIn className="w-3.5 h-3.5" />
@@ -310,7 +304,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleScaleDelta(p.id, -10);
                       }}
-                      title="Thu nhỏ logo (-10%)"
+                      title="Zoom out logo (-10%)"
                       className="p-1 text-slate-600 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                     >
                       <ZoomOut className="w-3.5 h-3.5" />
@@ -324,7 +318,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleEdit(p);
                       }}
-                      title={language === 'vi' ? "Sửa logo & link" : "Edit logo & link"}
+                      title="Edit logo & link"
                       className="p-1 text-slate-700 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -338,7 +332,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleDelete(p);
                       }}
-                      title={language === 'vi' ? "Xóa đối tác" : "Delete partner"}
+                      title="Delete partner"
                       className="p-1 text-slate-700 hover:text-red-600 rounded transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -352,7 +346,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                     href={p.website || '#'}
                     target={p.website ? "_blank" : undefined}
                     rel="noreferrer"
-                    title={`${p.name}${p.website ? ` (Nhấp để mở ${p.website})` : ''}`}
+                    title={`${p.name}${p.website ? ` (Click to open ${p.website})` : ''}`}
                     className="w-full h-full flex items-center justify-center p-2 cursor-pointer transition-transform duration-300 group-hover:scale-105"
                   >
                     <img
@@ -379,6 +373,8 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
         </div>
 
       </div>
+
+      <TakeActionStrip contentKeyPrefix="ourPartners" />
 
       {/* Partner Editor Modal */}
       <PartnerEditorModal
