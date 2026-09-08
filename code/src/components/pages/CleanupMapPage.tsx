@@ -424,11 +424,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     if (geojson && (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon')) {
       const geoLayer = L.geoJSON(geojson, {
         style: {
-          color: '#EF4444',
+          color: '#e53e3e',
           weight: 3.5,
-          dashArray: '8, 8', // Red dashed boundary matching Screenshot 2
-          fillColor: '#EF4444',
-          fillOpacity: 0.08
+          dashArray: '6, 6', // Red dashed boundary matching Screenshot 2
+          fillColor: '#e53e3e',
+          fillOpacity: 0.05
         }
       }).addTo(map);
 
@@ -445,11 +445,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         [lat - d * 0.7, lng - d * 1.0]
       ];
       const fallbackPoly = L.polygon(polygonPoints, {
-        color: '#EF4444',
+        color: '#e53e3e',
         weight: 3.5,
-        dashArray: '8, 8',
-        fillColor: '#EF4444',
-        fillOpacity: 0.08
+        dashArray: '6, 6',
+        fillColor: '#e53e3e',
+        fillOpacity: 0.05
       }).addTo(map);
       boundaryLayerRef.current = fallbackPoly;
     }
@@ -558,11 +558,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     if (geojson && (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon')) {
       const geoLayer = L.geoJSON(geojson, {
         style: {
-          color: '#EF4444',
+          color: '#e53e3e',
           weight: 3.5,
-          dashArray: '8, 8', // Red dashed line matching Screenshot 2
-          fillColor: '#EF4444',
-          fillOpacity: 0.08
+          dashArray: '6, 6', // Red dashed line matching Screenshot 2
+          fillColor: '#e53e3e',
+          fillOpacity: 0.05
         }
       }).addTo(map);
 
@@ -578,11 +578,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         [sug.lat - d * 0.7, sug.lng - d * 1.0]
       ];
       const fallbackPoly = L.polygon(polygonPoints, {
-        color: '#EF4444',
+        color: '#e53e3e',
         weight: 3.5,
-        dashArray: '8, 8',
-        fillColor: '#EF4444',
-        fillOpacity: 0.08
+        dashArray: '6, 6',
+        fillColor: '#e53e3e',
+        fillOpacity: 0.05
       }).addTo(map);
       boundaryLayerRef.current = fallbackPoly;
     }
@@ -879,11 +879,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       [coords.lat - d * 0.7, coords.lng - d * 1.0]
     ];
     const poly = L.polygon(polygonPoints, {
-      color: '#EF4444',
+      color: '#e53e3e',
       weight: 3.5,
-      dashArray: '8, 8', // Red dashed line matching Screenshot 2
-      fillColor: '#EF4444',
-      fillOpacity: 0.08
+      dashArray: '6, 6', // Red dashed line matching Screenshot 2
+      fillColor: '#e53e3e',
+      fillOpacity: 0.05
     }).addTo(mapInstanceRef.current!);
     boundaryLayerRef.current = poly;
 
