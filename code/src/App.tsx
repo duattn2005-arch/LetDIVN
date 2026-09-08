@@ -30,11 +30,15 @@ import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { CleanupMapPage } from './components/pages/CleanupMapPage';
 import { ContactBubble } from './components/ContactBubble';
+import { dbService } from './services/dbService';
+import { CleanupEvent } from './types';
+import { slugify } from './utils/slug';
 
 export function AppContent() {
   const [activeView, setActiveView] = useState<string>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
   const [selectedNewsArticleId, setSelectedNewsArticleId] = useState<string | undefined>(undefined);
+  const [events, setEvents] = useState<CleanupEvent[]>([]);
 
   // Modals state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -50,19 +54,74 @@ export function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeView]);
 
+  // Only project detail pages get a real, shareable URL (e.g. /da-nang, from
+  // the event's city) — every other view stays purely state-driven and
+  // resets the address bar back to '/'. Events are fetched here (not just in
+  // ProjectDetailPage) so a direct visit to /<slug> and browser back/forward
+  // can both resolve which project that slug refers to.
+  useEffect(() => {
+    const refresh = () => { dbService.getEvents().then(setEvents); };
+    refresh();
+    const unsubscribe = dbService.subscribe(refresh);
+    return () => unsubscribe();
+  }, []);
+
+  const resolveSlugToEvent = (path: string, list: CleanupEvent[]) =>
+    list.find((e) => e.id === path) || list.find((e) => slugify(e.city) === path);
+
+  // Deep-link support: landing directly on /<slug> opens that project.
+  const triedInitialUrlRef = React.useRef(false);
+  useEffect(() => {
+    if (triedInitialUrlRef.current || events.length === 0) return;
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+    if (path) {
+      const match = resolveSlugToEvent(path, events);
+      if (match) {
+        setSelectedProjectId(match.id);
+        setActiveView('project-detail');
+      }
+    }
+    triedInitialUrlRef.current = true;
+  }, [events]);
+
+  // Browser back/forward button support.
+  useEffect(() => {
+    const onPopState = () => {
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+      if (!path) {
+        setActiveView('home');
+        return;
+      }
+      const match = resolveSlugToEvent(path, events);
+      if (match) {
+        setSelectedProjectId(match.id);
+        setActiveView('project-detail');
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [events]);
+
+  const goToProject = (projectId: string) => {
+    setSelectedProjectId(projectId);
+    setActiveView('project-detail');
+    const evt = events.find((e) => e.id === projectId);
+    window.history.pushState(null, '', `/${evt ? slugify(evt.city) : projectId}`);
+  };
+
   const handleNavigate = (view: string, extraId?: string) => {
     if (view === 'project-detail' && extraId) {
-      setSelectedProjectId(extraId);
-      setActiveView('project-detail');
+      goToProject(extraId);
     } else if (view.startsWith('project:')) {
-      const pId = view.replace('project:', '');
-      setSelectedProjectId(pId);
-      setActiveView('project-detail');
+      goToProject(view.replace('project:', ''));
     } else if (view === 'news') {
       setSelectedNewsArticleId(extraId);
       setActiveView('news');
+      window.history.pushState(null, '', '/');
     } else {
       setActiveView(view);
+      window.history.pushState(null, '', '/');
     }
   };
 
@@ -77,8 +136,7 @@ export function AppContent() {
   };
 
   const handleSelectProject = (projectId: string) => {
-    setSelectedProjectId(projectId);
-    setActiveView('project-detail');
+    goToProject(projectId);
   };
 
   return (

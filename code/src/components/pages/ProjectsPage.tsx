@@ -19,7 +19,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   // Modal states
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -56,15 +55,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
     }
   };
 
-  const categories = [
-    'All',
-    'World Cleanup Day',
-    'Green Ocean Campaign',
-    'Environmental Day',
-    'Young Conservationists',
-    'Community Workshop'
-  ];
-
   const categoryMap: Record<string, string> = {
     'All': t.projectsAllCategoryLabel,
     'World Cleanup Day': t.projectWcd,
@@ -80,12 +70,18 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
     return e.status !== 'Pending';
   });
 
-  const filteredEvents = visibleEvents.filter(e => {
-    if (selectedCategory === 'All') return true;
-    return e.category === selectedCategory;
-  });
-
   const pendingCount = events.filter(e => e.status === 'Pending').length;
+
+  // Registration only stays open through the event's own date — once it's
+  // passed, "Register to Participate" is disabled rather than hidden, so the
+  // campaign card/history stays visible but can't collect new signups.
+  const isRegistrationClosed = (evt: CleanupEvent) => {
+    const eventDate = new Date(evt.date);
+    if (Number.isNaN(eventDate.getTime())) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return eventDate < today;
+  };
 
   return (
     <div className="py-16 bg-white">
@@ -129,27 +125,11 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
           </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                selectedCategory === cat
-                  ? 'bg-[#E81A7F] text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              {categoryMap[cat] || cat}
-            </button>
-          ))}
-        </div>
-
         {/* Event Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredEvents.map(evt => {
+          {visibleEvents.map(evt => {
             const isPending = evt.status === 'Pending';
+            const closed = isRegistrationClosed(evt);
 
             return (
               <div
@@ -254,10 +234,18 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     <EditableText contentKey="projects.viewDetailsBtn" defaultValue={t.projectsDetailBtn} as="span" />
                   </button>
                   <button
-                    onClick={() => onRegisterVolunteer(evt.id)}
-                    className="flex-1 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs py-2.5 rounded-full shadow-md transition-colors cursor-pointer text-center"
+                    onClick={() => !closed && onRegisterVolunteer(evt.id)}
+                    disabled={closed}
+                    title={closed ? (language === 'vi' ? 'Chiến dịch đã diễn ra, không thể đăng ký thêm' : 'This campaign has already taken place') : undefined}
+                    className={`flex-1 font-bold text-xs py-2.5 rounded-full shadow-md transition-colors text-center ${
+                      closed
+                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                        : 'bg-[#E81A7F] hover:bg-[#D01370] text-white cursor-pointer'
+                    }`}
                   >
-                    <EditableText contentKey="projects.registerBtn" defaultValue={t.projectsJoinBtn} as="span" />
+                    {closed
+                      ? <span>{language === 'vi' ? 'Đã kết thúc' : 'Registration Closed'}</span>
+                      : <EditableText contentKey="projects.registerBtn" defaultValue={t.projectsJoinBtn} as="span" />}
                   </button>
                 </div>
               </div>
