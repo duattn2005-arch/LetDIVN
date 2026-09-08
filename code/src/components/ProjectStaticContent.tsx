@@ -39,7 +39,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
         className="w-full h-full object-cover"
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3 text-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3 text-center">
         {content.kicker && (
           <EditableText
             contentKey={`${keyBase}.kicker`}
@@ -63,6 +63,9 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const hasImage = !!section.image;
           const isImageLeft = idx % 2 === 0;
           const isBulletList = section.bulletList ?? (section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160));
+          // Reference site centers only the title-adjacent intro blurb (no heading of its own);
+          // every other body paragraph (under a heading, e.g. "Background") is left-aligned there.
+          const textAlign = section.heading ? 'text-left' : 'text-center';
           const bandBg = idx % 2 === 0 ? BAND_GRAY : 'transparent';
           const sectionKey = `${keyBase}.section${idx}`;
 
@@ -124,7 +127,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           }
 
           const textBlock = (
-            <div className="space-y-3 text-center">
+            <div className={`space-y-3 ${textAlign}`}>
               {section.heading && (
                 <EditableText
                   contentKey={`${sectionKey}.heading`}
@@ -161,8 +164,8 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           if (!hasImage) {
             return (
               <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">{textBlock}</div>
-                {galleryBlock && <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">{galleryBlock}</div>}
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">{textBlock}</div>
+                {galleryBlock && <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">{galleryBlock}</div>}
               </div>
             );
           }

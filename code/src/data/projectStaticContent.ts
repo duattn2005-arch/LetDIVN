@@ -124,7 +124,6 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
         paragraphs: [
           'In order to raise the awareness of Vietnam local community in coastal cities and support adopting eco-friendly lifestyles, we run the "Green Ocean" campaign in Nam Dinh (Vietnam) with several activities aiming at secondary school students, resident group leaders and young emerging leaders. Our vision is that marine litter issues in coastal cities will be minimized, when trash will be collected and sent to proper recycling places.',
         ],
-        image: '/images/projects/goc-1.jpg',
       },
       {
         heading: 'Project objectives',
