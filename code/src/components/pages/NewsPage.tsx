@@ -133,19 +133,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
           ) : (
             <EditableText
               contentKey="newsPage.titleDefault"
-              defaultValue={t.newsPageTitleDefault || 'News & Environmental Activities'}
+              defaultValue="News"
               as="h1"
               className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
               render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
           )}
-          <EditableText
-            contentKey="newsPage.subtitle"
-            defaultValue={t.newsPageSubtitle}
-            as="p"
-            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
-            multiline
-          />
 
           {/* Add Article Button */}
           <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
