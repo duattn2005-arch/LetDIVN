@@ -128,7 +128,7 @@ export const MediaVideosPage: React.FC = () => {
                         role="button"
                         tabIndex={0}
                         onClick={(e) => handleDeleteVideo(e, v.id)}
-                        title="Delete video"
+                        title="Xóa video"
                         className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

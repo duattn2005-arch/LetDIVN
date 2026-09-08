@@ -126,15 +126,15 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         const parsed = JSON.parse(body || '{}');
         const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
 
-        // 10 columns A -> J: ID, TIME, FULL NAME, PHONE, EMAIL, ADDRESS, BIRTH YEAR, PROJECT, SKILLS, STATUS
+        // 10 cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
         const rowValues = parsed.rowValues || (parsed.name || parsed.fullName ? [
           parsed.id || `VOL-${Date.now().toString().slice(-6)}`,
-          parsed.time || new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
+          parsed.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
           parsed.name || parsed.fullName || '',
           parsed.phone || '',
           parsed.email || '',
           parsed.city || parsed.address || '',
-          parsed.birthYear || '',
+          parsed.age || parsed.ageGroup || '22 tuổi',
           parsed.project || parsed.eventName || 'World Cleanup Day 2026',
           parsed.skills || '',
           parsed.status || 'Approved'

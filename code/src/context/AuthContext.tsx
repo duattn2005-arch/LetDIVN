@@ -31,7 +31,7 @@ async function authRequest<T>(path: string, body?: unknown): Promise<T> {
     body: JSON.stringify(body || {}),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Yêu cầu thất bại');
   return data;
 }
 
@@ -64,10 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
 
     if (!GOOGLE_CLIENT_ID) {
-      throw new Error('Google login is not configured. Please add VITE_GOOGLE_CLIENT_ID to the .env file (see the instructions in .env.example).');
+      throw new Error('Đăng nhập Google chưa được cấu hình. Vui lòng thêm VITE_GOOGLE_CLIENT_ID vào file .env (xem hướng dẫn trong .env.example).');
     }
     if (typeof window === 'undefined' || !(window as any).google?.accounts?.oauth2) {
-      throw new Error('Unable to load the Google login service. Please check your network connection and disable any ad blockers, then try again.');
+      throw new Error('Không thể tải dịch vụ đăng nhập Google. Vui lòng kiểm tra kết nối mạng và tắt trình chặn quảng cáo, sau đó thử lại.');
     }
 
     const accessToken = await new Promise<string>((resolve, reject) => {
@@ -83,9 +83,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         error_callback: (err: any) => {
           if (err?.type === 'popup_closed') {
-            reject(new Error('You closed the Google login window before completing sign-in.'));
+            reject(new Error('Bạn đã đóng cửa sổ đăng nhập Google trước khi hoàn tất.'));
           } else {
-            reject(new Error(`Google login failed: ${err?.type || 'unknown error'}. Check the Client ID and authorized domains in Google Cloud Console.`));
+            reject(new Error(`Đăng nhập Google thất bại: ${err?.type || 'lỗi không xác định'}. Kiểm tra lại Client ID và tên miền được cấp phép trong Google Cloud Console.`));
           }
         },
       });
@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithFacebook = async (): Promise<UserProfile> => {
     if (typeof window === 'undefined' || !(window as any).FB) {
-      throw new Error('Unable to load the Facebook login service. Please check your network connection and disable any ad blockers, then try again.');
+      throw new Error('Không thể tải dịch vụ đăng nhập Facebook. Vui lòng kiểm tra kết nối mạng và tắt trình chặn quảng cáo, sau đó thử lại.');
     }
 
     const accessToken = await new Promise<string>((resolve, reject) => {
@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (response.authResponse?.accessToken) {
           resolve(response.authResponse.accessToken);
         } else {
-          reject(new Error('The user canceled Facebook login or closed the authentication window.'));
+          reject(new Error('Người dùng đã hủy đăng nhập Facebook hoặc đóng cửa sổ xác thực.'));
         }
       }, { scope: 'public_profile,email' });
     });
@@ -118,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithEmail = async (emailOrUsername: string, pass: string): Promise<UserProfile> => {
     const trimmedInput = (emailOrUsername || '').trim();
     if (!trimmedInput || !pass) {
-      throw new Error('Please fill in both your account and password.');
+      throw new Error('Vui lòng điền đầy đủ tài khoản và mật khẩu.');
     }
     const { user: loggedIn } = await authRequest<{ user: AuthUser }>('/login', {
       identifier: trimmedInput,
@@ -129,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const registerWithEmail = async (name: string, email: string, pass: string, phone?: string): Promise<UserProfile> => {
     if (!name || !email || !pass) {
-      throw new Error('Please fill in all required fields.');
+      throw new Error('Vui lòng điền đầy đủ các thông tin bắt buộc.');
     }
     const { user: registered } = await authRequest<{ user: AuthUser }>('/register', {
       name: name.trim(),
@@ -142,12 +142,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const requestPasswordReset = async (email: string): Promise<void> => {
     const trimmedEmail = (email || '').trim().toLowerCase();
-    if (!trimmedEmail) throw new Error('Please enter your email address.');
+    if (!trimmedEmail) throw new Error('Vui lòng nhập địa chỉ email.');
 
     const { code, name } = await authRequest<{ code: string; name: string }>('/request-reset', { email: trimmedEmail });
     const result = await sendPasswordResetEmail(trimmedEmail, name, code);
     if (!result.success) {
-      throw new Error(result.message || 'Unable to send the email. Please try again.');
+      throw new Error(result.message || 'Không thể gửi email. Vui lòng thử lại.');
     }
   };
 
@@ -155,10 +155,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const trimmedEmail = (email || '').trim().toLowerCase();
     const trimmedCode = (code || '').trim();
     if (!trimmedEmail || !trimmedCode || !newPassword) {
-      throw new Error('Please fill in all fields.');
+      throw new Error('Vui lòng điền đầy đủ thông tin.');
     }
     if (newPassword.length < 6) {
-      throw new Error('The new password must be at least 6 characters.');
+      throw new Error('Mật khẩu mới phải có ít nhất 6 ký tự.');
     }
     await authRequest('/reset-password', { email: trimmedEmail, code: trimmedCode, newPassword });
   };

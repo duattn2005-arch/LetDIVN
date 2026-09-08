@@ -161,23 +161,23 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     {isPending && (
                       <button
                         onClick={(e) => handleApprove(evt.id, evt.title, e)}
-                        title="Approve this campaign now"
+                        title="Duyệt chiến dịch này ngay"
                         className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-extrabold rounded-lg transition-all cursor-pointer flex items-center gap-1 shadow-sm"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Approve</span>
+                        <span>Duyệt</span>
                       </button>
                     )}
                     <button
                       onClick={(e) => handleEdit(evt, e)}
-                      title="Edit campaign"
+                      title="Sửa chiến dịch"
                       className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={(e) => handleDelete(evt.id, evt.title, e)}
-                      title="Delete campaign"
+                      title="Xóa chiến dịch"
                       className="p-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

@@ -20,7 +20,7 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
-  const [department, setDepartment] = useState('Executive Board');
+  const [department, setDepartment] = useState('Ban Điều Hành');
   const [avatar, setAvatar] = useState('');
   const [bio, setBio] = useState('');
   const [linkedin, setLinkedin] = useState('');
@@ -32,7 +32,7 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
     if (memberToEdit) {
       setName(memberToEdit.name || '');
       setRole(memberToEdit.role || '');
-      setDepartment(memberToEdit.department || 'Executive Board');
+      setDepartment(memberToEdit.department || 'Ban Điều Hành');
       setAvatar(memberToEdit.avatar || '');
       setBio(memberToEdit.bio || '');
       setLinkedin(memberToEdit.linkedin || '');
@@ -41,7 +41,7 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
     } else {
       setName('');
       setRole('');
-      setDepartment('Executive Board');
+      setDepartment('Ban Điều Hành');
       setAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80');
       setBio('');
       setLinkedin('');
@@ -56,15 +56,15 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError('Please enter the member\'s full name.');
+      setError('Vui lòng nhập họ và tên thành viên.');
       return;
     }
     if (!role.trim()) {
-      setError('Please enter the title / role.');
+      setError('Vui lòng nhập chức danh / vai trò.');
       return;
     }
     if (!avatar.trim()) {
-      setError('Please upload a photo for the member.');
+      setError('Vui lòng tải lên ảnh đại diện cho thành viên.');
       return;
     }
 
@@ -113,10 +113,10 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
             </div>
             <div>
               <h3 className="text-xl font-bold">
-                {memberToEdit ? 'Edit Member Information' : 'Add New Member'}
+                {memberToEdit ? 'Chỉnh Sửa Thông Tin Thành Viên' : 'Thêm Thành Viên Mới'}
               </h3>
               <p className="text-xs text-slate-400">
-                Update the Let's do it! Vietnam team roster
+                Cập nhật hồ sơ nhân sự đội ngũ Let's do it! Vietnam
               </p>
             </div>
           </div>
@@ -141,8 +141,8 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
           {/* Avatar Upload */}
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
             <ImageUploadWidget
-              label="Member Portrait / Profile Photo *"
-              aspectRatioLabel="A clear, square 1:1 photo is recommended (PNG, JPG)"
+              label="Ảnh Chân Dung / Đại Diện Thành Viên *"
+              aspectRatioLabel="Khuyên dùng ảnh vuông 1:1 rõ mặt (PNG, JPG)"
               currentImageUrl={avatar}
               onImageSelected={(url) => setAvatar(url)}
             />
@@ -151,28 +151,28 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Full Name *
+                Họ và Tên *
               </label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Nguyen Thi Lan Anh"
+                placeholder="VD: Nguyễn Thị Lan Anh"
                 className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Title / Position *
+                Chức Danh / Vị Trí *
               </label>
               <input
                 type="text"
                 required
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                placeholder="e.g., Northern Region Coordination Lead"
+                placeholder="VD: Trưởng Ban Điều Phối Miền Bắc"
                 className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
               />
             </div>
@@ -180,30 +180,30 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Department / Division
+              Phòng Ban / Khối
             </label>
             <select
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] bg-white cursor-pointer"
             >
-              <option value="Executive Board">Executive Board</option>
-              <option value="Communications & Events">Communications & Events</option>
-              <option value="External Affairs & Sponsorship">External Affairs & Sponsorship</option>
-              <option value="Logistics & Waste Coordination">Logistics & Waste Coordination</option>
-              <option value="Provincial / City Coordinator">Provincial / City Coordinator</option>
+              <option value="Ban Điều Hành">Ban Điều Hành</option>
+              <option value="Ban Truyền Thông & Sự Kiện">Ban Truyền Thông & Sự Kiện</option>
+              <option value="Ban Đối Ngoại & Tài Trợ">Ban Đối Ngoại & Tài Trợ</option>
+              <option value="Ban Hậu Cần & Điều Phối Rác Thải">Ban Hậu Cần & Điều Phối Rác Thải</option>
+              <option value="Điều Phối Viên Tỉnh / Thành">Điều Phối Viên Tỉnh / Thành</option>
             </select>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Bio / Short Introduction
+              Tiểu Sử / Giới Thiệu Ngắn (Bio)
             </label>
             <textarea
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Share their experience and passion for the environment..."
+              placeholder="Giới thiệu kinh nghiệm, niềm đam mê vì môi trường..."
               className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100 resize-y"
             />
           </div>
@@ -240,7 +240,7 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
                 <Mail className="w-3.5 h-3.5 text-[#E81A7F]" />
-                <span>Contact Email</span>
+                <span>Email Liên Hệ</span>
               </label>
               <input
                 type="email"
@@ -259,14 +259,14 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
               onClick={onClose}
               className="px-5 py-2.5 border border-slate-300 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Cancel
+              Hủy
             </button>
             <button
               type="submit"
               className="px-6 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              <span>{memberToEdit ? 'Save Changes' : 'Add Member'}</span>
+              <span>{memberToEdit ? 'Lưu Thay Đổi' : 'Thêm Thành Viên'}</span>
             </button>
           </div>
         </form>

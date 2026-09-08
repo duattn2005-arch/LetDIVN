@@ -89,7 +89,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-emerald-500/50 hover:scale-[1.02]"
               >
                 <Plus className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Thêm Hoạt Động Mới (Ảnh & Chữ)' : 'Add New Activity (Image & Text)'}</span>
+                <span>{language === 'vi' ? '+ Thêm Hoạt Động Mới (Ảnh & Chữ)' : '+ Add New Activity (Image & Text)'}</span>
               </button>
             </div>
           )}
@@ -112,28 +112,28 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
                       type="button"
                       onClick={() => handleToggleLayout(item)}
                       className="p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                      title="Swap Image Position (Left / Right)"
+                      title="Đổi vị trí Ảnh (Trái / Phải)"
                     >
                       <ArrowLeftRight className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Swap Side</span>
+                      <span className="hidden sm:inline">Đổi bên</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(item)}
                       className="p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                      title="Edit content & image"
+                      title="Chỉnh sửa nội dung & ảnh"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Edit</span>
+                      <span className="hidden sm:inline">Sửa</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(item.id, item.title)}
                       className="p-1.5 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                      title="Delete this item"
+                      title="Xóa mục này"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Delete</span>
+                      <span className="hidden sm:inline">Xóa</span>
                     </button>
                   </div>
                 )}
@@ -203,35 +203,35 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = ({ onEx
         {/* Process Steps */}
         <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 space-y-8 shadow-2xl">
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <EditableText contentKey="whatWeDo.processTitle" defaultValue="Our Standardized Cleanup Campaign Process" as="h2" className="text-2xl sm:text-3xl font-black" />
+            <EditableText contentKey="whatWeDo.processTitle" defaultValue="Quy Trình Một Chiến Dịch Dọn Rác Chuẩn Hóa" as="h2" className="text-2xl sm:text-3xl font-black" />
             <p className="text-xs sm:text-sm text-slate-400">
-              <EditableText contentKey="whatWeDo.processSubtitlePrefix" defaultValue="The safe, science-based steps taken by" as="span" /> <span className="whitespace-nowrap">Let's do it! Vietnam</span>
+              <EditableText contentKey="whatWeDo.processSubtitlePrefix" defaultValue="Các bước thực hiện an toàn và khoa học của" as="span" /> <span className="whitespace-nowrap">Let's do it! Vietnam</span>
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-center">
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">1</div>
-              <EditableText contentKey="whatWeDo.step1Title" defaultValue="Survey the Hotspot" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step1Desc" defaultValue="Measure the area & classify the types of pollution" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step1Title" defaultValue="Khảo sát điểm đen" as="h4" className="font-bold text-sm text-white" />
+              <EditableText contentKey="whatWeDo.step1Desc" defaultValue="Đo đạc diện tích & phân loại loại hình rác ô nhiễm" as="p" className="text-xs text-slate-400 mt-1" />
             </div>
 
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">2</div>
-              <EditableText contentKey="whatWeDo.step2Title" defaultValue="Mobilize Volunteers" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step2Desc" defaultValue="Open registration & provide specialized safety gear" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step2Title" defaultValue="Huy động tình nguyện" as="h4" className="font-bold text-sm text-white" />
+              <EditableText contentKey="whatWeDo.step2Desc" defaultValue="Mở cổng đăng ký & trang bị bảo hộ chuyên dụng" as="p" className="text-xs text-slate-400 mt-1" />
             </div>
 
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">3</div>
-              <EditableText contentKey="whatWeDo.step3Title" defaultValue="Cleanup & Sorting" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step3Desc" defaultValue="Collect & sort plastics, organic waste, and hazardous waste" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step3Title" defaultValue="Ra quân & Phân loại" as="h4" className="font-bold text-sm text-white" />
+              <EditableText contentKey="whatWeDo.step3Desc" defaultValue="Thu gom & phân loại nhựa, rác hữu cơ, rác độc hại" as="p" className="text-xs text-slate-400 mt-1" />
             </div>
 
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
               <div className="w-8 h-8 rounded-full bg-[#E81A7F] text-white font-black text-sm flex items-center justify-center mx-auto mb-3">4</div>
-              <EditableText contentKey="whatWeDo.step4Title" defaultValue="Handoff & Recycling" as="h4" className="font-bold text-sm text-white" />
-              <EditableText contentKey="whatWeDo.step4Desc" defaultValue="Weigh the collected waste & transfer it to processing plants" as="p" className="text-xs text-slate-400 mt-1" />
+              <EditableText contentKey="whatWeDo.step4Title" defaultValue="Bàn giao & Tái chế" as="h4" className="font-bold text-sm text-white" />
+              <EditableText contentKey="whatWeDo.step4Desc" defaultValue="Cân đo khối lượng & chuyển giao nhà máy xử lý" as="p" className="text-xs text-slate-400 mt-1" />
             </div>
           </div>
 

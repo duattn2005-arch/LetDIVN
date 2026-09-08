@@ -1,0 +1,182 @@
+import React from 'react';
+import { EditableText } from '../EditableText';
+import { EditableImage } from '../EditableImage';
+import { CampaignSections } from '../CampaignSections';
+
+export const WorldCleanupDayPage: React.FC = () => {
+  return (
+    <div className="bg-white">
+      {/* Hero banner: full-bleed, no rounding/border/shadow/overlay text */}
+      <div className="w-full aspect-4/1 bg-slate-100 overflow-hidden">
+        <EditableImage
+          contentKey="wcd.banner"
+          defaultValue="/images/world-cleanup-day/banner.jpg"
+          alt="A volunteer holding up litter pickers in a peace sign, surrounded by other masked volunteers"
+          wrapperClassName="w-full h-full"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
+        {/* Title & intro, centered */}
+        <div className="text-center mx-auto space-y-4 mb-14">
+          <EditableText
+            contentKey="wcd.title"
+            defaultValue="20 September – World Cleanup Day"
+            as="h2"
+            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight"
+          />
+          <EditableText
+            contentKey="wcd.intro"
+            defaultValue="World Cleanup Day has now been added to the official United Nations Calendar of International Days & Weeks from 2024 onwards! This presents even greater opportunities to unite tens of millions participants in cross-sector cooperation, bringing citizens, governments, and organisations together to tackle the global mismanaged waste crisis and to help create a new, more sustainable and waste-free world. Join us on 20 September this year and every year!"
+            as="p"
+            multiline
+            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-[800px] mx-auto text-pretty"
+          />
+        </div>
+
+        {/* Zig-zag content, pure white background */}
+        <div className="max-w-7xl mx-auto">
+          {/* Block 1: image left, text right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
+            <div className="aspect-3/2 bg-slate-100 rounded-2xl overflow-hidden">
+              <EditableImage
+                contentKey="wcd.block1.image"
+                defaultValue="/images/world-cleanup-day/block1-since2018.jpg"
+                alt="Volunteer sorting collected waste"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <EditableText
+              contentKey="wcd.block1.text"
+              defaultValue="Since 2018, World Cleanup Day has become the biggest civic movement in human history, uniting 211 countries and territories – which includes 95% of UN-listed countries – across the world, and 91 million volunteers, equal to 1.1% of global population – all striving to create a cleaner planet."
+              as="p"
+              multiline
+              className="text-sm sm:text-base text-slate-600 leading-relaxed"
+            />
+          </div>
+
+          {/* Block 2 (reversed): text left, image right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
+            <div className="space-y-4 order-2 lg:order-1">
+              <EditableText
+                contentKey="wcd.block2.text1"
+                defaultValue="World Cleanup Day harnesses the power of people around the world to achieve incredible things by joining together."
+                as="p"
+                multiline
+                className="text-sm sm:text-base text-slate-600 leading-relaxed"
+              />
+              <EditableText
+                contentKey="wcd.block2.text2"
+                defaultValue="Its beauty lies in cooperation and collaboration: building bridges between otherwise disparate communities – and including all levels and sectors of society – from citizens to businesses, to governments."
+                as="p"
+                multiline
+                className="text-sm sm:text-base text-slate-600 leading-relaxed"
+              />
+            </div>
+            <div className="aspect-3/2 bg-slate-100 rounded-2xl overflow-hidden order-1 lg:order-2">
+              <EditableImage
+                contentKey="wcd.block2.image"
+                defaultValue="/images/world-cleanup-day/block2-cooperation.jpg"
+                alt="Volunteers reviewing cleanup plans together"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Center: From Now and Forever */}
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-14 bg-slate-50 rounded-3xl p-6 sm:p-10">
+            <EditableText
+              contentKey="wcd.fromNowTitle"
+              defaultValue="From Now and Forever"
+              as="h2"
+              className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight"
+            />
+            <EditableText
+              contentKey="wcd.fromNowText1"
+              defaultValue="This year's event takes place on Friday 20 September following our addition to the UN Calendar of International Days!"
+              as="p"
+              multiline
+              resizable
+              className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance"
+            />
+            <EditableText
+              contentKey="wcd.fromNowText2"
+              defaultValue="We aim to activate 5% of the world's population that will catalyse lasting societal change in behaviour around mismanaged waste"
+              as="p"
+              multiline
+              resizable
+              className="text-sm sm:text-base text-slate-600 leading-relaxed text-balance"
+            />
+          </div>
+
+          {/* Block 3: image left, text right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
+            <div className="aspect-3/2 bg-slate-100 rounded-2xl overflow-hidden">
+              <EditableImage
+                contentKey="wcd.block3.image"
+                defaultValue="/images/world-cleanup-day/block3-global-movement.jpg"
+                alt="A large crowd of volunteers gathered together"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <EditableText
+              contentKey="wcd.block3.text"
+              defaultValue="World Cleanup Day has since grown into a global movement across almost every nation and territory on the planet, with millions of volunteers and a strong network of charismatic leaders. The simple act of cleaning has become a force that binds together people and groups that would otherwise never dream of working towards the same goal."
+              as="p"
+              multiline
+              className="text-sm sm:text-base text-slate-600 leading-relaxed"
+            />
+          </div>
+
+          {/* Block 4 (reversed): text left, image right */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
+            <EditableText
+              contentKey="wcd.block4.text"
+              defaultValue="We are the very definition of unity in civic society, transcending traditional barriers to cooperation and bringing together global corporations and national governments. Our movement includes every nationality, age group, gender identity, and religious affiliation. We now act as a focal point for collective intelligence, raising awareness of the challenges our environment faces."
+              as="p"
+              multiline
+              className="text-sm sm:text-base text-slate-600 leading-relaxed order-2 lg:order-1"
+            />
+            <div className="aspect-3/2 bg-slate-100 rounded-2xl overflow-hidden order-1 lg:order-2">
+              <EditableImage
+                contentKey="wcd.block4.image"
+                defaultValue="/images/world-cleanup-day/block4-unity.jpg"
+                alt="A volunteer collecting trash on a city street"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Closing gallery row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="aspect-3/2 bg-slate-100">
+              <EditableImage
+                contentKey="wcd.gallery1"
+                defaultValue="/images/world-cleanup-day/gallery1.jpg"
+                alt="Volunteers holding World Cleanup Day merchandise"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="aspect-3/2 bg-slate-100">
+              <EditableImage
+                contentKey="wcd.gallery2"
+                defaultValue="/what-we-do-wcd.jpg"
+                alt="A large crowd of volunteers at World Cleanup Day"
+                wrapperClassName="w-full h-full"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <CampaignSections page="world-cleanup-day" />
+    </div>
+  );
+};

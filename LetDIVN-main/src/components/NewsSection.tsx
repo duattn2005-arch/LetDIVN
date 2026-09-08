@@ -1,0 +1,113 @@
+import React, { useEffect, useState } from 'react';
+import { Calendar, ArrowRight, Plus } from 'lucide-react';
+import { dbService } from '../services/dbService';
+import { NewsArticle } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { EditableText } from './EditableText';
+import { TiltCard } from './TiltCard';
+
+interface NewsSectionProps {
+  onViewAll: () => void;
+}
+
+export const NewsSection: React.FC<NewsSectionProps> = ({ onViewAll }) => {
+  const { isAdmin } = useAuth();
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const refresh = () => {
+      dbService.getNews().then((all) => {
+        const published = all
+          .filter((a) => a.status !== 'Pending')
+          .sort((a, b) => (a.date < b.date ? 1 : -1))
+          .slice(0, 6);
+        setArticles(published);
+        setLoaded(true);
+      });
+    };
+    refresh();
+    const unsub = dbService.subscribe(refresh);
+    return unsub;
+  }, []);
+
+  // Nothing to fetch yet — avoid flashing a false "no articles" message
+  // before the request has even resolved.
+  if (!loaded) return null;
+
+  if (articles.length === 0 && !isAdmin) return null;
+
+  return (
+    <section className="py-10 sm:py-14 relative z-10 border-b border-slate-200/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="text-center space-y-3">
+          <EditableText
+            contentKey="newsSection.title"
+            defaultValue="News"
+            as="h2"
+            className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#E81A7F] tracking-tight"
+          />
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={onViewAll}
+              className="inline-flex items-center gap-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-4 py-2 rounded-full shadow-md transition-all cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add / Manage Articles</span>
+            </button>
+          )}
+        </div>
+
+        {articles.length === 0 ? (
+          <div className="text-center text-sm text-slate-400 py-8">
+            No published articles yet — click "Add / Manage Articles" to create one.
+          </div>
+        ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {articles.map((item) => (
+            <TiltCard
+              key={item.id}
+              onClick={onViewAll}
+              className="cursor-pointer group"
+            >
+              <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-5 sm:p-6 space-y-2">
+                <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                  <Calendar className="w-3 h-3 text-[#E81A7F]" />
+                  {item.date}
+                </span>
+                <h3 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
+                  {item.title}
+                </h3>
+                <div className="pt-1 flex items-center gap-1 text-xs font-bold text-[#E81A7F] group-hover:translate-x-1 transition-transform">
+                  <span>Read More</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            </TiltCard>
+          ))}
+        </div>
+        )}
+
+        {articles.length > 0 && (
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={onViewAll}
+              className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02]"
+            >
+              View All News
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
