@@ -44,7 +44,7 @@ export const MediaOnUsPage: React.FC = () => {
               <img
                 src={entry.image}
                 alt={entry.title}
-                className="w-96 aspect-3/2 object-cover shrink-0"
+                className="w-[28rem] aspect-3/2 object-cover shrink-0"
               />
 
               <div className="w-20 text-center shrink-0">
@@ -63,10 +63,7 @@ export const MediaOnUsPage: React.FC = () => {
                 rel="noreferrer"
                 className="flex flex-col items-center gap-1.5 shrink-0"
               >
-                <span
-                  className="inline-flex items-center px-8 py-3.5 rounded-full text-white text-base font-bold shadow-sm hover:opacity-90 transition-opacity"
-                  style={{ backgroundColor: BRAND_PINK }}
-                >
+                <span className="inline-flex items-center px-10 py-4 rounded-full text-white text-lg font-bold shadow-sm bg-[#DA1984] hover:bg-[#EBC61C] transition-colors">
                   {entry.title}
                 </span>
                 <span className="ref-body text-sm italic text-slate-400">Click to see media coverage on activities</span>
