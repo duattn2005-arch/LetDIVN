@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
-import { Calendar, User, Eye, ArrowRight, ArrowLeft, Share2, Sparkles, Plus, Edit3, Trash2, Search, CheckCircle2, Clock } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, Edit3, Trash2, Search, CheckCircle2, Clock } from 'lucide-react';
 import { ArticleEditorModal } from '../ArticleEditorModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -214,21 +214,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 bg-[#E81A7F] text-white text-[10px] font-bold uppercase px-3 py-1 rounded-full shadow-xs">
-                      {categoryMap[item.category] || item.category}
-                    </div>
 
                     {/* Status Badge */}
                     {isPending && (
                       <div className="absolute bottom-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         <EditableText contentKey="newsPage.pendingBadge" defaultValue={t.newsPagePendingBadge} as="span" />
-                      </div>
-                    )}
-
-                    {item.source && !isPending && (
-                      <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-md">
-                        <EditableText contentKey="newsPage.sourceLabel" defaultValue={t.newsPageSourceLabel} as="span" /> {item.source}
                       </div>
                     )}
 
@@ -264,21 +255,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   </div>
 
                   <div className="p-6 space-y-3">
-                    <div className="flex items-center gap-3 text-[11px] text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-[#E81A7F]" />
-                        {item.date}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <User className="w-3 h-3 text-[#E81A7F]" />
-                        {item.author}
-                      </span>
-                    </div>
-
-                    <h3 className="font-bold text-base sm:text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors line-clamp-2 leading-snug">
+                    <h3 className="ref-news-title text-base sm:text-lg line-clamp-2 leading-snug">
                       {item.title}
                     </h3>
+
+                    <div className="ref-news-date text-xs">{item.date}</div>
 
                     <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
                       {item.summary}
@@ -286,9 +267,10 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   </div>
                 </div>
 
-                <div className="p-6 pt-0 flex items-center justify-between border-t border-slate-100 text-xs font-bold text-[#E81A7F] group-hover:translate-x-1 transition-transform">
-                  <EditableText contentKey="newsPage.readMoreBtn" defaultValue={t.newsPageReadMoreBtn} as="span" />
-                  <ArrowRight className="w-4 h-4" />
+                <div className="px-6 pb-6">
+                  <span className="ref-news-readmore text-xs">
+                    <EditableText contentKey="newsPage.readMoreBtn" defaultValue={t.newsPageReadMoreBtn} as="span" /> »
+                  </span>
                 </div>
               </article>
             );

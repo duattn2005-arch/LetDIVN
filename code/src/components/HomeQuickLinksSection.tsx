@@ -74,16 +74,15 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
                 <button onClick={() => onNavigate('news')} className="block w-full aspect-16/9 overflow-hidden bg-slate-900 cursor-pointer">
                   <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                 </button>
-                <h3 className="ref-body text-sm sm:text-base font-semibold text-slate-800 leading-snug">
-                  <button onClick={() => onNavigate('news')} className="text-left cursor-pointer hover:text-[#F1138D] transition-colors">
+                <h3 className="ref-news-title text-base sm:text-lg leading-snug">
+                  <button onClick={() => onNavigate('news')} className="text-left cursor-pointer">
                     {item.title}
                   </button>
                 </h3>
-                <div className="ref-body text-xs text-slate-400">{formatDate(item.date)}</div>
+                <div className="ref-news-date text-xs">{formatDate(item.date)}</div>
                 <button
                   onClick={() => onNavigate('news')}
-                  className="ref-body text-sm font-semibold cursor-pointer"
-                  style={{ color: BRAND_PINK }}
+                  className="ref-news-readmore text-xs cursor-pointer"
                 >
                   Read More »
                 </button>

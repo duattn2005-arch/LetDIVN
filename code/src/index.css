@@ -26,6 +26,24 @@ h1, h2, h3, h4 {
   font-family: 'Poppins', sans-serif;
 }
 
+/* Reference-site News card typography (letsdoitvietnam.org/news/) */
+.ref-news-title {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  color: #54595F;
+}
+
+.ref-news-date {
+  font-family: 'Roboto Slab', serif;
+  color: #ADADAD;
+}
+
+.ref-news-readmore {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: #61CE70;
+}
+
 /* Mobile responsive smooth touch */
 * {
   -webkit-tap-highlight-color: transparent;
