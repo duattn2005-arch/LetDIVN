@@ -13,10 +13,10 @@ export interface ProvinceItem {
 export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
   {
     id: 'hanoi',
-    name: 'Hà Nội',
+    name: 'Hanoi',
     center: [21.0285, 105.8542],
     districts: [
-      { id: 'hn-all', name: 'Tất cả' },
+      { id: 'hn-all', name: 'All' },
       { id: 'hn-badinh', name: 'Ba Đình' },
       { id: 'hn-bavi', name: 'Ba Vì' },
       { id: 'hn-bactuliem', name: 'Bắc Từ Liêm' },
@@ -51,10 +51,10 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
   },
   {
     id: 'hcm',
-    name: 'Hồ Chí Minh',
+    name: 'Ho Chi Minh City',
     center: [10.8231, 106.6297],
     districts: [
-      { id: 'hcm-all', name: 'Tất cả' },
+      { id: 'hcm-all', name: 'All' },
       { id: 'hcm-q1', name: 'Quận 1' },
       { id: 'hcm-q3', name: 'Quận 3' },
       { id: 'hcm-q4', name: 'Quận 4' },
@@ -84,7 +84,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Đà Nẵng',
     center: [16.0544, 108.2022],
     districts: [
-      { id: 'danang-all', name: 'Tất cả' },
+      { id: 'danang-all', name: 'All' },
       { id: 'danang-sontra', name: 'Sơn Trà (Bán đảo Sơn Trà)' },
       { id: 'danang-haichau', name: 'Hải Châu' },
       { id: 'danang-thanhkhe', name: 'Thanh Khê' },
@@ -100,7 +100,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Hải Phòng',
     center: [20.8449, 106.6881],
     districts: [
-      { id: 'hp-all', name: 'Tất cả' },
+      { id: 'hp-all', name: 'All' },
       { id: 'hp-hongbang', name: 'Hồng Bàng' },
       { id: 'hp-ngoquyen', name: 'Ngô Quyền' },
       { id: 'hp-lechan', name: 'Lê Chân' },
@@ -123,7 +123,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Cần Thơ',
     center: [10.0452, 105.7469],
     districts: [
-      { id: 'ct-all', name: 'Tất cả' },
+      { id: 'ct-all', name: 'All' },
       { id: 'ct-ninhkieu', name: 'Ninh Kiều' },
       { id: 'ct-binhthuy', name: 'Bình Thủy' },
       { id: 'ct-cairang', name: 'Cái Răng' },
@@ -140,7 +140,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Ninh Bình',
     center: [20.2506, 105.9745],
     districts: [
-      { id: 'nb-all', name: 'Tất cả' },
+      { id: 'nb-all', name: 'All' },
       { id: 'nb-tp', name: 'TP. Ninh Bình' },
       { id: 'nb-tamdiep', name: 'TP. Tam Điệp' },
       { id: 'nb-hoalu', name: 'Hoa Lư (Tràng An)' },
@@ -156,7 +156,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Nam Định',
     center: [20.4200, 106.1683],
     districts: [
-      { id: 'nd-all', name: 'Tất cả' },
+      { id: 'nd-all', name: 'All' },
       { id: 'nd-tp', name: 'TP. Nam Định' },
       { id: 'nd-giaothuy', name: 'Giao Thủy (Quất Lâm - Xuân Thủy)' },
       { id: 'nd-haihau', name: 'Hải Hậu (Hải Thịnh)' },
@@ -174,7 +174,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Quảng Ninh',
     center: [21.0064, 107.2925],
     districts: [
-      { id: 'qn-all', name: 'Tất cả' },
+      { id: 'qn-all', name: 'All' },
       { id: 'qn-halong', name: 'TP. Hạ Long' },
       { id: 'qn-campha', name: 'TP. Cẩm Phả' },
       { id: 'qn-uongbi', name: 'TP. Uông Bí (Yên Tử)' },
@@ -193,7 +193,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Khánh Hòa',
     center: [12.2388, 109.1967],
     districts: [
-      { id: 'kh-all', name: 'Tất cả' },
+      { id: 'kh-all', name: 'All' },
       { id: 'kh-nhatrang', name: 'TP. Nha Trang' },
       { id: 'kh-camranh', name: 'TP. Cam Ranh' },
       { id: 'kh-ninhhoa', name: 'Thị xã Ninh Hòa' },
@@ -210,7 +210,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Lâm Đồng',
     center: [11.9404, 108.4583],
     districts: [
-      { id: 'ld-all', name: 'Tất cả' },
+      { id: 'ld-all', name: 'All' },
       { id: 'ld-dalat', name: 'TP. Đà Lạt' },
       { id: 'ld-baoloc', name: 'TP. Bảo Lộc' },
       { id: 'ld-ductrong', name: 'Đức Trọng' },
@@ -229,7 +229,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Bình Dương',
     center: [11.1348, 106.6667],
     districts: [
-      { id: 'bd-all', name: 'Tất cả' },
+      { id: 'bd-all', name: 'All' },
       { id: 'bd-thudaumot', name: 'TP. Thủ Dầu Một' },
       { id: 'bd-dian', name: 'TP. Dĩ An' },
       { id: 'bd-thuanan', name: 'TP. Thuận An' },
@@ -246,7 +246,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Đồng Nai',
     center: [10.9574, 106.8427],
     districts: [
-      { id: 'dn-all', name: 'Tất cả' },
+      { id: 'dn-all', name: 'All' },
       { id: 'dn-bienhoa', name: 'TP. Biên Hòa' },
       { id: 'dn-longkhanh', name: 'TP. Long Khánh' },
       { id: 'dn-longthanh', name: 'Long Thành (Sân bay)' },
@@ -265,7 +265,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Bà Rịa - Vũng Tàu',
     center: [10.4967, 107.1689],
     districts: [
-      { id: 'brvt-all', name: 'Tất cả' },
+      { id: 'brvt-all', name: 'All' },
       { id: 'brvt-vungtau', name: 'TP. Vũng Tàu' },
       { id: 'brvt-baria', name: 'TP. Bà Rịa' },
       { id: 'brvt-phumy', name: 'Thị xã Phú Mỹ' },
@@ -281,7 +281,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Kiên Giang',
     center: [10.0125, 105.0809],
     districts: [
-      { id: 'kg-all', name: 'Tất cả' },
+      { id: 'kg-all', name: 'All' },
       { id: 'kg-phuquoc', name: 'TP. Phú Quốc' },
       { id: 'kg-rachgia', name: 'TP. Rạch Giá' },
       { id: 'kg-hatiên', name: 'TP. Hà Tiên' },
@@ -304,7 +304,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Thừa Thiên Huế',
     center: [16.4637, 107.5909],
     districts: [
-      { id: 'tth-all', name: 'Tất cả' },
+      { id: 'tth-all', name: 'All' },
       { id: 'tth-hue', name: 'TP. Huế (Kinh Thành)' },
       { id: 'tth-huongthuy', name: 'Thị xã Hương Thủy' },
       { id: 'tth-huongtra', name: 'Thị xã Hương Trà' },
@@ -321,7 +321,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Quảng Nam',
     center: [15.5683, 108.1883],
     districts: [
-      { id: 'qnam-all', name: 'Tất cả' },
+      { id: 'qnam-all', name: 'All' },
       { id: 'qnam-hoian', name: 'TP. Hội An (Phố Cổ)' },
       { id: 'qnam-tamky', name: 'TP. Tam Kỳ' },
       { id: 'qnam-dienban', name: 'Thị xã Điện Bàn' },
@@ -335,7 +335,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Thanh Hóa',
     center: [19.8067, 105.7852],
     districts: [
-      { id: 'th-all', name: 'Tất cả' },
+      { id: 'th-all', name: 'All' },
       { id: 'th-tp', name: 'TP. Thanh Hóa' },
       { id: 'th-samson', name: 'TP. Sầm Sơn' },
       { id: 'th-nghison', name: 'Thị xã Nghi Sơn' },
@@ -354,7 +354,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Nghệ An',
     center: [18.6734, 105.6813],
     districts: [
-      { id: 'na-all', name: 'Tất cả' },
+      { id: 'na-all', name: 'All' },
       { id: 'na-vinh', name: 'TP. Vinh' },
       { id: 'na-cualo', name: 'Thị xã Cửa Lò' },
       { id: 'na-thaitoa', name: 'Thị xã Thái Hòa' },
@@ -373,7 +373,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Bắc Ninh',
     center: [21.1861, 106.0763],
     districts: [
-      { id: 'bn-all', name: 'Tất cả' },
+      { id: 'bn-all', name: 'All' },
       { id: 'bn-tp', name: 'TP. Bắc Ninh' },
       { id: 'bn-tuson', name: 'TP. Từ Sơn' },
       { id: 'bn-quevo', name: 'Thị xã Quế Võ' },
@@ -389,7 +389,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Hưng Yên',
     center: [20.6464, 106.0511],
     districts: [
-      { id: 'hy-all', name: 'Tất cả' },
+      { id: 'hy-all', name: 'All' },
       { id: 'hy-tp', name: 'TP. Hưng Yên (Phố Hiến)' },
       { id: 'hy-myhao', name: 'Thị xã Mỹ Hào' },
       { id: 'hy-vanlam', name: 'Văn Lâm' },
@@ -407,7 +407,7 @@ export const VIETNAM_PROVINCES_DATA: ProvinceItem[] = [
     name: 'Lào Cai',
     center: [22.4856, 103.9707],
     districts: [
-      { id: 'lc-all', name: 'Tất cả' },
+      { id: 'lc-all', name: 'All' },
       { id: 'lc-tp', name: 'TP. Lào Cai' },
       { id: 'lc-sapa', name: 'Thị xã Sa Pa (Fansipan)' },
       { id: 'lc-bac-ha', name: 'Bắc Hà' },

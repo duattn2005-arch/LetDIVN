@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenDbAdmin }) => 
     <footer className="bg-white border-t border-slate-200 text-slate-700 pt-16 pb-12 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Decorative growing forest — small "cây mọc lên" welcome to the footer */}
+        {/* Decorative growing forest — a small "trees sprouting" welcome to the footer */}
         <div className="flex items-end justify-center gap-1 sm:gap-2 pb-8">
           <GrowingTree size={30} variant="lime" delay={0} />
           <GrowingTree size={46} variant="emerald" delay={120} />
@@ -94,7 +94,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenDbAdmin }) => 
               <div>
                 <EditableText
                   contentKey="contact.phone1"
-                  defaultValue="035.872.6755 (Mr. Sơn)"
+                  defaultValue="035.872.6755 (Mr. Son)"
                   render={(value) => (
                     <a href={`tel:${value.replace(/\D/g, '')}`} className="flex items-center gap-3 hover:text-[#E81A7F] transition-colors group">
                       <div className="w-7 h-7 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shrink-0">
@@ -110,7 +110,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenDbAdmin }) => 
               <div>
                 <EditableText
                   contentKey="contact.phone2"
-                  defaultValue="0968.514.882 (Ms. Tú)"
+                  defaultValue="0968.514.882 (Ms. Tu)"
                   render={(value) => (
                     <a href={`tel:${value.replace(/\D/g, '')}`} className="flex items-center gap-3 hover:text-[#E81A7F] transition-colors group">
                       <div className="w-7 h-7 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shrink-0">
@@ -143,7 +143,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenDbAdmin }) => 
                 <div className="w-7 h-7 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shrink-0">
                   <MapPin className="w-3.5 h-3.5" />
                 </div>
-                <EditableText contentKey="footer.address" defaultValue="Hà Nội, TP. Hồ Chí Minh & Đà Nẵng, Việt Nam" as="span" className="font-medium text-slate-700 leading-snug" />
+                <EditableText contentKey="footer.address" defaultValue="Hanoi, Ho Chi Minh City & Da Nang, Vietnam" as="span" className="font-medium text-slate-700 leading-snug" />
               </div>
             </div>
 

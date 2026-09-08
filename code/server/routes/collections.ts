@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo } from '../db/collections.js';
+import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage, whoWeAre } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -31,7 +31,7 @@ router.delete('/events/:id', requireAdmin, (req, res) => {
 });
 
 // --- Volunteers (insert/delete keep events.registeredCount in sync) ---
-router.get('/volunteers', (req, res) => res.json(volunteers.getAll()));
+router.get('/volunteers', requireAdmin, (req, res) => res.json(volunteers.getAll()));
 router.post('/volunteers', (req, res) => {
   const body = req.body as Omit<VolunteerRegistration, 'id' | 'registeredAt'>;
   const created = volunteers.insert({ ...body, registeredAt: new Date().toISOString() } as any);
@@ -136,7 +136,7 @@ router.delete('/contacts/:id', requireAdmin, (req, res) => {
 
 // --- Videos ---
 router.get('/videos', (req, res) => res.json(videos.getAll()));
-router.post('/videos', (req, res) => {
+router.post('/videos', requireAdmin, (req, res) => {
   const { youtubeId, title, thumbnailUrl } = req.body || {};
   if (!youtubeId) {
     return res.status(400).json({ error: 'Thiếu mã video YouTube' });
@@ -149,7 +149,7 @@ router.post('/videos', (req, res) => {
   });
   res.json(created);
 });
-router.delete('/videos/:id', (req, res) => {
+router.delete('/videos/:id', requireAdmin, (req, res) => {
   videos.delete(String(req.params.id));
   res.json({ ok: true });
 });
@@ -170,4 +170,37 @@ router.delete('/what-we-do/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+// --- Media Coverage (Media On Us page) ---
+router.get('/media-coverage', (req, res) => res.json(mediaCoverage.getAll()));
+router.post('/media-coverage', requireAdmin, (req, res) => {
+  res.json(mediaCoverage.insert(req.body, { sortOrder: -1 })); // new entries lead the list
+});
+router.put('/media-coverage/:id', requireAdmin, (req, res) => {
+  const updated = mediaCoverage.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Item not found' });
+  res.json(updated);
+});
+router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
+  mediaCoverage.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
+// --- Who We Are ---
+router.get('/who-we-are', (req, res) => res.json(whoWeAre.getAll()));
+router.post('/who-we-are', requireAdmin, (req, res) => {
+  const all = whoWeAre.getAll();
+  res.json(whoWeAre.insert({ ...req.body, order: all.length + 1 }));
+});
+router.put('/who-we-are/:id', requireAdmin, (req, res) => {
+  const updated = whoWeAre.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Item not found' });
+  res.json(updated);
+});
+router.delete('/who-we-are/:id', requireAdmin, (req, res) => {
+  whoWeAre.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
 export default router;
+
+

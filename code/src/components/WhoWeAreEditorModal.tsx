@@ -1,44 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Sparkles, Check } from 'lucide-react';
-import { WhatWeDoItem } from '../types';
+import { WhoWeAreItem } from '../types';
 import { ImageUploadWidget } from './ImageUploadWidget';
 
-interface WhatWeDoEditorModalProps {
+interface WhoWeAreEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  itemToEdit: WhatWeDoItem | null;
-  onSave: (item: Omit<WhatWeDoItem, 'id'> | WhatWeDoItem) => void;
+  itemToEdit: WhoWeAreItem | null;
+  onSave: (item: Omit<WhoWeAreItem, 'id'> | WhoWeAreItem) => void;
 }
 
-export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
+export const WhoWeAreEditorModal: React.FC<WhoWeAreEditorModalProps> = ({
   isOpen,
   onClose,
   itemToEdit,
   onSave,
 }) => {
   const [title, setTitle] = useState('');
-  const [badge, setBadge] = useState('');
-  const [desc, setDesc] = useState('');
+  const [content, setContent] = useState('');
   const [image, setImage] = useState('');
   const [layout, setLayout] = useState<'image-left' | 'image-right'>('image-left');
-  const [highlightsStr, setHighlightsStr] = useState('');
 
   useEffect(() => {
     if (itemToEdit) {
       setTitle(itemToEdit.title || '');
-      setBadge(itemToEdit.badge || '');
-      setDesc(itemToEdit.desc || '');
+      setContent(itemToEdit.content || '');
       setImage(itemToEdit.image || '');
       setLayout(itemToEdit.layout || 'image-left');
-      setHighlightsStr((itemToEdit.highlights || []).join('\n'));
     } else {
       setTitle('');
-      setBadge('');
-      setDesc('');
-      setImage('/what-we-do-wcd.jpg');
+      setContent('');
+      setImage('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1000&auto=format&fit=crop&q=80');
       setLayout('image-left');
-      setHighlightsStr('');
     }
   }, [itemToEdit, isOpen]);
 
@@ -47,23 +41,20 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert('Please enter an activity title!');
+      alert('Please enter a section title!');
       return;
     }
-
-    const highlights = highlightsStr
-      .split('\n')
-      .map(s => s.trim())
-      .filter(Boolean);
+    if (!content.trim()) {
+      alert('Please enter the content!');
+      return;
+    }
 
     const payload = {
       ...(itemToEdit ? { id: itemToEdit.id } : {}),
       title: title.trim(),
-      badge: badge.trim() || 'Featured Activity',
-      desc: desc.trim(),
-      image: image.trim() || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&auto=format&fit=crop&q=90',
+      content: content.trim(),
+      image: image.trim() || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1000&auto=format&fit=crop&q=80',
       layout,
-      highlights,
     };
 
     onSave(payload as any);
@@ -81,10 +72,10 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
               <div>
                 <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-[#E81A7F]" />
-                  <span>{itemToEdit ? 'Edit Activity (Admin)' : 'Add New Activity (Admin)'}</span>
+                  <span>{itemToEdit ? 'Edit Section (Admin)' : 'Add New Section (Admin)'}</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Enter the image, title, and content to display on the What We Do page
+                  Enter the image, heading, and description to display on the Who We Are page
                 </p>
               </div>
               <button
@@ -97,30 +88,17 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Title & Badge */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Activity Title *</label>
-                  <input
-                    type="text"
-                    required
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g., World Cleanup Day, Educational Campaign..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Badge / Category Label</label>
-                  <input
-                    type="text"
-                    value={badge}
-                    onChange={(e) => setBadge(e.target.value)}
-                    placeholder="e.g., Global Campaign, Training..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
-                  />
-                </div>
+              {/* Title */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Section Heading *</label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g., Where It All Began, Let's Do It Vietnam Today..."
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                />
               </div>
 
               {/* Layout Option */}
@@ -158,30 +136,20 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
                 <ImageUploadWidget
                   currentImageUrl={image}
                   onImageSelected={(url) => setImage(url)}
+                  aspectRatioLabel="4:3 landscape ratio recommended"
                 />
               </div>
 
-              {/* Description */}
+              {/* Content / Description */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Detailed Description</label>
+                <label className="text-xs font-bold text-slate-700">Content / Story Description *</label>
                 <textarea
-                  rows={4}
-                  value={desc}
-                  onChange={(e) => setDesc(e.target.value)}
-                  placeholder="Describe the meaning, goals, and impact of the activity..."
+                  rows={5}
+                  required
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Write the historical background, milestones, or story for this section..."
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm leading-relaxed focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
-                />
-              </div>
-
-              {/* Highlights / Bullet points */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Key Highlights (one per line)</label>
-                <textarea
-                  rows={3}
-                  value={highlightsStr}
-                  onChange={(e) => setHighlightsStr(e.target.value)}
-                  placeholder="e.g.:&#10;5,000+ volunteers engaged&#10;Over 8,500 kg of waste collected"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                 />
               </div>
 
@@ -199,7 +167,7 @@ export const WhatWeDoEditorModal: React.FC<WhatWeDoEditorModalProps> = ({
                   className="px-6 py-2.5 rounded-xl bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
-                  <span>{itemToEdit ? 'Save Changes' : 'Add Activity'}</span>
+                  <span>{itemToEdit ? 'Save Changes' : 'Add Section'}</span>
                 </button>
               </div>
             </form>

@@ -30,7 +30,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
           </div>
           <EditableText
             contentKey="getInvolved.title"
-            defaultValue={t.getInvolvedTitle || 'Cùng Chung Tay Hành Động'}
+            defaultValue={t.getInvolvedTitle || 'Get Involved Today'}
             as="h2"
             className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight"
           />

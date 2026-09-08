@@ -13,8 +13,8 @@ interface ImageUploadWidgetProps {
 export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
   currentImageUrl,
   onImageSelected,
-  label = 'Tải ảnh lên từ máy tính hoặc nhập liên kết',
-  aspectRatioLabel = 'Khuyên dùng tỉ lệ 16:9 hoặc 4:3 (JPG, PNG, WebP)',
+  label = 'Upload an image from your computer or enter a link',
+  aspectRatioLabel = '16:9 or 4:3 ratio recommended (JPG, PNG, WebP)',
   placeholderText = 'https://...'
 }) => {
   const [activeMode, setActiveMode] = useState<'upload' | 'url' | 'paste'>('upload');
@@ -28,12 +28,12 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
   const handleFileChange = async (file: File | Blob) => {
     setError(null);
     if (!file.type.startsWith('image/')) {
-      setError('Vui lòng chọn tệp định dạng hình ảnh (PNG, JPG, JPEG, WebP, GIF)');
+      setError('Please select an image file (PNG, JPG, JPEG, WebP, GIF)');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError('Kích thước ảnh không được vượt quá 5MB');
+      setError('Image size must not exceed 5MB');
       return;
     }
 
@@ -48,7 +48,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
       setPreviewUrl(url);
       onImageSelected(url);
     } catch (err: any) {
-      setError(err?.message || 'Tải ảnh lên thất bại. Vui lòng thử lại.');
+      setError(err?.message || 'Image upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -104,7 +104,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
         }
       }
     } catch {
-      setError('Hãy nhấn phím Ctrl + V trực tiếp để dán ảnh đã copy.');
+      setError('Press Ctrl + V directly to paste the copied image.');
     }
   };
 
@@ -118,7 +118,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
 
   const handleApplyUrl = () => {
     if (!urlInput.trim()) {
-      setError('Vui lòng nhập đường link ảnh hợp lệ');
+      setError('Please enter a valid image link');
       return;
     }
     setError(null);
@@ -156,7 +156,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
           }`}
         >
           <Upload className="w-3.5 h-3.5 shrink-0" />
-          <span>Tải tệp lên</span>
+          <span>Upload File</span>
         </button>
 
         <button
@@ -168,7 +168,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
               : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-100'
           }`}
         >
-          <span>📋 Dán (Ctrl+V)</span>
+          <span>📋 Paste (Ctrl+V)</span>
         </button>
 
         <button
@@ -181,7 +181,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
           }`}
         >
           <Link className="w-3.5 h-3.5 shrink-0" />
-          <span>Gắn link ảnh</span>
+          <span>Attach Image Link</span>
         </button>
       </div>
 
@@ -214,9 +214,9 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
               <Upload className="w-5 h-5" />
             </div>
             <div className="text-xs font-semibold">
-              <span className="text-[#E81A7F] font-bold">Nhấn để chọn ảnh</span> hoặc kéo thả file vào đây
+              <span className="text-[#E81A7F] font-bold">Click to choose an image</span> or drag and drop a file here
             </div>
-            <p className="text-[10px] text-slate-400">Hỗ trợ PNG, JPG, JPEG, WEBP tối đa 5MB</p>
+            <p className="text-[10px] text-slate-400">Supports PNG, JPG, JPEG, WEBP up to 5MB</p>
           </div>
         </div>
       )}
@@ -232,9 +232,9 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
           <div className="flex flex-col items-center justify-center py-2 text-purple-800 space-y-1.5">
             <div className="text-2xl">📋</div>
             <div className="text-xs font-bold text-purple-900">
-              Nhấn vào đây rồi bấm <kbd className="px-1.5 py-0.5 bg-white border border-purple-300 rounded font-mono text-[11px]">Ctrl + V</kbd> để dán ảnh
+              Click here then press <kbd className="px-1.5 py-0.5 bg-white border border-purple-300 rounded font-mono text-[11px]">Ctrl + V</kbd> to paste the image
             </div>
-            <p className="text-[10px] text-purple-600">Hoặc click để tự động dán ảnh từ bộ nhớ tạm (Clipboard)</p>
+            <p className="text-[10px] text-purple-600">Or click to automatically paste the image from the clipboard</p>
           </div>
         </div>
       )}
@@ -256,7 +256,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
             className="px-4 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1"
           >
             <Check className="w-3.5 h-3.5" />
-            <span>Áp dụng</span>
+            <span>Apply</span>
           </button>
         </div>
       )}
@@ -276,12 +276,12 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
             src={previewUrl}
             alt="Preview"
             className="w-full h-36 object-cover"
-            onError={() => setError('Không thể tải ảnh từ đường dẫn đã cung cấp')}
+            onError={() => setError('Unable to load the image from the provided URL')}
           />
           <button
             type="button"
             onClick={handleClearImage}
-            title="Xóa ảnh"
+            title="Remove image"
             className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
@@ -290,10 +290,10 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
             {isUploading ? (
               <>
                 <Loader2 className="w-3 h-3 animate-spin" />
-                <span>Đang tải lên...</span>
+                <span>Uploading...</span>
               </>
             ) : (
-              <span>✓ Đã tải ảnh thành công</span>
+              <span>✓ Image uploaded successfully</span>
             )}
           </div>
         </div>

@@ -34,7 +34,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [city, setCity] = useState('Hà Nội');
+  const [city, setCity] = useState('Hanoi');
   const [avatar, setAvatar] = useState('');
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
       setName(user.name || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
-      setCity(user.city || 'Hà Nội');
+      setCity(user.city || 'Hanoi');
       setAvatar(user.avatar || '');
 
       dbService.getVolunteers().then((allVolunteers) => {
@@ -66,7 +66,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     e.preventDefault();
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone && cleanPhone.length !== 10) {
-      alert('Số điện thoại phải có đúng 10 chữ số (VD: 0987654321)!');
+      alert('Phone number must be exactly 10 digits (e.g., 0987654321)!');
       return;
     }
     updateProfile({
@@ -79,13 +79,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     try {
       confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } });
     } catch {}
-    setSuccessMsg('✓ Đã lưu thay đổi hồ sơ thành công!');
+    setSuccessMsg('✓ Profile changes saved successfully!');
     setTimeout(() => setSuccessMsg(null), 4000);
     setIsEditingAvatar(false);
   };
 
   const handleDownloadCertificate = () => {
-    alert(`Chứng nhận Tình nguyện viên Let's Do It Vietnam - Cấp cho: ${user.name}\nCảm ơn bạn đã đóng góp cho môi trường!`);
+    alert(`Let's Do It Vietnam Volunteer Certificate - Awarded to: ${user.name}\nThank you for your contribution to the environment!`);
   };
 
   if (!isOpen || !user) return null;
@@ -116,7 +116,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 type="button"
                 onClick={() => setIsEditingAvatar(!isEditingAvatar)}
                 className="absolute bottom-0 right-0 p-1.5 bg-slate-900 hover:bg-black text-white rounded-full border-2 border-white shadow cursor-pointer"
-                title="Thay đổi ảnh đại diện cá nhân"
+                title="Change profile picture"
               >
                 <Camera className="w-3.5 h-3.5" />
               </button>
@@ -130,11 +130,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                     ? 'bg-purple-900 text-purple-200 border border-purple-400' 
                     : 'bg-emerald-900 text-emerald-200 border border-emerald-400'
                 }`}>
-                  {user.role === 'admin' ? '🛡️ Tài Khoản Quản Trị (Admin)' : '🌱 Tài Khoản Cá Nhân (Tình Nguyện Viên)'}
+                  {user.role === 'admin' ? '🛡️ Administrator Account (Admin)' : '🌱 Personal Account (Volunteer)'}
                 </span>
               </div>
               <p className="text-xs text-white/80 mt-1">
-                Đăng nhập bằng: <strong>{user.provider.toUpperCase()}</strong> • Tham gia từ: {user.joinedAt}
+                Signed in with: <strong>{user.provider.toUpperCase()}</strong> • Member since: {user.joinedAt}
               </p>
             </div>
           </div>
@@ -153,12 +153,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           {isEditingAvatar && (
             <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold">Cập nhật ảnh đại diện cá nhân</span>
-                <button 
-                  onClick={() => setIsEditingAvatar(false)} 
+                <span className="text-xs font-bold">Update Profile Picture</span>
+                <button
+                  onClick={() => setIsEditingAvatar(false)}
                   className="text-xs text-slate-400 hover:text-slate-700"
                 >
-                  Đóng
+                  Close
                 </button>
               </div>
               <ImageUploadWidget
@@ -166,8 +166,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 onImageSelected={(val) => {
                   setAvatar(val);
                 }}
-                label="Chọn ảnh chân dung của bạn"
-                aspectRatioLabel="Tỉ lệ 1:1 vuông hoặc 4:3"
+                label="Choose your portrait photo"
+                aspectRatioLabel="Square 1:1 or 4:3 ratio"
               />
             </div>
           )}
@@ -175,14 +175,14 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           {/* Personal Impact Stats */}
           <div className="grid grid-cols-2 gap-3 text-center">
             <div className="bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700">
-              <span className="text-[11px] font-bold text-slate-500 uppercase">Chiến dịch tham gia</span>
+              <span className="text-[11px] font-bold text-slate-500 uppercase">Campaigns Joined</span>
               <div className="text-xl sm:text-2xl font-black text-emerald-600 mt-1">
                 {user.eventsAttended || (myRegistrations.length > 0 ? myRegistrations.length : 2)}
               </div>
             </div>
 
             <div className="bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700">
-              <span className="text-[11px] font-bold text-slate-500 uppercase">Hạng huy hiệu</span>
+              <span className="text-[11px] font-bold text-slate-500 uppercase">Badge Rank</span>
               <div className="text-xl sm:text-2xl font-black text-amber-500 mt-1">
                 Gold ★
               </div>
@@ -193,13 +193,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
               <User className="w-4 h-4 text-[#E81A7F]" />
-              <span>Thông tin hồ sơ cá nhân</span>
+              <span>Personal Profile Information</span>
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Họ và tên
+                  Full Name
                 </label>
                 <input
                   type="text"
@@ -212,7 +212,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Địa chỉ Email
+                  Email Address
                 </label>
                 <input
                   type="email"
@@ -225,10 +225,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Số điện thoại liên hệ (Đúng 10 số)
+                    Contact Phone Number (exactly 10 digits)
                   </label>
                   <span className={`text-[10px] font-mono font-bold ${phone.length === 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    {phone.length}/10 số
+                    {phone.length}/10 digits
                   </span>
                 </div>
                 <input
@@ -239,57 +239,57 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                   minLength={10}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="VD: 0987654321"
+                  placeholder="e.g., 0987654321"
                   className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-mono focus:outline-hidden focus:border-[#E81A7F]"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Tỉnh / Thành phố sinh sống
+                  Province / City of Residence
                 </label>
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F]"
                 >
-                  <optgroup label="Thành phố trực thuộc Trung ương">
-                    <option value="Hà Nội">Hà Nội</option>
-                    <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
-                    <option value="Hải Phòng">Hải Phòng</option>
-                    <option value="Đà Nẵng">Đà Nẵng</option>
-                    <option value="Huế">Huế</option>
-                    <option value="Cần Thơ">Cần Thơ</option>
+                  <optgroup label="Centrally-Governed Cities">
+                    <option value="Hanoi">Hanoi</option>
+                    <option value="Ho Chi Minh City">Ho Chi Minh City</option>
+                    <option value="Hai Phong">Hai Phong</option>
+                    <option value="Da Nang">Da Nang</option>
+                    <option value="Hue">Hue</option>
+                    <option value="Can Tho">Can Tho</option>
                   </optgroup>
-                  <optgroup label="Tỉnh">
+                  <optgroup label="Provinces">
                     <option value="An Giang">An Giang</option>
-                    <option value="Bắc Ninh">Bắc Ninh</option>
-                    <option value="Cà Mau">Cà Mau</option>
-                    <option value="Cao Bằng">Cao Bằng</option>
-                    <option value="Đắk Lắk">Đắk Lắk</option>
-                    <option value="Điện Biên">Điện Biên</option>
-                    <option value="Đồng Nai">Đồng Nai</option>
-                    <option value="Đồng Tháp">Đồng Tháp</option>
+                    <option value="Bac Ninh">Bac Ninh</option>
+                    <option value="Ca Mau">Ca Mau</option>
+                    <option value="Cao Bang">Cao Bang</option>
+                    <option value="Dak Lak">Dak Lak</option>
+                    <option value="Dien Bien">Dien Bien</option>
+                    <option value="Dong Nai">Dong Nai</option>
+                    <option value="Dong Thap">Dong Thap</option>
                     <option value="Gia Lai">Gia Lai</option>
-                    <option value="Hà Tĩnh">Hà Tĩnh</option>
-                    <option value="Hưng Yên">Hưng Yên</option>
-                    <option value="Khánh Hòa">Khánh Hòa</option>
-                    <option value="Lai Châu">Lai Châu</option>
-                    <option value="Lâm Đồng">Lâm Đồng</option>
-                    <option value="Lạng Sơn">Lạng Sơn</option>
-                    <option value="Lào Cai">Lào Cai</option>
-                    <option value="Nghệ An">Nghệ An</option>
-                    <option value="Ninh Bình">Ninh Bình</option>
-                    <option value="Phú Thọ">Phú Thọ</option>
-                    <option value="Quảng Ngãi">Quảng Ngãi</option>
-                    <option value="Quảng Ninh">Quảng Ninh</option>
-                    <option value="Quảng Trị">Quảng Trị</option>
-                    <option value="Sơn La">Sơn La</option>
-                    <option value="Tây Ninh">Tây Ninh</option>
-                    <option value="Thái Nguyên">Thái Nguyên</option>
-                    <option value="Thanh Hóa">Thanh Hóa</option>
-                    <option value="Tuyên Quang">Tuyên Quang</option>
-                    <option value="Vĩnh Long">Vĩnh Long</option>
+                    <option value="Ha Tinh">Ha Tinh</option>
+                    <option value="Hung Yen">Hung Yen</option>
+                    <option value="Khanh Hoa">Khanh Hoa</option>
+                    <option value="Lai Chau">Lai Chau</option>
+                    <option value="Lam Dong">Lam Dong</option>
+                    <option value="Lang Son">Lang Son</option>
+                    <option value="Lao Cai">Lao Cai</option>
+                    <option value="Nghe An">Nghe An</option>
+                    <option value="Ninh Binh">Ninh Binh</option>
+                    <option value="Phu Tho">Phu Tho</option>
+                    <option value="Quang Ngai">Quang Ngai</option>
+                    <option value="Quang Ninh">Quang Ninh</option>
+                    <option value="Quang Tri">Quang Tri</option>
+                    <option value="Son La">Son La</option>
+                    <option value="Tay Ninh">Tay Ninh</option>
+                    <option value="Thai Nguyen">Thai Nguyen</option>
+                    <option value="Thanh Hoa">Thanh Hoa</option>
+                    <option value="Tuyen Quang">Tuyen Quang</option>
+                    <option value="Vinh Long">Vinh Long</option>
                   </optgroup>
                 </select>
               </div>
@@ -310,7 +310,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 className="px-6 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer ml-auto"
               >
                 <Save className="w-4 h-4" />
-                <span>Lưu Thay Đổi</span>
+                <span>Save Changes</span>
               </button>
             </div>
           </form>
@@ -319,12 +319,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
             <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
               <Calendar className="w-4 h-4 text-[#E81A7F]" />
-              <span>Chiến dịch đã đăng ký tham gia ({myRegistrations.length})</span>
+              <span>Registered Campaigns ({myRegistrations.length})</span>
             </h4>
 
             {myRegistrations.length === 0 ? (
               <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-center text-xs text-slate-500">
-                Bạn chưa đăng ký chiến dịch nào. Hãy nhấn nút Đăng ký TNV trên trang chủ để tham gia cùng chúng tôi!
+                You haven't registered for any campaigns yet. Click the "Volunteer" button on the homepage to join us!
               </div>
             ) : (
               <div className="space-y-2">
@@ -335,7 +335,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                   >
                     <div>
                       <div className="font-bold text-slate-900 dark:text-slate-100">{reg.eventName}</div>
-                      <div className="text-slate-500">Địa điểm: {reg.city} • Size áo: {reg.tshirtSize}</div>
+                      <div className="text-slate-500">Location: {reg.city} • Shirt size: {reg.tshirtSize}</div>
                     </div>
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                       reg.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-yellow-100 text-yellow-800'
@@ -352,8 +352,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           <div className="p-4 bg-slate-100 dark:bg-slate-800/70 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
             {isAllowedAdminEmail(user.email) && (
               <div>
-                <div className="text-xs font-bold text-slate-900 dark:text-slate-100">Chuyển đổi chế độ xem:</div>
-                <div className="text-[11px] text-slate-500">Xem giao diện dưới quyền Admin hoặc Tình nguyện viên</div>
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-100">Switch View Mode:</div>
+                <div className="text-[11px] text-slate-500">View the interface as an Admin or as a Volunteer</div>
               </div>
             )}
 
@@ -364,7 +364,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                   onClick={() => switchRole(user.role === 'admin' ? 'volunteer' : 'admin')}
                   className="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold hover:text-[#E81A7F] transition-colors cursor-pointer"
                 >
-                  Chuyển sang: {user.role === 'admin' ? 'Tài Khoản Cá Nhân' : 'Tài Khoản Admin'}
+                  Switch to: {user.role === 'admin' ? 'Personal Account' : 'Admin Account'}
                 </button>
               )}
 
@@ -377,7 +377,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Đăng xuất</span>
+                <span>Logout</span>
               </button>
             </div>
           </div>

@@ -26,6 +26,7 @@ import {
   Loader2,
   KeyRound
 } from 'lucide-react';
+import { normalizeBirthYear } from '../utils/volunteerUtils';
 import { dbService } from '../services/dbService';
 import {
   VolunteerRegistration,
@@ -48,6 +49,7 @@ import {
   syncAllVolunteersToGoogleSheets,
   clearAllVolunteersFromGoogleSheets,
   validateSheetUrl,
+  getGoogleAppsScriptUrl,
   SheetVolunteerRow,
   DEFAULT_SPREADSHEET_ID
 } from '../services/googleSheetsService';
@@ -90,8 +92,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [isCreatingVolunteer, setIsCreatingVolunteer] = useState(false);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [isCreatingNews, setIsCreatingNews] = useState(false);
+  const [refreshToast, setRefreshToast] = useState<{ message: string; isError?: boolean } | null>(null);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
+
+  const handleManualRefresh = async () => {
+    if (isManualRefreshing) return;
+    setIsManualRefreshing(true);
+    setRefreshToast({ message: 'Refreshing data...' });
+    const minSpinPromise = new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      await Promise.all([refreshData(), minSpinPromise]);
+      setRefreshToast({ message: '✓ All data refreshed successfully!', isError: false });
+    } catch (err: any) {
+      await minSpinPromise;
+      setRefreshToast({ message: '⚠ Refresh error: ' + (err?.message || 'Unable to connect'), isError: true });
+    } finally {
+      setIsManualRefreshing(false);
+      setTimeout(() => {
+        setRefreshToast(null);
+      }, 3000);
+    }
+  };
 
   const refreshData = async () => {
+    let freshVols = volunteers;
     try {
       const [usersRes, volsRes, eventsRes, newsRes, partnersRes, galleryRes, statsRes] = await Promise.allSettled([
         dbService.getUsers(),
@@ -103,22 +127,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         dbService.getStats(),
       ]);
 
-      if (usersRes.status === 'fulfilled' && usersRes.value && usersRes.value.length > 0) {
+      if (usersRes.status === 'fulfilled' && usersRes.value) {
         setUsers(usersRes.value);
       }
-      if (volsRes.status === 'fulfilled' && volsRes.value && volsRes.value.length > 0) {
+      if (volsRes.status === 'fulfilled' && volsRes.value) {
         setVolunteers(volsRes.value);
+        freshVols = volsRes.value;
       }
-      if (eventsRes.status === 'fulfilled' && eventsRes.value && eventsRes.value.length > 0) {
+      if (eventsRes.status === 'fulfilled' && eventsRes.value) {
         setEvents(eventsRes.value);
       }
-      if (newsRes.status === 'fulfilled' && newsRes.value && newsRes.value.length > 0) {
+      if (newsRes.status === 'fulfilled' && newsRes.value) {
         setNews(newsRes.value);
       }
-      if (partnersRes.status === 'fulfilled' && partnersRes.value && partnersRes.value.length > 0) {
+      if (partnersRes.status === 'fulfilled' && partnersRes.value) {
         setPartners(partnersRes.value);
       }
-      if (galleryRes.status === 'fulfilled' && galleryRes.value && galleryRes.value.length > 0) {
+      if (galleryRes.status === 'fulfilled' && galleryRes.value) {
         setGallery(galleryRes.value);
       }
       if (statsRes.status === 'fulfilled' && statsRes.value) {
@@ -131,22 +156,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     // Fetch live rows from Google Sheets API
     setIsLoadingLiveSheets(true);
     try {
-      const sheetRes = await fetchDataFromSheets(appScriptUrl);
-      if (sheetRes.success && sheetRes.rows.length > 0) {
+      const activeSheetUrl = appScriptUrl || getGoogleAppsScriptUrl();
+      const sheetRes = await fetchDataFromSheets(activeSheetUrl);
+      if (sheetRes.success && sheetRes.rows && sheetRes.rows.length > 0) {
         setLiveSheetRows(sheetRes.rows);
       } else {
         // Fallback to local volunteer list if sheet is currently empty
-        setLiveSheetRows((volunteers.length > 0 ? volunteers : INITIAL_VOLUNTEERS).map((v, idx) => ({
+        setLiveSheetRows((freshVols.length > 0 ? freshVols : INITIAL_VOLUNTEERS).map((v, idx) => ({
           stt: idx + 1,
-          adminRole: v.fullName.includes('Admin') ? '(Admin)' : '',
-          registeredAt: new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-          fullName: v.fullName,
-          phone: v.phone,
-          email: v.email,
-          city: v.city,
-          ageGroup: v.ageGroup || '22 tuổi',
-          eventName: v.eventName,
-          skills: (v.skills || []).join(', '),
+          adminRole: v.fullName?.includes('Admin') ? '(Admin)' : '',
+          registeredAt: v.registeredAt ? new Date(v.registeredAt).toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }) : '',
+          fullName: v.fullName || '',
+          phone: v.phone || '',
+          email: v.email || '',
+          city: v.city || '',
+          birthYear: normalizeBirthYear(v.birthYear),
+          eventName: v.eventName || '',
+          skills: (Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')),
           status: v.status || 'Approved',
           notes: v.notes || ''
         })));
@@ -170,7 +196,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // Account CRUD
   const handleDeleteAccount = async (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa tài khoản này? Mật khẩu đã lưu của tài khoản cũng sẽ bị xóa.')) {
+    if (window.confirm('Are you sure you want to delete this account? Its saved password will also be deleted.')) {
       await dbService.deleteUser(id);
       refreshData();
     }
@@ -178,7 +204,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // Volunteer CRUD
   const handleDeleteVolunteer = async (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa bản ghi tình nguyện viên này khỏi CSDL?')) {
+    if (window.confirm('Are you sure you want to delete this volunteer record from the database?')) {
       await dbService.deleteVolunteer(id);
       refreshData();
     }
@@ -191,7 +217,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // Event CRUD
   const handleDeleteEvent = async (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
+    if (window.confirm('Are you sure you want to delete this event?')) {
       await dbService.deleteEvent(id);
       refreshData();
     }
@@ -199,7 +225,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // News CRUD
   const handleDeleteNews = async (id: string) => {
-    if (window.confirm('Bạn có chắc muốn xóa bài viết này?')) {
+    if (window.confirm('Are you sure you want to delete this article?')) {
       await dbService.deleteNews(id);
       refreshData();
     }
@@ -207,7 +233,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // Partner CRUD
   const handleDeletePartner = async (id: string) => {
-    if (window.confirm('Bạn có chắc muốn xóa đối tác này?')) {
+    if (window.confirm('Are you sure you want to delete this partner?')) {
       await dbService.deletePartner(id);
       refreshData();
     }
@@ -215,16 +241,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   // CSV Export for Google Sheets & Excel (Bulletproof UTF-8 BOM)
   const exportVolunteersCSV = () => {
-    const headers = ['STT', 'Vai Trò', 'Thời Gian Đăng Ký', 'Họ Và Tên', 'Số Điện Thoại', 'Email', 'Địa Chỉ / Tỉnh Thành', 'Độ Tuổi', 'Dự Án Đăng Ký', 'Kỹ Năng Hoặc Vai Trò', 'Trạng Thái', 'Ghi Chú'];
+    const headers = ['No.', 'Role', 'Registered At', 'Full Name', 'Phone Number', 'Email', 'Address / City', 'Birth Year', 'Registered Campaign', 'Skills or Role', 'Status', 'Notes'];
     const rows = (liveSheetRows.length > 0 ? liveSheetRows : volunteers).map((v: any, idx) => [
       idx + 1,
       v.adminRole || '',
-      new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+      new Date(v.registeredAt).toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
       `"${(v.fullName || '').replace(/"/g, '""')}"`,
       `'${v.phone || ''}`,
       `"${(v.email || '').replace(/"/g, '""')}"`,
       `"${(v.city || '').replace(/"/g, '""')}"`,
-      `"${v.ageGroup || ''}"`,
+      `"${normalizeBirthYear(v.birthYear)}"`,
       `"${(v.eventName || '').replace(/"/g, '""')}"`,
       `"${(Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')).replace(/"/g, '""')}"`,
       v.status || 'Approved',
@@ -235,7 +261,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `Danh_Sach_TNV_LetDoIt_2026_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Volunteer_List_LetDoIt_2026_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -243,15 +269,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   };
 
   const copyGoogleSheetToClipboard = () => {
-    const headers = ['STT', 'Thời Gian Đăng Ký', 'Họ Và Tên', 'Số Điện Thoại', 'Email', 'Địa Chỉ / Tỉnh Thành', 'Độ Tuổi', 'Dự Án Đăng Ký', 'Kỹ Năng / Vai Trò', 'Trạng Thái', 'Ghi Chú'];
+    const headers = ['No.', 'Registered At', 'Full Name', 'Phone Number', 'Email', 'Address / City', 'Birth Year', 'Registered Campaign', 'Skills / Role', 'Status', 'Notes'];
     const rows = (liveSheetRows.length > 0 ? liveSheetRows : volunteers).map((v: any, idx) => [
       idx + 1,
-      new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+      new Date(v.registeredAt).toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
       v.fullName,
       v.phone,
       v.email,
       v.city,
-      v.ageGroup || '',
+      normalizeBirthYear(v.birthYear),
       v.eventName,
       Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || ''),
       v.status || 'Approved',
@@ -278,13 +304,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     try {
       const res = await syncAllVolunteersToGoogleSheets(volunteers, appScriptUrl);
       if (res.success) {
-        setSyncResultMsg({ text: `✓ Đã đồng bộ thành công ${volunteers.length} dòng lên Google Sheets!` });
+        setSyncResultMsg({ text: `✓ Successfully synced ${volunteers.length} rows to Google Sheets!` });
         refreshData();
       } else {
         setSyncResultMsg({ text: `⚠ ${res.message}`, isError: true });
       }
     } catch (err: any) {
-      setSyncResultMsg({ text: `⚠ ${err?.message || 'Lỗi đồng bộ'}`, isError: true });
+      setSyncResultMsg({ text: `⚠ ${err?.message || 'Sync error'}`, isError: true });
     } finally {
       setIsSyncingAll(false);
       setTimeout(() => setSyncResultMsg(null), 5000);
@@ -293,7 +319,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   const handleClearAllSheetData = async () => {
     const confirmed = window.confirm(
-      `Bạn sắp XÓA VĨNH VIỄN toàn bộ ${displayRows.length} dòng dữ liệu trong Google Sheet thật (chỉ giữ lại dòng tiêu đề). Hành động này KHÔNG THỂ hoàn tác. Tiếp tục?`
+      `You are about to PERMANENTLY DELETE all ${displayRows.length} rows of data in the live Google Sheet (only the header row will remain). This action CANNOT be undone. Continue?`
     );
     if (!confirmed) return;
 
@@ -302,14 +328,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     try {
       const res = await clearAllVolunteersFromGoogleSheets(appScriptUrl);
       if (res.success) {
-        setSyncResultMsg({ text: '✓ Đã xóa toàn bộ dữ liệu trên Google Sheets!' });
+        setSyncResultMsg({ text: '✓ All data on Google Sheets has been deleted!' });
         setLiveSheetRows([]);
         refreshData();
       } else {
         setSyncResultMsg({ text: `⚠ ${res.message}`, isError: true });
       }
     } catch (err: any) {
-      setSyncResultMsg({ text: `⚠ ${err?.message || 'Lỗi khi xóa dữ liệu'}`, isError: true });
+      setSyncResultMsg({ text: `⚠ ${err?.message || 'Error deleting data'}`, isError: true });
     } finally {
       setIsClearingSheet(false);
       setTimeout(() => setSyncResultMsg(null), 5000);
@@ -326,12 +352,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     : volunteers.slice().reverse().map((v, idx) => ({
       stt: idx + 1,
       adminRole: v.fullName.includes('Admin') ? '(Admin)' : '',
-      registeredAt: new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+      registeredAt: new Date(v.registeredAt).toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
       fullName: v.fullName,
       phone: v.phone,
       email: v.email,
       city: v.city,
-      ageGroup: v.ageGroup || '22 tuổi',
+      birthYear: normalizeBirthYear(v.birthYear),
       eventName: v.eventName,
       skills: (v.skills || []).join(', '),
       status: v.status || 'Approved',
@@ -357,8 +383,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         className="relative bg-slate-950 text-slate-100 rounded-3xl max-w-6xl w-full h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-slate-700 animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Floating Refresh Toast Banner */}
+        {refreshToast && (
+          <div className={`absolute top-18 right-6 z-[999999] px-4 py-2 rounded-xl shadow-2xl border text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            refreshToast.isError
+              ? 'bg-red-900 border-red-500 text-red-100'
+              : 'bg-emerald-900 border-emerald-500 text-emerald-100'
+          }`}>
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isManualRefreshing || isLoadingLiveSheets ? 'animate-spin' : ''}`}
+              style={isManualRefreshing || isLoadingLiveSheets ? { animation: 'spin 0.8s linear infinite' } : undefined}
+            />
+            <span>{refreshToast.message}</span>
+          </div>
+        )}
 
-        {/* 1. KHUNG VIỀN & HEADER CHÍNH (GRADIENT ĐỎ/TÍM SANG TRỌNG) */}
+        {/* 1. Main header frame (elegant red/purple gradient) */}
         <div className="bg-gradient-to-r from-[#990033] via-[#6A0DAD] to-[#120E2E] px-6 py-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0 shadow-lg">
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-white shadow-inner backdrop-blur-xs">
@@ -367,38 +407,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             <div>
               <div className="flex items-center gap-2.5">
                 <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                  Hệ Thống Quản Trị Cơ Sở Dữ Liệu
+                  Database Admin System
                 </h3>
                 <span className="bg-[#FF2A85] text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-xs tracking-wider border border-white/20">
                   ENTERPRISE DB V2.0
                 </span>
               </div>
               <p className="text-xs text-white/85 font-medium mt-0.5">
-                Let's do it! Vietnam • Quản trị tập trung tình nguyện viên, chiến dịch, tin tức &amp; nguồn lực
+                Let's do it! Vietnam • Centralized management of volunteers, campaigns, news &amp; resources
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              onClick={refreshData}
-              title="Làm mới dữ liệu từ Google Sheets"
-              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition-colors cursor-pointer border border-white/15"
+              onClick={handleManualRefresh}
+              disabled={isManualRefreshing || isLoadingLiveSheets}
+              title="Refresh data from the database & Google Sheets"
+              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 disabled:opacity-75 rounded-xl transition-all cursor-pointer border border-white/15 flex items-center justify-center"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoadingLiveSheets ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isManualRefreshing || isLoadingLiveSheets ? 'animate-spin text-emerald-300' : ''}`}
+                style={isManualRefreshing || isLoadingLiveSheets ? { animation: 'spin 0.8s linear infinite' } : undefined}
+              />
             </button>
             <button
               id="close-db-admin-btn"
               onClick={onClose}
               className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-red-600/80 rounded-xl transition-colors cursor-pointer border border-white/15"
-              title="Đóng"
+              title="Close"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* 2. THANH MENU ĐIỀU HƯỚNG (NAVIGATION TABS - ACTIVE NỀN XANH LÁ CÂY SÁNG NỔI BẬT) */}
+        {/* 2. Navigation tabs (active tab highlighted in bright green) */}
         <div className="bg-slate-900 px-6 py-2.5 border-b border-slate-800 flex items-center gap-2 overflow-x-auto text-xs font-bold scrollbar-none flex-shrink-0">
 
           {/* TAB GOOGLE SHEETS */}
@@ -413,7 +457,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             <span>Google Sheets</span>
           </button>
 
-          {/* TAB TÀI KHOẢN */}
+          {/* TAB ACCOUNTS */}
           <button
             onClick={() => setActiveTab('accounts')}
             className={`px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'accounts'
@@ -422,13 +466,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               }`}
           >
             <KeyRound className="w-4 h-4" />
-            <span>Tài Khoản</span>
+            <span>Accounts</span>
             <span className="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-mono">
               {users.length}
             </span>
           </button>
 
-          {/* TAB TÌNH NGUYỆN VIÊN */}
+          {/* TAB VOLUNTEERS */}
           <button
             onClick={() => setActiveTab('volunteers')}
             className={`px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'volunteers'
@@ -437,13 +481,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               }`}
           >
             <Users className="w-4 h-4" />
-            <span>Tình Nguyện Viên</span>
+            <span>Volunteers</span>
             <span className="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-mono">
               {volunteers.length}
             </span>
           </button>
 
-          {/* TAB SỰ KIỆN DỌN RÁC */}
+          {/* TAB CLEANUP EVENTS */}
           <button
             onClick={() => setActiveTab('events')}
             className={`px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'events'
@@ -452,13 +496,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               }`}
           >
             <Calendar className="w-4 h-4" />
-            <span>Sự Kiện Dọn Rác</span>
+            <span>Cleanup Events</span>
             <span className="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-mono">
               {events.length}
             </span>
           </button>
 
-          {/* TAB TIN TỨC */}
+          {/* TAB NEWS */}
           <button
             onClick={() => setActiveTab('news')}
             className={`px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'news'
@@ -467,13 +511,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               }`}
           >
             <FileText className="w-4 h-4" />
-            <span>Tin Tức &amp; Báo Chí</span>
+            <span>News &amp; Press</span>
             <span className="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-mono">
               {news.length}
             </span>
           </button>
 
-          {/* TAB ĐỐI TÁC ESG */}
+          {/* TAB ESG PARTNERS */}
           <button
             onClick={() => setActiveTab('partners')}
             className={`px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'partners'
@@ -482,13 +526,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               }`}
           >
             <Building2 className="w-4 h-4" />
-            <span>Đối Tác ESG</span>
+            <span>ESG Partners</span>
             <span className="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full font-mono">
               {partners.length}
             </span>
           </button>
 
-          {/* TAB TỔNG QUAN & KPI */}
+          {/* TAB OVERVIEW & KPI */}
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'overview'
@@ -497,7 +541,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               }`}
           >
             <BarChart3 className="w-4 h-4" />
-            <span>Tổng Quan &amp; KPI</span>
+            <span>Overview &amp; KPI</span>
           </button>
         </div>
 
@@ -510,10 +554,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
 
 
-              {/* 3. THANH TRẠNG THÁI PHỤ (ĐƯỜNG DẪN OBFUSCATED GOOGLE SCRIPT) */}
+              {/* 3. Secondary status bar (obfuscated Google Script URL) */}
               <div className="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 text-xs flex flex-wrap items-center justify-end gap-3 shadow-md">
 
-                {/* Ô hiển thị đường dẫn obfuscated Google Script */}
+                {/* Obfuscated Google Script URL display */}
                 <div className="flex items-center gap-2 flex-1 sm:flex-initial min-w-[280px]">
                   <LinkIcon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <div className="flex-1 sm:w-72 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-emerald-400 font-mono text-[11px] truncate select-all">
@@ -522,23 +566,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                   <button
                     onClick={openAdminCustomSheetLink}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition-colors cursor-pointer flex items-center gap-1 shrink-0"
-                    title="Mở Google Sheet trên Drive"
+                    title="Open Google Sheet on Drive"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Mở Sheet</span>
+                    <span>Open Sheet</span>
                   </button>
                   <button
                     onClick={handleClearAllSheetData}
                     disabled={isClearingSheet || displayRows.length === 0}
                     className="bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-3 py-1.5 rounded-xl text-xs transition-colors cursor-pointer flex items-center gap-1 shrink-0"
-                    title="Xóa toàn bộ dữ liệu trên Google Sheet (giữ lại dòng tiêu đề)"
+                    title="Delete all data on the Google Sheet (keeps the header row)"
                   >
                     {isClearingSheet ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
                       <Trash2 className="w-3.5 h-3.5" />
                     )}
-                    <span>Xóa Tất Cả</span>
+                    <span>Clear All</span>
                   </button>
                 </div>
               </div>
@@ -552,7 +596,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                 </div>
               )}
 
-              {/* 4. BẢNG DỮ LIỆU CHÍNH (DATA TABLE VỚI CÁC CỘT CHUẨN XÁC) */}
+              {/* 4. Main data table (with exact matching columns) */}
               <div className="bg-white rounded-2xl overflow-hidden border border-slate-300 shadow-2xl text-slate-900">
 
                 {/* Table Grid Content */}
@@ -561,34 +605,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     <thead className="bg-[#4472C4] text-white font-black border-b-2 border-[#2f5597] sticky top-0 z-10 select-none">
                       <tr>
                         <th className="py-2.5 px-3 border-r border-white/20 text-center w-14">
-                          <span className="text-[10px] font-bold uppercase">STT</span>
+                          <span className="text-[10px] font-bold uppercase">No.</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[140px] text-center">
-                          <span className="text-[10px] font-bold uppercase">Thời Gian</span>
+                          <span className="text-[10px] font-bold uppercase">Time</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[160px] text-center">
-                          <span className="text-[10px] font-bold uppercase">Họ Và Tên</span>
+                          <span className="text-[10px] font-bold uppercase">Full Name</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[120px] text-center">
-                          <span className="text-[10px] font-bold uppercase">SDT</span>
+                          <span className="text-[10px] font-bold uppercase">Phone</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[170px] text-center">
                           <span className="text-[10px] font-bold uppercase">Email</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[140px] text-center">
-                          <span className="text-[10px] font-bold uppercase">Địa Chỉ</span>
+                          <span className="text-[10px] font-bold uppercase">Address</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 text-center min-w-[100px]">
-                          <span className="text-[10px] font-bold uppercase">Tuổi</span>
+                          <span className="text-[10px] font-bold uppercase">Birth Year</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[210px] text-center">
-                          <span className="text-[10px] font-bold uppercase">Dự Án</span>
+                          <span className="text-[10px] font-bold uppercase">Campaign</span>
                         </th>
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[180px] text-center">
-                          <span className="text-[10px] font-bold uppercase">Kỹ Năng</span>
+                          <span className="text-[10px] font-bold uppercase">Skills</span>
                         </th>
                         <th className="py-2.5 px-3 text-center min-w-[110px]">
-                          <span className="text-[10px] font-bold uppercase">Trạng Thái</span>
+                          <span className="text-[10px] font-bold uppercase">Status</span>
                         </th>
                       </tr>
                     </thead>
@@ -596,8 +640,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                       {displayRows.length === 0 ? (
                         <tr>
                           <td colSpan={10} className="py-12 text-center text-slate-500 font-sans">
-                            <div className="text-sm font-bold text-slate-700 mb-1">Chưa có dữ liệu hàng trong bảng tính</div>
-                            <p className="text-xs text-slate-400">Khi có thành viên đăng ký, hàng dữ liệu mới sẽ xuất hiện tự động tại đây!</p>
+                            <div className="text-sm font-bold text-slate-700 mb-1">No rows in the spreadsheet yet</div>
+                            <p className="text-xs text-slate-400">When members register, new data rows will automatically appear here!</p>
                           </td>
                         </tr>
                       ) : (
@@ -606,7 +650,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             key={idx}
                             className={`hover:bg-emerald-50/70 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/90'}`}
                           >
-                            {/* Cột không tên: (Admin) hoặc STT */}
+                            {/* Unnamed column: (Admin) or row number */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-bold bg-slate-100/70 text-slate-700">
                               <div>{idx + 1}</div>
                               {v.adminRole && (
@@ -621,7 +665,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-bold font-sans text-slate-900">
                               {v.fullName}
                             </td>
-                            {/* D: Số ĐT (Xanh dương đậm nổi bật) */}
+                            {/* D: Phone (highlighted in bold blue) */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center text-blue-700 font-bold font-mono">
                               {v.phone}
                             </td>
@@ -629,23 +673,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             <td className="py-2 px-3 border-r border-slate-200 text-center text-slate-700">
                               {v.email}
                             </td>
-                            {/* F: Địa Chỉ / Tỉnh */}
+                            {/* F: Address / Province */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans text-slate-800">
                               {v.city}
                             </td>
-                            {/* G: Độ Tuổi */}
+                            {/* G: Birth Year */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-bold text-slate-700">
-                              {v.ageGroup || '22 tuổi'}
+                              {normalizeBirthYear(v.birthYear)}
                             </td>
-                            {/* H: Dự Án / Chiến Dịch (Màu tím/hồng đậm) */}
+                            {/* H: Project / Campaign (dark purple/pink) */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans font-semibold text-purple-800">
                               {v.eventName}
                             </td>
-                            {/* I: Kỹ Năng / Vai Trò */}
+                            {/* I: Skills / Role */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans text-slate-700">
                               {v.skills}
                             </td>
-                            {/* J: Trạng Thái (Badge màu xanh lá cây bo góc Approved) */}
+                            {/* J: Status (rounded green "Approved" badge) */}
                             <td className="py-2 px-3 text-center">
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-sans bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs inline-block">
                                 Approved
@@ -662,13 +706,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             </div>
           )}
 
-          {/* TAB ACCOUNTS: TÀI KHOẢN ĐĂNG NHẬP */}
+          {/* TAB ACCOUNTS: LOGIN ACCOUNTS */}
           {activeTab === 'accounts' && (
             <div className="space-y-4">
               <div className="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 text-xs text-slate-300 flex items-center gap-2">
                 <KeyRound className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
-                  Mật khẩu được lưu dưới dạng mã hoá một chiều (salted hash) nên hệ thống không thể hiển thị mật khẩu gốc — cột "Mật Khẩu" chỉ cho biết tài khoản đã thiết lập mật khẩu hay đăng nhập qua mạng xã hội.
+                  Passwords are stored as a one-way salted hash, so the system cannot display the original password — the "Password" column only shows whether an account has a password set or signs in via a social provider.
                 </span>
               </div>
 
@@ -676,18 +720,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
                     <tr>
-                      <th className="py-3 px-4 font-semibold">Tài Khoản</th>
-                      <th className="py-3 px-4 font-semibold">Mật Khẩu</th>
-                      <th className="py-3 px-4 font-semibold">Vai Trò</th>
-                      <th className="py-3 px-4 font-semibold">Ngày Tham Gia</th>
-                      <th className="py-3 px-4 font-semibold text-right">Thao Tác</th>
+                      <th className="py-3 px-4 font-semibold">Account</th>
+                      <th className="py-3 px-4 font-semibold">Password</th>
+                      <th className="py-3 px-4 font-semibold">Role</th>
+                      <th className="py-3 px-4 font-semibold">Date Joined</th>
+                      <th className="py-3 px-4 font-semibold text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800">
                     {users.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="py-6 px-4 text-center text-slate-500">
-                          Chưa có tài khoản nào được đăng ký.
+                          No accounts have been registered yet.
                         </td>
                       </tr>
                     ) : (
@@ -702,11 +746,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             <td className="py-3 px-4">
                               {hasPassword ? (
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                  •••••••• (đã mã hoá)
+                                  •••••••• (encrypted)
                                 </span>
                               ) : (
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                                  Đăng nhập qua {u.provider === 'google' ? 'Google' : u.provider === 'facebook' ? 'Facebook' : u.provider}
+                                  Signed in via {u.provider === 'google' ? 'Google' : u.provider === 'facebook' ? 'Facebook' : u.provider}
                                 </span>
                               )}
                             </td>
@@ -716,7 +760,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                               <button
                                 onClick={() => handleDeleteAccount(u.id)}
                                 className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg transition-colors cursor-pointer"
-                                title="Xóa tài khoản"
+                                title="Delete account"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -740,7 +784,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
-                      placeholder="Tìm theo tên, email, sđt hoặc chiến dịch..."
+                      placeholder="Search by name, email, phone, or campaign..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-hidden focus:border-emerald-500"
@@ -753,7 +797,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Xuất CSV</span>
+                    <span>Export CSV</span>
                   </button>
                 </div>
               </div>
@@ -762,12 +806,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
                     <tr>
-                      <th className="py-3 px-4 font-semibold">Tên Tình Nguyện Viên</th>
-                      <th className="py-3 px-4 font-semibold">Thông Tin Liên Hệ</th>
-                      <th className="py-3 px-4 font-semibold">Chiến Dịch &amp; Địa Chỉ</th>
-                      <th className="py-3 px-4 font-semibold">Độ Tuổi &amp; Kỹ Năng</th>
-                      <th className="py-3 px-4 font-semibold">Trạng Thái</th>
-                      <th className="py-3 px-4 font-semibold text-right">Thao Tác</th>
+                      <th className="py-3 px-4 font-semibold">Volunteer Name</th>
+                      <th className="py-3 px-4 font-semibold">Contact Info</th>
+                      <th className="py-3 px-4 font-semibold">Campaign &amp; Address</th>
+                      <th className="py-3 px-4 font-semibold">Birth Year &amp; Skills</th>
+                      <th className="py-3 px-4 font-semibold">Status</th>
+                      <th className="py-3 px-4 font-semibold text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800">
@@ -786,7 +830,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                           <div className="text-slate-400 text-[11px]">{v.city}</div>
                         </td>
                         <td className="py-3 px-4 text-slate-300">
-                          <div className="font-bold text-emerald-400">{v.ageGroup || '22 tuổi'}</div>
+                          <div className="font-bold text-emerald-400">{normalizeBirthYear(v.birthYear)}</div>
                           <div className="text-slate-400 text-[11px]">{(v.skills || []).join(', ')}</div>
                         </td>
                         <td className="py-3 px-4">
@@ -805,7 +849,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                           <button
                             onClick={() => handleDeleteVolunteer(v.id)}
                             className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg transition-colors cursor-pointer"
-                            title="Xóa"
+                            title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -823,8 +867,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             <div className="space-y-4">
               <div className="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
                 <div>
-                  <h4 className="font-bold text-base text-white">Danh Sách Chiến Dịch &amp; Điểm Dọn Rác</h4>
-                  <p className="text-xs text-slate-400">Tổng cộng {events.length} sự kiện trên 63 tỉnh thành</p>
+                  <h4 className="font-bold text-base text-white">Campaign &amp; Cleanup Spot List</h4>
+                  <p className="text-xs text-slate-400">A total of {events.length} events across 63 provinces</p>
                 </div>
               </div>
 
@@ -844,13 +888,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                     <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
                       <div>
-                        <span>Đã đăng ký: </span>
-                        <strong className="text-emerald-400">{evt.registeredCount}</strong> / {evt.targetVolunteers} TNV
+                        <span>Registered: </span>
+                        <strong className="text-emerald-400">{evt.registeredCount}</strong> / {evt.targetVolunteers} volunteers
                       </div>
                       <button
                         onClick={() => handleDeleteEvent(evt.id)}
                         className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg transition-colors cursor-pointer"
-                        title="Xóa sự kiện"
+                        title="Delete event"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -865,7 +909,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           {activeTab === 'news' && (
             <div className="space-y-4">
               <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                <h4 className="font-bold text-base text-white">Tin Tức &amp; Báo Chí Viết Về Chúng Tôi</h4>
+                <h4 className="font-bold text-base text-white">News &amp; Press Coverage About Us</h4>
               </div>
               <div className="space-y-3">
                 {news.map((item) => (
@@ -896,7 +940,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                 <div key={p.id} className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-start gap-4">
                   <img src={p.logo} alt={p.name} className="w-14 h-14 rounded-xl object-cover bg-slate-950" />
                   <div className="flex-1">
-                    <span className="text-[10px] text-yellow-300 font-bold bg-yellow-950 px-2 py-0.5 rounded">Hạng {p.tier}</span>
+                    <span className="text-[10px] text-yellow-300 font-bold bg-yellow-950 px-2 py-0.5 rounded">{p.tier} Tier</span>
                     <h5 className="font-bold text-sm text-white mt-1">{p.name}</h5>
                     <p className="text-xs text-slate-400 line-clamp-2 mt-0.5">{p.description}</p>
                   </div>
@@ -909,21 +953,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           {activeTab === 'overview' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800">
-                <span className="text-xs font-bold text-slate-400 uppercase">Tổng Tình Nguyện Viên</span>
+                <span className="text-xs font-bold text-slate-400 uppercase">Total Volunteers</span>
                 <div className="text-3xl font-black text-white mt-2">{volunteers.length}</div>
-                <div className="text-xs text-emerald-400 mt-1">Đồng bộ Google Sheets trực tiếp</div>
+                <div className="text-xs text-emerald-400 mt-1">Synced live with Google Sheets</div>
               </div>
               <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800">
-                <span className="text-xs font-bold text-slate-400 uppercase">Chiến Dịch Đang Chạy</span>
+                <span className="text-xs font-bold text-slate-400 uppercase">Active Campaigns</span>
                 <div className="text-3xl font-black text-white mt-2">{events.length}</div>
-                <div className="text-xs text-slate-400 mt-1">Trên 63 tỉnh thành</div>
+                <div className="text-xs text-slate-400 mt-1">Across 63 provinces</div>
               </div>
               <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800">
-                <span className="text-xs font-bold text-slate-400 uppercase">Đối Tác Đồng Hành</span>
+                <span className="text-xs font-bold text-slate-400 uppercase">Partners</span>
                 <div className="text-3xl font-black text-white mt-2">
-                  {((partners.length > 0 ? partners.length : stats?.totalPartners) ?? 24).toLocaleString('vi-VN')}
+                  {((partners.length > 0 ? partners.length : stats?.totalPartners) ?? 24).toLocaleString('en-US')}
                 </div>
-                <div className="text-xs text-emerald-400 mt-1">Doanh nghiệp &amp; tổ chức ESG</div>
+                <div className="text-xs text-emerald-400 mt-1">Businesses &amp; ESG organizations</div>
               </div>
             </div>
           )}

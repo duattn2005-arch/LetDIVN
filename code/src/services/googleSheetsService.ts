@@ -1,4 +1,5 @@
 import { VolunteerRegistration } from '../types';
+import { normalizeBirthYear } from '../utils/volunteerUtils';
 
 export const DEFAULT_SPREADSHEET_ID = '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
 export const GOOGLE_SHEETS_STORAGE_KEY = 'ldiv_google_sheet_webhook';
@@ -21,7 +22,7 @@ export function setGoogleAppsScriptUrl(url: string): void {
 
 export function validateSheetUrl(url: string): { isValid: boolean; isSheetDirectUrl: boolean; message?: string } {
   if (!url) {
-    return { isValid: false, isSheetDirectUrl: false, message: 'Chưa cấu hình URL' };
+    return { isValid: false, isSheetDirectUrl: false, message: 'No URL configured' };
   }
   const clean = url.trim();
   if (clean.includes('docs.google.com/spreadsheets') || clean.length >= 20) {
@@ -30,7 +31,7 @@ export function validateSheetUrl(url: string): { isValid: boolean; isSheetDirect
   if (clean.startsWith('http://') || clean.startsWith('https://')) {
     return { isValid: true, isSheetDirectUrl: false };
   }
-  return { isValid: false, isSheetDirectUrl: false, message: 'URL không hợp lệ' };
+  return { isValid: false, isSheetDirectUrl: false, message: 'Invalid URL' };
 }
 
 export function extractSpreadsheetId(urlOrId?: string): string {
@@ -54,7 +55,7 @@ export interface SheetVolunteerRow {
   phone: string;
   email: string;
   city: string;
-  ageGroup: string;
+  birthYear: string;
   eventName: string;
   skills: string;
   status: string;
@@ -71,7 +72,7 @@ export interface VolunteerFormData {
   email: string;
   city: string;
   skills: string | string[];
-  age?: string | number;
+  birthYear?: string | number;
   project?: string;
   [key: string]: any;
 }
@@ -107,19 +108,19 @@ export async function fetchDataFromSheets(customSpreadsheetId?: string): Promise
         const col2 = (row[2] || '').trim();
         const col3 = (row[3] || '').trim();
         const col4 = (row[4] || '').trim();
-        // Phải có ít nhất thông tin họ tên hoặc số điện thoại/email hợp lệ (loại bỏ các ô chỉ chứa số thứ tự trống)
+        // Must have at least a valid name or phone/email (filters out rows with only a blank sequence number)
         return (col1.length > 0 && col2.length > 0) || (col2.length > 0 && (col3.length > 0 || col4.length > 0));
       });
 
     const rows: SheetVolunteerRow[] = validRawRows.map(({ row, sheetRowNumber }, idx) => ({
       stt: idx + 1,
       adminRole: row[2]?.includes('Admin') ? '(Admin)' : '',
-      registeredAt: row[1] || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
-      fullName: row[2] || row[1] || 'Tình nguyện viên',
+      registeredAt: row[1] || new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
+      fullName: row[2] || row[1] || 'Volunteer',
       phone: row[3] || row[2] || '',
       email: row[4] || row[3] || '',
-      city: row[5] || row[4] || 'Việt Nam',
-      ageGroup: row[6] || row[5] || '22 tuổi',
+      city: row[5] || row[4] || 'Vietnam',
+      birthYear: normalizeBirthYear(row[6] || row[5] || ''),
       eventName: row[7] || row[6] || 'World Cleanup Day 2026',
       skills: row[8] || row[7] || '',
       status: row[9] || row[8] || 'Approved',
@@ -129,16 +130,16 @@ export async function fetchDataFromSheets(customSpreadsheetId?: string): Promise
 
     return { success: true, rows, total: rows.length };
   } catch (err: any) {
-    console.warn('Lỗi đọc Google Sheets:', err);
-    return { success: false, rows: [], total: 0, message: err?.message || 'Lỗi kết nối Google Sheets' };
+    console.warn('Error reading Google Sheets:', err);
+    return { success: false, rows: [], total: 0, message: err?.message || 'Error connecting to Google Sheets' };
   }
 }
 
 /**
- * 1. Hàm saveToGoogleSheet nhận vào object data (name, phone, email, city, skills, age, project).
- * 2. Chuyển đổi dữ liệu object thành định dạng chuỗi URLSearchParams:
+ * 1. saveToGoogleSheet takes a data object (name, phone, email, city, skills, birthYear, project).
+ * 2. Converts the object into a URLSearchParams string:
  *    const searchParams = new URLSearchParams(data as any);
- * 3. Gửi fetch với Content-Type: 'application/x-www-form-urlencoded' và body: searchParams.toString()
+ * 3. Sends a fetch with Content-Type: 'application/x-www-form-urlencoded' and body: searchParams.toString()
  */
 export async function saveToGoogleSheet(
   data: VolunteerFormData,
@@ -148,22 +149,22 @@ export async function saveToGoogleSheet(
     const rawUrl = customUrl || getGoogleAppsScriptUrl();
     const skillsStr = Array.isArray(data.skills) ? data.skills.join(', ') : (data.skills || '');
     const submissionId = `VOL-${Date.now().toString().slice(-6)}`;
-    const submissionTime = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+    const submissionTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' });
 
-    // Chuyển đổi dữ liệu object thành định dạng chuỗi URL tìm kiếm (URLSearchParams)
+    // Convert the data object into a URL search-params string (URLSearchParams)
     const searchParams = new URLSearchParams();
     searchParams.append('name', data.name || '');
     searchParams.append('phone', data.phone || '');
     searchParams.append('email', data.email || '');
     searchParams.append('city', data.city || '');
     searchParams.append('skills', skillsStr);
-    searchParams.append('age', String(data.age || ''));
+    searchParams.append('birthYear', String(data.birthYear || ''));
     searchParams.append('project', data.project || 'World Cleanup Day 2026');
     searchParams.append('id', submissionId);
     searchParams.append('time', submissionTime);
     searchParams.append('status', 'Approved');
 
-    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
+    // 10 Columns A -> J: ID, TIME, FULL NAME, PHONE, EMAIL, ADDRESS, BIRTH YEAR, PROJECT, SKILLS, STATUS
     const rowValues = [
       submissionId,
       submissionTime,
@@ -171,13 +172,13 @@ export async function saveToGoogleSheet(
       data.phone || '',
       data.email || '',
       data.city || '',
-      String(data.age || ''),
+      String(data.birthYear || ''),
       data.project || 'World Cleanup Day 2026',
       skillsStr,
       'Approved'
     ];
 
-    // Google Apps Script Web App Endpoint sử dụng 'application/x-www-form-urlencoded'
+    // The Google Apps Script Web App endpoint uses 'application/x-www-form-urlencoded'
     if (rawUrl && rawUrl.includes('script.google.com')) {
       try {
         await fetch(rawUrl.trim(), {
@@ -190,7 +191,7 @@ export async function saveToGoogleSheet(
       } catch (scriptErr) {
         console.warn('Google Apps Script Web App sync log:', scriptErr);
       }
-      return { success: true, message: 'Đã gửi dữ liệu lên Google Sheets' };
+      return { success: true, message: 'Data sent to Google Sheets' };
     }
 
     // Backend Google Sheets API v4
@@ -207,7 +208,7 @@ export async function saveToGoogleSheet(
           email: data.email,
           city: data.city,
           skills: skillsStr,
-          age: data.age,
+          birthYear: data.birthYear,
           project: data.project,
           id: submissionId,
           time: submissionTime
@@ -216,16 +217,16 @@ export async function saveToGoogleSheet(
 
       if (response.ok) {
         const resData = await response.json().catch(() => ({}));
-        return { success: true, data: resData, message: 'Đã ghi nhận dữ liệu thành công!' };
+        return { success: true, data: resData, message: 'Data recorded successfully!' };
       }
     } catch (apiErr) {
       console.warn('Backend sheets API sync log:', apiErr);
     }
 
-    return { success: true, message: 'Đã hoàn tất ghi nhận!' };
+    return { success: true, message: 'Recording complete!' };
   } catch (err: any) {
     console.warn('saveToGoogleSheet error caught (silent):', err);
-    return { success: true, message: 'Đã ghi nhận' };
+    return { success: true, message: 'Recorded' };
   }
 }
 
@@ -246,12 +247,12 @@ export async function clearAllVolunteersFromGoogleSheets(
     });
 
     if (response.ok) {
-      return { success: true, message: 'Đã xóa toàn bộ dữ liệu trên Google Sheets!' };
+      return { success: true, message: 'All data on Google Sheets has been deleted!' };
     }
     const errData = await response.json().catch(() => ({}));
-    return { success: false, message: errData.error || 'Lỗi khi xóa dữ liệu Google Sheets' };
+    return { success: false, message: errData.error || 'Error deleting Google Sheets data' };
   } catch (err: any) {
-    return { success: false, message: err?.message || 'Lỗi kết nối Google Sheets' };
+    return { success: false, message: err?.message || 'Error connecting to Google Sheets' };
   }
 }
 
@@ -274,12 +275,12 @@ export async function deleteRowFromGoogleSheets(
     });
 
     if (response.ok) {
-      return { success: true, message: 'Đã xóa dòng dữ liệu trên Google Sheets!' };
+      return { success: true, message: 'The data row on Google Sheets has been deleted!' };
     }
     const errData = await response.json().catch(() => ({}));
-    return { success: false, message: errData.error || 'Lỗi khi xóa dòng dữ liệu' };
+    return { success: false, message: errData.error || 'Error deleting the data row' };
   } catch (err: any) {
-    return { success: false, message: err?.message || 'Lỗi kết nối Google Sheets' };
+    return { success: false, message: err?.message || 'Error connecting to Google Sheets' };
   }
 }
 
@@ -295,7 +296,7 @@ export async function appendVolunteerToGoogleSheets(
     phone: volunteer.phone,
     email: volunteer.email,
     city: volunteer.city,
-    age: volunteer.ageGroup || '22',
+    birthYear: volunteer.birthYear || '',
     project: volunteer.eventName,
     skills: volunteer.skills
   }, customUrl);
@@ -312,28 +313,28 @@ export async function syncAllVolunteersToGoogleSheets(
     const rawUrl = customUrl || getGoogleAppsScriptUrl();
     const spreadsheetId = extractSpreadsheetId(rawUrl);
 
-    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
+    // 10 Columns A -> J: ID, TIME, FULL NAME, PHONE, EMAIL, ADDRESS, BIRTH YEAR, PROJECT, SKILLS, STATUS
     const headerRow = [
       'ID',
-      'THỜI GIAN',
-      'HỌ VÀ TÊN',
-      'SĐT',
+      'TIME',
+      'FULL NAME',
+      'PHONE',
       'EMAIL',
-      'ĐỊA CHỈ',
-      'TUỔI',
-      'DỰ ÁN',
-      'KỸ NĂNG',
-      'TRẠNG THÁI'
+      'ADDRESS',
+      'BIRTH YEAR',
+      'PROJECT',
+      'SKILLS',
+      'STATUS'
     ];
 
     const dataRows = volunteers.map(v => [
       v.id || `VOL-${Date.now().toString().slice(-6)}`,
-      new Date(v.registeredAt || Date.now()).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+      new Date(v.registeredAt || Date.now()).toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
       v.fullName,
       v.phone,
       v.email,
       v.city,
-      v.ageGroup || '22',
+      v.birthYear || '',
       v.eventName,
       Array.isArray(v.skills) ? v.skills.join(', ') : '',
       v.status || 'Approved'
@@ -368,19 +369,17 @@ export async function syncAllVolunteersToGoogleSheets(
     });
 
     if (response.ok) {
-      return { success: true, count: volunteers.length, message: `Đã đồng bộ ${volunteers.length} bản ghi lên Google Sheets!` };
+      return { success: true, count: volunteers.length, message: `Synced ${volunteers.length} records to Google Sheets!` };
     } else {
       const errData = await response.json().catch(() => ({}));
-      return { success: false, message: errData.error || 'Lỗi khi đồng bộ Google Sheets' };
+      return { success: false, message: errData.error || 'Error syncing to Google Sheets' };
     }
   } catch (err: any) {
     console.warn('syncAllVolunteersToGoogleSheets error caught:', err);
-    return { 
-      success: true, 
+    return {
+      success: true,
       count: volunteers.length,
-      message: 'Đã hoàn tất đồng bộ dữ liệu!' 
+      message: 'Data sync complete!'
     };
   }
 }
-
-

@@ -39,7 +39,7 @@ export const OurTeamPage: React.FC = () => {
   };
 
   const handleDelete = (member: TeamMember) => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa thành viên "${member.name}" khỏi danh sách đội ngũ?`)) {
+    if (window.confirm(`Are you sure you want to remove "${member.name}" from the team list?`)) {
       dbService.deleteTeamMember(member.id);
       loadTeam();
     }
@@ -52,7 +52,7 @@ export const OurTeamPage: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <EditableText
             contentKey="ourTeam.title"
-            defaultValue={t.ourTeamTitle || "Đội Ngũ Let's do it! Vietnam"}
+            defaultValue={t.ourTeamTitle || "The Let's do it! Vietnam Team"}
             as="h1"
             className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
           />
@@ -77,7 +77,7 @@ export const OurTeamPage: React.FC = () => {
                 className="btn-pill-3d inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-6 py-2.5 shadow-lg cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>{language === 'vi' ? 'Thêm Thành Viên Mới' : '+ Add New Member'}</span>
+                <span>{language === 'vi' ? 'Thêm Thành Viên Mới' : 'Add New Member'}</span>
               </button>
             </div>
           )}
@@ -96,14 +96,14 @@ export const OurTeamPage: React.FC = () => {
                   <button
                     onClick={() => handleEdit(member)}
                     className="p-1.5 bg-white/90 hover:bg-white text-slate-700 hover:text-[#E81A7F] rounded-full shadow-md transition-colors cursor-pointer border border-slate-200"
-                    title="Chỉnh sửa thông tin"
+                    title="Edit information"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(member)}
                     className="p-1.5 bg-white/90 hover:bg-white text-slate-700 hover:text-red-600 rounded-full shadow-md transition-colors cursor-pointer border border-slate-200"
-                    title="Xóa thành viên"
+                    title="Delete member"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -169,7 +169,7 @@ export const OurTeamPage: React.FC = () => {
                     className="w-full py-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
-                    <span>Sửa & Cập Nhật Ảnh</span>
+                    <span>Edit & Update Photo</span>
                   </button>
                 </div>
               )}

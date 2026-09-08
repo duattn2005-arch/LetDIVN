@@ -111,7 +111,7 @@ export const FullGalleryPage: React.FC = () => {
               {isAdmin && (
                 <button
                   onClick={(e) => handleDeleteItem(e, item.id)}
-                  title="Xóa ảnh"
+                  title="Delete photo"
                   className="absolute top-3 right-3 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg z-20 shadow cursor-pointer transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -176,7 +176,7 @@ export const FullGalleryPage: React.FC = () => {
                   className="px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto border border-red-500/30"
                 >
                   <Trash2 className="w-4 h-4" />
-                  <span>Xóa ảnh khỏi thư viện</span>
+                  <span>Remove photo from gallery</span>
                 </button>
               )}
             </div>

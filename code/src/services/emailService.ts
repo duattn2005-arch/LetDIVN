@@ -20,7 +20,7 @@ export async function sendPasswordResetEmail(
   if (!isEmailServiceConfigured()) {
     return {
       success: false,
-      message: 'Chức năng gửi email chưa được cấu hình. Vui lòng thêm VITE_EMAILJS_SERVICE_ID / VITE_EMAILJS_TEMPLATE_ID / VITE_EMAILJS_PUBLIC_KEY vào file .env (xem hướng dẫn trong .env.example).'
+      message: 'Email sending is not configured. Please add VITE_EMAILJS_SERVICE_ID / VITE_EMAILJS_TEMPLATE_ID / VITE_EMAILJS_PUBLIC_KEY to the .env file (see the instructions in .env.example).'
     };
   }
 
@@ -35,7 +35,7 @@ export async function sendPasswordResetEmail(
   } catch (err: any) {
     return {
       success: false,
-      message: err?.text || err?.message || 'Không thể gửi email. Vui lòng kiểm tra lại cấu hình EmailJS.'
+      message: err?.text || err?.message || 'Unable to send the email. Please check your EmailJS configuration.'
     };
   }
 }

@@ -53,7 +53,7 @@ export const VideoAddModal: React.FC<VideoAddModalProps> = ({ isOpen, onClose, o
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!previewId) {
-      setError('Link YouTube không hợp lệ. Vui lòng dán link dạng youtube.com/watch?v=... hoặc youtu.be/...');
+      setError('Invalid YouTube link. Please paste a link like youtube.com/watch?v=... or youtu.be/...');
       return;
     }
     try {
@@ -67,8 +67,8 @@ export const VideoAddModal: React.FC<VideoAddModalProps> = ({ isOpen, onClose, o
       if (onSaved) onSaved(saved);
       onClose();
     } catch (err: any) {
-      console.error('Lỗi khi lưu video:', err);
-      setError(err?.message || 'Không thể lưu video. Vui lòng kiểm tra lại đường truyền và thử lại.');
+      console.error('Error saving video:', err);
+      setError(err?.message || 'Unable to save the video. Please check your connection and try again.');
     } finally {
       setIsSaving(false);
     }
@@ -86,8 +86,8 @@ export const VideoAddModal: React.FC<VideoAddModalProps> = ({ isOpen, onClose, o
               <Youtube className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold">Thêm Video Mới</h3>
-              <p className="text-xs text-slate-400">Dán link YouTube — tiêu đề &amp; ảnh sẽ tự lấy về</p>
+              <h3 className="text-lg font-bold">Add New Video</h3>
+              <p className="text-xs text-slate-400">Paste a YouTube link — the title &amp; thumbnail will be fetched automatically</p>
             </div>
           </div>
           <button
@@ -131,7 +131,7 @@ export const VideoAddModal: React.FC<VideoAddModalProps> = ({ isOpen, onClose, o
               <div className="min-w-0">
                 {isFetchingPreview ? (
                   <span className="text-xs text-slate-500 flex items-center gap-1.5">
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> Đang lấy tiêu đề...
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" /> Fetching title...
                   </span>
                 ) : (
                   <span className="text-sm font-bold text-slate-900 line-clamp-2">
@@ -148,7 +148,7 @@ export const VideoAddModal: React.FC<VideoAddModalProps> = ({ isOpen, onClose, o
               onClick={onClose}
               className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              Hủy
+              Cancel
             </button>
             <button
               type="submit"
@@ -158,12 +158,12 @@ export const VideoAddModal: React.FC<VideoAddModalProps> = ({ isOpen, onClose, o
               {isSaving ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Đang lưu...</span>
+                  <span>Saving...</span>
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  <span>Thêm Video</span>
+                  <span>Add Video</span>
                 </>
               )}
             </button>

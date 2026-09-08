@@ -31,7 +31,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onViewAllGallery
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-2.5">
           <EditableText
             contentKey="gallery.title"
-            defaultValue={t.galleryTitle || 'Thư Viện Hình Ảnh & Phóng Sự'}
+            defaultValue={t.galleryTitle || 'Photo & Media Gallery'}
             as="h2"
             className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight"
           />

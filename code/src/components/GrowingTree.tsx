@@ -13,7 +13,7 @@ const CANOPY_COLORS: Record<NonNullable<GrowingTreeProps['variant']>, [string, s
   pink: ['#BE185D', '#E81A7F', '#FF6FB0'],
 };
 
-// Decorative "cây mọc lên" accent: the trunk draws itself upward, then the
+// Decorative "tree sprouting up" accent: the trunk draws itself upward, then the
 // canopy springs in — plays once, the first time it scrolls into view.
 export const GrowingTree: React.FC<GrowingTreeProps> = ({
   size = 56,

@@ -48,7 +48,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
           className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-sm gap-2 cursor-pointer z-10"
         >
           <Edit3 className="w-5 h-5" />
-          <span>Đổi ảnh (Admin)</span>
+          <span>Change Image (Admin)</span>
         </button>
       )}
 
@@ -62,7 +62,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h4 className="font-bold text-slate-900 text-sm">Thay đổi ảnh (Admin)</h4>
+              <h4 className="font-bold text-slate-900 text-sm">Change Image (Admin)</h4>
               <button
                 onClick={() => setIsEditing(false)}
                 className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
@@ -83,7 +83,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
             {/* Quick 4K Sharp Presets & Reset */}
             <div className="pt-3 border-t border-slate-100 space-y-2">
               <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
-                <span>Gợi ý ảnh chất lượng cao (4K/HD):</span>
+                <span>High-quality image suggestions (4K/HD):</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -92,16 +92,16 @@ export const EditableImage: React.FC<EditableImageProps> = ({
                   }}
                   className="text-[#E81A7F] hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  <span>↺ Khôi phục ảnh gốc</span>
+                  <span>↺ Restore original image</span>
                 </button>
               </div>
 
               <div className="grid grid-cols-4 gap-2">
                 {[
-                  { label: 'Cây xanh 4K', url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=2560&auto=format&fit=crop&q=95' },
-                  { label: 'Cánh đồng 4K', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=2560&auto=format&fit=crop&q=95' },
-                  { label: 'Biển xanh 4K', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=2560&auto=format&fit=crop&q=95' },
-                  { label: 'Đội ngũ TNV 4K', url: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=2560&auto=format&fit=crop&q=95' },
+                  { label: 'Green Trees 4K', url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=2560&auto=format&fit=crop&q=95' },
+                  { label: 'Field 4K', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=2560&auto=format&fit=crop&q=95' },
+                  { label: 'Ocean 4K', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=2560&auto=format&fit=crop&q=95' },
+                  { label: 'Volunteer Team 4K', url: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=2560&auto=format&fit=crop&q=95' },
                 ].map((preset, idx) => (
                   <button
                     key={idx}
@@ -111,7 +111,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
                       setIsEditing(false);
                     }}
                     className="group/preset relative aspect-16/10 rounded-lg overflow-hidden border border-slate-200 hover:border-[#E81A7F] hover:ring-2 hover:ring-[#E81A7F]/40 transition-all cursor-pointer shadow-xs"
-                    title={`Chọn ${preset.label}`}
+                    title={`Choose ${preset.label}`}
                   >
                     <img src={preset.url} alt={preset.label} className="w-full h-full object-cover group-hover/preset:scale-110 transition-transform duration-300" />
                     <span className="absolute inset-x-0 bottom-0 bg-black/70 text-white text-[9px] font-bold text-center py-0.5 truncate px-1">

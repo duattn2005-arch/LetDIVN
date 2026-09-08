@@ -8,7 +8,8 @@ import {
   ContactMessage,
   UserProfile,
   MediaVideo,
-  WhatWeDoItem
+  WhatWeDoItem,
+  WhoWeAreItem
 } from '../types';
 
 type Listener = () => void;
@@ -49,7 +50,7 @@ class DatabaseService {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || `Yêu cầu thất bại (${res.status})`);
+      throw new Error(body.error || `Request failed (${res.status})`);
     }
     return res.json();
   }
@@ -238,6 +239,21 @@ class DatabaseService {
     return true;
   }
 
+  // --- WHO WE ARE ---
+  public getWhoWeAre(): Promise<WhoWeAreItem[]> {
+    return this.get('/who-we-are');
+  }
+  public addWhoWeAre(item: Omit<WhoWeAreItem, 'id'>): Promise<WhoWeAreItem> {
+    return this.mutate('/who-we-are', 'POST', item);
+  }
+  public updateWhoWeAre(item: WhoWeAreItem): Promise<WhoWeAreItem> {
+    return this.mutate(`/who-we-are/${encodeURIComponent(item.id)}`, 'PUT', item);
+  }
+  public async deleteWhoWeAre(id: string): Promise<boolean> {
+    await this.mutate(`/who-we-are/${encodeURIComponent(id)}`, 'DELETE');
+    return true;
+  }
+
   // --- USERS (admin dashboard) ---
   public getUsers(): Promise<(UserProfile & { hasPassword: boolean })[]> {
     return this.get('/users');
@@ -280,7 +296,7 @@ class DatabaseService {
     const res = await fetch('/api/upload', { method: 'POST', credentials: 'include', body: formData });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || 'Tải ảnh lên thất bại');
+      throw new Error(body.error || 'Image upload failed');
     }
     const data = await res.json();
     return data.url;

@@ -131,7 +131,7 @@ export const ContactBubble: React.FC<ContactBubbleProps> = ({ onOpenContactPage 
               <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#E1306C] group-hover:translate-x-0.5 transition-all" />
             </a>
 
-            {/* Hotline Mr. Sơn */}
+            {/* Hotline Mr. Son */}
             <a
               href="tel:0358726755"
               className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-200/80 text-slate-800 transition-all group cursor-pointer"
@@ -143,7 +143,7 @@ export const ContactBubble: React.FC<ContactBubbleProps> = ({ onOpenContactPage 
                 <div>
                   <EditableText
                     contentKey="contactBubble.hotline1Label"
-                    defaultValue="Hotline (Mr. Sơn)"
+                    defaultValue="Hotline (Mr. Son)"
                     as="div"
                     className="font-bold text-xs text-slate-900 group-hover:text-emerald-600 transition-colors"
                   />
@@ -158,7 +158,7 @@ export const ContactBubble: React.FC<ContactBubbleProps> = ({ onOpenContactPage 
               <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
             </a>
 
-            {/* Hotline Ms. Tú */}
+            {/* Hotline Ms. Tu */}
             <a
               href="tel:0968514882"
               className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-200/80 text-slate-800 transition-all group cursor-pointer"
@@ -170,7 +170,7 @@ export const ContactBubble: React.FC<ContactBubbleProps> = ({ onOpenContactPage 
                 <div>
                   <EditableText
                     contentKey="contactBubble.hotline2Label"
-                    defaultValue="Hotline (Ms. Tú)"
+                    defaultValue="Hotline (Ms. Tu)"
                     as="div"
                     className="font-bold text-xs text-slate-900 group-hover:text-emerald-600 transition-colors"
                   />

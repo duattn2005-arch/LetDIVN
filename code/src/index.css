@@ -142,7 +142,7 @@ button[class*="bg-pink-"]:hover {
 }
 
 /* =========================================================================
-   4. METALLIC & MULTI-COLOR FLOWING GRADIENT TEXT (HIỆU ỨNG CHỮ BIẾN SẮC & CHẠY MÀU)
+   4. METALLIC & MULTI-COLOR FLOWING GRADIENT TEXT (COLOR-SHIFTING FLOWING TEXT EFFECT)
    ========================================================================= */
 @keyframes gradient-flow-pixel {
   0% {
@@ -206,7 +206,7 @@ button[class*="bg-pink-"]:hover {
   animation: inherit !important;
 }
 
-/* 4.2 Lush Green Eco Gradient (Xanh Trồng Cây / Bảo Vệ Rừng) */
+/* 4.2 Lush Green Eco Gradient (Tree Planting / Forest Protection Green) */
 .gradient-text-emerald {
   background: linear-gradient(135deg, #059669 0%, #10B981 30%, #34D399 50%, #84CC16 75%, #059669 100%);
   background-size: 250% auto;
@@ -215,7 +215,7 @@ button[class*="bg-pink-"]:hover {
   animation: gradient-shimmer 4s ease infinite;
 }
 
-/* 4.3 Ocean Clean Gradient (Xanh Đại Dương) */
+/* 4.3 Ocean Clean Gradient (Ocean Blue) */
 .gradient-text-ocean {
   background: linear-gradient(135deg, #0284C7 0%, #06B6D4 30%, #38BDF8 50%, #6366F1 75%, #0284C7 100%);
   background-size: 250% auto;
@@ -233,7 +233,7 @@ button[class*="bg-pink-"]:hover {
   animation: gradient-shimmer 4s ease infinite;
 }
 
-/* 4.5 FLOWING RAINBOW ANIMATED BORDER (VIỀN CHẠY MÀU CẦU VỒNG XUNG QUANH THẺ LOGO) */
+/* 4.5 FLOWING RAINBOW ANIMATED BORDER (RAINBOW FLOWING BORDER AROUND THE LOGO CARD) */
 @keyframes rainbow-border-flow {
   0% {
     background-position: 0% 50%;
@@ -413,3 +413,18 @@ button[class*="bg-pink-"]:hover {
 .animate-subtle-zoom {
   animation: subtle-zoom 20s ease-in-out infinite;
 }
+
+/* Explicit Spin Animation for Refresh buttons */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite !important;
+}
+
