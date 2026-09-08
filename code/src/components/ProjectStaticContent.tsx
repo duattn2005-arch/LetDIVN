@@ -3,6 +3,7 @@ import { CircleDot } from 'lucide-react';
 import { PROJECT_STATIC_CONTENT } from '../data/projectStaticContent';
 import { EditableText } from './EditableText';
 import { EditableImage } from './EditableImage';
+import { EditableGalleryGrid } from './EditableGalleryGrid';
 
 const BRAND_PINK = '#F1138D';
 const BRAND_AMBER = '#FEAC13';
@@ -77,16 +78,12 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
 
           const galleryBlock = section.gallery && section.gallery.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mt-6">
-              {section.gallery.map((src, gi) => (
-                <EditableImage
-                  key={gi}
-                  contentKey={`${sectionKey}.gallery${gi}`}
-                  defaultValue={src}
-                  alt={section.heading || content.title}
-                  wrapperClassName="aspect-square bg-slate-900"
-                  className="w-full h-full object-cover"
-                />
-              ))}
+              <EditableGalleryGrid
+                contentKey={`${sectionKey}.gallery`}
+                defaultImages={section.gallery}
+                alt={section.heading || content.title}
+                cellClassName="aspect-square"
+              />
             </div>
           );
 
