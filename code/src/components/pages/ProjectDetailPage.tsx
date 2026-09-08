@@ -4,6 +4,7 @@ import { Calendar, MapPin, Users, Trash2, ArrowLeft, CheckCircle2, ShieldCheck, 
 import { useAuth } from '../../context/AuthContext';
 import { EventEditorModal } from '../EventEditorModal';
 import { EditableText } from '../EditableText';
+import { ProjectStaticContent } from '../ProjectStaticContent';
 import { CleanupEvent } from '../../types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -91,9 +92,13 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
   const percent = Math.min(100, Math.round((event.registeredCount / event.targetVolunteers) * 100));
 
   return (
-    <div className="py-12 bg-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        
+    <div className="bg-white">
+
+      {/* Campaign intro content mirrored from the matching page on letsdoitvietnam.org */}
+      <ProjectStaticContent category={event.category} />
+
+      <div className="py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+
         {/* Top bar: Back Button & Admin Edit Button */}
         <div className="flex items-center justify-between">
           <button
@@ -101,7 +106,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
             className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <EditableText contentKey="projectDetail.backBtn" defaultValue="Quay lại danh sách dự án" as="span" />
+            <EditableText contentKey="projectDetail.backBtn" defaultValue="Back to project list" as="span" />
           </button>
 
           {isAdmin && (
@@ -110,7 +115,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
               className="inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
             >
               <Edit3 className="w-4 h-4" />
-              <span>Chỉnh Sửa Chiến Dịch (Admin)</span>
+              <span>Edit Campaign (Admin)</span>
             </button>
           )}
         </div>
@@ -139,7 +144,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-8">
             <div>
-              <EditableText contentKey="projectDetail.descTitle" defaultValue="Mô Tả & Mục Tiêu Chiến Dịch" as="h3" className="text-2xl font-bold text-slate-900 mb-3" />
+              <EditableText contentKey="projectDetail.descTitle" defaultValue="Description & Campaign Goals" as="h3" className="text-2xl font-bold text-slate-900 mb-3" />
               <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
                 {event.description}
               </p>
@@ -149,7 +154,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
             <div className="space-y-3">
               <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-[#E81A7F]" />
-                <EditableText contentKey="projectDetail.scheduleTitle" defaultValue="Lịch Trình Chi Tiết" as="span" />
+                <EditableText contentKey="projectDetail.scheduleTitle" defaultValue="Detailed Schedule" as="span" />
               </h3>
               <div className="space-y-2.5 text-xs text-slate-700">
                 {event.schedule && event.schedule.length > 0 ? (
@@ -170,7 +175,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                         {event.time.split('-')[0]?.trim() || '07:00'}
                       </span>
                       <span className="text-slate-800 font-medium leading-relaxed pt-0.5">
-                        <EditableText contentKey="projectDetail.defaultSchedule1Activity" defaultValue="Tập trung tại điểm hẹn:" as="span" /> <strong>{event.meetingPoint || event.location}</strong>, điểm danh và phát trang thiết bị
+                        <EditableText contentKey="projectDetail.defaultSchedule1Activity" defaultValue="Gather at the meeting point:" as="span" /> <strong>{event.meetingPoint || event.location}</strong>, check-in and equipment distribution
                       </span>
                     </div>
                     <div className="p-3.5 bg-white border border-slate-200 rounded-2xl shadow-xs flex items-start gap-3.5">
@@ -182,7 +187,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                       />
                       <EditableText
                         contentKey="projectDetail.defaultSchedule2Activity"
-                        defaultValue="Khởi động, phổ biến quy tắc an toàn và chia đội hình theo tuyến đường dọn rác"
+                        defaultValue="Warm-up, safety briefing, and team assignment by cleanup route"
                         as="span"
                         className="text-slate-800 font-medium leading-relaxed pt-0.5"
                       />
@@ -196,7 +201,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                       />
                       <EditableText
                         contentKey="projectDetail.defaultSchedule3Activity"
-                        defaultValue="Ra quân dọn rác, phân loại rác thải tái chế, rác hữu cơ và rác độc hại"
+                        defaultValue="Cleanup begins: sorting recyclable, organic, and hazardous waste"
                         as="span"
                         className="text-slate-800 font-medium leading-relaxed pt-0.5"
                       />
@@ -210,7 +215,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                       />
                       <EditableText
                         contentKey="projectDetail.defaultSchedule4Activity"
-                        defaultValue="Tập kết rác tại xe chuyên dụng, cân đo tổng khối lượng, chụp ảnh kỷ niệm và bế mạc"
+                        defaultValue="Load waste onto the collection truck, weigh the total, group photo, and closing"
                         as="span"
                         className="text-slate-800 font-medium leading-relaxed pt-0.5"
                       />
@@ -225,7 +230,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-[#E81A7F]" />
-                  <EditableText contentKey="projectDetail.mapTitle" defaultValue="Bản Đồ Vị Trí Điểm Hẹn Dọn Rác" as="span" />
+                  <EditableText contentKey="projectDetail.mapTitle" defaultValue="Cleanup Meeting Point Map" as="span" />
                 </h3>
                 <a
                   href={event.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
@@ -233,7 +238,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                   rel="noreferrer"
                   className="text-xs font-bold text-[#E81A7F] hover:underline flex items-center gap-1"
                 >
-                  <EditableText contentKey="projectDetail.openMapsBtn" defaultValue="Mở Google Maps" as="span" />
+                  <EditableText contentKey="projectDetail.openMapsBtn" defaultValue="Open Google Maps" as="span" />
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
@@ -242,7 +247,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                 <div ref={mapContainerRef} className="w-full h-full"></div>
               </div>
               <p className="text-xs text-slate-500">
-                📍 <strong><EditableText contentKey="projectDetail.meetingAddressLabel" defaultValue="Địa chỉ tập kết:" as="span" /></strong> {event.meetingPoint || event.location}
+                📍 <strong><EditableText contentKey="projectDetail.meetingAddressLabel" defaultValue="Meeting address:" as="span" /></strong> {event.meetingPoint || event.location}
               </p>
             </div>
           </div>
@@ -251,9 +256,9 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
           <div className="space-y-6">
             <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-5 sticky top-24">
               <div className="space-y-1">
-                <EditableText contentKey="projectDetail.progressLabel" defaultValue="Tiến Độ Tuyển Tình Nguyện Viên" as="div" className="text-xs text-slate-500 font-bold uppercase" />
+                <EditableText contentKey="projectDetail.progressLabel" defaultValue="Volunteer Recruitment Progress" as="div" className="text-xs text-slate-500 font-bold uppercase" />
                 <div className="text-2xl font-black text-slate-900">
-                  {event.registeredCount.toLocaleString()} <span className="text-xs font-normal text-slate-500">/ {event.targetVolunteers.toLocaleString()} TNV</span>
+                  {event.registeredCount.toLocaleString()} <span className="text-xs font-normal text-slate-500">/ {event.targetVolunteers.toLocaleString()} volunteers</span>
                 </div>
               </div>
 
@@ -262,21 +267,21 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
                 <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                   <div className="bg-[#E81A7F] h-full rounded-full" style={{ width: `${percent}%` }}></div>
                 </div>
-                <div className="text-right text-[11px] font-bold text-[#E81A7F]">{percent}% <EditableText contentKey="projectDetail.percentJoinedSuffix" defaultValue="Đã tham gia" as="span" /></div>
+                <div className="text-right text-[11px] font-bold text-[#E81A7F]">{percent}% <EditableText contentKey="projectDetail.percentJoinedSuffix" defaultValue="Joined" as="span" /></div>
               </div>
 
               <div className="space-y-3 text-xs text-slate-600 pt-3 border-t border-slate-200">
-                <div>📅 <strong><EditableText contentKey="projectDetail.dateLabel" defaultValue="Ngày tổ chức:" as="span" /></strong> {event.date}</div>
-                <div>⏰ <strong><EditableText contentKey="projectDetail.timeLabel" defaultValue="Thời gian:" as="span" /></strong> {event.time}</div>
-                <div>📍 <strong><EditableText contentKey="projectDetail.locationLabel" defaultValue="Địa điểm:" as="span" /></strong> {event.location}</div>
-                <div>👤 <strong><EditableText contentKey="projectDetail.leaderLabel" defaultValue="Trưởng nhóm điều phối:" as="span" /></strong> {event.leader}</div>
+                <div>📅 <strong><EditableText contentKey="projectDetail.dateLabel" defaultValue="Date:" as="span" /></strong> {event.date}</div>
+                <div>⏰ <strong><EditableText contentKey="projectDetail.timeLabel" defaultValue="Time:" as="span" /></strong> {event.time}</div>
+                <div>📍 <strong><EditableText contentKey="projectDetail.locationLabel" defaultValue="Location:" as="span" /></strong> {event.location}</div>
+                <div>👤 <strong><EditableText contentKey="projectDetail.leaderLabel" defaultValue="Team Leader:" as="span" /></strong> {event.leader}</div>
               </div>
 
               <button
                 onClick={() => onRegisterVolunteer(event.id)}
                 className="w-full bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm py-3.5 rounded-full shadow-lg transition-all cursor-pointer text-center"
               >
-                <EditableText contentKey="projectDetail.registerBtn" defaultValue="Đăng Ký Tham Gia Ngay" as="span" />
+                <EditableText contentKey="projectDetail.registerBtn" defaultValue="Register to Join Now" as="span" />
               </button>
 
 
