@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
-import { ArrowRight, ArrowLeft, Plus, Edit3, Trash2, Search, CheckCircle2, Clock } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, Edit3, Trash2, CheckCircle2, Clock } from 'lucide-react';
 import { ArticleEditorModal } from '../ArticleEditorModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -156,36 +156,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                 <span>{language === 'vi' ? `Có ${pendingCount} bài viết đang chờ duyệt!` : `${pendingCount} article(s) pending review!`}</span>
               </span>
             )}
-          </div>
-        </div>
-
-        {/* Filter bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-100">
-          <div className="flex flex-wrap items-center gap-2">
-            {categories.map(c => (
-              <button
-                key={c}
-                onClick={() => setSelectedCat(c)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  selectedCat === c ? 'bg-[#E81A7F] text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-                }`}
-              >
-                {categoryMap[c] || c}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative min-w-[220px]">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="text"
-                placeholder={language === 'vi' ? 'Tìm kiếm bài viết...' : language === 'ja' ? '記事を検索...' : 'Search articles...'}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
-              />
-            </div>
           </div>
         </div>
 
