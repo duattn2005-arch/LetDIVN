@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
 import { ArrowRight, ArrowLeft, Plus, Edit3, Trash2, CheckCircle2, Clock } from 'lucide-react';
@@ -12,6 +11,12 @@ import { TakeActionStrip } from '../TakeActionStrip';
 
 interface NewsPageProps {
   initialCategory?: 'All' | 'Media On Us' | 'News';
+}
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) => {
@@ -121,6 +126,89 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
 
       <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
+        {selectedArticle ? (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setSelectedArticle(null)}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <EditableText contentKey="newsPage.backToListBtn" defaultValue={t.newsPageBackToListBtn} as="span" />
+              </button>
+
+              {isAdmin && (
+                <button
+                  onClick={(e) => handleOpenEdit(e, selectedArticle)}
+                  className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit this article</span>
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              <div className="lg:col-span-2 space-y-5">
+                <h1 className="ref-body" style={{ color: '#6EC1E4', fontWeight: 600, fontSize: '30px', lineHeight: 1.3 }}>
+                  {selectedArticle.title}
+                </h1>
+                <div className="ref-news-date text-xs">{formatDate(selectedArticle.date)}</div>
+
+                {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
+                  <div className="space-y-5">
+                    {selectedArticle.contentBlocks.map((block, i) =>
+                      block.type === 'image' ? (
+                        <img key={i} src={block.value} alt={selectedArticle.title} className="w-full" />
+                      ) : (
+                        <p key={i} className="ref-body whitespace-pre-line" style={{ color: '#7A7A7A', fontSize: '18px', lineHeight: 1.32 }}>
+                          {block.value}
+                        </p>
+                      )
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full" />
+                    <p className="ref-body whitespace-pre-line" style={{ color: '#7A7A7A', fontSize: '18px', lineHeight: 1.32 }}>
+                      {selectedArticle.content}
+                    </p>
+                  </div>
+                )}
+
+                {selectedArticle.sourceUrl && (
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
+                    <a
+                      href={selectedArticle.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#E81A7F] font-bold hover:underline"
+                    >
+                      {selectedArticle.source || <EditableText contentKey="newsPage.defaultSourceLabel" defaultValue={t.newsPageDefaultSourceLabel} as="span" />} →
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-8">
+                {visibleNews.filter((a) => a.id !== selectedArticle.id).slice(0, 5).map((a) => (
+                  <div key={a.id} onClick={() => setSelectedArticle(a)} className="space-y-2 cursor-pointer group">
+                    <div className="aspect-16/10 overflow-hidden bg-slate-900">
+                      <img src={a.image} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                    <h3 className="ref-news-title text-base leading-snug">{a.title}</h3>
+                    <div className="ref-news-readmore text-xs">
+                      <EditableText contentKey="newsPage.readMoreBtn" defaultValue={t.newsPageReadMoreBtn} as="span" /> »
+                    </div>
+                    <div className="ref-news-date text-xs">{formatDate(a.date)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+        <>
         <div className="text-center max-w-6xl mx-auto space-y-4">
           {selectedCat === 'Media On Us' ? (
             <EditableText
@@ -222,7 +310,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                       {item.title}
                     </h3>
 
-                    <div className="ref-news-date text-xs">{item.date}</div>
+                    <div className="ref-news-date text-xs">{formatDate(item.date)}</div>
 
                     <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
                       {item.summary}
@@ -270,6 +358,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             </button>
           </div>
         )}
+        </>
+        )}
 
       </div>
 
@@ -282,96 +372,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
         articleToEdit={articleToEdit}
         onSaved={refreshNews}
       />
-
-      {/* Article Detail View Modal */}
-      {selectedArticle && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[999999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div 
-            className="relative bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 p-6 sm:p-8 space-y-6 animate-in zoom-in-95 duration-200 my-8"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <button
-                onClick={() => setSelectedArticle(null)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <EditableText contentKey="newsPage.backToListBtn" defaultValue={t.newsPageBackToListBtn} as="span" />
-              </button>
-
-              {isAdmin && (
-                <button
-                  onClick={(e) => handleOpenEdit(e, selectedArticle)}
-                  className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit this article</span>
-                </button>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <div className="inline-block bg-[#E81A7F] text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full">
-                {categoryMap[selectedArticle.category] || selectedArticle.category}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
-                {selectedArticle.title}
-              </h2>
-              <div className="flex items-center gap-4 text-xs text-slate-500">
-                <span>📅 {selectedArticle.date}</span>
-                <span>👤 {selectedArticle.author}</span>
-                {selectedArticle.source && <span>📰 <EditableText contentKey="newsPage.sourceLabel" defaultValue={t.newsPageSourceLabel} as="span" /> {selectedArticle.source}</span>}
-              </div>
-            </div>
-
-            <div className="aspect-16/9 rounded-2xl overflow-hidden shadow-md">
-              <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full h-full object-cover" />
-            </div>
-
-            <div className="p-4 bg-pink-50/50 rounded-2xl border border-pink-100/60 text-xs font-semibold text-slate-700 leading-relaxed italic">
-              "{selectedArticle.summary}"
-            </div>
-
-            {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
-              <div className="text-sm text-slate-700 leading-relaxed space-y-4 border-t border-slate-100 pt-4">
-                {selectedArticle.contentBlocks.map((block, i) =>
-                  block.type === 'image' ? (
-                    <img
-                      key={i}
-                      src={block.value}
-                      alt={selectedArticle.title}
-                      className="w-full rounded-2xl shadow-md"
-                    />
-                  ) : (
-                    <p key={i} className="whitespace-pre-line">{block.value}</p>
-                  )
-                )}
-              </div>
-            ) : (
-              <div className="text-sm text-slate-700 leading-relaxed space-y-4 whitespace-pre-line border-t border-slate-100 pt-4">
-                {selectedArticle.content}
-              </div>
-            )}
-
-            {selectedArticle.sourceUrl && (
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
-                <a
-                  href={selectedArticle.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[#E81A7F] font-bold hover:underline"
-                >
-                  {selectedArticle.source || <EditableText contentKey="newsPage.defaultSourceLabel" defaultValue={t.newsPageDefaultSourceLabel} as="span" />} →
-                </a>
-              </div>
-            )}
-          </div>
-        </div>,
-        document.body
-      )}
     </div>
   );
 };
-
 
