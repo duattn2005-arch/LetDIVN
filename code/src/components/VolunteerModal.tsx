@@ -98,6 +98,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
     setPhone(digitsOnly);
 
+    // Optional field — only flag an error once they've typed *something* that
+    // isn't a complete number yet, never for leaving it blank.
     if (digitsOnly.length > 0 && digitsOnly.length < 10) {
       setPhoneError(`Phone number must be exactly 10 digits (currently ${digitsOnly.length}/10 digits)`);
     } else {
@@ -124,11 +126,12 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Validate the phone number constraint (exactly 10 digits)
+    // 1. Phone number is optional — only validate its format when the
+    // volunteer actually entered something.
     const cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length !== 10) {
+    if (cleanPhone.length > 0 && cleanPhone.length !== 10) {
       setPhoneError('Phone number must be exactly 10 digits (no more, no less)!');
-      alert('⚠ Invalid phone number!\nPlease enter exactly 10 digits (e.g., 0987654321).');
+      alert('⚠ Invalid phone number!\nPlease enter exactly 10 digits (e.g., 0987654321), or leave it blank.');
       return;
     }
 
@@ -254,19 +257,18 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-slate-700">Phone Number (10 digits) *</label>
-                  <span className={`text-[10px] font-mono font-bold ${phone.length === 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    {phone.length}/10 digits
-                  </span>
+                  <label className="block text-xs font-bold text-slate-700">Phone Number</label>
+                  {phone.length > 0 && (
+                    <span className={`text-[10px] font-mono font-bold ${phone.length === 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      {phone.length}/10 digits
+                    </span>
+                  )}
                 </div>
                 <input
                   type="tel"
-                  required
                   inputMode="numeric"
-                  pattern="[0-9]{10}"
                   maxLength={10}
-                  minLength={10}
-                  placeholder="e.g., 0987654321"
+                  placeholder="e.g., 0987654321 (optional)"
                   value={phone}
                   onChange={handlePhoneChange}
                   className={`w-full px-3.5 py-2 border rounded-xl text-xs sm:text-sm font-mono focus:outline-hidden transition-colors ${
@@ -303,7 +305,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-bold text-slate-700">
-                    Birth Year (4 digits) *
+                    Birth Year *
                   </label>
                   {calculatedAge !== null && (
                     <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.2 rounded-full border border-emerald-200">

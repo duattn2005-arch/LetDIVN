@@ -12,7 +12,15 @@ import type {
 } from '../../src/types.js';
 
 export const events = makeCollection<CleanupEvent>({ table: 'events', idPrefix: 'evt', order: 'created_desc' });
-export const volunteers = makeCollection<VolunteerRegistration>({ table: 'volunteers', idPrefix: 'vol', order: 'created_desc' });
+export const volunteers = makeCollection<VolunteerRegistration>({
+  table: 'volunteers',
+  idPrefix: 'vol',
+  order: 'created_desc',
+  // `event_id` is a real column (indexed, NOT NULL) alongside the JSON blob —
+  // must stay populated on every insert/update or the table's own NOT NULL
+  // constraint rejects the row outright.
+  extraColumns: (item) => ({ event_id: item.eventId }),
+});
 export const news = makeCollection<NewsArticle>({ table: 'news', idPrefix: 'news', order: 'created_desc' });
 export const partners = makeCollection<Partner>({ table: 'partners', idPrefix: 'part', order: 'sort_order' });
 export const gallery = makeCollection<GalleryItem>({ table: 'gallery', idPrefix: 'gal', order: 'created_desc' });
