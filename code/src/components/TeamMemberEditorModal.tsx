@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Sparkles, User, CheckCircle2, AlertCircle, Save, Briefcase, Mail, Linkedin, Facebook } from 'lucide-react';
+import { X, User, AlertCircle, Save } from 'lucide-react';
 import { TeamMember } from '../types';
 import { dbService } from '../services/dbService';
 import { ImageUploadWidget } from './ImageUploadWidget';
@@ -20,33 +20,18 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
-  const [department, setDepartment] = useState('Ban Điều Hành');
   const [avatar, setAvatar] = useState('');
-  const [bio, setBio] = useState('');
-  const [linkedin, setLinkedin] = useState('');
-  const [facebook, setFacebook] = useState('');
-  const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (memberToEdit) {
       setName(memberToEdit.name || '');
       setRole(memberToEdit.role || '');
-      setDepartment(memberToEdit.department || 'Ban Điều Hành');
       setAvatar(memberToEdit.avatar || '');
-      setBio(memberToEdit.bio || '');
-      setLinkedin(memberToEdit.linkedin || '');
-      setFacebook(memberToEdit.facebook || '');
-      setEmail(memberToEdit.email || '');
     } else {
       setName('');
       setRole('');
-      setDepartment('Ban Điều Hành');
       setAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80');
-      setBio('');
-      setLinkedin('');
-      setFacebook('');
-      setEmail('');
     }
     setError(null);
   }, [memberToEdit, isOpen]);
@@ -70,27 +55,9 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
 
     let saved: TeamMember;
     if (memberToEdit) {
-      saved = await dbService.updateTeamMember(memberToEdit.id, {
-        name,
-        role,
-        department,
-        avatar,
-        bio,
-        linkedin: linkedin.trim() || undefined,
-        facebook: facebook.trim() || undefined,
-        email: email.trim() || undefined
-      });
+      saved = await dbService.updateTeamMember(memberToEdit.id, { name, role, avatar });
     } else {
-      saved = await dbService.addTeamMember({
-        name,
-        role,
-        department,
-        avatar,
-        bio,
-        linkedin: linkedin.trim() || undefined,
-        facebook: facebook.trim() || undefined,
-        email: email.trim() || undefined
-      });
+      saved = await dbService.addTeamMember({ name, role, avatar, department: '', bio: '' });
     }
 
     if (onSaved) onSaved(saved);
@@ -174,80 +141,6 @@ export const TeamMemberEditorModal: React.FC<TeamMemberEditorModalProps> = ({
                 onChange={(e) => setRole(e.target.value)}
                 placeholder="VD: Trưởng Ban Điều Phối Miền Bắc"
                 className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Phòng Ban / Khối
-            </label>
-            <select
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] bg-white cursor-pointer"
-            >
-              <option value="Ban Điều Hành">Ban Điều Hành</option>
-              <option value="Ban Truyền Thông & Sự Kiện">Ban Truyền Thông & Sự Kiện</option>
-              <option value="Ban Đối Ngoại & Tài Trợ">Ban Đối Ngoại & Tài Trợ</option>
-              <option value="Ban Hậu Cần & Điều Phối Rác Thải">Ban Hậu Cần & Điều Phối Rác Thải</option>
-              <option value="Điều Phối Viên Tỉnh / Thành">Điều Phối Viên Tỉnh / Thành</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Tiểu Sử / Giới Thiệu Ngắn (Bio)
-            </label>
-            <textarea
-              rows={3}
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="Giới thiệu kinh nghiệm, niềm đam mê vì môi trường..."
-              className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:border-[#E81A7F] focus:ring-2 focus:ring-pink-100 resize-y"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" />
-                <span>LinkedIn</span>
-              </label>
-              <input
-                type="url"
-                value={linkedin}
-                onChange={(e) => setLinkedin(e.target.value)}
-                placeholder="https://linkedin.com/in/..."
-                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                <Facebook className="w-3.5 h-3.5 text-[#1877F2]" />
-                <span>Facebook</span>
-              </label>
-              <input
-                type="url"
-                value={facebook}
-                onChange={(e) => setFacebook(e.target.value)}
-                placeholder="https://facebook.com/..."
-                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                <Mail className="w-3.5 h-3.5 text-[#E81A7F]" />
-                <span>Email Liên Hệ</span>
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@letsdoitvietnam.org"
-                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
               />
             </div>
           </div>

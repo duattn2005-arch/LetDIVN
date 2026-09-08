@@ -126,7 +126,7 @@ export const OurTeamPage: React.FC = () => {
                 />
               </div>
 
-              <div className="p-4 bg-slate-50">
+              <div className="p-4 bg-slate-50 text-center">
                 <h3 className="ref-heading text-base" style={{ color: BRAND_PINK }}>
                   {member.name}
                 </h3>
