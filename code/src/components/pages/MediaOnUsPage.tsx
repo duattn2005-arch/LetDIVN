@@ -39,37 +39,53 @@ export const MediaOnUsPage: React.FC = () => {
         </div>
 
         <div className="max-w-6xl mx-auto space-y-12">
-          {MEDIA_ON_US_ENTRIES.map((entry) => (
-            <div key={entry.title} className="flex flex-wrap items-center gap-x-12 gap-y-5">
-              <img
-                src={entry.image}
-                alt={entry.title}
-                className="w-[28rem] aspect-3/2 object-cover shrink-0"
-              />
+          {MEDIA_ON_US_ENTRIES.map((entry, idx) => {
+            const entryKey = `mediaOnUsPage.entry${idx}`;
+            return (
+              <div key={entry.title} className="flex flex-wrap items-center gap-x-12 gap-y-5">
+                <EditableImage
+                  contentKey={`${entryKey}.image`}
+                  defaultValue={entry.image}
+                  alt={entry.title}
+                  wrapperClassName="w-[28rem] aspect-3/2 bg-slate-900 shrink-0"
+                  className="w-full h-full object-cover"
+                />
 
-              <div className="w-20 text-center shrink-0">
-                <div className="text-5xl sm:text-6xl font-black" style={{ color: BRAND_PINK }}>{entry.articles}</div>
-                <div className="text-base text-slate-500 mt-1">Article</div>
+                <div className="w-20 text-center shrink-0">
+                  <EditableText
+                    contentKey={`${entryKey}.articles`}
+                    defaultValue={String(entry.articles)}
+                    as="div"
+                    className="text-5xl sm:text-6xl font-black"
+                    render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
+                  />
+                  <div className="text-base text-slate-500 mt-1">Article</div>
+                </div>
+
+                <div className="w-20 text-center shrink-0">
+                  <EditableText
+                    contentKey={`${entryKey}.segments`}
+                    defaultValue={String(entry.segments)}
+                    as="div"
+                    className="text-5xl sm:text-6xl font-black text-orange-500"
+                  />
+                  <div className="text-base text-slate-500 mt-1">Segment</div>
+                </div>
+
+                <a
+                  href={entry.pdf}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex flex-col items-center gap-1.5 shrink-0"
+                >
+                  <span className="inline-flex items-center px-10 py-4 rounded-full text-white text-lg font-bold shadow-sm bg-[#DA1984] hover:bg-[#EBC61C] transition-colors">
+                    <EditableText contentKey={`${entryKey}.title`} defaultValue={entry.title} as="span" />
+                  </span>
+                  <span className="ref-body text-sm italic text-slate-400">Click to see media coverage on activities</span>
+                </a>
               </div>
-
-              <div className="w-20 text-center shrink-0">
-                <div className="text-5xl sm:text-6xl font-black text-orange-500">{entry.segments}</div>
-                <div className="text-base text-slate-500 mt-1">Segment</div>
-              </div>
-
-              <a
-                href={entry.pdf}
-                target="_blank"
-                rel="noreferrer"
-                className="flex flex-col items-center gap-1.5 shrink-0"
-              >
-                <span className="inline-flex items-center px-10 py-4 rounded-full text-white text-lg font-bold shadow-sm bg-[#DA1984] hover:bg-[#EBC61C] transition-colors">
-                  {entry.title}
-                </span>
-                <span className="ref-body text-sm italic text-slate-400">Click to see media coverage on activities</span>
-              </a>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
       </div>

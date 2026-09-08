@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { dbService } from '../services/dbService';
 import { NewsArticle } from '../types';
+import { EditableText } from './EditableText';
+import { EditableImage } from './EditableImage';
 
 const BRAND_PINK = '#F1138D';
 
 const QUICK_LINKS = [
-  { label: 'Who We Are', image: '/images/home-quicklinks/who-we-are.jpg', view: 'who-we-are' },
-  { label: 'What We Do', image: '/images/home-quicklinks/what-we-do.jpg', view: 'what-we-do' },
-  { label: 'Our Partners', image: '/images/home-quicklinks/our-partners.jpg', view: 'our-partners' },
-  { label: 'Media on Us', image: '/images/home-quicklinks/media-on-us.jpg', view: 'media-on-us' },
+  { key: 'whoWeAre', label: 'Who We Are', image: '/images/home-quicklinks/who-we-are.jpg', view: 'who-we-are' },
+  { key: 'whatWeDo', label: 'What We Do', image: '/images/home-quicklinks/what-we-do.jpg', view: 'what-we-do' },
+  { key: 'ourPartners', label: 'Our Partners', image: '/images/home-quicklinks/our-partners.jpg', view: 'our-partners' },
+  { key: 'mediaOnUs', label: 'Media on Us', image: '/images/home-quicklinks/media-on-us.jpg', view: 'media-on-us' },
 ];
 
 function formatDate(dateStr: string) {
@@ -35,41 +37,46 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string) => voi
 
   return (
     <div className="bg-white py-12">
-      <h2
+      <EditableText
+        contentKey="home.quickLinks.title"
+        defaultValue="Cultivating the Beautiful in Vietnam"
+        as="h2"
         className="ref-heading text-3xl sm:text-4xl text-center px-4"
-        style={{ color: BRAND_PINK, fontWeight: 400 }}
-      >
-        Cultivating the Beautiful in Vietnam
-      </h2>
+        render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
+      />
 
       <div className="mt-8 grid grid-cols-2 sm:grid-cols-4">
         {QUICK_LINKS.map((link) => (
-          <button
-            key={link.view}
-            onClick={() => onNavigate(link.view)}
-            className="relative aspect-square sm:aspect-3/4 overflow-hidden group cursor-pointer bg-black"
-          >
-            <img
-              src={link.image}
+          <div key={link.view} className="relative aspect-square sm:aspect-3/4 overflow-hidden group">
+            <button onClick={() => onNavigate(link.view)} className="absolute inset-0 z-10 cursor-pointer" aria-label={link.label} />
+            <EditableImage
+              contentKey={`home.quickLinks.${link.key}Image`}
+              defaultValue={link.image}
               alt={link.label}
+              wrapperClassName="absolute inset-0"
               className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-            <span className="ref-heading absolute bottom-4 left-4 text-white text-base sm:text-lg">
-              {link.label}
-            </span>
-          </button>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none" />
+            <EditableText
+              contentKey={`home.quickLinks.${link.key}Label`}
+              defaultValue={link.label}
+              as="span"
+              className="ref-heading absolute bottom-4 left-4 z-20"
+              render={(v) => <span className="text-white text-base sm:text-lg">{v}</span>}
+            />
+          </div>
         ))}
       </div>
 
       {latestNews.length > 0 && (
         <>
-          <h2
+          <EditableText
+            contentKey="home.quickLinks.newsTitle"
+            defaultValue="News"
+            as="h2"
             className="ref-heading text-3xl sm:text-4xl text-center px-4 mt-16"
-            style={{ color: BRAND_PINK, fontWeight: 400 }}
-          >
-            News
-          </h2>
+            render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
+          />
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-8 px-4 sm:px-8 lg:px-12">
             {latestNews.map((item) => (

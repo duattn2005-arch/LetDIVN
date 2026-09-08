@@ -1,13 +1,14 @@
 import React from 'react';
 import { EditableImage } from './EditableImage';
+import { EditableText } from './EditableText';
 
 const BRAND_PINK = '#F1138D';
 
 const cards = [
-  { title: 'World Cleanup Day', desc: 'Create a positive impact on the environment by mobilizing millions of volunteers in Vietnam.' },
-  { title: 'Environmental Awareness', desc: 'Empower individuals to make informed choices and take action for a greener planet' },
-  { title: 'Community Engagement', desc: 'Drive meaningful change and inspire others to join the cause.' },
-  { title: 'Sustainable Lifestyle', desc: 'Emphasizing responsible consumption, waste reduction, and eco-friendly choices' },
+  { key: 'card1', title: 'World Cleanup Day', desc: 'Create a positive impact on the environment by mobilizing millions of volunteers in Vietnam.' },
+  { key: 'card2', title: 'Environmental Awareness', desc: 'Empower individuals to make informed choices and take action for a greener planet' },
+  { key: 'card3', title: 'Community Engagement', desc: 'Drive meaningful change and inspire others to join the cause.' },
+  { key: 'card4', title: 'Sustainable Lifestyle', desc: 'Emphasizing responsible consumption, waste reduction, and eco-friendly choices' },
 ];
 
 /**
@@ -36,9 +37,21 @@ export const TakeActionStrip: React.FC<{ contentKeyPrefix: string }> = ({ conten
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
         {cards.map((card) => (
-          <div key={card.title} className="space-y-1.5">
-            <h4 className="ref-heading text-sm uppercase tracking-wide" style={{ color: BRAND_PINK }}>{card.title}</h4>
-            <p className="ref-body text-xs text-slate-500 leading-relaxed">{card.desc}</p>
+          <div key={card.key} className="space-y-1.5">
+            <EditableText
+              contentKey={`${contentKeyPrefix}.${card.key}Title`}
+              defaultValue={card.title}
+              as="h4"
+              className="ref-heading text-sm uppercase tracking-wide"
+              render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
+            />
+            <EditableText
+              contentKey={`${contentKeyPrefix}.${card.key}Desc`}
+              defaultValue={card.desc}
+              as="p"
+              className="ref-body text-xs text-slate-500 leading-relaxed"
+              multiline
+            />
           </div>
         ))}
       </div>

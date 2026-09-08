@@ -1,9 +1,13 @@
 import React from 'react';
 import { PROJECT_STATIC_CONTENT } from '../data/projectStaticContent';
+import { EditableText } from './EditableText';
+import { EditableImage } from './EditableImage';
 
 const BRAND_PINK = '#F1138D';
 const BRAND_AMBER = '#FEAC13';
 const BAND_GRAY = '#F2F2F2';
+
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 /**
  * Renders the "about this campaign" content mirrored from the matching page
@@ -13,35 +17,43 @@ const BAND_GRAY = '#F2F2F2';
  * Typography and layout are matched to the reference site's Elementor/Divi
  * build: "Chau Philomene One" (weight 500) for every heading, "Poppins" for
  * body copy, plain (non-rounded, no shadow) photos, and full-bleed
- * alternating gray/white bands for each image+text section.
+ * alternating gray/white bands for each image+text section. All text/images
+ * are wired through EditableText/EditableImage so admins can edit them.
  */
 export const ProjectStaticContent: React.FC<{ category: string }> = ({ category }) => {
   const content = PROJECT_STATIC_CONTENT[category];
   if (!content) return null;
 
   const titleColor = content.titleColor || BRAND_PINK;
+  const keyBase = `project.${slugify(category)}`;
 
   return (
     <div className="bg-white">
-      <div className="w-full aspect-21/9 sm:h-[280px] sm:aspect-auto bg-slate-900">
-        <img src={content.hero} alt={content.title} className="w-full h-full object-cover" />
-      </div>
+      <EditableImage
+        contentKey={`${keyBase}.hero`}
+        defaultValue={content.hero}
+        alt={content.title}
+        wrapperClassName="w-full aspect-21/9 sm:h-[280px] sm:aspect-auto bg-slate-900"
+        className="w-full h-full object-cover"
+      />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3 text-center">
         {content.kicker && (
-          <h3
-            className="ref-heading text-xl sm:text-2xl"
-            style={{ color: BRAND_AMBER }}
-          >
-            {content.kicker}
-          </h3>
+          <EditableText
+            contentKey={`${keyBase}.kicker`}
+            defaultValue={content.kicker}
+            as="h3"
+            className="block ref-heading text-xl sm:text-2xl"
+            render={(v) => <span style={{ color: BRAND_AMBER }}>{v}</span>}
+          />
         )}
-        <h2
-          className="ref-heading text-3xl sm:text-4xl lg:text-[45px]"
-          style={{ color: titleColor }}
-        >
-          {content.title}
-        </h2>
+        <EditableText
+          contentKey={`${keyBase}.title`}
+          defaultValue={content.title}
+          as="h2"
+          className="block ref-heading text-3xl sm:text-4xl lg:text-[45px]"
+          render={(v) => <span style={{ color: titleColor }}>{v}</span>}
+        />
       </div>
 
       <div>
@@ -50,26 +62,38 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const isImageLeft = idx % 2 === 0;
           const isBulletList = section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160);
           const bandBg = idx % 2 === 0 ? BAND_GRAY : 'transparent';
+          const sectionKey = `${keyBase}.section${idx}`;
 
           const textBlock = (
             <div className="space-y-3 text-center">
               {section.heading && (
-                <h3 className="ref-heading text-xl sm:text-2xl text-left" style={{ color: BRAND_AMBER }}>
-                  {section.heading}
-                </h3>
+                <EditableText
+                  contentKey={`${sectionKey}.heading`}
+                  defaultValue={section.heading}
+                  as="h3"
+                  className="ref-heading text-xl sm:text-2xl text-left"
+                  render={(v) => <span style={{ color: BRAND_AMBER }}>{v}</span>}
+                />
               )}
               {isBulletList ? (
                 <ul className="space-y-2 text-left">
                   {section.paragraphs.map((p, i) => (
                     <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
                       <span style={{ color: BRAND_AMBER }} className="shrink-0">•</span>
-                      <span>{p}</span>
+                      <EditableText contentKey={`${sectionKey}.p${i}`} defaultValue={p} as="span" multiline />
                     </li>
                   ))}
                 </ul>
               ) : (
                 section.paragraphs.map((p, i) => (
-                  <p key={i} className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed">{p}</p>
+                  <EditableText
+                    key={i}
+                    contentKey={`${sectionKey}.p${i}`}
+                    defaultValue={p}
+                    as="p"
+                    multiline
+                    className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
+                  />
                 ))
               )}
             </div>
@@ -91,10 +115,12 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 }`}
               >
                 <div className={isImageLeft ? 'order-1' : 'order-1 md:order-2'}>
-                  <img
-                    src={section.image}
+                  <EditableImage
+                    contentKey={`${sectionKey}.image`}
+                    defaultValue={section.image!}
                     alt={section.heading || content.title}
-                    className="w-full aspect-3/2 object-cover"
+                    wrapperClassName="aspect-3/2 bg-slate-900"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className={isImageLeft ? 'order-2' : 'order-2 md:order-1'}>{textBlock}</div>
