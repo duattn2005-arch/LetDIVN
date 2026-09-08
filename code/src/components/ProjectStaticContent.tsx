@@ -28,6 +28,10 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
 
   const titleColor = content.titleColor || BRAND_PINK;
   const keyBase = `project.${slugify(category)}`;
+  // Left/right alternation only counts sections that actually have an image —
+  // a heading-only or gallery-only section in between (verified against the
+  // reference site) doesn't flip the side of the next real image band.
+  let imageBandIndex = -1;
 
   return (
     <div className="bg-white">
@@ -61,13 +65,14 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
       <div>
         {content.sections.map((section, idx) => {
           const hasImage = !!section.image;
-          const isImageLeft = idx % 2 === 0;
+          if (hasImage) imageBandIndex++;
+          const isImageLeft = imageBandIndex % 2 === 0;
           const isBulletList = section.bulletList ?? (section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160));
           // Reference site centers only the title-adjacent intro blurb (no heading of its own)
           // and any title-style heading section; every other body paragraph (under a regular
           // amber sub-heading, e.g. "Background") is left-aligned there.
           const textAlign = !section.heading || section.headingAsTitle ? 'text-center' : 'text-left';
-          const bandBg = idx % 2 === 0 ? BAND_GRAY : 'transparent';
+          const bandBg = section.band ? (section.band === 'gray' ? BAND_GRAY : 'transparent') : idx % 2 === 0 ? BAND_GRAY : 'transparent';
           const sectionKey = `${keyBase}.section${idx}`;
 
           const galleryBlock = section.gallery && section.gallery.length > 0 && (

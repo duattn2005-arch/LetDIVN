@@ -15,6 +15,8 @@ export interface ProjectSection {
   bulletList?: boolean;
   /** Render `heading` like the page's main title (large, centered, title color) instead of the regular small amber sub-heading — matches mid-page "title-style" headings like World Cleanup Day's "From Now and Forever". */
   headingAsTitle?: boolean;
+  /** Explicit gray/white band background. The reference site doesn't alternate these on a fixed idx%2 rule — it's per-section design — so default (unset) falls back to alternating by section index, and this overrides it when that default doesn't match. */
+  band?: 'gray' | 'white';
 }
 
 export interface ProjectStaticContent {
@@ -87,24 +89,36 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
     title: 'Environmental Day',
     sections: [
       {
-        heading: 'The Splendor of Nature',
+        band: 'white',
         paragraphs: [
-          "It's a universal experience. Getting hands dirty, nurturing growth. Pausing to absorb its beauty and draw inspiration. Encouraging our community to appreciate nature's wonders – that's our mission! And thus, we are forming alliances with like-minded individuals who share our passion.",
+          "The Splendor of Nature. It's a universal experience. Getting hands dirty, nurturing growth. Pausing to absorb its beauty and draw inspiration. Encouraging our community to appreciate nature's wonders – that's our mission! And thus, we are forming alliances with like-minded individuals who share our passion.",
+        ],
+      },
+      {
+        band: 'gray',
+        paragraphs: [
+          'Our focus is on blending the boundaries between nature and urban development, inviting nature into the city to influence how we design our urban environments. We are particularly enthusiastic about projects that incorporate elements such as native plants, trash sorting, and diverse environmental activities into our collaborations.',
         ],
         image: '/images/projects/envday-1.jpg',
       },
       {
+        band: 'white',
         paragraphs: [
-          'Our focus is on blending the boundaries between nature and urban development, inviting nature into the city to influence how we design our urban environments. We are particularly enthusiastic about projects that incorporate elements such as native plants, trash sorting, and diverse environmental activities into our collaborations.',
           "We are firm believers in ensuring that every individual in our community has the opportunity to embrace the wonders of nature on a daily basis. Whether it involves cultivating your own food, exploring the flora of the prairie, or seeking tranquility in a meditative garden, our goal is to enhance our community's accessibility to these enriching experiences.",
         ],
         image: '/images/projects/envday-2.jpg',
       },
       {
+        band: 'white',
         heading: 'Create Valuable Sustainable Lifestyle',
+        headingAsTitle: true,
         paragraphs: [
           'We offer a range of programs and initiatives designed to bring nature closer to everyone. For those interested in sustainable living, our urban workshops teach the basics of green lifestyle, even in small spaces. Our guided nature walks provide a deeper appreciation for the eco-friendly life that thrives in our region.',
         ],
+      },
+      {
+        band: 'gray',
+        paragraphs: [],
         gallery: [
           '/images/projects/gallery/envday-g1.jpg',
           '/images/projects/gallery/envday-g2.jpg',
