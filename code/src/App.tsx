@@ -24,6 +24,7 @@ import { ProjectsPage } from './components/pages/ProjectsPage';
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage';
 import { NewsPage } from './components/pages/NewsPage';
 import { MediaOnUsPage } from './components/pages/MediaOnUsPage';
+import { HomeQuickLinksSection } from './components/HomeQuickLinksSection';
 import { FullGalleryPage } from './components/pages/FullGalleryPage';
 import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
@@ -102,7 +103,8 @@ export function AppContent() {
               onExploreProjects={() => handleNavigate('projects')}
               onExploreMap={() => handleNavigate('map')}
             />
-            <AboutSection 
+            <HomeQuickLinksSection onNavigate={handleNavigate} />
+            <AboutSection
               onLearnMore={() => handleNavigate('who-we-are')}
             />
             <MediaVideosPage />
