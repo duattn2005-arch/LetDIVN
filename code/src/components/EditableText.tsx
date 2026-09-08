@@ -152,7 +152,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
   if (!isAdmin) {
     return render ? (
-      <span style={displayStyle}>{render(resolvedValue)}</span>
+      <span className={className} style={displayStyle}>{render(resolvedValue)}</span>
     ) : (
       <Tag className={`whitespace-pre-line ${className}`} style={displayStyle}>{resolvedValue}</Tag>
     );
@@ -332,7 +332,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
   if (render) {
     return (
       <span
-        className="group/edit inline-flex items-center gap-0.5 whitespace-pre-line cursor-text"
+        className={`group/edit inline-flex items-center gap-0.5 whitespace-pre-line cursor-text ${className}`}
         style={displayStyle}
         onMouseUp={handleMouseUpToEdit}
         title="Bôi đen chữ hoặc bấm bút chì để sửa"
