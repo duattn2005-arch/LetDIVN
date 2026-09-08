@@ -91,7 +91,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
     <div className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        <div className="text-center max-w-5xl mx-auto space-y-4">
           <EditableText
             contentKey="projects.title"
             defaultValue={t.projectsTitle}

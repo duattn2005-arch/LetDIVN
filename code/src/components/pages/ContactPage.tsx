@@ -56,7 +56,7 @@ export const ContactPage: React.FC = () => {
     <div className="py-16 bg-white select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
 
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        <div className="text-center max-w-5xl mx-auto space-y-4">
           <EditableText
             contentKey="contactPage.title"
             defaultValue={t.navContactUs || 'Contact Us'}

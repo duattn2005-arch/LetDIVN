@@ -27,7 +27,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
         <img src={content.hero} alt={content.title} className="w-full h-full object-cover" />
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3 text-center">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3 text-center">
         {content.kicker && (
           <h3
             className="ref-heading text-xl sm:text-2xl"

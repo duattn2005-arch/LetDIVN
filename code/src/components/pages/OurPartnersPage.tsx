@@ -140,7 +140,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => 
 
       <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
 
-        <div className="text-center max-w-3xl mx-auto space-y-3">
+        <div className="text-center max-w-5xl mx-auto space-y-3">
           <EditableText
             contentKey="ourPartners.title"
             defaultValue="We Work With the Best Partners"
