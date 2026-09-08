@@ -354,26 +354,33 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
     let resolved: { lat: number; lng: number; displayName: string; fullAddress: string; geojson?: any } | null = null;
 
-    try {
-      const nomRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=1`,
-        { headers: { 'Accept-Language': 'en' } }
-      );
-      if (nomRes.ok) {
-        const data = await nomRes.json();
-        if (data && data.length > 0) {
-          const item = data[0];
-          resolved = {
-            lat: parseFloat(item.lat),
-            lng: parseFloat(item.lon),
-            displayName: item.display_name.split(',')[0],
-            fullAddress: item.display_name,
-            geojson: item.geojson
-          };
+    // Nominatim is the only source of real administrative boundary polygons
+    // (Photon below never returns one) — worth one quick retry on a transient
+    // failure before settling for the approximate fallback shape.
+    for (let attempt = 0; attempt < 2 && !resolved; attempt++) {
+      try {
+        const nomRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=1`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        if (nomRes.ok) {
+          const data = await nomRes.json();
+          if (data && data.length > 0) {
+            const item = data[0];
+            resolved = {
+              lat: parseFloat(item.lat),
+              lng: parseFloat(item.lon),
+              displayName: item.display_name.split(',')[0],
+              fullAddress: item.display_name,
+              geojson: item.geojson
+            };
+          }
+          break;
         }
+      } catch (err) {
+        console.warn(`Nominatim geocoding error (attempt ${attempt + 1}):`, err);
+        if (attempt === 0) await new Promise((r) => setTimeout(r, 400));
       }
-    } catch (err) {
-      console.warn('Nominatim geocoding error:', err);
     }
 
     // Fast, resilient fallback when Nominatim is slow, rate-limited, or unreachable —
