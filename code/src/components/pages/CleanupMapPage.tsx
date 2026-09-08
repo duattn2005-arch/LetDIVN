@@ -167,8 +167,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         (async (): Promise<SearchSuggestion[]> => {
           try {
             const nomRes = await fetch(
-              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(normalizedQuery)}&countrycodes=vn&format=json&addressdetails=1&limit=8&polygon_geojson=1`,
-              { headers: { 'Accept-Language': 'en' }, signal: controller.signal }
+              `/api/geocode/search?q=${encodeURIComponent(normalizedQuery)}&limit=8`,
+              { signal: controller.signal }
             );
             if (!nomRes.ok) return [];
             const data = await nomRes.json();
@@ -206,7 +206,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         (async (): Promise<SearchSuggestion[]> => {
           try {
             const photonRes = await fetch(
-              `https://photon.komoot.io/api/?q=${encodeURIComponent(normalizedQuery)}&limit=6&bbox=102.0,8.0,110.0,24.0&lang=en`,
+              `/api/geocode/photon?q=${encodeURIComponent(normalizedQuery)}&limit=6`,
               { signal: controller.signal }
             );
             if (!photonRes.ok) return [];
@@ -285,9 +285,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)
         .then(r => (r.ok ? r.json() : null))
         .catch(() => null),
-      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
-        headers: { 'Accept-Language': 'en' }
-      })
+      fetch(`/api/geocode/reverse?lat=${lat}&lon=${lng}&zoom=18`)
         .then(r => (r.ok ? r.json() : null))
         .catch(() => null)
     ]);
@@ -360,8 +358,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     for (let attempt = 0; attempt < 2 && !resolved; attempt++) {
       try {
         const nomRes = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Vietnam')}&countrycodes=vn&format=json&polygon_geojson=1&limit=1`,
-          { headers: { 'Accept-Language': 'en' } }
+          `/api/geocode/search?q=${encodeURIComponent(query + ', Vietnam')}&limit=1`
         );
         if (nomRes.ok) {
           const data = await nomRes.json();
@@ -388,7 +385,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     if (!resolved) {
       try {
         const photonRes = await fetch(
-          `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1&bbox=102.0,8.0,110.0,24.0&lang=en`
+          `/api/geocode/photon?q=${encodeURIComponent(query)}&limit=1`
         );
         if (photonRes.ok) {
           const data = await photonRes.json();
@@ -520,8 +517,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&countrycodes=vn&format=json&polygon_geojson=1&limit=1&viewbox=${viewbox}&bounded=1`,
-          { headers: { 'Accept-Language': 'en' } }
+          `/api/geocode/search?q=${encodeURIComponent(name)}&limit=1&viewbox=${viewbox}`
         );
         if (res.ok) {
           const data = await res.json();
