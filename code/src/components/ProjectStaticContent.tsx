@@ -70,9 +70,11 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const isImageLeft = imageBandIndex % 2 === 0;
           const isBulletList = section.bulletList ?? (section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160));
           // Reference site centers only the title-adjacent intro blurb (no heading of its own)
-          // and any title-style heading section; every other body paragraph (under a regular
-          // amber sub-heading, e.g. "Background") is left-aligned there.
-          const textAlign = !section.heading || section.headingAsTitle ? 'text-center' : 'text-left';
+          // and any title-style heading section — UNLESS the paragraph sits in an image+text
+          // band, which is always left-aligned regardless of heading (verified on World Cleanup
+          // Day's "Since 2018" and Environmental Day's image bands). Every other body paragraph
+          // (under a regular amber sub-heading, e.g. "Background") is left-aligned too.
+          const textAlign = hasImage || (section.heading && !section.headingAsTitle) ? 'text-left' : 'text-center';
           const bandBg = section.band ? (section.band === 'gray' ? BAND_GRAY : 'transparent') : idx % 2 === 0 ? BAND_GRAY : 'transparent';
           const sectionKey = `${keyBase}.section${idx}`;
 
@@ -164,6 +166,82 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                     className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
                   />
                 ))
+              )}
+
+              {section.subBlocks && section.subBlocks.length > 0 && (
+                <div className="text-left space-y-8 pt-2">
+                  {section.subBlocks.map((block, bi) => (
+                    <div key={bi} className="space-y-2">
+                      <EditableText
+                        contentKey={`${sectionKey}.sub${bi}.title`}
+                        defaultValue={block.title}
+                        as="p"
+                        className="ref-body text-sm sm:text-base font-bold text-slate-700"
+                      />
+                      <EditableText
+                        contentKey={`${sectionKey}.sub${bi}.text`}
+                        defaultValue={block.text}
+                        as="p"
+                        multiline
+                        className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
+                      />
+                      {block.gallery && block.gallery.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                          <EditableGalleryGrid
+                            contentKey={`${sectionKey}.sub${bi}.gallery`}
+                            defaultImages={block.gallery}
+                            alt={block.title}
+                            cellClassName="aspect-3/2"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {(section.closingParagraphs?.length || section.closingBullets?.length) && (
+                <div className="text-left space-y-3 pt-2">
+                  {section.closingParagraphs?.[0] && (
+                    <EditableText
+                      contentKey={`${sectionKey}.closing.p0`}
+                      defaultValue={section.closingParagraphs[0]}
+                      as="p"
+                      multiline
+                      className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
+                    />
+                  )}
+                  {section.closingBullets && section.closingBullets.length > 0 && (
+                    <>
+                      {section.closingBulletsLabel && (
+                        <EditableText
+                          contentKey={`${sectionKey}.closing.bulletsLabel`}
+                          defaultValue={section.closingBulletsLabel}
+                          as="p"
+                          className="ref-body text-sm sm:text-base font-bold text-slate-700"
+                        />
+                      )}
+                      <ul className="space-y-1.5">
+                        {section.closingBullets.map((p, i) => (
+                          <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
+                            <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
+                            <EditableText contentKey={`${sectionKey}.closing.bullet${i}`} defaultValue={p} as="span" multiline />
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  {section.closingParagraphs?.slice(1).map((p, i) => (
+                    <EditableText
+                      key={i}
+                      contentKey={`${sectionKey}.closing.p${i + 1}`}
+                      defaultValue={p}
+                      as="p"
+                      multiline
+                      className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
+                    />
+                  ))}
+                </div>
               )}
             </div>
           );
