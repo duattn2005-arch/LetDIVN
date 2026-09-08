@@ -41,6 +41,16 @@ export const EditableImage: React.FC<EditableImageProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [draftPosition, setDraftPosition] = useState(DEFAULT_OBJECT_POSITION);
   const [isDragging, setIsDragging] = useState(false);
+  // The live wrapper's own aspect ratio often comes from responsive Tailwind
+  // classes (e.g. a different ratio above/below the `sm:` breakpoint) that
+  // only make sense at the image's *real* on-page width — reusing those
+  // classes for the edit modal's preview (which is narrower, inside a
+  // max-w-md dialog) silently produces a different-shaped box than the real
+  // image, so a position that looks right in the preview crops wrong on the
+  // actual page. Measuring the live element's current rendered box instead
+  // guarantees the preview always matches reality.
+  const [previewRatio, setPreviewRatio] = useState<number | null>(null);
+  const liveImgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     const refresh = () => {
@@ -131,16 +141,20 @@ export const EditableImage: React.FC<EditableImageProps> = ({
     dbService.setContent(positionKey, DEFAULT_OBJECT_POSITION);
   };
 
-  const previewClassName = hasPosition ? 'w-full aspect-video bg-slate-900' : wrapperClassName || 'w-full aspect-video bg-slate-900';
+  const openEditor = () => {
+    const rect = liveImgRef.current?.getBoundingClientRect();
+    setPreviewRatio(rect && rect.height > 0 ? rect.width / rect.height : null);
+    setIsEditing(true);
+  };
 
   return (
     <div className={`${positionClass} group/img ${wrapperClassName}`}>
-      <img src={value} alt={alt} className={className} style={{ objectPosition }} />
+      <img ref={liveImgRef} src={value} alt={alt} className={className} style={{ objectPosition }} />
 
       {isAdmin && (
         <button
           type="button"
-          onClick={() => setIsEditing(true)}
+          onClick={openEditor}
           className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-sm gap-2 cursor-pointer z-10"
         >
           <Edit3 className="w-5 h-5" />
@@ -154,10 +168,10 @@ export const EditableImage: React.FC<EditableImageProps> = ({
           onClick={() => setIsEditing(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl animate-in zoom-in-95 duration-150"
+            className="bg-white rounded-2xl max-w-md w-full max-h-[88vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
               <h4 className="font-bold text-slate-900 text-sm">Thay đổi ảnh (Admin)</h4>
               <button
                 onClick={() => setIsEditing(false)}
@@ -166,6 +180,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
                 <X className="w-4 h-4" />
               </button>
             </div>
+            <div className="overflow-y-auto p-5 space-y-4">
             <ImageUploadWidget
               currentImageUrl={value}
               onImageSelected={(url) => {
@@ -244,7 +259,8 @@ export const EditableImage: React.FC<EditableImageProps> = ({
                   const t = e.touches[0];
                   if (t) startDrag(t.clientX, t.clientY);
                 }}
-                className={`relative overflow-hidden rounded-xl border-2 border-dashed border-purple-300 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} select-none ${previewClassName}`}
+                style={{ aspectRatio: previewRatio ?? 16 / 9, maxHeight: '40vh' }}
+                className={`relative w-full overflow-hidden rounded-xl border-2 border-dashed border-purple-300 bg-slate-900 mx-auto ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
               >
                 <img
                   src={value}
@@ -256,6 +272,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
                 <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-white/40" />
               </div>
               <p className="text-[10px] text-slate-400">Nhấn giữ và kéo trực tiếp trên ảnh, vị trí sẽ tự lưu khi thả chuột.</p>
+            </div>
             </div>
           </div>
         </div>,
