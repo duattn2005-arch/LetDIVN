@@ -127,21 +127,23 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
               contentKey="newsPage.titleMedia"
               defaultValue={t.newsPageTitleMedia || 'Press & TV Coverage About Us'}
               as="h1"
-              className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+              className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+              render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
           ) : (
             <EditableText
               contentKey="newsPage.titleDefault"
               defaultValue={t.newsPageTitleDefault || 'News & Environmental Activities'}
               as="h1"
-              className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+              className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+              render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
           )}
           <EditableText
             contentKey="newsPage.subtitle"
             defaultValue={t.newsPageSubtitle}
             as="p"
-            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
+            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
             multiline
           />
 

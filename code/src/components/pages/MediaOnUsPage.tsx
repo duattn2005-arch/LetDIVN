@@ -27,13 +27,14 @@ export const MediaOnUsPage: React.FC = () => {
             contentKey="mediaOnUsPage.title"
             defaultValue="Media on Us"
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
             contentKey="mediaOnUsPage.subtitle"
             defaultValue="We are delighted to have received enthusiastic and proactive support from the press network in Vietnam. We firmly believe that achieving significant goals is possible only with community support through the influence of the press and social media."
             as="p"
-            className="text-sm sm:text-base text-slate-600 leading-relaxed [text-wrap:balance]"
+            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed [text-wrap:balance]"
             multiline
           />
         </div>
@@ -50,7 +51,7 @@ export const MediaOnUsPage: React.FC = () => {
                   alt={entry.title}
                   className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover shrink-0"
                 />
-                <h3 className="font-bold text-base sm:text-lg text-slate-900 leading-snug">{entry.title}</h3>
+                <h3 className="ref-heading text-base sm:text-lg text-slate-900 leading-snug">{entry.title}</h3>
               </div>
 
               <div className="flex items-center gap-6 sm:gap-8 justify-center">

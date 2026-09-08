@@ -72,7 +72,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
             contentKey="whatWeDo.title"
             defaultValue="WHAT WE DO"
             as="h1"
-            className="text-3xl sm:text-4xl font-bold tracking-tight"
+            className="ref-heading text-3xl sm:text-4xl lg:text-[45px]"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
 
@@ -81,13 +81,13 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
             defaultValue="At Let's Do It! Vietnam, we're on a mission to transform our beautiful country into a cleaner, greener haven."
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
           />
           <EditableText
             contentKey="whatWeDo.differenceSubtitle"
             defaultValue="Here's how we make a difference:"
             as="p"
-            className="text-sm sm:text-base text-slate-600"
+            className="ref-body text-sm sm:text-base text-slate-600"
           />
 
           {/* Admin Add New Section Button */}
@@ -124,14 +124,14 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
                     contentKey={`whatWeDo.${item.id}.img`}
                     defaultValue={item.image}
                     alt={item.title}
-                    wrapperClassName="rounded-2xl overflow-hidden shadow-md aspect-4/3 bg-slate-900"
+                    wrapperClassName="aspect-4/3 bg-slate-900"
                     className="w-full h-full object-cover"
                   />
                 </div>
 
                 {/* Text Column */}
                 <div className={`space-y-3 ${isImageLeft ? 'order-2' : 'order-2 md:order-1'}`}>
-                  <h2 className="text-xl sm:text-2xl font-bold leading-tight">
+                  <h2 className="ref-heading text-xl sm:text-2xl">
                     <EditableText
                       contentKey={`whatWeDo.${item.id}.title`}
                       defaultValue={item.title}
@@ -139,7 +139,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
                       render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
                     />
                   </h2>
-                  <div className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                  <div className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed">
                     <EditableText
                       contentKey={`whatWeDo.${item.id}.desc`}
                       defaultValue={item.desc}

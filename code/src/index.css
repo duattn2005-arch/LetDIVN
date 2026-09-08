@@ -15,6 +15,17 @@ h1, h2, h3, h4 {
   text-wrap: balance;
 }
 
+/* Reference-site typography (letsdoitvietnam.org): brand pink section
+   titles use "Chau Philomene One", body copy uses "Poppins". */
+.ref-heading {
+  font-family: 'Chau Philomene One', sans-serif;
+  font-weight: 500;
+}
+
+.ref-body {
+  font-family: 'Poppins', sans-serif;
+}
+
 /* Mobile responsive smooth touch */
 * {
   -webkit-tap-highlight-color: transparent;

@@ -145,21 +145,21 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => 
             contentKey="ourPartners.title"
             defaultValue="We Work With the Best Partners"
             as="h1"
-            className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-2xl sm:text-3xl lg:text-[45px] [text-wrap:balance]"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
             contentKey="ourPartners.subtitle"
             defaultValue="Working with strong partners can make a significant impact."
             as="p"
-            className="text-sm sm:text-base text-slate-600"
+            className="ref-body text-sm sm:text-base text-slate-600"
           />
           <EditableText
             contentKey="ourPartners.desc"
             defaultValue="We collaborate with local communities, schools, and businesses to organize large-scale clean-up campaigns. We partner with companies to promote sustainable practices within their operations."
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
           />
 
           {isAdmin && (

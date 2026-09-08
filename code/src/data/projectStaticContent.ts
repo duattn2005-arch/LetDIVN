@@ -8,6 +8,8 @@ export interface ProjectStaticContent {
   hero: string;
   kicker?: string;
   title: string;
+  /** Main title color, matching each campaign's brand accent on letsdoitvietnam.org. Defaults to brand pink. */
+  titleColor?: string;
   sections: ProjectSection[];
 }
 
@@ -77,6 +79,7 @@ export const PROJECT_STATIC_CONTENT: Record<string, ProjectStaticContent> = {
     hero: '/images/projects/goc-hero.jpg',
     kicker: 'Tackle marine litter issues',
     title: 'Green Ocean Campaign',
+    titleColor: '#44ACAC',
     sections: [
       {
         paragraphs: [

@@ -62,7 +62,7 @@ export const OurTeamPage: React.FC = () => {
             contentKey="ourTeam.title"
             defaultValue="OUR TEAM"
             as="h1"
-            className="text-3xl sm:text-4xl font-bold tracking-tight"
+            className="ref-heading text-3xl sm:text-4xl lg:text-[45px]"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
@@ -70,7 +70,7 @@ export const OurTeamPage: React.FC = () => {
             defaultValue="Meet the passionate individuals behind Let's Do It! Vietnam—a diverse team united by a common purpose: to protect our environment and inspire positive change. 🌿🌏"
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
           />
 
           {/* Admin Management Bar */}
@@ -127,7 +127,7 @@ export const OurTeamPage: React.FC = () => {
               </div>
 
               <div className="p-4 bg-slate-50">
-                <h3 className="text-base font-bold" style={{ color: BRAND_PINK }}>
+                <h3 className="ref-heading text-base" style={{ color: BRAND_PINK }}>
                   {member.name}
                 </h3>
                 <div className="text-xs font-semibold text-slate-600 mt-0.5">
