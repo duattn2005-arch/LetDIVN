@@ -38,24 +38,21 @@ export const MediaOnUsPage: React.FC = () => {
           />
         </div>
 
-        <div className="space-y-10">
+        <div className="max-w-5xl mx-auto space-y-10">
           {MEDIA_ON_US_ENTRIES.map((entry) => (
-            <div
-              key={entry.title}
-              className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] items-center gap-6 sm:gap-10"
-            >
+            <div key={entry.title} className="flex flex-wrap items-center gap-x-10 gap-y-4">
               <img
                 src={entry.image}
                 alt={entry.title}
-                className="w-full sm:w-56 aspect-16/10 object-cover"
+                className="w-64 aspect-3/2 object-cover shrink-0"
               />
 
-              <div className="text-center">
+              <div className="w-16 text-center shrink-0">
                 <div className="text-4xl sm:text-5xl font-black" style={{ color: BRAND_PINK }}>{entry.articles}</div>
                 <div className="text-sm text-slate-500 mt-0.5">Article</div>
               </div>
 
-              <div className="text-center">
+              <div className="w-16 text-center shrink-0">
                 <div className="text-4xl sm:text-5xl font-black text-orange-500">{entry.segments}</div>
                 <div className="text-sm text-slate-500 mt-0.5">Segment</div>
               </div>
