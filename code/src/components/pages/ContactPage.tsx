@@ -61,7 +61,8 @@ export const ContactPage: React.FC = () => {
             contentKey="contactPage.title"
             defaultValue={t.navContactUs || 'Contact Us'}
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <EditableText
             contentKey="contactPage.subtitle"

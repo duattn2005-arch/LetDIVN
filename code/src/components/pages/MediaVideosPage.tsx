@@ -51,7 +51,8 @@ export const MediaVideosPage: React.FC = () => {
             contentKey="videosPage.title"
             defaultValue={t.videosPageTitle}
             as="h2"
-            className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-2xl sm:text-3xl lg:text-4xl [text-wrap:balance]"
+            render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <EditableText
             contentKey="videosPage.subtitle"

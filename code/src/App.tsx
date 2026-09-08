@@ -30,7 +30,6 @@ import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { CleanupMapPage } from './components/pages/CleanupMapPage';
 import { ContactBubble } from './components/ContactBubble';
-import { AmbientBackground } from './components/AmbientBackground';
 
 export function AppContent() {
   const [activeView, setActiveView] = useState<string>('home');
@@ -80,9 +79,6 @@ export function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 text-slate-800 antialiased font-sans relative selection:bg-[#E81A7F] selection:text-white">
-      {/* 3D Ambient Particle & Ecological Environment Elements */}
-      <AmbientBackground />
-
       {/* Global Header */}
       <Header
         activeView={activeView}

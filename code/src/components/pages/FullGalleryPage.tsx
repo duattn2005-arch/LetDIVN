@@ -53,7 +53,8 @@ export const FullGalleryPage: React.FC = () => {
             contentKey="fullGallery.title"
             defaultValue={t.fullGalleryTitle}
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]">
             <EditableText contentKey="fullGallery.subtitle" defaultValue={t.fullGallerySubtitle} as="span" />

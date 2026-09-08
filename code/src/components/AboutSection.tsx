@@ -25,7 +25,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
               contentKey="about.title"
               defaultValue={t.aboutTitle || "Let's do it! Vietnam Movement"}
               as="h2"
-              className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight"
+              className="ref-heading text-2xl sm:text-3xl lg:text-4xl"
+              render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
 
             <EditableText

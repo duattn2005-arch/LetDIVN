@@ -33,7 +33,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onViewAllGallery
             contentKey="gallery.title"
             defaultValue={t.galleryTitle || 'Photo & Media Gallery'}
             as="h2"
-            className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight"
+            className="ref-heading text-2xl sm:text-3xl lg:text-4xl"
+            render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <EditableText
             contentKey="gallery.subtitle"
