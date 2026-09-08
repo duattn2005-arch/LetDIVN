@@ -1,5 +1,4 @@
 import React from 'react';
-import { Newspaper, Radio, Download } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { TakeActionStrip } from '../TakeActionStrip';
@@ -39,52 +38,41 @@ export const MediaOnUsPage: React.FC = () => {
           />
         </div>
 
-        <div className="space-y-6">
-          {MEDIA_ON_US_ENTRIES.map((entry, idx) => (
+        <div className="space-y-10">
+          {MEDIA_ON_US_ENTRIES.map((entry) => (
             <div
               key={entry.title}
-              className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] items-center gap-6 bg-white rounded-3xl border border-slate-200/80 shadow-xs p-4 sm:p-5"
+              className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] items-center gap-6 sm:gap-10"
             >
-              <div className="flex items-center gap-4">
-                <img
-                  src={entry.image}
-                  alt={entry.title}
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover shrink-0"
-                />
-                <h3 className="ref-heading text-base sm:text-lg text-slate-900 leading-snug">{entry.title}</h3>
+              <img
+                src={entry.image}
+                alt={entry.title}
+                className="w-full sm:w-56 aspect-16/10 object-cover"
+              />
+
+              <div className="text-center">
+                <div className="text-4xl sm:text-5xl font-black" style={{ color: BRAND_PINK }}>{entry.articles}</div>
+                <div className="text-sm text-slate-500 mt-0.5">Article</div>
               </div>
 
-              <div className="flex items-center gap-6 sm:gap-8 justify-center">
-                <div className="text-center">
-                  <div className="flex items-center gap-1.5 justify-center">
-                    <Newspaper className="w-4 h-4" style={{ color: BRAND_PINK }} />
-                    <span className="text-2xl sm:text-3xl font-black" style={{ color: BRAND_PINK }}>{entry.articles}</span>
-                  </div>
-                  <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Article{entry.articles !== 1 ? 's' : ''}</div>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center gap-1.5 justify-center">
-                    <Radio className="w-4 h-4 text-orange-500" />
-                    <span className="text-2xl sm:text-3xl font-black text-orange-500">{entry.segments}</span>
-                  </div>
-                  <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Segment{entry.segments !== 1 ? 's' : ''}</div>
-                </div>
+              <div className="text-center">
+                <div className="text-4xl sm:text-5xl font-black text-orange-500">{entry.segments}</div>
+                <div className="text-sm text-slate-500 mt-0.5">Segment</div>
               </div>
 
               <a
                 href={entry.pdf}
                 target="_blank"
                 rel="noreferrer"
-                className="flex flex-col items-center sm:items-end gap-1 shrink-0"
+                className="flex flex-col items-center gap-1.5 shrink-0"
               >
                 <span
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-xs font-bold shadow-sm hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center px-6 py-2.5 rounded-full text-white text-sm font-bold shadow-sm hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: BRAND_PINK }}
                 >
-                  <Download className="w-3.5 h-3.5" />
                   {entry.title}
                 </span>
-                <span className="text-[10px] text-slate-400">Click to see media coverage on activities</span>
+                <span className="ref-body text-xs italic text-slate-400">Click to see media coverage on activities</span>
               </a>
             </div>
           ))}
