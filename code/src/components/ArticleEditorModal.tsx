@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Sparkles, Save, AlertCircle, Calendar, User, Globe, CheckCircle2 } from 'lucide-react';
-import { NewsArticle } from '../types';
+import { X, FileText, Sparkles, Save, AlertCircle, Calendar, User, Globe, CheckCircle2, Plus, Image as ImageIcon, Type, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { NewsArticle, NewsContentBlock } from '../types';
 import { dbService } from '../services/dbService';
 import { ImageUploadWidget } from './ImageUploadWidget';
 import { useAuth } from '../context/AuthContext';
+
+let blockIdSeq = 0;
+const newBlockId = () => `b${Date.now()}-${blockIdSeq++}`;
+type EditableBlock = NewsContentBlock & { _id: string };
 
 interface ArticleEditorModalProps {
   isOpen: boolean;
@@ -23,7 +27,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<NewsArticle['category']>('News');
   const [summary, setSummary] = useState('');
-  const [content, setContent] = useState('');
+  const [blocks, setBlocks] = useState<EditableBlock[]>([{ _id: newBlockId(), type: 'text', value: '' }]);
   const [author, setAuthor] = useState(user?.name || 'Let\'s do it! Vietnam Editorial Team');
   const [date, setDate] = useState('');
   const [image, setImage] = useState('');
@@ -37,7 +41,11 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setTitle(articleToEdit.title);
       setCategory(articleToEdit.category);
       setSummary(articleToEdit.summary);
-      setContent(articleToEdit.content);
+      setBlocks(
+        articleToEdit.contentBlocks && articleToEdit.contentBlocks.length > 0
+          ? articleToEdit.contentBlocks.map((b) => ({ ...b, _id: newBlockId() }))
+          : [{ _id: newBlockId(), type: 'text', value: articleToEdit.content }]
+      );
       setAuthor(articleToEdit.author);
       setDate(articleToEdit.date);
       setImage(articleToEdit.image);
@@ -48,7 +56,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setTitle('');
       setCategory('News');
       setSummary('');
-      setContent('');
+      setBlocks([{ _id: newBlockId(), type: 'text', value: '' }]);
       setAuthor(user?.name || 'Let\'s do it! Vietnam Editorial Team');
       setDate(new Date().toISOString().split('T')[0]);
       setImage('https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80');
@@ -71,8 +79,15 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
       setError('Please enter an article summary.');
       return;
     }
-    if (!content.trim()) {
-      setError('Please enter the full article content.');
+    const cleanedBlocks: NewsContentBlock[] = blocks
+      .map(({ _id, ...b }) => ({ ...b, value: b.value.trim() }))
+      .filter((b) => b.value);
+    const content = cleanedBlocks
+      .filter((b) => b.type === 'text')
+      .map((b) => b.value)
+      .join('\n\n');
+    if (cleanedBlocks.length === 0) {
+      setError('Please add at least one paragraph or image to the article content.');
       return;
     }
     if (!image.trim()) {
@@ -98,6 +113,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
         category,
         summary,
         content,
+        contentBlocks: cleanedBlocks,
         author,
         date,
         image,
@@ -113,6 +129,7 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
         category,
         summary,
         content,
+        contentBlocks: cleanedBlocks,
         author,
         date,
         image,
@@ -129,6 +146,26 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
 
     if (onSaved) onSaved(saved);
     onClose();
+  };
+
+  const addBlock = (type: 'text' | 'image') => {
+    setBlocks((prev) => [...prev, { _id: newBlockId(), type, value: '' }]);
+  };
+  const updateBlockValue = (id: string, value: string) => {
+    setBlocks((prev) => prev.map((b) => (b._id === id ? { ...b, value } : b)));
+  };
+  const removeBlock = (id: string) => {
+    setBlocks((prev) => (prev.length > 1 ? prev.filter((b) => b._id !== id) : prev));
+  };
+  const moveBlock = (id: string, dir: -1 | 1) => {
+    setBlocks((prev) => {
+      const idx = prev.findIndex((b) => b._id === id);
+      const newIdx = idx + dir;
+      if (idx < 0 || newIdx < 0 || newIdx >= prev.length) return prev;
+      const next = [...prev];
+      [next[idx], next[newIdx]] = [next[newIdx], next[idx]];
+      return next;
+    });
   };
 
   if (!isOpen) return null;
@@ -228,19 +265,89 @@ export const ArticleEditorModal: React.FC<ArticleEditorModalProps> = ({
             ></textarea>
           </div>
 
-          {/* Full Content */}
+          {/* Content blocks: an ordered mix of paragraphs and images */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Full article content <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              rows={6}
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="The full text of the article..."
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm leading-relaxed focus:outline-hidden focus:border-[#E81A7F]"
-            ></textarea>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Article content <span className="text-red-500">*</span>
+              </label>
+              <span className="text-[11px] text-slate-400">Add as many paragraphs and images as you like, in any order</span>
+            </div>
+            <div className="space-y-3">
+              {blocks.map((block, i) => (
+                <div key={block._id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50/60 dark:bg-slate-800/40">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                      {block.type === 'text' ? <Type className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
+                      {block.type === 'text' ? 'Paragraph' : 'Image'}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveBlock(block._id, -1)}
+                        disabled={i === 0}
+                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        title="Move up"
+                      >
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveBlock(block._id, 1)}
+                        disabled={i === blocks.length - 1}
+                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        title="Move down"
+                      >
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeBlock(block._id)}
+                        disabled={blocks.length === 1}
+                        className="p-1 text-red-400 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  {block.type === 'text' ? (
+                    <textarea
+                      rows={4}
+                      value={block.value}
+                      onChange={(e) => updateBlockValue(block._id, e.target.value)}
+                      placeholder="Paragraph text..."
+                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm leading-relaxed focus:outline-hidden focus:border-[#E81A7F]"
+                    />
+                  ) : (
+                    <ImageUploadWidget
+                      currentImageUrl={block.value}
+                      onImageSelected={(url) => updateBlockValue(block._id, url)}
+                      label=""
+                      aspectRatioLabel="Shown full-width within the article"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 mt-3">
+              <button
+                type="button"
+                onClick={() => addBlock('text')}
+                className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 hover:border-[#E81A7F] hover:text-[#E81A7F] transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add paragraph</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => addBlock('image')}
+                className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-300 hover:border-[#E81A7F] hover:text-[#E81A7F] transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add image</span>
+              </button>
+            </div>
           </div>
 
           {/* Author, Date, Source */}
