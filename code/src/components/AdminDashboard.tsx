@@ -27,6 +27,7 @@ import {
   KeyRound
 } from 'lucide-react';
 import { dbService } from '../services/dbService';
+import { ArticleEditorModal } from './ArticleEditorModal';
 import {
   VolunteerRegistration,
   CleanupEvent,
@@ -89,7 +90,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   // Modal forms for adding items
   const [isCreatingVolunteer, setIsCreatingVolunteer] = useState(false);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
-  const [isCreatingNews, setIsCreatingNews] = useState(false);
+  const [isNewsEditorOpen, setIsNewsEditorOpen] = useState(false);
+  const [newsArticleToEdit, setNewsArticleToEdit] = useState<NewsArticle | null>(null);
 
   const refreshData = async () => {
     try {
@@ -203,6 +205,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       await dbService.deleteNews(id);
       refreshData();
     }
+  };
+
+  const handleOpenCreateNews = () => {
+    setNewsArticleToEdit(null);
+    setIsNewsEditorOpen(true);
+  };
+
+  const handleOpenEditNews = (article: NewsArticle) => {
+    setNewsArticleToEdit(article);
+    setIsNewsEditorOpen(true);
   };
 
   // Partner CRUD
@@ -351,8 +363,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   if (!isOpen) return null;
 
-  return typeof document !== 'undefined' ? createPortal(
-    <div className="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-150">
+  return typeof document !== 'undefined' ? (
+    <>
+      {createPortal(
+        <div className="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-150">
       <div
         className="relative bg-slate-950 text-slate-100 rounded-3xl max-w-6xl w-full h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-slate-700 animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
@@ -864,8 +878,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           {/* TAB 3: NEWS */}
           {activeTab === 'news' && (
             <div className="space-y-4">
-              <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+              <div className="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
                 <h4 className="font-bold text-base text-white">Tin Tức &amp; Báo Chí Viết Về Chúng Tôi</h4>
+                <button
+                  onClick={handleOpenCreateNews}
+                  className="px-3.5 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Thêm bài viết</span>
+                </button>
               </div>
               <div className="space-y-3">
                 {news.map((item) => (
@@ -877,12 +898,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                         <h5 className="font-bold text-sm text-white truncate">{item.title}</h5>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleDeleteNews(item.id)}
-                      className="p-2 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-xl transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => handleOpenEditNews(item)}
+                        className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
+                        title="Sửa bài viết"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteNews(item.id)}
+                        className="p-2 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-xl transition-colors cursor-pointer"
+                        title="Xóa bài viết"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -932,7 +963,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
       </div>
     </div>,
-    document.body
+        document.body
+      )}
+      <ArticleEditorModal
+        isOpen={isNewsEditorOpen}
+        onClose={() => setIsNewsEditorOpen(false)}
+        articleToEdit={newsArticleToEdit}
+        onSaved={refreshData}
+      />
+    </>
   ) : null;
 };
 
