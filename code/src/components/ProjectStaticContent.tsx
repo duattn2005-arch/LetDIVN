@@ -79,7 +79,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const sectionKey = `${keyBase}.section${idx}`;
 
           const galleryBlock = section.gallery && section.gallery.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mt-6">
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2.5 mt-6">
               <EditableGalleryGrid
                 contentKey={`${sectionKey}.gallery`}
                 defaultImages={section.gallery}
@@ -206,7 +206,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                         className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
                       />
                       {block.gallery && block.gallery.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
                           <EditableGalleryGrid
                             contentKey={`${sectionKey}.sub${bi}.gallery`}
                             defaultImages={block.gallery}
