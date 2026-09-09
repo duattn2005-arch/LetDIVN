@@ -34,6 +34,33 @@ import { dbService } from './services/dbService';
 import { CleanupEvent } from './types';
 import { slugify } from './utils/slug';
 
+// Every top-level nav destination gets a real, shareable URL, mirroring the
+// reference site's pattern (e.g. https://letsdoitvietnam.org/who-we-are/).
+const VIEW_PATHS: Record<string, string> = {
+  home: '/',
+  'who-we-are': '/who-we-are/',
+  'what-we-do': '/what-we-do/',
+  'our-team': '/our-team/',
+  'our-partners': '/our-partners/',
+  projects: '/projects/',
+  map: '/cleanup-map/',
+  news: '/news/',
+  'media-on-us': '/media-on-us/',
+  gallery: '/gallery/',
+  videos: '/videos/',
+  contact: '/contact/',
+};
+
+const normalizePath = (pathname: string) => {
+  const trimmed = pathname.replace(/^\/+|\/+$/g, '');
+  return trimmed ? `/${trimmed}/` : '/';
+};
+
+const viewForPath = (pathname: string): string | undefined => {
+  const normalized = normalizePath(pathname);
+  return Object.keys(VIEW_PATHS).find((view) => VIEW_PATHS[view] === normalized);
+};
+
 export function AppContent() {
   const [activeView, setActiveView] = useState<string>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
@@ -54,11 +81,12 @@ export function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeView]);
 
-  // Only project detail pages get a real, shareable URL (e.g. /da-nang, from
-  // the event's city) — every other view stays purely state-driven and
-  // resets the address bar back to '/'. Events are fetched here (not just in
-  // ProjectDetailPage) so a direct visit to /<slug> and browser back/forward
-  // can both resolve which project that slug refers to.
+  // Every nav destination gets a real URL. Project detail pages use a
+  // category slug (e.g. /world-cleanup-day/, matching the reference site)
+  // since a "project" is the static campaign story, not a specific dated
+  // event instance — city/id are kept as fallbacks for older links. Events
+  // are fetched here (not just in ProjectDetailPage) so a direct visit to
+  // /<slug> and browser back/forward can both resolve which project it is.
   useEffect(() => {
     const refresh = () => { dbService.getEvents().then(setEvents); };
     refresh();
@@ -67,14 +95,36 @@ export function AppContent() {
   }, []);
 
   const resolveSlugToEvent = (path: string, list: CleanupEvent[]) =>
-    list.find((e) => e.id === path) || list.find((e) => slugify(e.city) === path);
+    list.find((e) => e.id === path) ||
+    list.find((e) => slugify(e.category) === path) ||
+    list.find((e) => slugify(e.city) === path);
 
-  // Deep-link support: landing directly on /<slug> opens that project.
+  // Resolve the current pathname to either a static view or a project, used
+  // both on initial load and on browser back/forward.
+  const applyPath = (pathname: string) => {
+    const staticView = viewForPath(pathname);
+    if (staticView) {
+      setActiveView(staticView);
+      return;
+    }
+    const path = pathname.replace(/^\/+|\/+$/g, '');
+    if (path) {
+      const match = resolveSlugToEvent(path, events);
+      if (match) {
+        setSelectedProjectId(match.id);
+        setActiveView('project-detail');
+        return;
+      }
+    }
+    setActiveView('home');
+  };
+
+  // Deep-link support: landing directly on /<slug> opens the right page.
   const triedInitialUrlRef = React.useRef(false);
   useEffect(() => {
     if (triedInitialUrlRef.current || events.length === 0) return;
     const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-    if (path) {
+    if (path && !viewForPath(window.location.pathname)) {
       const match = resolveSlugToEvent(path, events);
       if (match) {
         setSelectedProjectId(match.id);
@@ -86,18 +136,7 @@ export function AppContent() {
 
   // Browser back/forward button support.
   useEffect(() => {
-    const onPopState = () => {
-      const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-      if (!path) {
-        setActiveView('home');
-        return;
-      }
-      const match = resolveSlugToEvent(path, events);
-      if (match) {
-        setSelectedProjectId(match.id);
-        setActiveView('project-detail');
-      }
-    };
+    const onPopState = () => applyPath(window.location.pathname);
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +149,7 @@ export function AppContent() {
     // (from the Header's Projects dropdown, which navigates by category so
     // it always resolves to whichever live event currently has it).
     const evt = events.find((e) => e.id === projectId) || events.find((e) => e.category === projectId);
-    window.history.pushState(null, '', `/${evt ? slugify(evt.city) : slugify(projectId)}`);
+    window.history.pushState(null, '', `/${evt ? slugify(evt.category) : slugify(projectId)}/`);
   };
 
   const handleNavigate = (view: string, extraId?: string) => {
@@ -121,10 +160,10 @@ export function AppContent() {
     } else if (view === 'news') {
       setSelectedNewsArticleId(extraId);
       setActiveView('news');
-      window.history.pushState(null, '', '/');
+      window.history.pushState(null, '', VIEW_PATHS.news);
     } else {
       setActiveView(view);
-      window.history.pushState(null, '', '/');
+      window.history.pushState(null, '', VIEW_PATHS[view] || '/');
     }
   };
 

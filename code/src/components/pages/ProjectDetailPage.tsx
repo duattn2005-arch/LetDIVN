@@ -32,6 +32,7 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
   const event =
     events.find((e) => e.id === projectId) ||
     events.find((e) => e.category === projectId) ||
+    events.find((e) => slugify(e.category) === projectId) ||
     events.find((e) => slugify(e.city) === projectId) ||
     events[0];
 
