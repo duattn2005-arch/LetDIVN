@@ -9,6 +9,7 @@ import type {
   ContactMessage,
   MediaVideo,
   WhatWeDoItem,
+  WhoWeAreItem,
 } from '../../src/types.js';
 
 export const events = makeCollection<CleanupEvent>({ table: 'events', idPrefix: 'evt', order: 'created_desc' });
@@ -28,3 +29,4 @@ export const team = makeCollection<TeamMember>({ table: 'team', idPrefix: 'tm', 
 export const contacts = makeCollection<ContactMessage>({ table: 'contacts', idPrefix: 'msg', order: 'created_desc' });
 export const videos = makeCollection<MediaVideo>({ table: 'videos', idPrefix: 'vid', order: 'created_desc' });
 export const whatWeDo = makeCollection<WhatWeDoItem>({ table: 'what_we_do', idPrefix: 'wwd', order: 'sort_order' });
+export const whoWeAreSections = makeCollection<WhoWeAreItem>({ table: 'who_we_are_sections', idPrefix: 'wwa', order: 'sort_order' });

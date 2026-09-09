@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo } from '../db/collections.js';
+import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, whoWeAreSections } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -167,6 +167,22 @@ router.put('/what-we-do/:id', requireAdmin, (req, res) => {
 });
 router.delete('/what-we-do/:id', requireAdmin, (req, res) => {
   whatWeDo.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
+// --- Who We Are (extra sections) ---
+router.get('/who-we-are-sections', (req, res) => res.json(whoWeAreSections.getAll()));
+router.post('/who-we-are-sections', requireAdmin, (req, res) => {
+  const all = whoWeAreSections.getAll();
+  res.json(whoWeAreSections.insert({ ...req.body, order: all.length + 1 }));
+});
+router.put('/who-we-are-sections/:id', requireAdmin, (req, res) => {
+  const updated = whoWeAreSections.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
+  res.json(updated);
+});
+router.delete('/who-we-are-sections/:id', requireAdmin, (req, res) => {
+  whoWeAreSections.delete(String(req.params.id));
   res.json({ ok: true });
 });
 

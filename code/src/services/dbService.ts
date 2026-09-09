@@ -8,7 +8,8 @@ import {
   ContactMessage,
   UserProfile,
   MediaVideo,
-  WhatWeDoItem
+  WhatWeDoItem,
+  WhoWeAreItem
 } from '../types';
 
 type Listener = () => void;
@@ -235,6 +236,21 @@ class DatabaseService {
   }
   public async deleteWhatWeDo(id: string): Promise<boolean> {
     await this.mutate(`/what-we-do/${encodeURIComponent(id)}`, 'DELETE');
+    return true;
+  }
+
+  // --- WHO WE ARE (extra sections) ---
+  public getWhoWeAreSections(): Promise<WhoWeAreItem[]> {
+    return this.get('/who-we-are-sections');
+  }
+  public addWhoWeAreSection(item: Omit<WhoWeAreItem, 'id'>): Promise<WhoWeAreItem> {
+    return this.mutate('/who-we-are-sections', 'POST', item);
+  }
+  public updateWhoWeAreSection(item: WhoWeAreItem): Promise<WhoWeAreItem> {
+    return this.mutate(`/who-we-are-sections/${encodeURIComponent(item.id)}`, 'PUT', item);
+  }
+  public async deleteWhoWeAreSection(id: string): Promise<boolean> {
+    await this.mutate(`/who-we-are-sections/${encodeURIComponent(id)}`, 'DELETE');
     return true;
   }
 
