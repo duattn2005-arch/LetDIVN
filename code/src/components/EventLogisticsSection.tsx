@@ -13,17 +13,24 @@ interface EventLogisticsSectionProps {
 
 // A plain L.marker() relies on Leaflet's default icon image assets, which
 // don't resolve correctly in this bundled app (shows as a broken icon). Use
-// a self-contained divIcon instead, same fix already used on CleanupMapPage.
+// the same self-contained pulsing pin divIcon as CleanupMapPage instead, so
+// this embedded map matches it exactly rather than using a plainer marker.
 const meetingPointIcon = L.divIcon({
   className: 'meeting-point-marker',
   html: `
-    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#E81A7F] to-[#FF4D9E] flex items-center justify-center text-white shadow-lg border-2 border-white">
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
+    <div class="relative flex items-center justify-center">
+      <div class="absolute -inset-2 bg-pink-500/30 rounded-full animate-ping"></div>
+      <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#E81A7F] to-[#FF4D9E] flex items-center justify-center text-white shadow-xl border-2 border-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </div>
     </div>
   `,
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -20],
 });
 
 type Align = 'left' | 'center' | 'right';
@@ -295,7 +302,7 @@ export const EventLogisticsSection: React.FC<EventLogisticsSectionProps> = ({ ev
                 </a>
               )}
             </div>
-            <div ref={mapContainerRef} className="w-full h-72 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100" />
+            <div ref={mapContainerRef} className="w-full h-96 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100" />
 
             <div className="group/mp relative mt-2">
               {editingMeetingPoint ? (
