@@ -22,6 +22,7 @@ import { OurTeamPage } from './components/pages/OurTeamPage';
 import { OurPartnersPage } from './components/pages/OurPartnersPage';
 import { ProjectsPage } from './components/pages/ProjectsPage';
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage';
+import { CampaignDetailPage } from './components/pages/CampaignDetailPage';
 import { NewsPage } from './components/pages/NewsPage';
 import { MediaOnUsPage } from './components/pages/MediaOnUsPage';
 import { HomeQuickLinksSection } from './components/HomeQuickLinksSection';
@@ -43,6 +44,7 @@ const VIEW_PATHS: Record<string, string> = {
   'our-team': '/our-team/',
   'our-partners': '/our-partners/',
   projects: '/projects/',
+  'explore-campaigns': '/explore-campaigns/',
   map: '/cleanup-map/',
   news: '/news/',
   'media-on-us': '/media-on-us/',
@@ -61,9 +63,20 @@ const viewForPath = (pathname: string): string | undefined => {
   return Object.keys(VIEW_PATHS).find((view) => VIEW_PATHS[view] === normalized);
 };
 
+// /explore-campaigns/<slug> is its own URL namespace — kept fully separate
+// from /projects/ and per-category project slugs like /world-cleanup-day/.
+const CAMPAIGN_BASE_PATH = '/explore-campaigns/';
+
+const campaignSlugFromPath = (pathname: string): string | undefined => {
+  const normalized = normalizePath(pathname);
+  if (normalized === CAMPAIGN_BASE_PATH || !normalized.startsWith(CAMPAIGN_BASE_PATH)) return undefined;
+  return normalized.slice(CAMPAIGN_BASE_PATH.length).replace(/\/+$/, '');
+};
+
 export function AppContent() {
   const [activeView, setActiveView] = useState<string>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string>('evt-wcd-2026');
   const [selectedNewsArticleId, setSelectedNewsArticleId] = useState<string | undefined>(undefined);
   const [events, setEvents] = useState<CleanupEvent[]>([]);
 
@@ -99,9 +112,21 @@ export function AppContent() {
     list.find((e) => slugify(e.category) === path) ||
     list.find((e) => slugify(e.city) === path);
 
-  // Resolve the current pathname to either a static view or a project, used
-  // both on initial load and on browser back/forward.
+  const resolveCampaignSlug = (slug: string, list: CleanupEvent[]) =>
+    list.find((e) => e.id === slug) || list.find((e) => slugify(e.city) === slug);
+
+  // Resolve the current pathname to a campaign, a static view, or a project,
+  // used both on initial load and on browser back/forward.
   const applyPath = (pathname: string) => {
+    const campaignSlug = campaignSlugFromPath(pathname);
+    if (campaignSlug) {
+      const match = resolveCampaignSlug(campaignSlug, events);
+      if (match) {
+        setSelectedCampaignId(match.id);
+        setActiveView('campaign-detail');
+        return;
+      }
+    }
     const staticView = viewForPath(pathname);
     if (staticView) {
       setActiveView(staticView);
@@ -122,16 +147,27 @@ export function AppContent() {
   // Deep-link support: landing directly on a static page's URL (e.g.
   // /who-we-are/) opens that page immediately — doesn't need event data.
   useEffect(() => {
+    if (campaignSlugFromPath(window.location.pathname)) return;
     const staticView = viewForPath(window.location.pathname);
     if (staticView && staticView !== 'home') setActiveView(staticView);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Deep-link support: landing directly on /<project-slug> opens that
-  // project once events have loaded (skipped if the path is a static page).
+  // Deep-link support: landing directly on /explore-campaigns/<slug> or
+  // /<project-slug> resolves once events have loaded (skipped for static pages).
   const triedInitialUrlRef = React.useRef(false);
   useEffect(() => {
     if (triedInitialUrlRef.current || events.length === 0) return;
+    const campaignSlug = campaignSlugFromPath(window.location.pathname);
+    if (campaignSlug) {
+      const match = resolveCampaignSlug(campaignSlug, events);
+      if (match) {
+        setSelectedCampaignId(match.id);
+        setActiveView('campaign-detail');
+      }
+      triedInitialUrlRef.current = true;
+      return;
+    }
     const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
     if (path && !viewForPath(window.location.pathname)) {
       const match = resolveSlugToEvent(path, events);
@@ -161,11 +197,20 @@ export function AppContent() {
     window.history.pushState(null, '', `/${evt ? slugify(evt.category) : slugify(projectId)}/`);
   };
 
+  const goToCampaign = (campaignId: string) => {
+    setSelectedCampaignId(campaignId);
+    setActiveView('campaign-detail');
+    const evt = events.find((e) => e.id === campaignId);
+    window.history.pushState(null, '', `${CAMPAIGN_BASE_PATH}${evt ? slugify(evt.city) : slugify(campaignId)}/`);
+  };
+
   const handleNavigate = (view: string, extraId?: string) => {
     if (view === 'project-detail' && extraId) {
       goToProject(extraId);
     } else if (view.startsWith('project:')) {
       goToProject(view.replace('project:', ''));
+    } else if (view === 'campaign-detail' && extraId) {
+      goToCampaign(extraId);
     } else if (view === 'news') {
       setSelectedNewsArticleId(extraId);
       setActiveView('news');
@@ -205,11 +250,11 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'explore-campaigns', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
-              onExploreProjects={() => handleNavigate('projects')}
+              onExploreProjects={() => handleNavigate('explore-campaigns')}
               onExploreMap={() => handleNavigate('map')}
             />
             <HomeQuickLinksSection onNavigate={handleNavigate} />
@@ -247,6 +292,24 @@ export function AppContent() {
         {activeView === 'projects' && (
           <ProjectsPage
             onSelectProject={handleSelectProject}
+            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
+          />
+        )}
+
+        {/* Same campaign grid as /projects/, but "View Campaign Details" goes
+            straight to the schedule/map/registration page — never the static
+            per-category project story. */}
+        {activeView === 'explore-campaigns' && (
+          <ProjectsPage
+            onSelectProject={goToCampaign}
+            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
+          />
+        )}
+
+        {activeView === 'campaign-detail' && (
+          <CampaignDetailPage
+            campaignId={selectedCampaignId}
+            onBack={() => handleNavigate('explore-campaigns')}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
           />
         )}
