@@ -40,7 +40,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
         contentKey={`${keyBase}.hero`}
         defaultValue={content.hero}
         alt={content.title}
-        wrapperClassName="w-full aspect-21/9 sm:h-[280px] sm:aspect-auto bg-slate-900"
+        wrapperClassName="w-full aspect-21/9 sm:h-[420px] sm:aspect-auto bg-slate-900"
         className="w-full h-full object-cover"
       />
 
