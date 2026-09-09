@@ -8,7 +8,8 @@ import {
   ContactMessage,
   UserProfile,
   MediaVideo,
-  WhatWeDoItem
+  WhatWeDoItem,
+  MediaCoverageEntry
 } from '../types';
 
 export const INITIAL_USERS: UserProfile[] = [
@@ -640,6 +641,75 @@ export const INITIAL_WHAT_WE_DO: WhatWeDoItem[] = [
     image: '/images/what-we-do/sustainable.jpg',
     layout: 'image-right',
     order: 4
+  }
+];
+
+// Press/TV coverage summary per campaign, mirrored from the "Media on Us"
+// page on letsdoitvietnam.org. Each entry links to a PDF listing the
+// individual articles and broadcast segments counted for that campaign.
+export const INITIAL_MEDIA_COVERAGE: MediaCoverageEntry[] = [
+  {
+    id: 'mc-1',
+    title: 'World Cleanup Day 2019',
+    articles: 10,
+    segments: 7,
+    image: '/images/media-on-us/m01.jpg',
+    pdf: '/media-coverage/world-cleanup-day-2019.pdf',
+    order: 1
+  },
+  {
+    id: 'mc-2',
+    title: 'World Cleanup Day 2020',
+    articles: 20,
+    segments: 3,
+    image: '/images/media-on-us/m02.jpg',
+    pdf: '/media-coverage/world-cleanup-day-2020.pdf',
+    order: 2
+  },
+  {
+    id: 'mc-3',
+    title: 'Green Ocean Campaign 2021',
+    articles: 10,
+    segments: 3,
+    image: '/images/media-on-us/m03.jpg',
+    pdf: '/media-coverage/green-ocean-campaign-2021.pdf',
+    order: 3
+  },
+  {
+    id: 'mc-4',
+    title: 'World Cleanup Day 2022',
+    articles: 40,
+    segments: 7,
+    image: '/images/media-on-us/m04.jpg',
+    pdf: '/media-coverage/world-cleanup-day-2022.pdf',
+    order: 4
+  },
+  {
+    id: 'mc-5',
+    title: 'World Cleanup Day 2023',
+    articles: 13,
+    segments: 7,
+    image: '/images/media-on-us/m05.jpg',
+    pdf: '/media-coverage/world-cleanup-day-2023.pdf',
+    order: 5
+  },
+  {
+    id: 'mc-6',
+    title: 'World Cleanup Day 2024',
+    articles: 22,
+    segments: 5,
+    image: '/images/media-on-us/m06.jpg',
+    pdf: '/media-coverage/world-cleanup-day-2024.pdf',
+    order: 6
+  },
+  {
+    id: 'mc-7',
+    title: 'World Cleanup Day 2025',
+    articles: 37,
+    segments: 4,
+    image: '/images/media-on-us/m07.jpg',
+    pdf: '/media-coverage/world-cleanup-day-2025.pdf',
+    order: 7
   }
 ];
 

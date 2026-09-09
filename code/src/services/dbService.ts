@@ -9,7 +9,8 @@ import {
   UserProfile,
   MediaVideo,
   WhatWeDoItem,
-  WhoWeAreItem
+  WhoWeAreItem,
+  MediaCoverageEntry
 } from '../types';
 
 type Listener = () => void;
@@ -251,6 +252,21 @@ class DatabaseService {
   }
   public async deleteWhoWeAreSection(id: string): Promise<boolean> {
     await this.mutate(`/who-we-are-sections/${encodeURIComponent(id)}`, 'DELETE');
+    return true;
+  }
+
+  // --- MEDIA COVERAGE (Media on Us entries) ---
+  public getMediaCoverage(): Promise<MediaCoverageEntry[]> {
+    return this.get('/media-coverage');
+  }
+  public addMediaCoverage(item: Omit<MediaCoverageEntry, 'id'>): Promise<MediaCoverageEntry> {
+    return this.mutate('/media-coverage', 'POST', item);
+  }
+  public updateMediaCoverage(item: MediaCoverageEntry): Promise<MediaCoverageEntry> {
+    return this.mutate(`/media-coverage/${encodeURIComponent(item.id)}`, 'PUT', item);
+  }
+  public async deleteMediaCoverage(id: string): Promise<boolean> {
+    await this.mutate(`/media-coverage/${encodeURIComponent(id)}`, 'DELETE');
     return true;
   }
 

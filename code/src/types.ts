@@ -170,4 +170,14 @@ export interface WhoWeAreItem {
   order?: number;
 }
 
+export interface MediaCoverageEntry {
+  id: string;
+  title: string;
+  articles: number;
+  segments: number;
+  image: string;
+  pdf: string;
+  order?: number;
+}
+
 

@@ -1,12 +1,52 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit3, Trash2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { dbService } from '../../services/dbService';
+import { MediaCoverageEntry } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { TakeActionStrip } from '../TakeActionStrip';
-import { MEDIA_ON_US_ENTRIES } from '../../data/mediaOnUsData';
+import { MediaCoverageEditorModal } from '../MediaCoverageEditorModal';
 
 const BRAND_PINK = '#F1138D';
 
 export const MediaOnUsPage: React.FC = () => {
+  const { isAdmin } = useAuth();
+  const [entries, setEntries] = useState<MediaCoverageEntry[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<MediaCoverageEntry | null>(null);
+
+  useEffect(() => {
+    const refresh = () => { dbService.getMediaCoverage().then(setEntries); };
+    refresh();
+    const unsub = dbService.subscribe(refresh);
+    return unsub;
+  }, []);
+
+  const handleOpenAdd = () => {
+    setEditingItem(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (item: MediaCoverageEntry) => {
+    setEditingItem(item);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id: string, title: string) => {
+    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+      dbService.deleteMediaCoverage(id);
+    }
+  };
+
+  const handleSaveItem = (data: Omit<MediaCoverageEntry, 'id'> | MediaCoverageEntry) => {
+    if ('id' in data && data.id) {
+      dbService.updateMediaCoverage(data as MediaCoverageEntry);
+    } else {
+      dbService.addMediaCoverage(data);
+    }
+  };
+
   return (
     <div className="bg-white">
 
@@ -36,13 +76,26 @@ export const MediaOnUsPage: React.FC = () => {
             className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed [text-wrap:balance]"
             multiline
           />
+
+          {isAdmin && (
+            <div className="pt-2 flex justify-center">
+              <button
+                type="button"
+                onClick={handleOpenAdd}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-emerald-500/50 hover:scale-[1.02]"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Coverage Entry</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="max-w-6xl mx-auto space-y-12">
-          {MEDIA_ON_US_ENTRIES.map((entry, idx) => {
-            const entryKey = `mediaOnUsPage.entry${idx}`;
+          {entries.map((entry) => {
+            const entryKey = `mediaOnUsPage.entry.${entry.id}`;
             return (
-              <div key={entry.title} className="flex flex-wrap items-center gap-x-12 gap-y-5">
+              <div key={entry.id} className="relative group flex flex-wrap items-center gap-x-12 gap-y-5">
                 <EditableImage
                   contentKey={`${entryKey}.image`}
                   defaultValue={entry.image}
@@ -83,6 +136,29 @@ export const MediaOnUsPage: React.FC = () => {
                   </span>
                   <span className="ref-body text-sm italic text-slate-400">Click to see media coverage on activities</span>
                 </a>
+
+                {isAdmin && (
+                  <div className="absolute top-0 right-0 z-20 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-700 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(entry)}
+                      className="p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
+                      title="Edit article/segment counts & PDF link"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(entry.id, entry.title)}
+                      className="p-1.5 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
+                      title="Delete this entry"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Delete</span>
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -91,6 +167,13 @@ export const MediaOnUsPage: React.FC = () => {
       </div>
 
       <TakeActionStrip contentKeyPrefix="mediaOnUsPage" />
+
+      <MediaCoverageEditorModal
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); setEditingItem(null); }}
+        itemToEdit={editingItem}
+        onSave={handleSaveItem}
+      />
     </div>
   );
 };

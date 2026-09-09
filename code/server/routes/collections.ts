@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, whoWeAreSections } from '../db/collections.js';
+import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, whoWeAreSections, mediaCoverage } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -183,6 +183,22 @@ router.put('/who-we-are-sections/:id', requireAdmin, (req, res) => {
 });
 router.delete('/who-we-are-sections/:id', requireAdmin, (req, res) => {
   whoWeAreSections.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
+// --- Media Coverage (Media on Us entries) ---
+router.get('/media-coverage', (req, res) => res.json(mediaCoverage.getAll()));
+router.post('/media-coverage', requireAdmin, (req, res) => {
+  const all = mediaCoverage.getAll();
+  res.json(mediaCoverage.insert({ ...req.body, order: all.length + 1 }));
+});
+router.put('/media-coverage/:id', requireAdmin, (req, res) => {
+  const updated = mediaCoverage.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
+  res.json(updated);
+});
+router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
+  mediaCoverage.delete(String(req.params.id));
   res.json({ ok: true });
 });
 
