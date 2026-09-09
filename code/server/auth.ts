@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { db } from './db/index.js';
 
 export const SESSION_COOKIE = 'ldiv_session';
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SESSION_TTL_MS = 365 * 24 * 60 * 60 * 1000; // 1 year — admin stays signed in on their device without re-logging-in
 
 // --- Password hashing (server-side only from here on — never trust a
 // client-computed hash). scrypt is Node's built-in slow KDF, no extra dep. ---
