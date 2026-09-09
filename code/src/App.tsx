@@ -322,10 +322,7 @@ export function AppContent() {
         )}
 
         {activeView === 'project-detail' && (
-          <ProjectDetailPage
-            projectId={selectedProjectId}
-            onBack={() => handleNavigate('projects')}
-          />
+          <ProjectDetailPage projectId={selectedProjectId} />
         )}
 
         {activeView === 'news' && (
