@@ -119,7 +119,16 @@ export function AppContent() {
     setActiveView('home');
   };
 
-  // Deep-link support: landing directly on /<slug> opens the right page.
+  // Deep-link support: landing directly on a static page's URL (e.g.
+  // /who-we-are/) opens that page immediately — doesn't need event data.
+  useEffect(() => {
+    const staticView = viewForPath(window.location.pathname);
+    if (staticView && staticView !== 'home') setActiveView(staticView);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Deep-link support: landing directly on /<project-slug> opens that
+  // project once events have loaded (skipped if the path is a static page).
   const triedInitialUrlRef = React.useRef(false);
   useEffect(() => {
     if (triedInitialUrlRef.current || events.length === 0) return;

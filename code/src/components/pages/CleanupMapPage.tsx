@@ -798,9 +798,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         <div class="p-2 font-sans max-w-xs text-slate-900">
           <div class="relative aspect-16/9 rounded-xl overflow-hidden mb-2 bg-slate-100">
             <img src="${evt.image}" alt="${evt.title}" class="w-full h-full object-cover" />
-            <div class="absolute top-2 left-2 bg-[#E81A7F] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow">
-              ${evt.category}
-            </div>
             ${isPending ? `
               <div class="absolute top-2 right-2 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
                 Pending review
@@ -1044,9 +1041,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <span className="text-[9px] font-black uppercase bg-pink-500/20 text-[#FF4D9E] px-2 py-0.5 rounded-full">
-                          {evt.category}
-                        </span>
                         {isPending && (
                           <EditableText contentKey="cleanupMap.pendingBadge" defaultValue="Pending review" as="span" className="text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-md" />
                         )}
@@ -1276,10 +1270,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-[9px] font-extrabold uppercase bg-pink-500/20 text-[#FF4D9E] px-2 py-0.5 rounded-full">
-                      {activeEvent.category}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-bold ml-auto">
+                    <span className="text-[10px] text-slate-400 font-bold">
                       📍 {activeEvent.city}
                     </span>
                   </div>
