@@ -79,12 +79,12 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const sectionKey = `${keyBase}.section${idx}`;
 
           const galleryBlock = section.gallery && section.gallery.length > 0 && (
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2.5 mt-6">
+            <div className="flex flex-wrap gap-2.5 mt-6">
               <EditableGalleryGrid
                 contentKey={`${sectionKey}.gallery`}
                 defaultImages={section.gallery}
                 alt={section.heading || content.title}
-                cellClassName="aspect-square"
+                cellClassName="w-24 sm:w-28 lg:w-32 aspect-square"
               />
             </div>
           );
@@ -206,12 +206,12 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                         className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
                       />
                       {block.gallery && block.gallery.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+                        <div className="flex flex-wrap gap-2.5 pt-2">
                           <EditableGalleryGrid
                             contentKey={`${sectionKey}.sub${bi}.gallery`}
                             defaultImages={block.gallery}
                             alt={block.title}
-                            cellClassName="aspect-3/2"
+                            cellClassName="w-28 sm:w-32 lg:w-36 aspect-3/2"
                           />
                         </div>
                       )}
