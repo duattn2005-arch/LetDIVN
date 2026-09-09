@@ -325,7 +325,6 @@ export function AppContent() {
           <ProjectDetailPage
             projectId={selectedProjectId}
             onBack={() => handleNavigate('projects')}
-            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
           />
         )}
 
