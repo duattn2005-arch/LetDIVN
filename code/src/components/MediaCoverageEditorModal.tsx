@@ -26,10 +26,10 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
   useEffect(() => {
     if (itemToEdit) {
       setTitle(itemToEdit.title || '');
-      setArticles(String(itemToEdit.articles ?? 0));
-      setSegments(String(itemToEdit.segments ?? 0));
+      setArticles(String(itemToEdit.articleCount ?? 0));
+      setSegments(String(itemToEdit.segmentCount ?? 0));
       setImage(itemToEdit.image || '');
-      setPdf(itemToEdit.pdf || '');
+      setPdf(itemToEdit.pdfUrl || '');
     } else {
       setTitle('');
       setArticles('0');
@@ -51,10 +51,10 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
     const payload = {
       ...(itemToEdit ? { id: itemToEdit.id } : {}),
       title: title.trim(),
-      articles: Number(articles) || 0,
-      segments: Number(segments) || 0,
+      articleCount: Number(articles) || 0,
+      segmentCount: Number(segments) || 0,
       image: image.trim() || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&auto=format&fit=crop&q=90',
-      pdf: pdf.trim(),
+      pdfUrl: pdf.trim(),
     };
 
     onSave(payload as any);

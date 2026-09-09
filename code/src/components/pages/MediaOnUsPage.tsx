@@ -106,8 +106,8 @@ export const MediaOnUsPage: React.FC = () => {
 
                 <div className="w-20 text-center shrink-0">
                   <EditableText
-                    contentKey={`${entryKey}.articles`}
-                    defaultValue={String(entry.articles)}
+                    contentKey={`${entryKey}.articleCount`}
+                    defaultValue={String(entry.articleCount)}
                     as="div"
                     className="text-5xl sm:text-6xl font-black"
                     render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
@@ -117,8 +117,8 @@ export const MediaOnUsPage: React.FC = () => {
 
                 <div className="w-20 text-center shrink-0">
                   <EditableText
-                    contentKey={`${entryKey}.segments`}
-                    defaultValue={String(entry.segments)}
+                    contentKey={`${entryKey}.segmentCount`}
+                    defaultValue={String(entry.segmentCount)}
                     as="div"
                     className="text-5xl sm:text-6xl font-black text-orange-500"
                   />
@@ -126,7 +126,7 @@ export const MediaOnUsPage: React.FC = () => {
                 </div>
 
                 <a
-                  href={entry.pdf}
+                  href={entry.pdfUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="flex flex-col items-center gap-1.5 shrink-0"

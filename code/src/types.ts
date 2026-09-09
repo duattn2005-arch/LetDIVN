@@ -173,10 +173,10 @@ export interface WhoWeAreItem {
 export interface MediaCoverageEntry {
   id: string;
   title: string;
-  articles: number;
-  segments: number;
+  articleCount: number;
+  segmentCount: number;
   image: string;
-  pdf: string;
+  pdfUrl: string;
   order?: number;
 }
 
