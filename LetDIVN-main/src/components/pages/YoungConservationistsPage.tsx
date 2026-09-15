@@ -1,8 +1,15 @@
 import React from 'react';
-import { Paintbrush, BookOpen, Users, Leaf } from 'lucide-react';
+import { Paintbrush, BookOpen, Users, Leaf, CheckCircle2 } from 'lucide-react';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { CampaignSections } from '../CampaignSections';
+
+const KEY_TAKEAWAYS = [
+  "Authentic encounters with Vietnam's wildlife",
+  'Deepened understanding of conservation culture and nature connections',
+  'Hands-on learning of wildlife care and protection methods',
+  'Guidance from experts at conservation centers',
+];
 
 export const YoungConservationistsPage: React.FC = () => {
   return (
@@ -65,7 +72,7 @@ A select 24 participants earned a field trip experience through a short film com
         <div className="mb-14 bg-slate-50 rounded-3xl p-4 sm:p-8">
           <EditableText
             contentKey="ycsw.activity1.title"
-            defaultValue="Activity 1: Sharing session on wildlife conservation from a pangolin conservation expert"
+            defaultValue="Activity 1: Sharing session on wildlife conservation from Pangolin conservation expert"
             as="h2"
             className="text-xl sm:text-2xl font-black text-[#E81A7F] tracking-tight mb-4"
           />
@@ -142,9 +149,11 @@ Participants joined five interactive online training sessions on Zoom, equipping
           />
           <EditableText
             contentKey="ycsw.activity3.text"
-            defaultValue="To select 24 passionate young individuals for a 5-day volunteer experience at Cuc Phuong National Park, YCSW launched a wildlife-themed short film contest. Participants created impactful 3-minute films, showcasing their knowledge from five online training sessions and raising awareness of Vietnam's wildlife challenges.
+            defaultValue="To select 24 passionate young individuals for a 5-day volunteer experience at Cuc Phuong National Park, YCSW launched a wildlife-themed short film contest. Participants—either solo or in teams of up to four—created impactful 3-minute films, showcasing their knowledge from five online training sessions and raising awareness of Vietnam's wildlife challenges.
 
-From 35 submitted films, the top 10 productions were chosen for the final pitching round. The selected filmmakers earned their place in an immersive field experience, putting their passion into action at Cuc Phuong National Park."
+From 35 submitted films, the top 10 productions were chosen for the final pitching round, where creators presented their stories in an online format. These standout films encouraged communities to reject wildlife trade and consumption, demonstrating deep creativity and commitment.
+
+The selected filmmakers earned their place in an immersive field experience, putting their passion into action at Cuc Phuong National Park."
             as="p"
             multiline
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6"
@@ -181,7 +190,7 @@ From 35 submitted films, the top 10 productions were chosen for the final pitchi
           />
           <EditableText
             contentKey="ycsw.activity4.intro"
-            defaultValue="As one of the last activities in the program, this activity was built for young people to visit and experience wildlife rescue and conservation centers, including Save Vietnam's Wildlife, the Endangered Primate Rescue Center, the Turtle Conservation Center, and Ninh Binh Bear Sanctuary."
+            defaultValue="As one of the last activities in the program, the activity was built for young people to visit and experience wildlife rescue/conservation centers, including Save Vietnam's Wildlife, Endangered Primate Rescue Center, Turtle Conservation Center, and Ninh Binh Bear Sanctuary."
             as="p"
             multiline
             className="text-sm sm:text-base text-slate-600 leading-relaxed mb-8"
@@ -190,32 +199,32 @@ From 35 submitted films, the top 10 productions were chosen for the final pitchi
           {[
             {
               day: 'day1',
-              title: 'Day 1 — Opening Program, Visiting the National Park Museum and Trekking Observation Pavilion',
-              text: "On the first day, the program started with the opening ceremony with the participation of the U.S. Embassy in Hanoi, representatives of Cuc Phuong National Park, and representatives of wildlife rescue centers — with 24 young people volunteering. After settling in, participants visited the Cuc Phuong National Park Museum and learned about the forest's creatures and the history of Cuc Phuong Forest, then went trekking to the observation hut about 1km away, where they could see the whole view of the Garden Gate area.",
+              title: 'Opening Program, Visiting the National Park Museum and Trekking Observation Pavilion.',
+              text: "On the first day, the program started with the opening ceremony with the participation of the U.S Embassy in Hanoi and, representatives of Cuc Phuong National Park, representatives of wildlife rescue centers – were 24 young people volunteering. After cleaning and settling down, you visited the Cuc Phuong National Park Museum and learned about the forest's creatures and the history of Cuc Phuong Forest. After finishing visiting the museum, you go trekking to the Observation hut about 1km from the resting place, where you can see the whole view of the Garden Gate area.",
               images: ['day1-1', 'day1-2', 'day1-3'],
             },
             {
               day: 'day2',
-              title: 'Day 2 — Visiting and Volunteering at the Center for Small Carnivores and Pangolins (Save Vietnam Wildlife)',
-              text: 'On the second day, the young people learned about small carnivores and pangolins at the Save Vietnam Wildlife Center in the morning. In the afternoon, they took part in volunteer activities: cleaning up the wildlife cage area, preparing food (crabs, fish, ants) for the animals, mowing the grass, and observing the behavior of mammals and pangolins. In the evening, participants came together to brainstorm solutions and directions for tackling existing problems at Save Vietnam Wildlife.',
+              title: 'Visiting and volunteering at the Center for Small Carnivores and Pangolins (Save Vietnam Wildlife).',
+              text: 'On the second day, the young people learned about small carnivores and pangolins at the Center for Save Vietnam Wildlife in the morning. In the afternoon, you can participate in volunteer activities at the center: clean up the wildlife cage area, prepare food (crabs, fish, ants) for the animals in the center, mow the grass, provide food for animals and observe the behavior of mammals and pangolins. On the second day, in a series of five days ending with an evening activity, young people come together to brainstorm solutions and directions for activities to solve existing problems at Save Vietnam Wildlife.',
               images: ['day2-1', 'day2-2', 'day2-3'],
             },
             {
               day: 'day3',
-              title: 'Day 3 — Turtle Rescue Center and Primate Rescue Center',
-              text: "On the third day, participants visited and volunteered at the Turtle Conservation Center in the morning and the Endangered Primate Rescue Center (EPRC) in the afternoon. After being introduced to each center's activities, goals, and missions, the young people were given protective equipment — wading boots, rubber gloves, and masks — to clean animal cages, clear grass, and prepare food for wild animals, while also observing the animals directly.",
+              title: 'Turtle Rescue Center and Primate Rescue Center',
+              text: "On the third day, you can visit and participate in volunteer activities at the Turtle Conservation Center in the morning and the Endangered Primate Rescue Center (EPRC) in the afternoon. Similar to the second day's activities, participants were introduced to the two centers' activities, goals, and missions. After that, the young people will be provided with crucial protective equipment such as wading boots, rubber gloves, and masks to participate in cleaning animal cages, clearing grass, and preparing food for wild animals. Along with that, you also got to observe interactive animals directly.",
               images: ['day3-1', 'day3-2', 'day3-3'],
             },
             {
               day: 'day4',
-              title: 'Day 4 — Ninh Binh Bear Sanctuary, Firefly Watching at Night and Survival Camping',
-              text: 'On the fourth day, the group visited the last conservation center, Ninh Binh Bear Sanctuary, operated by FOUR PAWS Vietnam. Here they joined a workshop introducing the center and the bear species of Vietnam, along with the risks and threats bears face, and practiced growing plants to replace bear bile — the product of illegal bear exploitation. The group completed a garden named "Bear Bile Plant Garden – YCSW" at the sanctuary\'s main hall. In the evening, participants watched fireflies at Cuc Phuong National Park and practiced overnight camping in the garden.',
+              title: 'Ninh Binh Bear Sanctuary, walking to see fireflies at night and Practicing survival camping.',
+              text: 'On the fourth day, the young people went to the last wildlife conservation and rescue center, Ninh Binh Bear Sanctuary, operated by FOUR PAWS Vietnam. Here, young people can participate in the Workshop to introduce the center and learn about bear species in Vietnam and the risks and threats to bears. Here, young people can directly practice growing plants to replace bear bile – the product of illegal bear exploitation in Vietnam for many years. Young people have completed the Garden with the name "Bear bile plant garden – YCSW" at the main hall of Ninh Binh Bear Sanctuary. On the fourth day evening, you can participate in night firefly watching activities at Cuc Phuong National Park and practice overnight camping in the Garden.',
               images: ['day4-1', 'day4-2', 'day4-3'],
             },
             {
               day: 'day5',
-              title: 'Day 5 — Trekking in the Forest, Van Long Lagoon, Summary',
-              text: "On the last day, the 24 young people took part in nearly 5 hours of trekking, first being guided on the essential tools, safe movement in the forest, and how to interact with forest animals. After trekking and a lunch break, the group visited Van Long Lagoon and learned about Vietnam's endangered langurs, before the program closed with a summary activity for the whole five-day journey.",
+              title: 'Trekking in the forest, Van Long lagoon, Summary',
+              text: "On the last day of the five-day series, 24 young people participated in trekking for nearly 5 hours. Before trekking, you are guided to prepare the essential tools for the activity, safe methods of moving in the forest, and interacting with the animals in the forest; after finishing trekking and taking a lunch break. After trekking, you can visit Van Long Lagoon and learn about the endangered langurs of Vietnam. Also, the program held a summary activity for the five-day journey.",
               images: ['day5-1', 'day5-2', 'day5-3'],
             },
           ].map(({ day, title, text, images }) => (
@@ -251,9 +260,32 @@ From 35 submitted films, the top 10 productions were chosen for the final pitchi
 
           <EditableText
             contentKey="ycsw.activity4.text"
-            defaultValue="From July 14 to July 18, YCSW led a five-day hands-on experience at Cuc Phuong National Park (Nho Quan, Ninh Binh), where young participants engaged in the care and conservation of endangered species such as pangolins, otters, turtles, macaques, and bears — visiting Save Vietnam's Wildlife, the Endangered Primate Rescue Center, the Turtle Conservation Center, and Ninh Binh Bear Sanctuary.
+            defaultValue="From July 14 to July 18, YCSW led a five-day hands-on experience at Cuc Phuong National Park (Ngo Quan, Ninh Binh), where young participants engaged in the care and conservation of endangered species such as pangolins, otters, turtles, macaques, and bears. Building on their online training, this real-world exposure fueled innovative ideas and inspired action."
+            as="p"
+            multiline
+            className="text-sm sm:text-base text-slate-600 leading-relaxed mb-6"
+          />
 
-Beyond training, the program strengthened connections among alumni in Vietnam's wildlife and environmental sectors. With nearly 3,500 applications, the overwhelming interest underscores public engagement and youth commitment to conservation."
+          <EditableText
+            contentKey="ycsw.activity4.takeawaysTitle"
+            defaultValue="Key takeaways included:"
+            as="p"
+            className="text-sm sm:text-base font-bold text-slate-900 mb-3"
+          />
+          <ul className="space-y-2 mb-6">
+            {KEY_TAKEAWAYS.map((text, i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-5 h-5 text-[#E81A7F] shrink-0 mt-0.5" />
+                <span className="text-sm sm:text-base text-slate-600 leading-relaxed">{text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <EditableText
+            contentKey="ycsw.activity4.closing"
+            defaultValue="Beyond training, the program strengthened connections among alumni in Vietnam's wildlife and environmental sectors. Through effective outreach, the project highlighted alumni contributions while fostering collaboration for future conservation initiatives.
+
+With nearly 3,500 applications, the overwhelming interest underscores public engagement and youth commitment to conservation. These participants now represent a vital force, ready to contribute to government agencies, NGOs, and social projects dedicated to nature and wildlife protection."
             as="p"
             multiline
             className="text-sm sm:text-base text-slate-600 leading-relaxed"
