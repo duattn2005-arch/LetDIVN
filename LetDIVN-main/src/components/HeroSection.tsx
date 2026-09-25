@@ -17,7 +17,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onExploreProjects,
   onExploreMap,
 }) => {
-  const [activeSlide, setActiveSlide] = useState<0 | 1>(0);
+  const [activeSlide] = useState<0 | 1>(0);
   const { t } = useLanguage();
   const [heroBadgePart1, heroBadgePart2] = t.heroSlide1Badge.split(' • ');
 
@@ -204,25 +204,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
       )}
 
-      {/* Slide Switcher Controls at bottom */}
-      <div className="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 z-20 flex items-center gap-1.5 sm:gap-2 bg-black/60 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/15 shadow-xl">
-        <button
-          onClick={() => setActiveSlide(0)}
-          className={`px-3 py-1 text-[11px] sm:text-xs font-bold rounded-full transition-all cursor-pointer whitespace-nowrap ${
-            activeSlide === 0 ? 'bg-[#E81A7F] text-white shadow-md' : 'text-slate-300 hover:text-white'
-          }`}
-        >
-          {t.heroSlideTab1}
-        </button>
-        <button
-          onClick={() => setActiveSlide(1)}
-          className={`px-3 py-1 text-[11px] sm:text-xs font-bold rounded-full transition-all cursor-pointer whitespace-nowrap ${
-            activeSlide === 1 ? 'bg-[#E81A7F] text-white shadow-md' : 'text-slate-300 hover:text-white'
-          }`}
-        >
-          {t.heroSlideTab2}
-        </button>
-      </div>
 
     </div>
   );
