@@ -1,9 +1,9 @@
-import { randomBytes, scryptSync, timingSafeEqual, createPublicKey, createVerify } from 'crypto';
+import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 import type { Request, Response } from 'express';
 import { db } from './db/index.js';
 
 export const SESSION_COOKIE = 'ldiv_session';
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SESSION_TTL_MS = 365 * 24 * 60 * 60 * 1000; // 1 year — admin stays signed in on their device without re-logging-in
 
 // --- Password hashing (server-side only from here on — never trust a
 // client-computed hash). scrypt is Node's built-in slow KDF, no extra dep. ---
@@ -147,80 +147,4 @@ export function requireAuth(req: Request, res: Response, next: () => void): void
   }
   (req as any).user = user;
   next();
-}
-
-// --- Google ID token verification (for the redirect-based "Sign In With
-// Google" flow used by in-app browsers — see AuthContext.tsx). No popup, so
-// no window.opener needed, which is what actually breaks inside Messenger/
-// Zalo's embedded browser. Verifies the JWT signature against Google's
-// published public keys — no client secret required, since this is an ID
-// token (identity only), not an authorization code. ---
-let cachedGoogleCerts: { keys: any[]; fetchedAt: number } | null = null;
-
-async function getGoogleCerts(): Promise<any[]> {
-  const now = Date.now();
-  if (cachedGoogleCerts && now - cachedGoogleCerts.fetchedAt < 60 * 60 * 1000) {
-    return cachedGoogleCerts.keys;
-  }
-  const res = await fetch('https://www.googleapis.com/oauth2/v3/certs');
-  const data: any = await res.json();
-  cachedGoogleCerts = { keys: data.keys || [], fetchedAt: now };
-  return cachedGoogleCerts.keys;
-}
-
-function base64UrlToBuffer(input: string): Buffer {
-  return Buffer.from(input.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
-}
-
-export async function verifyGoogleIdToken(
-  idToken: string,
-  expectedAudience: string,
-  expectedNonce?: string | null
-): Promise<{ email: string; name: string; picture?: string } | null> {
-  const reject = (reason: string, detail?: unknown) => {
-    console.error(`[google-id-token] rejected: ${reason}`, detail ?? '');
-    return null;
-  };
-  try {
-    const parts = idToken.split('.');
-    if (parts.length !== 3) return reject('malformed token (not 3 parts)');
-    const [headerB64, payloadB64, signatureB64] = parts;
-
-    const header = JSON.parse(base64UrlToBuffer(headerB64).toString('utf8'));
-    const payload = JSON.parse(base64UrlToBuffer(payloadB64).toString('utf8'));
-
-    const now = Math.floor(Date.now() / 1000);
-    if (typeof payload.exp !== 'number' || payload.exp < now) {
-      return reject('expired or missing exp', { exp: payload.exp, now });
-    }
-    if (payload.aud !== expectedAudience) {
-      return reject('aud mismatch', { got: payload.aud, expected: expectedAudience });
-    }
-    if (payload.iss !== 'https://accounts.google.com' && payload.iss !== 'accounts.google.com') {
-      return reject('iss mismatch', { got: payload.iss });
-    }
-    if (!payload.email) return reject('no email claim in payload');
-    // Prevents a captured/leaked token being replayed later to log in as the
-    // victim — the client generates a fresh nonce per redirect attempt and
-    // we require it to come back unchanged inside the signed token.
-    if (expectedNonce && payload.nonce !== expectedNonce) {
-      return reject('nonce mismatch (possible replay)', { got: payload.nonce });
-    }
-
-    const certs = await getGoogleCerts();
-    const cert = certs.find((k) => k.kid === header.kid);
-    if (!cert) {
-      return reject('no matching cert for kid', { kid: header.kid, availableKids: certs.map((k) => k.kid) });
-    }
-
-    const publicKey = createPublicKey({ key: cert, format: 'jwk' });
-    const verifier = createVerify('RSA-SHA256');
-    verifier.update(`${headerB64}.${payloadB64}`);
-    const isValid = verifier.verify(publicKey, base64UrlToBuffer(signatureB64));
-    if (!isValid) return reject('signature verification failed');
-
-    return { email: payload.email, name: payload.name || payload.email, picture: payload.picture };
-  } catch (err) {
-    return reject('threw during verification', err instanceof Error ? err.message : err);
-  }
 }

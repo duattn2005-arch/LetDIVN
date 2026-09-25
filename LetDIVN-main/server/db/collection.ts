@@ -3,12 +3,17 @@ import { db } from './index.js';
 
 type OrderMode = 'created_desc' | 'created_asc' | 'sort_order';
 
-interface CollectionOptions {
+interface CollectionOptions<T> {
   table: string;
   idPrefix: string;
   order: OrderMode;
-  /** For a table with an extra required column outside the {id, created_at, data} shape (e.g. volunteers.event_id, indexed for lookups). */
-  extraColumn?: { name: string; getValue: (item: any) => string };
+  /**
+   * A few tables (e.g. volunteers.event_id) keep one field as a real column
+   * outside the `data` JSON blob, for a fast indexed lookup/join. Return the
+   * column -> value pairs to persist alongside `data` on every insert/update
+   * so that column never drifts from (or is left NULL relative to) the JSON.
+   */
+  extraColumns?: (item: T) => Record<string, string | number>;
 }
 
 /**
@@ -17,12 +22,18 @@ interface CollectionOptions {
  * shape, so one generic helper covers all of them instead of hand-writing
  * near-identical SQL per resource.
  */
-export function makeCollection<T extends { id: string }>(opts: CollectionOptions) {
-  const { table, idPrefix, order, extraColumn } = opts;
+export function makeCollection<T extends { id: string }>(opts: CollectionOptions<T>) {
+  const { table, idPrefix, order, extraColumns } = opts;
   const orderSql =
     order === 'sort_order' ? 'ORDER BY sort_order ASC' :
     order === 'created_asc' ? 'ORDER BY created_at ASC' :
     'ORDER BY created_at DESC';
+
+  const extraColsFor = (item: T): { names: string[]; values: (string | number)[] } => {
+    const cols = extraColumns ? extraColumns(item) : {};
+    const names = Object.keys(cols);
+    return { names, values: names.map((n) => cols[n]) };
+  };
 
   return {
     getAll(): T[] {
@@ -38,14 +49,16 @@ export function makeCollection<T extends { id: string }>(opts: CollectionOptions
     insert(partial: Omit<T, 'id'>, extra?: { sortOrder?: number }): T {
       const id = `${idPrefix}-${Date.now()}-${randomUUID().slice(0, 6)}`;
       const item = { ...partial, id } as T;
+      const { names, values } = extraColsFor(item);
       if (order === 'sort_order') {
         const sortOrder = extra?.sortOrder ?? nextSortOrder(table);
-        db.prepare(`INSERT INTO ${table} (id, sort_order, data) VALUES (?, ?, ?)`).run(id, sortOrder, JSON.stringify(item));
-      } else if (extraColumn) {
-        db.prepare(`INSERT INTO ${table} (id, ${extraColumn.name}, created_at, data) VALUES (?, ?, ?, ?)`)
-          .run(id, extraColumn.getValue(item), Date.now(), JSON.stringify(item));
+        const cols = ['id', 'sort_order', ...names, 'data'];
+        db.prepare(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`)
+          .run(id, sortOrder, ...values, JSON.stringify(item));
       } else {
-        db.prepare(`INSERT INTO ${table} (id, created_at, data) VALUES (?, ?, ?)`).run(id, Date.now(), JSON.stringify(item));
+        const cols = ['id', 'created_at', ...names, 'data'];
+        db.prepare(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`)
+          .run(id, Date.now(), ...values, JSON.stringify(item));
       }
       return item;
     },
@@ -54,22 +67,20 @@ export function makeCollection<T extends { id: string }>(opts: CollectionOptions
       const existing = this.getById(id);
       if (!existing) return null;
       const merged = { ...existing, ...updates, id } as T;
-      db.prepare(`UPDATE ${table} SET data = ? WHERE id = ?`).run(JSON.stringify(merged), id);
+      const { names, values } = extraColsFor(merged);
+      const setCols = [...names.map((n) => `${n} = ?`), 'data = ?'];
+      db.prepare(`UPDATE ${table} SET ${setCols.join(', ')} WHERE id = ?`).run(...values, JSON.stringify(merged), id);
       return merged;
     },
 
     replaceAll(items: T[]): void {
       const insert = db.prepare(`INSERT INTO ${table} (id, sort_order, data) VALUES (?, ?, ?)`);
       const clear = db.prepare(`DELETE FROM ${table}`);
-      db.exec('BEGIN');
-      try {
+      const tx = db.transaction((rows: T[]) => {
         clear.run();
-        items.forEach((item, index) => insert.run(item.id, index, JSON.stringify(item)));
-        db.exec('COMMIT');
-      } catch (err) {
-        db.exec('ROLLBACK');
-        throw err;
-      }
+        rows.forEach((item, index) => insert.run(item.id, index, JSON.stringify(item)));
+      });
+      tx(items);
     },
 
     delete(id: string): boolean {
@@ -85,24 +96,21 @@ export function makeCollection<T extends { id: string }>(opts: CollectionOptions
      * seeded rows come back in the same order they were authored in.
      */
     seedRaw(item: T, rank: number): void {
+      const { names, values } = extraColsFor(item);
       if (order === 'sort_order') {
-        db.prepare(`INSERT INTO ${table} (id, sort_order, data) VALUES (?, ?, ?)`).run(item.id, rank, JSON.stringify(item));
+        const cols = ['id', 'sort_order', ...names, 'data'];
+        db.prepare(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`)
+          .run(item.id, rank, ...values, JSON.stringify(item));
       } else if (order === 'created_asc') {
-        if (extraColumn) {
-          db.prepare(`INSERT INTO ${table} (id, ${extraColumn.name}, created_at, data) VALUES (?, ?, ?, ?)`)
-            .run(item.id, extraColumn.getValue(item), rank, JSON.stringify(item));
-        } else {
-          db.prepare(`INSERT INTO ${table} (id, created_at, data) VALUES (?, ?, ?)`).run(item.id, rank, JSON.stringify(item));
-        }
-      } else if (extraColumn) {
-        // created_desc: earlier array entries must sort first, i.e. need the
-        // largest created_at, so rank counts down.
-        db.prepare(`INSERT INTO ${table} (id, ${extraColumn.name}, created_at, data) VALUES (?, ?, ?, ?)`)
-          .run(item.id, extraColumn.getValue(item), -rank, JSON.stringify(item));
+        const cols = ['id', 'created_at', ...names, 'data'];
+        db.prepare(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`)
+          .run(item.id, rank, ...values, JSON.stringify(item));
       } else {
         // created_desc: earlier array entries must sort first, i.e. need the
         // largest created_at, so rank counts down.
-        db.prepare(`INSERT INTO ${table} (id, created_at, data) VALUES (?, ?, ?)`).run(item.id, -rank, JSON.stringify(item));
+        const cols = ['id', 'created_at', ...names, 'data'];
+        db.prepare(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`)
+          .run(item.id, -rank, ...values, JSON.stringify(item));
       }
     },
 

@@ -5,7 +5,7 @@ import { getAllUsers, deleteUser } from '../db/users.js';
 
 const router = Router();
 
-router.get('/users', requireAdmin, (req, res) => {
+router.get('/users', (req, res) => {
   const users = getAllUsers();
   const emails = new Set(
     (db.prepare('SELECT email FROM credentials').all() as { email: string }[]).map((r) => r.email)

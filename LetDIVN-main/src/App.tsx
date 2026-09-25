@@ -3,8 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
-import { CultivatingSection } from './components/CultivatingSection';
-import { NewsSection } from './components/NewsSection';
+import { AboutSection } from './components/AboutSection';
 import { GallerySection } from './components/GallerySection';
 import { GetInvolvedSection } from './components/GetInvolvedSection';
 import { Footer } from './components/Footer';
@@ -23,62 +22,63 @@ import { OurTeamPage } from './components/pages/OurTeamPage';
 import { OurPartnersPage } from './components/pages/OurPartnersPage';
 import { ProjectsPage } from './components/pages/ProjectsPage';
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage';
+import { CampaignDetailPage } from './components/pages/CampaignDetailPage';
 import { NewsPage } from './components/pages/NewsPage';
 import { MediaOnUsPage } from './components/pages/MediaOnUsPage';
+import { HomeQuickLinksSection } from './components/HomeQuickLinksSection';
 import { FullGalleryPage } from './components/pages/FullGalleryPage';
 import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { CleanupMapPage } from './components/pages/CleanupMapPage';
-import { WorldCleanupDayPage } from './components/pages/WorldCleanupDayPage';
-import { EnvironmentalDayPage } from './components/pages/EnvironmentalDayPage';
-import { GreenOceanCampaignPage } from './components/pages/GreenOceanCampaignPage';
-import { YoungConservationistsPage } from './components/pages/YoungConservationistsPage';
-import { CommunityWorkshopPage } from './components/pages/CommunityWorkshopPage';
 import { ContactBubble } from './components/ContactBubble';
-import { AmbientBackground } from './components/AmbientBackground';
+import { dbService } from './services/dbService';
+import { CleanupEvent } from './types';
+import { slugify } from './utils/slug';
 
-// Keeps the address bar in sync with the current view — so pages are
-// bookmarkable/shareable/refreshable and the back/forward buttons work,
-// matching a normal (non-SPA) site instead of staying on a single URL.
-const VIEW_TO_PATH: Record<string, string> = {
+// Every top-level nav destination gets a real, shareable URL, mirroring the
+// reference site's pattern (e.g. https://letsdoitvietnam.org/who-we-are/).
+const VIEW_PATHS: Record<string, string> = {
   home: '/',
   'who-we-are': '/who-we-are/',
   'what-we-do': '/what-we-do/',
   'our-team': '/our-team/',
   'our-partners': '/our-partners/',
   projects: '/projects/',
+  'explore-campaigns': '/explore-campaigns/',
   map: '/cleanup-map/',
   news: '/news/',
   'media-on-us': '/media-on-us/',
   gallery: '/gallery/',
   videos: '/videos/',
   contact: '/contact/',
-  'world-cleanup-day': '/world-cleanup-day/',
-  'environmental-day': '/environmental-day/',
-  'green-ocean-campaign': '/green-ocean-campaign/',
-  'young-conservationists': '/young-conservationists/',
-  'community-workshop': '/community-workshop/',
 };
 
-function pathForView(view: string, projectId?: string): string {
-  if (view === 'project-detail' && projectId) return `/projects/${encodeURIComponent(projectId)}/`;
-  return VIEW_TO_PATH[view] || '/';
-}
+const normalizePath = (pathname: string) => {
+  const trimmed = pathname.replace(/^\/+|\/+$/g, '');
+  return trimmed ? `/${trimmed}/` : '/';
+};
 
-function parseLocation(): { view: string; projectId?: string } {
-  const path = window.location.pathname.replace(/\/+$/, '') || '/';
-  if (path === '/') return { view: 'home' };
-  const projectMatch = path.match(/^\/projects\/([^/]+)$/);
-  if (projectMatch) {
-    return { view: 'project-detail', projectId: decodeURIComponent(projectMatch[1]) };
-  }
-  const entry = Object.entries(VIEW_TO_PATH).find(([, p]) => p.replace(/\/+$/, '') === path);
-  return { view: entry ? entry[0] : 'home' };
-}
+const viewForPath = (pathname: string): string | undefined => {
+  const normalized = normalizePath(pathname);
+  return Object.keys(VIEW_PATHS).find((view) => VIEW_PATHS[view] === normalized);
+};
+
+// /explore-campaigns/<slug> is its own URL namespace — kept fully separate
+// from /projects/ and per-category project slugs like /world-cleanup-day/.
+const CAMPAIGN_BASE_PATH = '/explore-campaigns/';
+
+const campaignSlugFromPath = (pathname: string): string | undefined => {
+  const normalized = normalizePath(pathname);
+  if (normalized === CAMPAIGN_BASE_PATH || !normalized.startsWith(CAMPAIGN_BASE_PATH)) return undefined;
+  return normalized.slice(CAMPAIGN_BASE_PATH.length).replace(/\/+$/, '');
+};
 
 export function AppContent() {
-  const [activeView, setActiveView] = useState<string>(() => parseLocation().view);
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => parseLocation().projectId || '');
+  const [activeView, setActiveView] = useState<string>('home');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string>('evt-wcd-2026');
+  const [selectedNewsArticleId, setSelectedNewsArticleId] = useState<string | undefined>(undefined);
+  const [events, setEvents] = useState<CleanupEvent[]>([]);
 
   // Modals state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -94,35 +94,130 @@ export function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeView]);
 
-  // Browser back/forward buttons: re-sync state from the URL instead of
-  // navigating (pushState already put it there).
+  // Every nav destination gets a real URL. Project detail pages use a
+  // category slug (e.g. /world-cleanup-day/, matching the reference site)
+  // since a "project" is the static campaign story, not a specific dated
+  // event instance — city/id are kept as fallbacks for older links. Events
+  // are fetched here (not just in ProjectDetailPage) so a direct visit to
+  // /<slug> and browser back/forward can both resolve which project it is.
   useEffect(() => {
-    const onPopState = () => {
-      const { view, projectId } = parseLocation();
-      if (projectId) setSelectedProjectId(projectId);
-      setActiveView(view);
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
+    const refresh = () => { dbService.getEvents().then(setEvents); };
+    refresh();
+    const unsubscribe = dbService.subscribe(refresh);
+    return () => unsubscribe();
   }, []);
 
-  const handleNavigate = (view: string, extraId?: string) => {
-    let nextView = view;
-    let nextProjectId: string | undefined;
+  const resolveSlugToEvent = (path: string, list: CleanupEvent[]) =>
+    list.find((e) => e.id === path) ||
+    list.find((e) => slugify(e.category) === path) ||
+    list.find((e) => slugify(e.city) === path);
 
-    if (view === 'project-detail' && extraId) {
-      nextProjectId = extraId;
-    } else if (view.startsWith('project:')) {
-      nextProjectId = view.replace('project:', '');
-      nextView = 'project-detail';
+  const resolveCampaignSlug = (slug: string, list: CleanupEvent[]) =>
+    list.find((e) => e.id === slug) || list.find((e) => slugify(e.city) === slug);
+
+  // Resolve the current pathname to a campaign, a static view, or a project,
+  // used both on initial load and on browser back/forward.
+  const applyPath = (pathname: string) => {
+    const campaignSlug = campaignSlugFromPath(pathname);
+    if (campaignSlug) {
+      const match = resolveCampaignSlug(campaignSlug, events);
+      if (match) {
+        setSelectedCampaignId(match.id);
+        setActiveView('campaign-detail');
+        return;
+      }
     }
+    const staticView = viewForPath(pathname);
+    if (staticView) {
+      setActiveView(staticView);
+      return;
+    }
+    const path = pathname.replace(/^\/+|\/+$/g, '');
+    if (path) {
+      const match = resolveSlugToEvent(path, events);
+      if (match) {
+        setSelectedProjectId(match.id);
+        setActiveView('project-detail');
+        return;
+      }
+    }
+    setActiveView('home');
+  };
 
-    if (nextProjectId) setSelectedProjectId(nextProjectId);
-    setActiveView(nextView);
+  // Deep-link support: landing directly on a static page's URL (e.g.
+  // /who-we-are/) opens that page immediately — doesn't need event data.
+  useEffect(() => {
+    if (campaignSlugFromPath(window.location.pathname)) return;
+    const staticView = viewForPath(window.location.pathname);
+    if (staticView && staticView !== 'home') setActiveView(staticView);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const path = pathForView(nextView, nextProjectId);
-    if (window.location.pathname !== path) {
-      window.history.pushState({}, '', path);
+  // Deep-link support: landing directly on /explore-campaigns/<slug> or
+  // /<project-slug> resolves once events have loaded (skipped for static pages).
+  const triedInitialUrlRef = React.useRef(false);
+  useEffect(() => {
+    if (triedInitialUrlRef.current || events.length === 0) return;
+    const campaignSlug = campaignSlugFromPath(window.location.pathname);
+    if (campaignSlug) {
+      const match = resolveCampaignSlug(campaignSlug, events);
+      if (match) {
+        setSelectedCampaignId(match.id);
+        setActiveView('campaign-detail');
+      }
+      triedInitialUrlRef.current = true;
+      return;
+    }
+    const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+    if (path && !viewForPath(window.location.pathname)) {
+      const match = resolveSlugToEvent(path, events);
+      if (match) {
+        setSelectedProjectId(match.id);
+        setActiveView('project-detail');
+      }
+    }
+    triedInitialUrlRef.current = true;
+  }, [events]);
+
+  // Browser back/forward button support.
+  useEffect(() => {
+    const onPopState = () => applyPath(window.location.pathname);
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [events]);
+
+  const goToProject = (projectId: string) => {
+    setSelectedProjectId(projectId);
+    setActiveView('project-detail');
+    // projectId may be an event id (from a project card) or a category name
+    // (from the Header's Projects dropdown, which navigates by category so
+    // it always resolves to whichever live event currently has it).
+    const evt = events.find((e) => e.id === projectId) || events.find((e) => e.category === projectId);
+    window.history.pushState(null, '', `/${evt ? slugify(evt.category) : slugify(projectId)}/`);
+  };
+
+  const goToCampaign = (campaignId: string) => {
+    setSelectedCampaignId(campaignId);
+    setActiveView('campaign-detail');
+    const evt = events.find((e) => e.id === campaignId);
+    window.history.pushState(null, '', `${CAMPAIGN_BASE_PATH}${evt ? slugify(evt.city) : slugify(campaignId)}/`);
+  };
+
+  const handleNavigate = (view: string, extraId?: string) => {
+    if (view === 'project-detail' && extraId) {
+      goToProject(extraId);
+    } else if (view.startsWith('project:')) {
+      goToProject(view.replace('project:', ''));
+    } else if (view === 'campaign-detail' && extraId) {
+      goToCampaign(extraId);
+    } else if (view === 'news') {
+      setSelectedNewsArticleId(extraId);
+      setActiveView('news');
+      window.history.pushState(null, '', VIEW_PATHS.news);
+    } else {
+      setActiveView(view);
+      window.history.pushState(null, '', VIEW_PATHS[view] || '/');
     }
   };
 
@@ -137,14 +232,11 @@ export function AppContent() {
   };
 
   const handleSelectProject = (projectId: string) => {
-    handleNavigate('project-detail', projectId);
+    goToProject(projectId);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 text-slate-800 antialiased font-sans relative selection:bg-[#E81A7F] selection:text-white">
-      {/* 3D Ambient Particle & Ecological Environment Elements */}
-      <AmbientBackground />
-
       {/* Global Header */}
       <Header
         activeView={activeView}
@@ -158,15 +250,17 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact', 'world-cleanup-day', 'environmental-day', 'green-ocean-campaign', 'young-conservationists', 'community-workshop'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'explore-campaigns', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
-              onExploreProjects={() => handleNavigate('projects')}
+              onExploreProjects={() => handleNavigate('explore-campaigns')}
               onExploreMap={() => handleNavigate('map')}
             />
-            <CultivatingSection onNavigate={handleNavigate} />
-            <NewsSection onViewAll={() => handleNavigate('news')} />
+            <HomeQuickLinksSection onNavigate={handleNavigate} />
+            <AboutSection
+              onLearnMore={() => handleNavigate('who-we-are')}
+            />
             <MediaVideosPage />
             <GallerySection 
               onViewAllGallery={() => handleNavigate('gallery')}
@@ -202,23 +296,38 @@ export function AppContent() {
           />
         )}
 
+        {/* Same campaign grid as /projects/, but "View Campaign Details" goes
+            straight to the schedule/map/registration page — never the static
+            per-category project story. */}
+        {activeView === 'explore-campaigns' && (
+          <ProjectsPage
+            onSelectProject={goToCampaign}
+            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
+          />
+        )}
+
+        {activeView === 'campaign-detail' && (
+          <CampaignDetailPage
+            campaignId={selectedCampaignId}
+            onBack={() => handleNavigate('explore-campaigns')}
+            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
+          />
+        )}
+
         {activeView === 'map' && (
           <CleanupMapPage
             onSelectProject={handleSelectProject}
+            onSelectCampaign={goToCampaign}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
           />
         )}
 
         {activeView === 'project-detail' && (
-          <ProjectDetailPage
-            projectId={selectedProjectId}
-            onBack={() => handleNavigate('projects')}
-            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
-          />
+          <ProjectDetailPage projectId={selectedProjectId} />
         )}
 
         {activeView === 'news' && (
-          <NewsPage initialCategory="All" />
+          <NewsPage initialCategory="All" initialArticleId={selectedNewsArticleId} />
         )}
 
         {activeView === 'media-on-us' && (
@@ -235,26 +344,6 @@ export function AppContent() {
 
         {activeView === 'contact' && (
           <ContactPage />
-        )}
-
-        {activeView === 'world-cleanup-day' && (
-          <WorldCleanupDayPage />
-        )}
-
-        {activeView === 'environmental-day' && (
-          <EnvironmentalDayPage />
-        )}
-
-        {activeView === 'green-ocean-campaign' && (
-          <GreenOceanCampaignPage />
-        )}
-
-        {activeView === 'young-conservationists' && (
-          <YoungConservationistsPage />
-        )}
-
-        {activeView === 'community-workshop' && (
-          <CommunityWorkshopPage />
         )}
       </main>
 

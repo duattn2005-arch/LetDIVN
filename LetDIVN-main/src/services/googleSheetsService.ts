@@ -1,5 +1,4 @@
 import { VolunteerRegistration } from '../types';
-import { normalizeBirthYear } from '../utils/volunteerUtils';
 
 export const DEFAULT_SPREADSHEET_ID = '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
 export const GOOGLE_SHEETS_STORAGE_KEY = 'ldiv_google_sheet_webhook';
@@ -55,7 +54,7 @@ export interface SheetVolunteerRow {
   phone: string;
   email: string;
   city: string;
-  birthYear: string;
+  ageGroup: string;
   eventName: string;
   skills: string;
   status: string;
@@ -72,7 +71,7 @@ export interface VolunteerFormData {
   email: string;
   city: string;
   skills: string | string[];
-  birthYear?: string | number;
+  age?: string | number;
   project?: string;
   [key: string]: any;
 }
@@ -120,7 +119,7 @@ export async function fetchDataFromSheets(customSpreadsheetId?: string): Promise
       phone: row[3] || row[2] || '',
       email: row[4] || row[3] || '',
       city: row[5] || row[4] || 'Việt Nam',
-      birthYear: normalizeBirthYear(row[6] || row[5] || ''),
+      ageGroup: row[6] || row[5] || '22 tuổi',
       eventName: row[7] || row[6] || 'World Cleanup Day 2026',
       skills: row[8] || row[7] || '',
       status: row[9] || row[8] || 'Approved',
@@ -158,13 +157,13 @@ export async function saveToGoogleSheet(
     searchParams.append('email', data.email || '');
     searchParams.append('city', data.city || '');
     searchParams.append('skills', skillsStr);
-    searchParams.append('birthYear', String(data.birthYear || ''));
+    searchParams.append('age', String(data.age || ''));
     searchParams.append('project', data.project || 'World Cleanup Day 2026');
     searchParams.append('id', submissionId);
     searchParams.append('time', submissionTime);
     searchParams.append('status', 'Approved');
 
-    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, NĂM SINH, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
+    // 10 Cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
     const rowValues = [
       submissionId,
       submissionTime,
@@ -172,7 +171,7 @@ export async function saveToGoogleSheet(
       data.phone || '',
       data.email || '',
       data.city || '',
-      String(data.birthYear || ''),
+      String(data.age || ''),
       data.project || 'World Cleanup Day 2026',
       skillsStr,
       'Approved'
@@ -208,7 +207,7 @@ export async function saveToGoogleSheet(
           email: data.email,
           city: data.city,
           skills: skillsStr,
-          birthYear: data.birthYear,
+          age: data.age,
           project: data.project,
           id: submissionId,
           time: submissionTime
@@ -285,55 +284,6 @@ export async function deleteRowFromGoogleSheets(
 }
 
 /**
- * Updates a single cell (e.g. the "TRẠNG THÁI" column) on the real Google
- * Sheet. `cell` is an A1-style reference like "J5".
- */
-export async function updateCellInGoogleSheets(
-  cell: string,
-  value: string,
-  customUrl?: string
-): Promise<{ success: boolean; message?: string }> {
-  try {
-    const rawUrl = customUrl || getGoogleAppsScriptUrl();
-    const spreadsheetId = extractSpreadsheetId(rawUrl);
-
-    const response = await fetch('/api/sheets/update-range', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ spreadsheetId, range: cell, values: [[value]] }),
-    });
-
-    if (response.ok) {
-      return { success: true };
-    }
-    const errData = await response.json().catch(() => ({}));
-    return { success: false, message: errData.error || 'Lỗi khi cập nhật Google Sheets' };
-  } catch (err: any) {
-    return { success: false, message: err?.message || 'Lỗi kết nối Google Sheets' };
-  }
-}
-
-/**
- * Finds the live sheet row number for a volunteer that only exists locally
- * (matched by email, falling back to phone), so status updates/deletes made
- * from the "Tình Nguyện Viên" tab can also apply to the real Google Sheet
- * row, not just the internal DB.
- */
-export async function findSheetRowNumber(
-  volunteer: { email?: string; phone?: string },
-  customUrl?: string
-): Promise<number | null> {
-  const { rows } = await fetchDataFromSheets(customUrl);
-  const email = (volunteer.email || '').trim().toLowerCase();
-  const phone = (volunteer.phone || '').trim();
-  const match = rows.find((r) =>
-    (!!email && r.email.trim().toLowerCase() === email) ||
-    (!!phone && r.phone.trim() === phone)
-  );
-  return match?.sheetRowNumber ?? null;
-}
-
-/**
  * Backward compatibility alias for existing code
  */
 export async function appendVolunteerToGoogleSheets(
@@ -345,7 +295,7 @@ export async function appendVolunteerToGoogleSheets(
     phone: volunteer.phone,
     email: volunteer.email,
     city: volunteer.city,
-    birthYear: volunteer.birthYear || '',
+    age: volunteer.ageGroup || '',
     project: volunteer.eventName,
     skills: volunteer.skills
   }, customUrl);
@@ -383,7 +333,7 @@ export async function syncAllVolunteersToGoogleSheets(
       v.phone,
       v.email,
       v.city,
-      v.birthYear || '',
+      v.ageGroup || '',
       v.eventName,
       Array.isArray(v.skills) ? v.skills.join(', ') : '',
       v.status || 'Approved'

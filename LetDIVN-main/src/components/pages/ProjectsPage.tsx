@@ -6,16 +6,15 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EventEditorModal } from '../EventEditorModal';
 import { EditableText } from '../EditableText';
-import { isEventExpired } from '../../utils/eventUtils';
 
 interface ProjectsPageProps {
   onSelectProject: (id: string) => void;
   onRegisterVolunteer: (eventId?: string) => void;
 }
 
-export const ProjectsPage: React.FC<ProjectsPageProps> = ({
+export const ProjectsPage: React.FC<ProjectsPageProps> = ({ 
   onSelectProject,
-  onRegisterVolunteer,
+  onRegisterVolunteer 
 }) => {
   const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
@@ -56,6 +55,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
     }
   };
 
+
   // For regular visitors, only show approved events (not Pending).
   const visibleEvents = events.filter(e => {
     if (isAdmin) return true;
@@ -64,16 +64,28 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
 
   const pendingCount = events.filter(e => e.status === 'Pending').length;
 
+  // Registration only stays open through the event's own date — once it's
+  // passed, "Register to Participate" is disabled rather than hidden, so the
+  // campaign card/history stays visible but can't collect new signups.
+  const isRegistrationClosed = (evt: CleanupEvent) => {
+    const eventDate = new Date(evt.date);
+    if (Number.isNaN(eventDate.getTime())) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return eventDate < today;
+  };
+
   return (
     <div className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        <div className="text-center max-w-6xl mx-auto space-y-4">
           <EditableText
             contentKey="projects.title"
             defaultValue={t.projectsTitle}
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <EditableText
             contentKey="projects.subtitle"
@@ -109,7 +121,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {visibleEvents.map(evt => {
             const isPending = evt.status === 'Pending';
-            const isExpired = isEventExpired(evt.date);
+            const closed = isRegistrationClosed(evt);
 
             return (
               <div
@@ -122,23 +134,23 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                     {isPending && (
                       <button
                         onClick={(e) => handleApprove(evt.id, evt.title, e)}
-                        title="Approve this campaign now"
+                        title="Duyệt chiến dịch này ngay"
                         className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-extrabold rounded-lg transition-all cursor-pointer flex items-center gap-1 shadow-sm"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Approve</span>
+                        <span>Duyệt</span>
                       </button>
                     )}
                     <button
                       onClick={(e) => handleEdit(evt, e)}
-                      title="Edit campaign"
+                      title="Sửa chiến dịch"
                       className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={(e) => handleDelete(evt.id, evt.title, e)}
-                      title="Delete campaign"
+                      title="Xóa chiến dịch"
                       className="p-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -148,19 +160,16 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
 
                 <div>
                   <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
-                    <img 
-                      src={evt.image} 
-                      alt={evt.title} 
+                    <img
+                      src={evt.image}
+                      alt={evt.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+
                     {isPending ? (
                       <div className="absolute bottom-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         <span>{language === 'vi' ? 'Chờ Duyệt (Pending)' : 'Pending Review'}</span>
-                      </div>
-                    ) : isExpired ? (
-                      <div className="absolute bottom-3 left-3 bg-slate-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
-                        {language === 'vi' ? 'Đã hết hạn' : 'Expired'}
                       </div>
                     ) : (
                       <div className="absolute bottom-3 left-3 bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
@@ -170,8 +179,9 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                   </div>
 
                   <div className="p-6 space-y-4">
-                    <h3
-                      className="font-black text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors line-clamp-2"
+                    <h3 
+                      onClick={() => onSelectProject(evt.id)}
+                      className="font-black text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors cursor-pointer line-clamp-2"
                     >
                       {evt.title}
                     </h3>
@@ -208,24 +218,23 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                 <div className="p-6 pt-0 flex gap-2">
                   <button
                     onClick={() => onSelectProject(evt.id)}
-                    className="flex-1 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-xs py-2.5 rounded-full transition-colors cursor-pointer text-center"
+                    className="flex-1 py-2.5 border border-slate-300 hover:border-slate-400 text-slate-700 font-bold text-xs rounded-full transition-colors cursor-pointer text-center"
                   >
-                    <EditableText contentKey="projects.detailsBtn" defaultValue={language === 'vi' ? 'Xem Chi Tiết' : 'View Details'} as="span" />
+                    <EditableText contentKey="projects.viewDetailsBtn" defaultValue={t.projectsDetailBtn} as="span" />
                   </button>
                   <button
-                    onClick={() => onRegisterVolunteer(evt.id)}
-                    disabled={isExpired}
+                    onClick={() => !closed && onRegisterVolunteer(evt.id)}
+                    disabled={closed}
+                    title={closed ? (language === 'vi' ? 'Chiến dịch đã diễn ra, không thể đăng ký thêm' : 'This campaign has already taken place') : undefined}
                     className={`flex-1 font-bold text-xs py-2.5 rounded-full shadow-md transition-colors text-center ${
-                      isExpired
-                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      closed
+                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                         : 'bg-[#E81A7F] hover:bg-[#D01370] text-white cursor-pointer'
                     }`}
                   >
-                    {isExpired ? (
-                      <span>{language === 'vi' ? 'Đã hết hạn' : 'Expired'}</span>
-                    ) : (
-                      <EditableText contentKey="projects.registerBtn" defaultValue={t.projectsJoinBtn} as="span" />
-                    )}
+                    {closed
+                      ? <span>{language === 'vi' ? 'Đã kết thúc' : 'Registration Closed'}</span>
+                      : <EditableText contentKey="projects.registerBtn" defaultValue={t.projectsJoinBtn} as="span" />}
                   </button>
                 </div>
               </div>

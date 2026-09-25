@@ -48,12 +48,13 @@ export const FullGalleryPage: React.FC = () => {
     <div className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        <div className="text-center max-w-6xl mx-auto space-y-4">
           <EditableText
             contentKey="fullGallery.title"
             defaultValue={t.fullGalleryTitle}
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]">
             <EditableText contentKey="fullGallery.subtitle" defaultValue={t.fullGallerySubtitle} as="span" />

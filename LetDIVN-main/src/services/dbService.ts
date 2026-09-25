@@ -10,8 +10,7 @@ import {
   MediaVideo,
   WhatWeDoItem,
   WhoWeAreItem,
-  MediaCoverageEntry,
-  CampaignSection
+  MediaCoverageEntry
 } from '../types';
 
 type Listener = () => void;
@@ -52,7 +51,7 @@ class DatabaseService {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || `Request failed (${res.status})`);
+      throw new Error(body.error || `Yêu cầu thất bại (${res.status})`);
     }
     return res.json();
   }
@@ -91,19 +90,13 @@ class DatabaseService {
   }
 
   public async setContent(key: string, value: string): Promise<void> {
-    // Patch the cache *before* notifying — components refreshing in response
-    // to their own save read this same cache synchronously-scheduled ahead
-    // of `notify()`'s callers, so patching after would leave their own
-    // change looking stale until some unrelated later mutation notified again.
-    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'PUT', body: JSON.stringify({ value }) });
+    await this.mutate(`/content/${encodeURIComponent(key)}`, 'PUT', { value });
     if (this.contentCache) this.contentCache[key] = value;
-    this.notify();
   }
 
   public async resetContent(key: string): Promise<void> {
-    await this.request(`/content/${encodeURIComponent(key)}`, { method: 'DELETE' });
+    await this.mutate(`/content/${encodeURIComponent(key)}`, 'DELETE');
     if (this.contentCache) delete this.contentCache[key];
-    this.notify();
   }
 
   // --- EVENTS ---
@@ -235,37 +228,22 @@ class DatabaseService {
     return true;
   }
 
-  // --- WHO WE ARE ---
-  public getWhoWeAre(): Promise<WhoWeAreItem[]> {
-    return this.get('/who-we-are');
+  // --- WHO WE ARE (extra sections) ---
+  public getWhoWeAreSections(): Promise<WhoWeAreItem[]> {
+    return this.get('/who-we-are-sections');
   }
-  public addWhoWeAre(item: Omit<WhoWeAreItem, 'id'>): Promise<WhoWeAreItem> {
-    return this.mutate('/who-we-are', 'POST', item);
+  public addWhoWeAreSection(item: Omit<WhoWeAreItem, 'id'>): Promise<WhoWeAreItem> {
+    return this.mutate('/who-we-are-sections', 'POST', item);
   }
-  public updateWhoWeAre(item: WhoWeAreItem): Promise<WhoWeAreItem> {
-    return this.mutate(`/who-we-are/${encodeURIComponent(item.id)}`, 'PUT', item);
+  public updateWhoWeAreSection(item: WhoWeAreItem): Promise<WhoWeAreItem> {
+    return this.mutate(`/who-we-are-sections/${encodeURIComponent(item.id)}`, 'PUT', item);
   }
-  public async deleteWhoWeAre(id: string): Promise<boolean> {
-    await this.mutate(`/who-we-are/${encodeURIComponent(id)}`, 'DELETE');
+  public async deleteWhoWeAreSection(id: string): Promise<boolean> {
+    await this.mutate(`/who-we-are-sections/${encodeURIComponent(id)}`, 'DELETE');
     return true;
   }
 
-  // --- CAMPAIGN SECTIONS (admin-added blocks on campaign info pages) ---
-  public getCampaignSections(page: string): Promise<CampaignSection[]> {
-    return this.get(`/campaign-sections?page=${encodeURIComponent(page)}`);
-  }
-  public addCampaignSection(item: Omit<CampaignSection, 'id'>): Promise<CampaignSection> {
-    return this.mutate('/campaign-sections', 'POST', item);
-  }
-  public updateCampaignSection(item: CampaignSection): Promise<CampaignSection> {
-    return this.mutate(`/campaign-sections/${encodeURIComponent(item.id)}`, 'PUT', item);
-  }
-  public async deleteCampaignSection(id: string): Promise<boolean> {
-    await this.mutate(`/campaign-sections/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
-  }
-
-  // --- MEDIA COVERAGE (Media On Us page) ---
+  // --- MEDIA COVERAGE (Media on Us entries) ---
   public getMediaCoverage(): Promise<MediaCoverageEntry[]> {
     return this.get('/media-coverage');
   }
@@ -322,7 +300,7 @@ class DatabaseService {
     const res = await fetch('/api/upload', { method: 'POST', credentials: 'include', body: formData });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || 'Image upload failed');
+      throw new Error(body.error || 'Tải ảnh lên thất bại');
     }
     const data = await res.json();
     return data.url;

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Edit3, X } from 'lucide-react';
+import { Edit3, X, Move, RotateCcw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { dbService } from '../services/dbService';
 import { ImageUploadWidget } from './ImageUploadWidget';
@@ -15,6 +15,17 @@ interface EditableImageProps {
   wrapperClassName?: string;
 }
 
+const DEFAULT_OBJECT_POSITION = '50% 50%';
+
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+const parseObjectPosition = (pos: string): [number, number] => {
+  const parts = pos.split(/\s+/).map((p) => parseFloat(p));
+  const x = Number.isFinite(parts[0]) ? parts[0] : 50;
+  const y = Number.isFinite(parts[1]) ? parts[1] : 50;
+  return [x, y];
+};
+
 export const EditableImage: React.FC<EditableImageProps> = ({
   contentKey,
   defaultValue,
@@ -23,28 +34,127 @@ export const EditableImage: React.FC<EditableImageProps> = ({
   wrapperClassName = '',
 }) => {
   const { isAdmin } = useAuth();
+  const positionKey = `${contentKey}__position`;
+
   const [value, setValue] = useState(defaultValue);
+  const [objectPosition, setObjectPosition] = useState(DEFAULT_OBJECT_POSITION);
   const [isEditing, setIsEditing] = useState(false);
+  const [draftPosition, setDraftPosition] = useState(DEFAULT_OBJECT_POSITION);
+  const [isDragging, setIsDragging] = useState(false);
+  // The live wrapper's own aspect ratio often comes from responsive Tailwind
+  // classes (e.g. a different ratio above/below the `sm:` breakpoint) that
+  // only make sense at the image's *real* on-page width — reusing those
+  // classes for the edit modal's preview (which is narrower, inside a
+  // max-w-md dialog) silently produces a different-shaped box than the real
+  // image, so a position that looks right in the preview crops wrong on the
+  // actual page. Measuring the live element's current rendered box instead
+  // guarantees the preview always matches reality.
+  const [previewRatio, setPreviewRatio] = useState<number | null>(null);
+  const liveImgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    const refresh = () => { dbService.getContent(contentKey, defaultValue).then(setValue); };
+    const refresh = () => {
+      Promise.all([
+        dbService.getContent(contentKey, defaultValue),
+        dbService.getContent(positionKey, DEFAULT_OBJECT_POSITION),
+      ]).then(([nextVal, nextPos]) => {
+        setValue(nextVal);
+        setObjectPosition(nextPos);
+        setDraftPosition((current) => (isEditingRef.current ? current : nextPos));
+      });
+    };
     refresh();
     const unsub = dbService.subscribe(refresh);
     return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contentKey, defaultValue]);
+  }, [contentKey, defaultValue, positionKey]);
+
+  // Avoids the refresh effect stomping on an in-progress drag if content
+  // changes elsewhere while this modal happens to be open.
+  const isEditingRef = useRef(isEditing);
+  useEffect(() => {
+    isEditingRef.current = isEditing;
+  }, [isEditing]);
 
   const hasPosition = wrapperClassName.includes('absolute') || wrapperClassName.includes('fixed') || wrapperClassName.includes('relative');
   const positionClass = hasPosition ? '' : 'relative';
 
+  const previewRef = useRef<HTMLDivElement>(null);
+  const dragStateRef = useRef<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
+
+  const startDrag = (clientX: number, clientY: number) => {
+    const [x, y] = parseObjectPosition(draftPosition);
+    dragStateRef.current = { startX: clientX, startY: clientY, startPosX: x, startPosY: y };
+    setIsDragging(true);
+  };
+
+  const moveDrag = useCallback((clientX: number, clientY: number) => {
+    const drag = dragStateRef.current;
+    const rect = previewRef.current?.getBoundingClientRect();
+    if (!drag || !rect) return;
+    const dx = clientX - drag.startX;
+    const dy = clientY - drag.startY;
+    // Dragging the photo right/down should reveal more of its left/top edge
+    // (the intuitive "grab the photo and slide it" motion), which means the
+    // object-position percentage — which is where inside the *image* aligns
+    // with the container — moves the opposite way.
+    const nextX = clamp(drag.startPosX - (dx / rect.width) * 100, 0, 100);
+    const nextY = clamp(drag.startPosY - (dy / rect.height) * 100, 0, 100);
+    setDraftPosition(`${nextX.toFixed(1)}% ${nextY.toFixed(1)}%`);
+  }, []);
+
+  const endDrag = useCallback(() => {
+    dragStateRef.current = null;
+    setIsDragging(false);
+    setDraftPosition((finalPos) => {
+      dbService.setContent(positionKey, finalPos);
+      setObjectPosition(finalPos);
+      return finalPos;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [positionKey]);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMouseMove = (e: MouseEvent) => moveDrag(e.clientX, e.clientY);
+    const onMouseUp = () => endDrag();
+    const onTouchMove = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) moveDrag(t.clientX, t.clientY);
+    };
+    const onTouchEnd = () => endDrag();
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('touchmove', onTouchMove);
+    window.addEventListener('touchend', onTouchEnd);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [isDragging, moveDrag, endDrag]);
+
+  const resetPosition = () => {
+    setDraftPosition(DEFAULT_OBJECT_POSITION);
+    setObjectPosition(DEFAULT_OBJECT_POSITION);
+    dbService.setContent(positionKey, DEFAULT_OBJECT_POSITION);
+  };
+
+  const openEditor = () => {
+    const rect = liveImgRef.current?.getBoundingClientRect();
+    setPreviewRatio(rect && rect.height > 0 ? rect.width / rect.height : null);
+    setIsEditing(true);
+  };
+
   return (
     <div className={`${positionClass} group/img ${wrapperClassName}`}>
-      <img src={value} alt={alt} className={className} />
+      <img ref={liveImgRef} src={value} alt={alt} className={className} style={{ objectPosition }} />
 
       {isAdmin && (
         <button
           type="button"
-          onClick={() => setIsEditing(true)}
+          onClick={openEditor}
           className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white font-bold text-sm gap-2 cursor-pointer z-10"
         >
           <Edit3 className="w-5 h-5" />
@@ -58,10 +168,10 @@ export const EditableImage: React.FC<EditableImageProps> = ({
           onClick={() => setIsEditing(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl animate-in zoom-in-95 duration-150"
+            className="bg-white rounded-2xl max-w-md w-full max-h-[88vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
               <h4 className="font-bold text-slate-900 text-sm">Thay đổi ảnh (Admin)</h4>
               <button
                 onClick={() => setIsEditing(false)}
@@ -70,6 +180,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
                 <X className="w-4 h-4" />
               </button>
             </div>
+            <div className="overflow-y-auto p-5 space-y-4">
             <ImageUploadWidget
               currentImageUrl={value}
               onImageSelected={(url) => {
@@ -121,6 +232,48 @@ export const EditableImage: React.FC<EditableImageProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Drag-to-reposition (adjusts which part of the photo shows through the crop) */}
+            <div className="pt-3 border-t border-slate-100 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
+                <span className="inline-flex items-center gap-1">
+                  <Move className="w-3.5 h-3.5" />
+                  Kéo ảnh để chỉnh vị trí hiển thị
+                </span>
+                <button
+                  type="button"
+                  onClick={resetPosition}
+                  className="text-[#E81A7F] hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Về giữa</span>
+                </button>
+              </div>
+              <div
+                ref={previewRef}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startDrag(e.clientX, e.clientY);
+                }}
+                onTouchStart={(e) => {
+                  const t = e.touches[0];
+                  if (t) startDrag(t.clientX, t.clientY);
+                }}
+                style={{ aspectRatio: previewRatio ?? 16 / 9, maxHeight: '40vh' }}
+                className={`relative w-full overflow-hidden rounded-xl border-2 border-dashed border-purple-300 bg-slate-900 mx-auto ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
+              >
+                <img
+                  src={value}
+                  alt={alt}
+                  draggable={false}
+                  className="w-full h-full object-cover pointer-events-none"
+                  style={{ objectPosition: draftPosition }}
+                />
+                <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-white/40" />
+              </div>
+              <p className="text-[10px] text-slate-400">Nhấn giữ và kéo trực tiếp trên ảnh, vị trí sẽ tự lưu khi thả chuột.</p>
+            </div>
+            </div>
           </div>
         </div>,
         document.body
@@ -128,5 +281,3 @@ export const EditableImage: React.FC<EditableImageProps> = ({
     </div>
   );
 };
-
-

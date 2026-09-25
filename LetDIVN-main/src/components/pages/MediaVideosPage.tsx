@@ -46,12 +46,13 @@ export const MediaVideosPage: React.FC = () => {
     <div className="py-10 sm:py-14 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
-        <div className="text-center max-w-3xl mx-auto space-y-3">
+        <div className="text-center max-w-6xl mx-auto space-y-3">
           <EditableText
             contentKey="videosPage.title"
             defaultValue={t.videosPageTitle}
             as="h2"
-            className="text-2xl sm:text-3xl lg:text-4xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-2xl sm:text-3xl lg:text-4xl [text-wrap:balance]"
+            render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <EditableText
             contentKey="videosPage.subtitle"
@@ -79,6 +80,15 @@ export const MediaVideosPage: React.FC = () => {
             <Youtube className="w-10 h-10 text-slate-300 mx-auto" />
             <div className="text-sm font-bold text-slate-700">{t.videosPageEmptyTitle}</div>
             <p className="text-xs text-slate-400 max-w-md mx-auto">{t.videosPageEmptyDesc}</p>
+            <div className="pt-2">
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="btn-pill-3d px-5 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs shadow-md inline-flex items-center gap-2 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{t.videosPageAddBtn}</span>
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">

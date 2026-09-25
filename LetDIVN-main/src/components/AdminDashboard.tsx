@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+
+const formatBirthYear = (v?: string) => (v || '').replace(/\s*\(\d+\s*y\/o\)\s*$/i, '').trim();
 import { createPortal } from 'react-dom';
 import {
   X,
@@ -24,12 +26,9 @@ import {
   Check,
   Link as LinkIcon,
   Loader2,
-  KeyRound,
-  ShieldCheck,
-  ShieldOff
+  KeyRound
 } from 'lucide-react';
 import { dbService } from '../services/dbService';
-import { normalizeBirthYear } from '../utils/volunteerUtils';
 import {
   VolunteerRegistration,
   CleanupEvent,
@@ -49,9 +48,6 @@ import {
   fetchDataFromSheets,
   syncAllVolunteersToGoogleSheets,
   clearAllVolunteersFromGoogleSheets,
-  deleteRowFromGoogleSheets,
-  updateCellInGoogleSheets,
-  findSheetRowNumber,
   validateSheetUrl,
   SheetVolunteerRow,
   DEFAULT_SPREADSHEET_ID
@@ -68,12 +64,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [activeTab, setActiveTab] = useState<TabType>('sheets');
   const [copiedSheet, setCopiedSheet] = useState(false);
   const [isSyncingAll, setIsSyncingAll] = useState(false);
+  const [isLoadingLiveSheets, setIsLoadingLiveSheets] = useState(false);
   const [liveSheetRows, setLiveSheetRows] = useState<SheetVolunteerRow[]>([]);
   const [syncResultMsg, setSyncResultMsg] = useState<{ text: string; isError?: boolean } | null>(null);
   const [appScriptUrl, setAppScriptUrl] = useState(localStorage.getItem('ldiv_google_sheet_webhook') || DEFAULT_SPREADSHEET_ID);
   const [savedUrlMsg, setSavedUrlMsg] = useState(false);
   const [isClearingSheet, setIsClearingSheet] = useState(false);
-  const [deletingRowKey, setDeletingRowKey] = useState<number | null>(null);
 
   // Database state lists initialized with real seed data
   const [users, setUsers] = useState<(UserProfile & { hasPassword: boolean })[]>(() =>
@@ -85,8 +81,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [partners, setPartners] = useState<Partner[]>(() => INITIAL_PARTNERS);
   const [gallery, setGallery] = useState<GalleryItem[]>(() => INITIAL_GALLERY);
   const [stats, setStats] = useState<Awaited<ReturnType<typeof dbService.getStats>> | null>(null);
-  const [grantedAdmins, setGrantedAdmins] = useState<string[]>([]);
-  const [grantingEmail, setGrantingEmail] = useState<string | null>(null);
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -96,28 +90,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   // Modal forms for adding items
   const [isCreatingVolunteer, setIsCreatingVolunteer] = useState(false);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
-  const [isCreatingNews, setIsCreatingNews] = useState(false);
-  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
-
-  const handleManualRefresh = async () => {
-    if (isManualRefreshing) return;
-    setIsManualRefreshing(true);
-    // Keeps the spin visible for at least a beat even on a near-instant
-    // refresh, so it reads as "did something" rather than a flicker.
-    const minSpinPromise = new Promise(resolve => setTimeout(resolve, 1000));
-    try {
-      await Promise.all([refreshData(), minSpinPromise]);
-    } catch {
-      await minSpinPromise;
-    } finally {
-      setIsManualRefreshing(false);
-    }
-  };
 
   const refreshData = async () => {
-    let freshVols = volunteers;
     try {
-      const [usersRes, volsRes, eventsRes, newsRes, partnersRes, galleryRes, statsRes, grantedRes] = await Promise.allSettled([
+      const [usersRes, volsRes, eventsRes, newsRes, partnersRes, galleryRes, statsRes] = await Promise.allSettled([
         dbService.getUsers(),
         dbService.getVolunteers(),
         dbService.getEvents(),
@@ -125,29 +101,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         dbService.getPartners(),
         dbService.getGallery(),
         dbService.getStats(),
-        dbService.getGrantedAdminEmails(),
       ]);
 
-      if (usersRes.status === 'fulfilled' && usersRes.value) {
+      if (usersRes.status === 'fulfilled' && usersRes.value && usersRes.value.length > 0) {
         setUsers(usersRes.value);
       }
-      if (grantedRes.status === 'fulfilled' && grantedRes.value) {
-        setGrantedAdmins(grantedRes.value);
-      }
-      if (volsRes.status === 'fulfilled' && volsRes.value) {
+      if (volsRes.status === 'fulfilled' && volsRes.value && volsRes.value.length > 0) {
         setVolunteers(volsRes.value);
-        freshVols = volsRes.value;
       }
-      if (eventsRes.status === 'fulfilled' && eventsRes.value) {
+      if (eventsRes.status === 'fulfilled' && eventsRes.value && eventsRes.value.length > 0) {
         setEvents(eventsRes.value);
       }
-      if (newsRes.status === 'fulfilled' && newsRes.value) {
+      if (newsRes.status === 'fulfilled' && newsRes.value && newsRes.value.length > 0) {
         setNews(newsRes.value);
       }
-      if (partnersRes.status === 'fulfilled' && partnersRes.value) {
+      if (partnersRes.status === 'fulfilled' && partnersRes.value && partnersRes.value.length > 0) {
         setPartners(partnersRes.value);
       }
-      if (galleryRes.status === 'fulfilled' && galleryRes.value) {
+      if (galleryRes.status === 'fulfilled' && galleryRes.value && galleryRes.value.length > 0) {
         setGallery(galleryRes.value);
       }
       if (statsRes.status === 'fulfilled' && statsRes.value) {
@@ -158,30 +129,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     }
 
     // Fetch live rows from Google Sheets API
+    setIsLoadingLiveSheets(true);
     try {
       const sheetRes = await fetchDataFromSheets(appScriptUrl);
-      if (sheetRes.success && sheetRes.rows && sheetRes.rows.length > 0) {
+      if (sheetRes.success && sheetRes.rows.length > 0) {
         setLiveSheetRows(sheetRes.rows);
       } else {
-        // Fallback to local volunteer list if the sheet is currently empty or unreachable.
-        setLiveSheetRows((freshVols.length > 0 ? freshVols : INITIAL_VOLUNTEERS).map((v, idx) => ({
+        // Fallback to local volunteer list if sheet is currently empty
+        setLiveSheetRows((volunteers.length > 0 ? volunteers : INITIAL_VOLUNTEERS).map((v, idx) => ({
           stt: idx + 1,
-          adminRole: v.fullName?.includes('Admin') ? '(Admin)' : '',
-          registeredAt: v.registeredAt ? new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : '',
-          fullName: v.fullName || '',
-          phone: v.phone || '',
-          email: v.email || '',
-          city: v.city || '',
-          birthYear: normalizeBirthYear(v.birthYear),
-          eventName: v.eventName || '',
-          skills: (Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')),
+          adminRole: v.fullName.includes('Admin') ? '(Admin)' : '',
+          registeredAt: new Date(v.registeredAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+          fullName: v.fullName,
+          phone: v.phone,
+          email: v.email,
+          city: v.city,
+          ageGroup: formatBirthYear(v.ageGroup),
+          eventName: v.eventName,
+          skills: (v.skills || []).join(', '),
           status: v.status || 'Approved',
-          notes: v.notes || '',
-          localId: v.id
+          notes: v.notes || ''
         })));
       }
     } catch {
       // ignore
+    } finally {
+      setIsLoadingLiveSheets(false);
     }
   };
 
@@ -203,58 +176,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     }
   };
 
-  const handleGrantAdmin = async (name: string, email: string) => {
-    if (!window.confirm(`Cấp quyền Admin cho "${name}" (${email})?\n\nTài khoản này sẽ thấy đúng vai trò Admin từ lần đăng nhập tiếp theo.`)) return;
-    setGrantingEmail(email);
-    try {
-      await dbService.grantAdmin(email);
-      refreshData();
-    } finally {
-      setGrantingEmail(null);
-    }
-  };
-
-  const handleRevokeAdmin = async (name: string, email: string) => {
-    if (!window.confirm(`Thu hồi quyền Admin của "${name}" (${email})?\n\nTài khoản sẽ trở về vai trò thường từ lần đăng nhập tiếp theo.`)) return;
-    setGrantingEmail(email);
-    try {
-      await dbService.revokeAdmin(email);
-      refreshData();
-    } finally {
-      setGrantingEmail(null);
-    }
-  };
-
   // Volunteer CRUD
   const handleDeleteVolunteer = async (id: string) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa bản ghi tình nguyện viên này khỏi CSDL?')) return;
-    const volunteer = volunteers.find((v) => v.id === id);
-    await dbService.deleteVolunteer(id);
-    // Keep the real Google Sheet in sync — find the matching row (by
-    // email/phone, since the sheet has no local db id) and remove it too.
-    if (volunteer) {
-      try {
-        const rowNumber = await findSheetRowNumber(volunteer, appScriptUrl);
-        if (rowNumber) await deleteRowFromGoogleSheets(rowNumber, appScriptUrl);
-      } catch {
-        // best-effort — the DB delete already succeeded either way
-      }
+    if (window.confirm('Bạn có chắc chắn muốn xóa bản ghi tình nguyện viên này khỏi CSDL?')) {
+      await dbService.deleteVolunteer(id);
+      refreshData();
     }
-    refreshData();
   };
 
   const handleUpdateVolunteerStatus = async (id: string, status: VolunteerRegistration['status']) => {
-    const volunteer = volunteers.find((v) => v.id === id);
     await dbService.updateVolunteer(id, { status });
-    // Keep the real Google Sheet's TRẠNG THÁI column (J) in sync too.
-    if (volunteer) {
-      try {
-        const rowNumber = await findSheetRowNumber(volunteer, appScriptUrl);
-        if (rowNumber) await updateCellInGoogleSheets(`J${rowNumber}`, status, appScriptUrl);
-      } catch {
-        // best-effort — the DB update already succeeded either way
-      }
-    }
     refreshData();
   };
 
@@ -285,7 +216,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       `'${v.phone || ''}`,
       `"${(v.email || '').replace(/"/g, '""')}"`,
       `"${(v.city || '').replace(/"/g, '""')}"`,
-      `"${normalizeBirthYear(v.birthYear)}"`,
+      `"${formatBirthYear(v.ageGroup)}"`,
       `"${(v.eventName || '').replace(/"/g, '""')}"`,
       `"${(Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || '')).replace(/"/g, '""')}"`,
       v.status || 'Approved',
@@ -312,7 +243,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       v.phone,
       v.email,
       v.city,
-      normalizeBirthYear(v.birthYear),
+      formatBirthYear(v.ageGroup),
       v.eventName,
       Array.isArray(v.skills) ? v.skills.join(', ') : (v.skills || ''),
       v.status || 'Approved',
@@ -354,7 +285,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   const handleClearAllSheetData = async () => {
     const confirmed = window.confirm(
-      `Bạn sắp XÓA VĨNH VIỄN toàn bộ ${displayRows.length} dòng dữ liệu trong Google Sheet thật VÀ trong CSDL nội bộ (chỉ giữ lại dòng tiêu đề trên Sheet). Hành động này KHÔNG THỂ hoàn tác. Tiếp tục?`
+      `Bạn sắp XÓA VĨNH VIỄN toàn bộ ${displayRows.length} dòng dữ liệu trong Google Sheet thật (chỉ giữ lại dòng tiêu đề). Hành động này KHÔNG THỂ hoàn tác. Tiếp tục?`
     );
     if (!confirmed) return;
 
@@ -363,10 +294,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
     try {
       const res = await clearAllVolunteersFromGoogleSheets(appScriptUrl);
       if (res.success) {
-        // Xóa Tất Cả phải xóa sạch cả 2 nơi, không chỉ Sheet — nếu không,
-        // CSDL nội bộ vẫn còn dữ liệu và sẽ hiện lại ngay qua chế độ dự phòng.
-        await Promise.all(volunteers.map((v) => dbService.deleteVolunteer(v.id)));
-        setSyncResultMsg({ text: '✓ Đã xóa toàn bộ dữ liệu trên Google Sheets và CSDL nội bộ!' });
+        setSyncResultMsg({ text: '✓ Đã xóa toàn bộ dữ liệu trên Google Sheets!' });
         setLiveSheetRows([]);
         refreshData();
       } else {
@@ -376,40 +304,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       setSyncResultMsg({ text: `⚠ ${err?.message || 'Lỗi khi xóa dữ liệu'}`, isError: true });
     } finally {
       setIsClearingSheet(false);
-      setTimeout(() => setSyncResultMsg(null), 5000);
-    }
-  };
-
-  const handleDeleteSheetRow = async (row: SheetVolunteerRow, rowKey: number) => {
-    const label = row.fullName || 'dòng này';
-    if (!window.confirm(`Xóa vĩnh viễn đăng ký của "${label}"? Hành động này không thể hoàn tác.`)) return;
-
-    setDeletingRowKey(rowKey);
-    setSyncResultMsg(null);
-    try {
-      if (row.sheetRowNumber) {
-        const res = await deleteRowFromGoogleSheets(row.sheetRowNumber, appScriptUrl);
-        if (!res.success) throw new Error(res.message || 'Lỗi khi xóa trên Google Sheets');
-        setLiveSheetRows((prev) => prev.filter((r) => r.sheetRowNumber !== row.sheetRowNumber));
-        // A live sheet row was appended alongside a local DB record too
-        // (dual-write on registration) — find and remove that match so it
-        // doesn't linger and reappear via fallback display later.
-        const matchingLocal = volunteers.find((v) =>
-          (!!row.email && v.email?.trim().toLowerCase() === row.email.trim().toLowerCase()) ||
-          (!!row.phone && v.phone?.trim() === row.phone.trim())
-        );
-        if (matchingLocal) await dbService.deleteVolunteer(matchingLocal.id);
-      } else if (row.localId) {
-        await dbService.deleteVolunteer(row.localId);
-        const rowNumber = await findSheetRowNumber(row, appScriptUrl).catch(() => null);
-        if (rowNumber) await deleteRowFromGoogleSheets(rowNumber, appScriptUrl);
-      }
-      setSyncResultMsg({ text: `✓ Đã xóa "${label}"` });
-      refreshData();
-    } catch (err: any) {
-      setSyncResultMsg({ text: `⚠ ${err?.message || 'Lỗi khi xóa dòng dữ liệu'}`, isError: true });
-    } finally {
-      setDeletingRowKey(null);
       setTimeout(() => setSyncResultMsg(null), 5000);
     }
   };
@@ -429,12 +323,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
       phone: v.phone,
       email: v.email,
       city: v.city,
-      birthYear: normalizeBirthYear(v.birthYear),
+      ageGroup: formatBirthYear(v.ageGroup),
       eventName: v.eventName,
       skills: (v.skills || []).join(', '),
       status: v.status || 'Approved',
-      notes: v.notes || '',
-      localId: v.id
+      notes: v.notes || ''
     })));
 
   const filteredVolunteers = volunteers.filter(v => {
@@ -450,12 +343,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   if (!isOpen) return null;
 
-  return typeof document !== 'undefined' ? createPortal(
-    <div className="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-150">
+  return typeof document !== 'undefined' ? (
+    <>
+      {createPortal(
+        <div className="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-150">
       <div
         className="relative bg-slate-950 text-slate-100 rounded-3xl max-w-6xl w-full h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-slate-700 animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
+
         {/* 1. KHUNG VIỀN & HEADER CHÍNH (GRADIENT ĐỎ/TÍM SANG TRỌNG) */}
         <div className="bg-gradient-to-r from-[#990033] via-[#6A0DAD] to-[#120E2E] px-6 py-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0 shadow-lg">
           <div className="flex items-center gap-3.5">
@@ -479,12 +375,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
           <div className="flex items-center gap-2">
             <button
-              onClick={handleManualRefresh}
-              disabled={isManualRefreshing}
-              title="Làm mới dữ liệu từ CSDL & Google Sheets"
-              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 active:scale-95 disabled:opacity-75 rounded-xl transition-all cursor-pointer border border-white/15 flex items-center justify-center"
+              onClick={refreshData}
+              title="Làm mới dữ liệu từ Google Sheets"
+              className="p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition-colors cursor-pointer border border-white/15"
             >
-              <RefreshCw className={`w-4 h-4 ${isManualRefreshing ? 'animate-spin text-emerald-300' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoadingLiveSheets ? 'animate-spin' : ''}`} />
             </button>
             <button
               id="close-db-admin-btn"
@@ -686,18 +581,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                         <th className="py-2.5 px-3 border-r border-white/20 min-w-[180px] text-center">
                           <span className="text-[10px] font-bold uppercase">Kỹ Năng</span>
                         </th>
-                        <th className="py-2.5 px-3 border-r border-white/20 text-center min-w-[110px]">
+                        <th className="py-2.5 px-3 text-center min-w-[110px]">
                           <span className="text-[10px] font-bold uppercase">Trạng Thái</span>
-                        </th>
-                        <th className="py-2.5 px-3 text-center min-w-[80px]">
-                          <span className="text-[10px] font-bold uppercase">Thao Tác</span>
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 font-mono text-[11px]">
                       {displayRows.length === 0 ? (
                         <tr>
-                          <td colSpan={11} className="py-12 text-center text-slate-500 font-sans">
+                          <td colSpan={10} className="py-12 text-center text-slate-500 font-sans">
                             <div className="text-sm font-bold text-slate-700 mb-1">Chưa có dữ liệu hàng trong bảng tính</div>
                             <p className="text-xs text-slate-400">Khi có thành viên đăng ký, hàng dữ liệu mới sẽ xuất hiện tự động tại đây!</p>
                           </td>
@@ -735,9 +627,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans text-slate-800">
                               {v.city}
                             </td>
-                            {/* G: Năm Sinh */}
+                            {/* G: Độ Tuổi */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-bold text-slate-700">
-                              {normalizeBirthYear(v.birthYear)}
+                              {formatBirthYear(v.ageGroup)}
                             </td>
                             {/* H: Dự Án / Chiến Dịch (Màu tím/hồng đậm) */}
                             <td className="py-2 px-3 border-r border-slate-200 text-center font-sans font-semibold text-purple-800">
@@ -748,25 +640,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                               {v.skills}
                             </td>
                             {/* J: Trạng Thái (Badge màu xanh lá cây bo góc Approved) */}
-                            <td className="py-2 px-3 border-r border-slate-200 text-center">
+                            <td className="py-2 px-3 text-center">
                               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-sans bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs inline-block">
                                 Approved
                               </span>
-                            </td>
-                            {/* Thao Tác: xóa từng người */}
-                            <td className="py-2 px-3 text-center">
-                              <button
-                                onClick={() => handleDeleteSheetRow(v, idx)}
-                                disabled={deletingRowKey === idx}
-                                title="Xóa đăng ký này"
-                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {deletingRowKey === idx ? (
-                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                )}
-                              </button>
                             </td>
                           </tr>
                         ))
@@ -810,10 +687,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     ) : (
                       users.map((u) => {
                         const hasPassword = u.hasPassword;
-                        const email = (u.email || '').trim().toLowerCase();
-                        const isGranted = !!email && grantedAdmins.includes(email);
-                        const isPendingAdmin = isGranted && u.role !== 'admin';
-                        const isBusy = grantingEmail === email;
                         return (
                           <tr key={u.id} className="hover:bg-slate-800/40 transition-colors">
                             <td className="py-3 px-4 font-bold text-white">
@@ -831,46 +704,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                                 </span>
                               )}
                             </td>
-                            <td className="py-3 px-4 text-slate-300 font-mono">
-                              <div>{u.role}</div>
-                              {isPendingAdmin && (
-                                <span className="mt-1 inline-block px-2 py-0.5 rounded-full text-[10px] font-bold font-sans bg-amber-100 text-amber-800 border border-amber-300">
-                                  ⏳ Chờ đăng nhập lại để có quyền Admin
-                                </span>
-                              )}
-                            </td>
+                            <td className="py-3 px-4 text-slate-300 font-mono">{u.role}</td>
                             <td className="py-3 px-4 text-slate-400">{u.joinedAt}</td>
                             <td className="py-3 px-4 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
-                                {email && (
-                                  u.role === 'admin' || isGranted ? (
-                                    <button
-                                      onClick={() => handleRevokeAdmin(u.name, email)}
-                                      disabled={isBusy}
-                                      className="p-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                                      title="Thu hồi quyền Admin"
-                                    >
-                                      {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldOff className="w-3.5 h-3.5" />}
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={() => handleGrantAdmin(u.name, email)}
-                                      disabled={isBusy}
-                                      className="p-1.5 bg-emerald-950/60 hover:bg-emerald-900 text-emerald-400 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                                      title="Cấp quyền Admin"
-                                    >
-                                      {isBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-                                    </button>
-                                  )
-                                )}
-                                <button
-                                  onClick={() => handleDeleteAccount(u.id)}
-                                  className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg transition-colors cursor-pointer"
-                                  title="Xóa tài khoản"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
+                              <button
+                                onClick={() => handleDeleteAccount(u.id)}
+                                className="p-1.5 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-lg transition-colors cursor-pointer"
+                                title="Xóa tài khoản"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </td>
                           </tr>
                         );
@@ -937,7 +780,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                           <div className="text-slate-400 text-[11px]">{v.city}</div>
                         </td>
                         <td className="py-3 px-4 text-slate-300">
-                          <div className="font-bold text-emerald-400">{normalizeBirthYear(v.birthYear)}</div>
+                          <div className="font-bold text-emerald-400">{formatBirthYear(v.ageGroup)}</div>
                           <div className="text-slate-400 text-[11px]">{(v.skills || []).join(', ')}</div>
                         </td>
                         <td className="py-3 px-4">
@@ -984,6 +827,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                   <div key={evt.id} className="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start mb-2">
+                        <span className="bg-pink-950 text-pink-300 border border-pink-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+                          {evt.category}
+                        </span>
                         <span className="text-xs text-slate-400 font-mono">{evt.date} • {evt.time}</span>
                       </div>
                       <h5 className="font-bold text-base text-white">{evt.title}</h5>
@@ -1012,19 +858,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           {/* TAB 3: NEWS */}
           {activeTab === 'news' && (
             <div className="space-y-4">
-              <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
                 <div>
                   <h4 className="font-bold text-base text-white">Tin Tức &amp; Báo Chí Viết Về Chúng Tôi</h4>
                   <p className="text-xs text-slate-400 mt-0.5">Bài viết được đăng và chỉnh sửa trên Decap CMS (đăng nhập bằng GitHub).</p>
                 </div>
                 <a
-                  href="/admin/index.html"
+                  href="/admin/index.html#/collections/news/new"
                   target="_blank"
                   rel="noreferrer"
-                  className="px-3.5 py-2 bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shrink-0"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Mở Decap CMS</span>
+                  <Plus className="w-4 h-4" />
+                  <span>Thêm bài viết</span>
                 </a>
               </div>
               <div className="space-y-3">
@@ -1041,8 +887,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                       href={`/admin/index.html#/collections/news/entries/${encodeURIComponent(item.slug)}`}
                       target="_blank"
                       rel="noreferrer"
-                      title="Sửa trên Decap CMS"
-                      className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-colors cursor-pointer"
+                      className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer shrink-0"
+                      title="Sửa bài viết trên Decap CMS"
                     >
                       <Edit3 className="w-4 h-4" />
                     </a>
@@ -1095,7 +941,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
       </div>
     </div>,
-    document.body
+        document.body
+      )}
+    </>
   ) : null;
 };
 

@@ -27,7 +27,7 @@ const CACHE_TTL_MS = 60 * 1000;
 
 const repoPath = (p: string) => (REPO_APP_DIR ? `${REPO_APP_DIR}/${p}` : p);
 
-type ArticleFile = Partial<Omit<NewsArticle, 'id' | 'slug' | 'content' | 'views'>>;
+type ArticleFile = Partial<Omit<NewsArticle, 'slug' | 'content' | 'views'>>;
 
 function toArticle(fileName: string, doc: ArticleFile): NewsArticle {
   const slug = fileName.replace(/\.json$/i, '');
@@ -35,7 +35,9 @@ function toArticle(fileName: string, doc: ArticleFile): NewsArticle {
     (b): b is NewsContentBlock => !!b && (b.type === 'text' || b.type === 'image') && typeof b.value === 'string' && b.value !== ''
   );
   return {
-    id: `news-${slug}`,
+    // Articles migrated from the database keep their original id, since the
+    // homepage news picker stores selections by id.
+    id: doc.id || `news-${slug}`,
     slug,
     title: doc.title || slug,
     category: doc.category || 'News',

@@ -16,7 +16,7 @@ export function useAutoTranslate(text: string): string {
     let cancelled = false;
     setDisplayText(text);
 
-    if (language === 'vi' || !text?.trim()) return;
+    if (!text?.trim()) return;
 
     translateText(text, language).then((translated) => {
       if (!cancelled) setDisplayText(translated);
@@ -43,7 +43,7 @@ export function useAutoTranslateList(items: string[]): string[] {
     let cancelled = false;
     setDisplayItems(items);
 
-    if (language === 'vi' || items.length === 0) return;
+    if (items.length === 0) return;
 
     translateText(joined, language).then((translated) => {
       if (cancelled) return;

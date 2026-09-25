@@ -2,31 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { Partner } from '../../types';
 import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { 
-  Sparkles, 
-  Building2, 
-  ExternalLink, 
-  Handshake, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  ShieldCheck, 
-  Globe, 
-  ZoomIn, 
-  ZoomOut, 
-  ArrowLeft, 
-  ArrowRight, 
-  Move, 
-  Sliders,
-  RotateCcw
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  Globe,
+  ZoomIn,
+  ZoomOut,
+  ArrowLeft,
+  ArrowRight,
+  Move
 } from 'lucide-react';
 import { PartnerEditorModal } from '../PartnerEditorModal';
 import { EditableText } from '../EditableText';
+import { EditableImage } from '../EditableImage';
+import { TakeActionStrip } from '../TakeActionStrip';
 
-export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onBecomePartner }) => {
+const BRAND_PINK = '#F1138D';
+
+export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => {
   const { isAdmin } = useAuth();
-  const { language } = useLanguage();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -58,7 +53,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
   };
 
   const handleDelete = (partner: Partner) => {
-    if (window.confirm(language === 'vi' ? `Bạn có chắc chắn muốn xóa đối tác "${partner.name}"?` : `Are you sure you want to delete partner "${partner.name}"?`)) {
+    if (window.confirm(`Are you sure you want to delete partner "${partner.name}"?`)) {
       dbService.deletePartner(partner.id);
       loadPartners();
     }
@@ -132,39 +127,43 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
   };
 
   return (
-    <div className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+    <div className="bg-white">
+
+      {/* Full-width hero banner */}
+      <EditableImage
+        contentKey="ourPartners.heroImage"
+        defaultValue="/images/our-partners/hero.jpg"
+        alt="Let's Do It Vietnam volunteers"
+        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        className="w-full h-full object-cover"
+      />
+
+      <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+
+        <div className="text-center max-w-6xl mx-auto space-y-3">
           <EditableText
             contentKey="ourPartners.title"
             defaultValue="We Work With the Best Partners"
             as="h1"
-            className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#E81A7F] tracking-tight leading-tight [text-wrap:balance]"
+            className="ref-heading text-2xl sm:text-3xl lg:text-[45px] [text-wrap:balance]"
+            render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
             contentKey="ourPartners.subtitle"
             defaultValue="Working with strong partners can make a significant impact."
             as="p"
-            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
+            className="ref-body text-sm sm:text-base text-slate-600"
           />
           <EditableText
-            contentKey="ourPartners.description"
-            defaultValue="We collaborate with local communities, schools, and businesses to organize large-scale clean-up campaigns. We partners with companies to promote sustainable practices within their operations."
+            contentKey="ourPartners.desc"
+            defaultValue="We collaborate with local communities, schools, and businesses to organize large-scale clean-up campaigns. We partner with companies to promote sustainable practices within their operations."
             as="p"
             multiline
-            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl mx-auto [text-wrap:balance]"
+            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
           />
 
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={onBecomePartner}
-              className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-sm px-8 py-3 rounded-full shadow-lg transition-all cursor-pointer"
-            >
-              <EditableText contentKey="ourPartners.becomePartnerBtn" defaultValue="Become a Partner" as="span" />
-            </button>
-
-            {isAdmin && (
+          {isAdmin && (
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={handleAddNew}
                 className="inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer"
@@ -172,8 +171,8 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                 <Plus className="w-4 h-4" />
                 <span>Add Partner / Sponsor</span>
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Interactive Resize & Drag-and-Drop Control Bar */}
@@ -181,7 +180,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
           <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
             <div className="flex items-center gap-2 text-slate-700 font-bold">
               <Move className="w-4 h-4 text-[#E81A7F]" />
-              <span>🖐 Drag and drop any logo to reposition it</span>
+              <span>🖐 Drag any logo to reorder it</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-5">
@@ -319,7 +318,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleEdit(p);
                       }}
-                      title={language === 'vi' ? "Sửa logo & link" : "Edit logo & link"}
+                      title="Edit logo & link"
                       className="p-1 text-slate-700 hover:text-[#E81A7F] rounded transition-colors cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -333,7 +332,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
                         e.stopPropagation();
                         handleDelete(p);
                       }}
-                      title={language === 'vi' ? "Xóa đối tác" : "Delete partner"}
+                      title="Delete partner"
                       className="p-1 text-slate-700 hover:text-red-600 rounded transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -374,6 +373,8 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = ({ onB
         </div>
 
       </div>
+
+      <TakeActionStrip contentKeyPrefix="ourPartners" />
 
       {/* Partner Editor Modal */}
       <PartnerEditorModal

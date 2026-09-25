@@ -50,6 +50,8 @@ collections:
     summary: '{{date}} · {{title}}'
     sortable_fields: [date, title]
     fields:
+      # Original database id of migrated articles (homepage picker stores ids).
+      - { label: ID, name: id, widget: hidden, required: false }
       - { label: Tiêu đề, name: title, widget: string }
       - label: Chuyên mục
         name: category

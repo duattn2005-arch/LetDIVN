@@ -1,15 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { DatabaseSync } from 'node:sqlite';
+import Database from 'better-sqlite3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, '..', 'data');
 fs.mkdirSync(dataDir, { recursive: true });
 
-export const db = new DatabaseSync(path.join(dataDir, 'app.db'));
-db.exec('PRAGMA journal_mode = WAL;');
-db.exec('PRAGMA foreign_keys = ON;');
+export const db = new Database(path.join(dataDir, 'app.db'));
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 
 // Every content collection is stored as {id, created_at, [sort_order], data JSON}.
 // This mirrors the shape each row already had as a JSON object in localStorage,
@@ -72,25 +72,17 @@ db.exec(`
     data TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS who_we_are_sections (
+    id TEXT PRIMARY KEY,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    data TEXT NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS media_coverage (
     id TEXT PRIMARY KEY,
     sort_order INTEGER NOT NULL DEFAULT 0,
     data TEXT NOT NULL
   );
-
-  CREATE TABLE IF NOT EXISTS who_we_are (
-    id TEXT PRIMARY KEY,
-    sort_order INTEGER NOT NULL DEFAULT 0,
-    data TEXT NOT NULL
-  );
-
-  CREATE TABLE IF NOT EXISTS campaign_sections (
-    id TEXT PRIMARY KEY,
-    page TEXT NOT NULL,
-    created_at INTEGER NOT NULL,
-    data TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_campaign_sections_page ON campaign_sections(page);
 
   CREATE TABLE IF NOT EXISTS site_content (
     key TEXT PRIMARY KEY,

@@ -67,14 +67,15 @@ export const Header: React.FC<HeaderProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Projects dropdown: purely informational campaign pages — registration
-  // and schedule tracking lives under Other -> Join As Volunteer instead.
-  const projectItems: { title: string; view: string }[] = [
-    { title: t.projectWcd, view: 'world-cleanup-day' },
-    { title: t.projectEnvDay, view: 'environmental-day' },
-    { title: t.projectGreenOcean, view: 'green-ocean-campaign' },
-    { title: t.projectYoungWildlife, view: 'young-conservationists' },
-    { title: t.projectWorkshop, view: 'community-workshop' },
+  // Navigate by category (not a hardcoded event id) so this always resolves
+  // to whichever live event currently has that category, however its id
+  // was generated.
+  const projectItems = [
+    { title: t.projectWcd, id: 'World Cleanup Day' },
+    { title: t.projectEnvDay, id: 'Environmental Day' },
+    { title: t.projectGreenOcean, id: 'Green Ocean Campaign' },
+    { title: t.projectYoungWildlife, id: 'Wildlife & Nature' },
+    { title: t.projectWorkshop, id: 'Workshop & Education' }
   ];
 
   return (
@@ -114,16 +115,16 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 text-slate-300 shrink-0 z-10 bg-slate-900 pl-2 shadow-[-10px_0_15px_rgba(15,23,42,0.9)]">
-            {/* Database Admin Button */}
+            {/* Database Admin Button — admin-only, was previously visible to every visitor */}
             {isAdmin && (
-              <button
-                id="top-bar-db-btn"
-                onClick={onOpenDbAdmin}
-                className="hidden sm:flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer bg-purple-900/60 hover:bg-purple-800 text-purple-200 px-2.5 py-0.5 rounded text-[11px] border border-purple-700/50"
-              >
-                <Database className="w-3 h-3 text-[#E81A7F]" />
-                <span className="font-bold">{t.adminDb}</span>
-              </button>
+            <button 
+              id="top-bar-db-btn"
+              onClick={onOpenDbAdmin}
+              className="hidden sm:flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer bg-purple-900/60 hover:bg-purple-800 text-purple-200 px-2.5 py-0.5 rounded text-[11px] border border-purple-700/50"
+            >
+              <Database className="w-3 h-3 text-[#E81A7F]" />
+              <span className="font-bold">{t.adminDb}</span>
+            </button>
             )}
           </div>
         </div>
@@ -154,26 +155,16 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Nav Items: shown from xl (1280px), same as before — this is the
-              width the site is actually used at, so it must always be visible here
-              rather than falling back to the hamburger menu. To guarantee no
-              language can ever overlap the language/auth controls (translations
-              vary a lot in length — French runs much longer than Vietnamese),
-              each label has a capped max-width with ellipsis truncation instead of
-              relying on padding trims alone: the nav's total width is now bounded
-              regardless of translation length, so it can never push past its box.
-              Short labels (Vietnamese, English, ...) display in full since they
-              never reach their cap; only unusually long ones clip with "…". */}
-          <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-1 2xl:gap-2.5 text-[12px] xl:text-[13px] 2xl:text-[14px] font-semibold overflow-visible no-scrollbar mx-2 2xl:mx-4">
+          {/* Desktop Nav Items: Centered and well-spaced across the available width */}
+          <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-2 xl:gap-3.5 2xl:gap-5 text-[14px] xl:text-[15px] 2xl:text-[16px] font-semibold overflow-visible no-scrollbar mx-2 2xl:mx-4">
 
             {/* 1. Who We Are */}
             <button
               id="nav-who-we-are"
               onClick={() => onNavigate('who-we-are')}
-              title={t.navWhoWeAre}
-              className={`shrink-0 max-w-[118px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'who-we-are'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'who-we-are' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -184,10 +175,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-what-we-do"
               onClick={() => onNavigate('what-we-do')}
-              title={t.navWhatWeDo}
-              className={`shrink-0 max-w-[130px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'what-we-do'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'what-we-do' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -198,10 +188,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-team"
               onClick={() => onNavigate('our-team')}
-              title={t.navOurTeam}
-              className={`shrink-0 max-w-[82px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'our-team'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'our-team' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -212,10 +201,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-partners"
               onClick={() => onNavigate('our-partners')}
-              title={t.navOurPartners}
-              className={`shrink-0 max-w-[100px] min-[1366px]:max-w-none truncate px-2 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'our-partners'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'our-partners' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
               }`}
             >
@@ -227,30 +215,18 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-other-dropdown-btn"
                 onClick={() => setOtherDropdownOpen(!otherDropdownOpen)}
-                title={t.navOther}
-                className={`shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all cursor-pointer ${
+                className={`shrink-0 flex items-center gap-1.5 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                   currentView === 'media-on-us' || currentView === 'news' || currentView === 'gallery' || currentView === 'videos'
                     ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}
               >
-                <span className="max-w-[70px] min-[1366px]:max-w-none truncate">{t.navOther}</span>
-                <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${otherDropdownOpen ? 'rotate-180' : ''}`} />
+                <span>{t.navOther}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${otherDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {otherDropdownOpen && (
                 <div className="absolute top-full left-0 mt-1.5 w-60 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-[100] animate-in fade-in-50 slide-in-from-top-2 duration-150">
-                  <button
-                    onClick={() => {
-                      onNavigate('projects');
-                      setOtherDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-[#E81A7F] hover:bg-pink-50/60 font-bold transition-colors cursor-pointer flex items-center justify-between"
-                  >
-                    <EditableText contentKey="header.otherJoinVolunteer" defaultValue="Join As Volunteer" as="span" />
-                    <span className="text-[10px] font-bold">→</span>
-                  </button>
-                  <div className="border-t border-slate-100 my-1"></div>
                   <button
                     onClick={() => {
                       onNavigate('media-on-us');
@@ -300,15 +276,14 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-projects-dropdown-btn"
                 onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
-                title={t.navProject}
-                className={`shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all cursor-pointer ${
-                  projectItems.some((item) => item.view === currentView)
-                    ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
+                className={`shrink-0 flex items-center gap-1.5 px-3.5 2xl:px-4.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  currentView === 'projects' || currentView === 'project-detail'
+                    ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}
               >
-                <span className="max-w-[80px] min-[1366px]:max-w-none truncate">{t.navProject}</span>
-                <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${projectsDropdownOpen ? 'rotate-180' : ''}`} />
+                <span>{t.navProject}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${projectsDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {projectsDropdownOpen && (
@@ -318,16 +293,12 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                   {projectItems.map((item) => (
                     <button
-                      key={item.view}
+                      key={item.id}
                       onClick={() => {
-                        onNavigate(item.view);
+                        onNavigate('project-detail', item.id);
                         setProjectsDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-between ${
-                        currentView === item.view
-                          ? 'text-[#E81A7F] bg-pink-50'
-                          : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60'
-                      }`}
+                      className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60 font-semibold transition-colors cursor-pointer flex items-center justify-between"
                     >
                       <span className="truncate pr-2">• {item.title}</span>
                       <span className="text-[10px] text-pink-500 font-bold shrink-0">→</span>
@@ -337,25 +308,25 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            {/* 7. Real Cleanup Map */}
+            {/* 7. Real Cleanup Map (Pin Icon Badge) */}
             <button
               id="nav-cleanup-map"
               onClick={() => onNavigate('map')}
               title={t.navMap}
-              className={`shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-xl transition-all cursor-pointer ${
-                currentView === 'map'
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs'
+              className={`shrink-0 flex items-center gap-1.5 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                currentView === 'map' 
+                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs' 
                   : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/50 font-semibold'
               }`}
             >
-              <MapPin className="w-4.5 h-4.5 shrink-0 text-[#E81A7F]" />
-              <span className="max-w-[80px] min-[1366px]:max-w-none truncate">{t.navMap}</span>
+              <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
+              <span>{t.navMap}</span>
             </button>
 
           </nav>
 
-          {/* Right Action Controls: Auth + Contact Us (language switcher removed — site is English-only now) */}
-          <div className="hidden xl:flex items-center space-x-2 2xl:space-x-3 shrink-0">
+          {/* Right Action Controls: Auth + Contact Us */}
+          <div className="hidden xl:flex items-center space-x-2.5 2xl:space-x-4 shrink-0">
 
             {/* Combined Single Auth Button (Đăng Ký / Đăng Nhập) */}
             {!isAuthenticated ? (
@@ -455,7 +426,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Mobile / Tablet Menu Toggle (Shown when < xl; language switcher removed) */}
+          {/* Mobile / Tablet Menu Toggle (Shown when < xl) */}
           <div className="flex xl:hidden items-center gap-2 shrink-0 z-10">
 
             <button
@@ -507,12 +478,6 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="pt-2 border-t border-slate-100">
               <div className="text-xs font-bold text-slate-400 px-3 uppercase">{t.navOther}</div>
               <button
-                onClick={() => { onNavigate('projects'); setMobileMenuOpen(false); }}
-                className="w-full text-left px-5 py-1.5 text-xs text-[#E81A7F] font-bold hover:underline"
-              >
-                • <EditableText contentKey="header.otherJoinVolunteer" defaultValue="Join As Volunteer" as="span" />
-              </button>
-              <button
                 onClick={() => { onNavigate('media-on-us'); setMobileMenuOpen(false); }}
                 className="w-full text-left px-5 py-1.5 text-xs text-slate-700 hover:text-[#E81A7F]"
               >
@@ -535,13 +500,13 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Projects in Mobile */}
             <div className="pt-2 border-t border-slate-100">
               <div className="text-xs font-bold text-slate-400 px-3 uppercase">{t.navProject}</div>
-              {projectItems.map((item) => (
+              {projectItems.map(p => (
                 <button
-                  key={item.view}
-                  onClick={() => { onNavigate(item.view); setMobileMenuOpen(false); }}
+                  key={p.id}
+                  onClick={() => { onNavigate('project-detail', p.id); setMobileMenuOpen(false); }}
                   className="w-full text-left px-5 py-1.5 text-xs text-slate-700 hover:text-[#E81A7F]"
                 >
-                  • {item.title}
+                  • {p.title}
                 </button>
               ))}
             </div>

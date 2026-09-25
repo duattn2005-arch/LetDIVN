@@ -26,27 +26,6 @@ try {
 let cachedToken: { token: string; expiresAt: number } | null = null;
 const sheetMetaCache: Record<string, { title: string; sheetId: number }> = {};
 
-// Failures here previously vanished silently (client callers treat sheets
-// sync as best-effort and swallow errors) — log server-side so a bad
-// registration write is actually diagnosable instead of just "missing".
-function logSheetsError(endpoint: string, detail: unknown): void {
-  console.error(`[google-sheets] ${endpoint} failed:`, detail);
-}
-
-// Network blips to Google's servers (DNS hiccup, brief ETIMEDOUT) are common
-// enough on a VPS that a single fetch() failure shouldn't immediately fall
-// back to stale/local data — retry a couple of times with a short delay first.
-async function fetchWithRetry(url: string, options: RequestInit, retries = 2, delayMs = 400): Promise<Response> {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      return await fetch(url, options);
-    } catch (err) {
-      if (attempt >= retries) throw err;
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
-  }
-}
-
 async function getGoogleOAuthToken(): Promise<string> {
   if (!SERVICE_ACCOUNT) {
     throw new Error('Missing Google service account credentials. Add a credentials.json file (see .env.example) or set GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.');
@@ -74,7 +53,7 @@ async function getGoogleOAuthToken(): Promise<string> {
   const signature = sign.sign(SERVICE_ACCOUNT.private_key, 'base64url');
   const jwt = `${signatureInput}.${signature}`;
 
-  const res = await fetchWithRetry('https://oauth2.googleapis.com/token', {
+  const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -122,18 +101,16 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         const spreadsheetId = urlObj.searchParams.get('spreadsheetId') || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
         const token = await getGoogleOAuthToken();
         const { title: sheetTitle } = await getFirstSheetMeta(spreadsheetId, token);
-        const sheetsRes = await fetchWithRetry(
+        const sheetsRes = await fetch(
           `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetTitle)}!A1:Z500`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }
         );
         const data = await sheetsRes.json();
-        if (!sheetsRes.ok) logSheetsError('read', data);
         res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(data));
       } catch (err: any) {
-        logSheetsError('read', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -149,7 +126,7 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         const parsed = JSON.parse(body || '{}');
         const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
 
-        // 10 cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, NĂM SINH, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
+        // 10 cột A -> J: ID, THỜI GIAN, HỌ VÀ TÊN, SĐT, EMAIL, ĐỊA CHỈ, TUỔI, DỰ ÁN, KỸ NĂNG, TRẠNG THÁI
         const rowValues = parsed.rowValues || (parsed.name || parsed.fullName ? [
           parsed.id || `VOL-${Date.now().toString().slice(-6)}`,
           parsed.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
@@ -157,7 +134,7 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
           parsed.phone || '',
           parsed.email || '',
           parsed.city || parsed.address || '',
-          parsed.birthYear || '',
+          parsed.age || parsed.ageGroup || '22 tuổi',
           parsed.project || parsed.eventName || 'World Cleanup Day 2026',
           parsed.skills || '',
           parsed.status || 'Approved'
@@ -187,11 +164,9 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const sheetsData = await sheetsRes.json();
-        if (!sheetsRes.ok) logSheetsError('append', sheetsData);
         res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(sheetsData));
       } catch (err: any) {
-        logSheetsError('append', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -232,11 +207,9 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const sheetsData = await sheetsRes.json();
-        if (!sheetsRes.ok) logSheetsError('sync-all', sheetsData);
         res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(sheetsData));
       } catch (err: any) {
-        logSheetsError('sync-all', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -265,11 +238,9 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const clearData = await clearRes.json();
-        if (!clearRes.ok) logSheetsError('clear', clearData);
         res.writeHead(clearRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(clearData));
       } catch (err: any) {
-        logSheetsError('clear', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }
@@ -320,55 +291,9 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         );
 
         const deleteData = await deleteRes.json();
-        if (!deleteRes.ok) logSheetsError('delete-row', deleteData);
         res.writeHead(deleteRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(deleteData));
       } catch (err: any) {
-        logSheetsError('delete-row', err);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err?.message || 'Server error' }));
-      }
-    });
-    return;
-  }
-
-  if (req.url?.startsWith('/api/sheets/update-range') && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const parsed = JSON.parse(body || '{}');
-        const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
-        const range = parsed.range; // e.g. "J5" (one cell) or "A5:J5" (a full row)
-        const values = parsed.values; // 2D array matching that range, e.g. [["Pending"]]
-
-        if (!range || !Array.isArray(values)) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Missing range or values' }));
-          return;
-        }
-
-        const token = await getGoogleOAuthToken();
-        const { title: sheetTitle } = await getFirstSheetMeta(spreadsheetId, token);
-
-        const updateRes = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetTitle)}!${range}?valueInputOption=USER_ENTERED`,
-          {
-            method: 'PUT',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ values }),
-          }
-        );
-
-        const updateData = await updateRes.json();
-        if (!updateRes.ok) logSheetsError('update-range', updateData);
-        res.writeHead(updateRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(updateData));
-      } catch (err: any) {
-        logSheetsError('update-range', err);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
       }

@@ -22,7 +22,7 @@ export interface VolunteerRegistration {
   city: string;
   eventId: string;
   eventName: string;
-  birthYear: string;
+  ageGroup: string;
   tshirtSize: 'S' | 'M' | 'L' | 'XL' | 'XXL';
   emergencyContact: string;
   skills: string[];
@@ -54,10 +54,10 @@ export interface CleanupEvent {
   schedule?: { time: string; activity: string }[];
 }
 
-/** One paragraph or one image, in the order they should appear in the article body. */
-export type NewsContentBlock =
-  | { type: 'text'; value: string }
-  | { type: 'image'; value: string };
+export interface NewsContentBlock {
+  type: 'text' | 'image';
+  value: string;
+}
 
 export interface NewsArticle {
   id: string;
@@ -66,16 +66,10 @@ export interface NewsArticle {
   category: 'Media On Us' | 'News' | 'Press Release' | 'Impact Story';
   summary: string;
   content: string;
-  /** Body as freely-orderable text/image blocks. When present, takes over
-   *  rendering from `content`/`images` (kept for older articles / plain-text
-   *  consumers like search). */
   contentBlocks?: NewsContentBlock[];
   author: string;
   date: string;
   image: string;
-  /** Legacy: extra photos shown after the content, for articles saved before
-   *  contentBlocks existed. */
-  images?: string[];
   source?: string;
   sourceUrl?: string;
   views: number;
@@ -96,18 +90,6 @@ export interface Partner {
   email?: string;
   phone?: string;
   scale?: number; // Zoom / Scale percentage (e.g. 100, 120, 80)
-}
-
-// One row on the "Media On Us" page — a year/campaign's press-coverage
-// summary, linking out to a PDF listing the actual articles/segments
-// (matches how the org already tracks this offline, one PDF per campaign).
-export interface MediaCoverageEntry {
-  id: string;
-  title: string; // e.g. "World Cleanup Day 2019" — doubles as the button label
-  image: string;
-  articleCount: number;
-  segmentCount: number;
-  pdfUrl: string;
 }
 
 export interface GalleryItem {
@@ -182,25 +164,20 @@ export interface WhatWeDoItem {
 export interface WhoWeAreItem {
   id: string;
   title: string;
-  content: string;
+  desc: string;
   image: string;
   layout?: 'image-left' | 'image-right';
-  textAlign?: 'left' | 'center' | 'right' | 'justify';
   order?: number;
 }
 
-/** Admin-addable image+text block appended to a campaign info page (World
- * Cleanup Day, Environmental Day, ...). Same shape as WhoWeAreItem, scoped
- * to one page via `page` (e.g. 'world-cleanup-day') so every campaign page
- * can share one collection instead of five near-identical ones. */
-export interface CampaignSection {
+export interface MediaCoverageEntry {
   id: string;
-  page: string;
   title: string;
-  content: string;
+  articleCount: number;
+  segmentCount: number;
   image: string;
-  layout?: 'image-left' | 'image-right';
-  textAlign?: 'left' | 'center' | 'right' | 'justify';
+  pdfUrl: string;
+  order?: number;
 }
 
 

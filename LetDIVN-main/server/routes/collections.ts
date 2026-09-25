@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
 import { getNews } from '../newsContent.js';
-import { events, volunteers, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage, whoWeAre, campaignSections } from '../db/collections.js';
+import { events, volunteers, partners, gallery, team, contacts, videos, whatWeDo, whoWeAreSections, mediaCoverage } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -32,7 +32,7 @@ router.delete('/events/:id', requireAdmin, (req, res) => {
 });
 
 // --- Volunteers (insert/delete keep events.registeredCount in sync) ---
-router.get('/volunteers', requireAdmin, (req, res) => res.json(volunteers.getAll()));
+router.get('/volunteers', (req, res) => res.json(volunteers.getAll()));
 router.post('/volunteers', (req, res) => {
   const body = req.body as Omit<VolunteerRegistration, 'id' | 'registeredAt'>;
   const created = volunteers.insert({ ...body, registeredAt: new Date().toISOString() } as any);
@@ -126,7 +126,7 @@ router.delete('/contacts/:id', requireAdmin, (req, res) => {
 
 // --- Videos ---
 router.get('/videos', (req, res) => res.json(videos.getAll()));
-router.post('/videos', requireAdmin, (req, res) => {
+router.post('/videos', (req, res) => {
   const { youtubeId, title, thumbnailUrl } = req.body || {};
   if (!youtubeId) {
     return res.status(400).json({ error: 'Thiếu mã video YouTube' });
@@ -139,7 +139,7 @@ router.post('/videos', requireAdmin, (req, res) => {
   });
   res.json(created);
 });
-router.delete('/videos/:id', requireAdmin, (req, res) => {
+router.delete('/videos/:id', (req, res) => {
   videos.delete(String(req.params.id));
   res.json({ ok: true });
 });
@@ -160,14 +160,31 @@ router.delete('/what-we-do/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// --- Media Coverage (Media On Us page) ---
+// --- Who We Are (extra sections) ---
+router.get('/who-we-are-sections', (req, res) => res.json(whoWeAreSections.getAll()));
+router.post('/who-we-are-sections', requireAdmin, (req, res) => {
+  const all = whoWeAreSections.getAll();
+  res.json(whoWeAreSections.insert({ ...req.body, order: all.length + 1 }));
+});
+router.put('/who-we-are-sections/:id', requireAdmin, (req, res) => {
+  const updated = whoWeAreSections.update(String(req.params.id), req.body);
+  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
+  res.json(updated);
+});
+router.delete('/who-we-are-sections/:id', requireAdmin, (req, res) => {
+  whoWeAreSections.delete(String(req.params.id));
+  res.json({ ok: true });
+});
+
+// --- Media Coverage (Media on Us entries) ---
 router.get('/media-coverage', (req, res) => res.json(mediaCoverage.getAll()));
 router.post('/media-coverage', requireAdmin, (req, res) => {
-  res.json(mediaCoverage.insert(req.body, { sortOrder: -1 })); // new entries lead the list
+  const all = mediaCoverage.getAll();
+  res.json(mediaCoverage.insert({ ...req.body, order: all.length + 1 }));
 });
 router.put('/media-coverage/:id', requireAdmin, (req, res) => {
   const updated = mediaCoverage.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Item not found' });
+  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
   res.json(updated);
 });
 router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
@@ -175,42 +192,4 @@ router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// --- Who We Are ---
-router.get('/who-we-are', (req, res) => res.json(whoWeAre.getAll()));
-router.post('/who-we-are', requireAdmin, (req, res) => {
-  const all = whoWeAre.getAll();
-  res.json(whoWeAre.insert({ ...req.body, order: all.length + 1 }));
-});
-router.put('/who-we-are/:id', requireAdmin, (req, res) => {
-  const updated = whoWeAre.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Item not found' });
-  res.json(updated);
-});
-router.delete('/who-we-are/:id', requireAdmin, (req, res) => {
-  whoWeAre.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
-// --- Campaign Sections (admin-added blocks on World Cleanup Day, Environmental
-// Day, Green Ocean Campaign, Young Conservationists, Community Workshop) ---
-router.get('/campaign-sections', (req, res) => {
-  const all = campaignSections.getAll();
-  const page = req.query.page;
-  res.json(page ? all.filter((s) => s.page === page) : all);
-});
-router.post('/campaign-sections', requireAdmin, (req, res) => {
-  res.json(campaignSections.insert(req.body));
-});
-router.put('/campaign-sections/:id', requireAdmin, (req, res) => {
-  const updated = campaignSections.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Item not found' });
-  res.json(updated);
-});
-router.delete('/campaign-sections/:id', requireAdmin, (req, res) => {
-  campaignSections.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
 export default router;
-
-

@@ -1,30 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
-import { Calendar, ArrowLeft, Plus, Edit3, Search, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Plus, Edit3, Clock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
-import { TiltCard } from '../TiltCard';
+import { EditableImage } from '../EditableImage';
+import { TakeActionStrip } from '../TakeActionStrip';
+
+interface NewsPageProps {
+  initialCategory?: 'All' | 'Media On Us' | 'News';
+  /** Jump straight to this article's detail view (e.g. clicked from a homepage news card) instead of the list. */
+  initialArticleId?: string;
+}
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 
 // Articles are written and edited in Decap CMS (public/admin/), not on the page.
 const DECAP_NEW_ARTICLE_URL = '/admin/index.html#/collections/news/new';
 const decapEditUrl = (article: NewsArticle) => `/admin/index.html#/collections/news/entries/${encodeURIComponent(article.slug)}`;
 
-interface NewsPageProps {
-  initialCategory?: 'All' | 'Media On Us' | 'News';
-}
-
-export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) => {
+export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', initialArticleId }) => {
   const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState<string>('');
   const [newsList, setNewsList] = useState<NewsArticle[]>([]);
-  const [newsLoaded, setNewsLoaded] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const ARTICLES_PER_PAGE = 9;
+  const PAGE_SIZE = 6;
 
   const categoryMap: Record<string, string> = {
     'All': t.newsCatAll,
@@ -34,15 +42,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     'Impact Story': t.newsCatImpact
   };
 
-  const categories = ['All', 'News', 'Media On Us', 'Press Release', 'Impact Story'];
+  const categories = ['All', 'News', 'Press Release', 'Impact Story'];
 
   const refreshNews = () => {
     dbService.getNews().then((updated) => {
-      setNewsList(updated);
-      setNewsLoaded(true);
+      const sorted = [...updated].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setNewsList(sorted);
       setSelectedArticle((current) => {
         if (!current) return current;
-        return updated.find((a) => a.id === current.id) || current;
+        return sorted.find((a) => a.id === current.id) || current;
       });
     });
   };
@@ -53,23 +61,24 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     return () => unsub();
   }, []);
 
-  // Jump back to page 1 whenever the visible set changes shape, so a filter
-  // or search never leaves the view stranded on a now-empty later page.
+  // Deep-link into one article's detail view (e.g. clicked from a homepage
+  // news card). A ref tracks which id we've already applied so a later
+  // background refresh doesn't keep snapping the user back to it after
+  // they've clicked "Back to List".
+  const appliedArticleIdRef = React.useRef<string | undefined>(undefined);
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCat, search]);
+    if (!initialArticleId || appliedArticleIdRef.current === initialArticleId) return;
+    const found = newsList.find((a) => a.id === initialArticleId);
+    if (found) {
+      setSelectedArticle(found);
+      appliedArticleIdRef.current = initialArticleId;
+    }
+  }, [initialArticleId, newsList]);
 
-  const openArticle = (article: NewsArticle) => {
-    setSelectedArticle(article);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const visibleNews = newsList
-    .filter(n => {
-      if (isAdmin) return true;
-      return n.status !== 'Pending';
-    })
-    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  const visibleNews = newsList.filter(n => {
+    if (isAdmin) return true;
+    return n.status !== 'Pending';
+  });
 
   const filteredNews = visibleNews.filter(n => {
     const matchesCat = selectedCat === 'All' || n.category === selectedCat;
@@ -77,171 +86,140 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
     return matchesCat && matchesSearch;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredNews.length / ARTICLES_PER_PAGE));
-  const safePage = Math.min(currentPage, totalPages);
-  const paginatedNews = filteredNews.slice((safePage - 1) * ARTICLES_PER_PAGE, safePage * ARTICLES_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(filteredNews.length / PAGE_SIZE));
+  const pagedNews = filteredNews.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCat, search]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [totalPages, currentPage]);
 
   const pendingCount = newsList.filter(n => n.status === 'Pending').length;
 
-  if (selectedArticle) {
-    const otherArticles = visibleNews.filter((a) => a.id !== selectedArticle.id).slice(0, 6);
+  return (
+    <div className="bg-white">
 
-    return (
-      <div className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      {/* Full-width hero banner */}
+      <EditableImage
+        contentKey="newsPage.heroImage"
+        defaultValue="/images/news/hero.png"
+        alt="Collected waste"
+        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        className="w-full h-full object-cover"
+      />
 
-            {/* Main article content */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => setSelectedArticle(null)}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
+      <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+
+        {selectedArticle ? (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setSelectedArticle(null)}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <EditableText contentKey="newsPage.backToListBtn" defaultValue={t.newsPageBackToListBtn} as="span" />
+              </button>
+
+              {isAdmin && (
+                <a
+                  href={decapEditUrl(selectedArticle)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
-                  <ArrowLeft className="w-4 h-4" />
-                  <EditableText contentKey="newsPage.backToListBtn" defaultValue={t.newsPageBackToListBtn} as="span" />
-                </button>
-
-                {isAdmin && (
-                  <a
-                    href={decapEditUrl(selectedArticle)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit this article</span>
-                  </a>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                <div className="inline-block bg-[#E81A7F] text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full">
-                  {categoryMap[selectedArticle.category] || selectedArticle.category}
-                </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
-                  {selectedArticle.title}
-                </h1>
-                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                  <span>📅 {selectedArticle.date}</span>
-                  <span>👤 {selectedArticle.author}</span>
-                  {selectedArticle.source && <span>📰 <EditableText contentKey="newsPage.sourceLabel" defaultValue={t.newsPageSourceLabel} as="span" /> {selectedArticle.source}</span>}
-                </div>
-              </div>
-
-              {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
-                <div className="space-y-6">
-                  {selectedArticle.contentBlocks.map((block, index) =>
-                    block.type === 'text' ? (
-                      <p key={index} className="text-base text-slate-700 leading-relaxed whitespace-pre-line">
-                        {block.value}
-                      </p>
-                    ) : (
-                      <div key={index} className="rounded-2xl overflow-hidden shadow-md">
-                        <img src={block.value} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
-                      </div>
-                    )
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="text-base text-slate-700 leading-relaxed space-y-4 whitespace-pre-line">
-                    {selectedArticle.content}
-                  </div>
-
-                  {selectedArticle.images && selectedArticle.images.length > 0 && (
-                    <div className="space-y-4">
-                      {selectedArticle.images.map((url, index) => (
-                        <div key={index} className="rounded-2xl overflow-hidden shadow-md">
-                          <img src={url} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-
-              {selectedArticle.sourceUrl && (
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
-                  <a
-                    href={selectedArticle.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[#E81A7F] font-bold hover:underline"
-                  >
-                    {selectedArticle.source || <EditableText contentKey="newsPage.defaultSourceLabel" defaultValue={t.newsPageDefaultSourceLabel} as="span" />} →
-                  </a>
-                </div>
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit this article</span>
+                </a>
               )}
             </div>
 
-            {/* Sidebar: other articles */}
-            <div className="lg:col-span-1 space-y-4">
-              <h3 className="text-lg font-black text-slate-900">Recent Articles</h3>
-              <div className="space-y-4">
-                {otherArticles.map((a) => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    onClick={() => openArticle(a)}
-                    className="w-full text-left bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all cursor-pointer group"
-                  >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              <div className="lg:col-span-2 space-y-5">
+                <h1 className="ref-body" style={{ color: '#6EC1E4', fontWeight: 600, fontSize: '30px', lineHeight: 1.3 }}>
+                  {selectedArticle.title}
+                </h1>
+                <div className="ref-news-date text-xs">{formatDate(selectedArticle.date)}</div>
+
+                {selectedArticle.contentBlocks && selectedArticle.contentBlocks.length > 0 ? (
+                  <div className="space-y-5">
+                    {selectedArticle.contentBlocks.map((block, i) =>
+                      block.type === 'image' ? (
+                        <img key={i} src={block.value} alt={selectedArticle.title} className="w-full" />
+                      ) : (
+                        <p key={i} className="ref-body whitespace-pre-line" style={{ color: '#7A7A7A', fontSize: '18px', lineHeight: 1.32 }}>
+                          {block.value}
+                        </p>
+                      )
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full" />
+                    <p className="ref-body whitespace-pre-line" style={{ color: '#7A7A7A', fontSize: '18px', lineHeight: 1.32 }}>
+                      {selectedArticle.content}
+                    </p>
+                  </div>
+                )}
+
+                {selectedArticle.sourceUrl && (
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
+                    <a
+                      href={selectedArticle.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#E81A7F] font-bold hover:underline"
+                    >
+                      {selectedArticle.source || <EditableText contentKey="newsPage.defaultSourceLabel" defaultValue={t.newsPageDefaultSourceLabel} as="span" />} →
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-8">
+                {visibleNews.filter((a) => a.id !== selectedArticle.id).slice(0, 5).map((a) => (
+                  <div key={a.id} onClick={() => setSelectedArticle(a)} className="space-y-2 cursor-pointer group">
                     <div className="aspect-16/10 overflow-hidden bg-slate-900">
-                      <img
-                        src={a.image}
-                        alt={a.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      <img src={a.image} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
-                    <div className="p-4 space-y-2">
-                      <h4 className="font-bold text-sm text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
-                        {a.title}
-                      </h4>
-                      <span className="text-xs font-bold text-emerald-600">Read More »</span>
-                      <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-100">{a.date}</div>
+                    <h3 className="ref-news-title text-base leading-snug">{a.title}</h3>
+                    <div className="ref-news-readmore text-xs">
+                      <EditableText contentKey="newsPage.readMoreBtn" defaultValue={t.newsPageReadMoreBtn} as="span" /> »
                     </div>
-                  </button>
+                    <div className="ref-news-date text-xs">{formatDate(a.date)}</div>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-
-        <div className="text-center max-w-4xl mx-auto space-y-4">
+        ) : (
+        <>
+        <div className="text-center max-w-6xl mx-auto space-y-4">
           {selectedCat === 'Media On Us' ? (
             <EditableText
               contentKey="newsPage.titleMedia"
               defaultValue={t.newsPageTitleMedia || 'Press & TV Coverage About Us'}
               as="h1"
-              className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+              className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+              render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
           ) : (
             <EditableText
               contentKey="newsPage.titleDefault"
-              defaultValue={t.newsPageTitleDefault || 'News & Environmental Activities'}
+              defaultValue="News"
               as="h1"
-              className="text-3xl sm:text-4xl lg:text-5xl font-black metallic-title tracking-tight leading-tight [text-wrap:balance]"
+              className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+              render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
           )}
-          <EditableText
-            contentKey="newsPage.subtitle"
-            defaultValue={t.newsPageSubtitle}
-            as="p"
-            className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
-            multiline
-          />
 
           {/* Add Article Button (Admin only) */}
-          <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
-            {isAdmin && (
+          {isAdmin && (
+            <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
               <a
                 href={DECAP_NEW_ARTICLE_URL}
                 target="_blank"
@@ -251,62 +229,27 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                 <Plus className="w-4 h-4" />
                 <span><EditableText contentKey="newsPage.addArticleBtn" defaultValue={t.newsPageAddArticleBtn} as="span" /></span>
               </a>
-            )}
 
-            {isAdmin && pendingCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold px-3.5 py-2.5 rounded-full animate-pulse">
-                <Clock className="w-4 h-4 text-amber-600" />
-                <span>{language === 'vi' ? `Có ${pendingCount} bài viết đang chờ duyệt!` : `${pendingCount} article(s) pending review!`}</span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Filter bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-100">
-          <div className="flex flex-wrap items-center gap-2">
-            {categories.map(c => (
-              <button
-                key={c}
-                onClick={() => setSelectedCat(c)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  selectedCat === c ? 'bg-[#E81A7F] text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-                }`}
-              >
-                {categoryMap[c] || c}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative min-w-[220px]">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-              <input
-                type="text"
-                placeholder={language === 'vi' ? 'Tìm kiếm bài viết...' : language === 'ja' ? '記事を検索...' : 'Search articles...'}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F]"
-              />
+              {pendingCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold px-3.5 py-2.5 rounded-full animate-pulse">
+                  <Clock className="w-4 h-4 text-amber-600" />
+                  <span>{language === 'vi' ? `Có ${pendingCount} bài viết đang chờ duyệt!` : `${pendingCount} article(s) pending review!`}</span>
+                </span>
+              )}
             </div>
-          </div>
+          )}
         </div>
 
         {/* News Grid */}
-        {!newsLoaded ? (
-          <div className="text-center text-sm text-slate-400 py-16">Loading articles...</div>
-        ) : filteredNews.length === 0 ? (
-          <div className="text-center text-sm text-slate-400 py-16">No articles match this filter yet.</div>
-        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {paginatedNews.map(item => {
+          {pagedNews.map(item => {
             const isPending = item.status === 'Pending';
 
             return (
-              <TiltCard
+              <article
                 key={item.id}
-                onClick={() => openArticle(item)}
-                className={`${isPending ? 'ring-2 ring-amber-300/60 bg-amber-50/20' : ''} flex flex-col justify-between group cursor-pointer`}
+                onClick={() => setSelectedArticle(item)}
+                className={`bg-white rounded-3xl border ${isPending ? 'border-amber-400 ring-2 ring-amber-300/60 bg-amber-50/20' : 'border-slate-200/80'} overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer relative`}
               >
                 <div>
                   <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
@@ -315,21 +258,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 bg-[#E81A7F] text-white text-[10px] font-bold uppercase px-3 py-1 rounded-full shadow-xs">
-                      {categoryMap[item.category] || item.category}
-                    </div>
 
                     {/* Status Badge */}
                     {isPending && (
                       <div className="absolute bottom-3 left-3 bg-amber-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         <EditableText contentKey="newsPage.pendingBadge" defaultValue={t.newsPagePendingBadge} as="span" />
-                      </div>
-                    )}
-
-                    {item.source && !isPending && (
-                      <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-md">
-                        <EditableText contentKey="newsPage.sourceLabel" defaultValue={t.newsPageSourceLabel} as="span" /> {item.source}
                       </div>
                     )}
 
@@ -348,73 +282,66 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                     )}
                   </div>
 
-                  <div className="pt-5 pb-2 px-4 space-y-3">
-                    <h3 className="font-bold text-base sm:text-lg text-slate-900 group-hover:text-[#E81A7F] transition-colors leading-snug">
+                  <div className="p-6 space-y-3">
+                    <h3 className="ref-news-title text-base sm:text-lg line-clamp-2 leading-snug">
                       {item.title}
                     </h3>
 
-                    <span className="flex items-center gap-1 text-xs text-slate-400">
-                      <Calendar className="w-3 h-3 text-[#E81A7F]" />
-                      {item.date}
-                    </span>
+                    <div className="ref-news-date text-xs">{formatDate(item.date)}</div>
 
-                    <p className="text-sm text-slate-500 line-clamp-3 leading-relaxed">
+                    <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
                       {item.summary}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-2 px-4 pb-5">
-                  <span className="text-sm font-bold text-emerald-600 group-hover:underline">
+                <div className="px-6 pb-6">
+                  <span className="ref-news-readmore text-xs">
                     <EditableText contentKey="newsPage.readMoreBtn" defaultValue={t.newsPageReadMoreBtn} as="span" /> »
                   </span>
                 </div>
-              </TiltCard>
+              </article>
             );
           })}
         </div>
-        )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-1.5 pt-4">
+          <div className="flex items-center justify-center gap-2 pt-2">
             <button
-              type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={safePage === 1}
-              className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              disabled={currentPage === 1}
+              className="px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" />
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
-                key={page}
-                type="button"
-                onClick={() => setCurrentPage(page)}
-                className={`w-9 h-9 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                  page === safePage
-                    ? 'bg-[#E81A7F] text-white shadow-sm'
-                    : 'text-slate-700 hover:bg-slate-100 border border-slate-200'
+                key={p}
+                onClick={() => setCurrentPage(p)}
+                className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  currentPage === p ? 'bg-[#E81A7F] text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
                 }`}
               >
-                {page}
+                {p}
               </button>
             ))}
             <button
-              type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={safePage === totalPages}
-              className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
+        )}
+        </>
         )}
 
       </div>
 
+      <TakeActionStrip contentKeyPrefix="newsPage" />
     </div>
   );
 };
-
 

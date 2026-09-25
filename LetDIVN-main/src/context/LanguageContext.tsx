@@ -1537,25 +1537,31 @@ export const translations = {
 
 interface LanguageContextType {
   language: Language;
+  setLanguage: (lang: Language) => void;
   t: typeof translations['vi'];
+  currentLangInfo: LanguageInfo;
+  supportedLanguages: LanguageInfo[];
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Locked to English site-wide — the language switcher UI was removed per
-// request ("bỏ ngôn ngữ đi chuyển hết sang tiếng anh, không có ngôn ngữ khác
-// nữa"). `language` is kept as a real piece of context state (rather than
-// deleting it and the `Language` union) since dozens of components still do
-// `language === 'vi' ? ... : ...` for their own copy — those checks simply
-// always take the non-Vietnamese branch now. Also means useAutoTranslate's
-// early-return for 'vi' never fires, so admin-entered content (which is
-// mostly typed in Vietnamese) now gets auto-translated to English everywhere.
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // English-only site: language switching is disabled, so this is a no-op kept
+  // only so components destructuring `setLanguage` don't need to change.
   const language: Language = 'en';
-  const t = translations[language];
+  const setLanguage = (_lang: Language) => {};
+
+  const t = translations['en'];
+  const currentLangInfo = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   return (
-    <LanguageContext.Provider value={{ language, t }}>
+    <LanguageContext.Provider value={{
+      language,
+      setLanguage,
+      t,
+      currentLangInfo,
+      supportedLanguages: SUPPORTED_LANGUAGES
+    }}>
       {children}
     </LanguageContext.Provider>
   );

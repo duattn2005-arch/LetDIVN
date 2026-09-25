@@ -192,7 +192,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`relative border-2 border-dashed rounded-xl p-2.5 text-center cursor-pointer transition-all ${
+          className={`relative border-2 border-dashed rounded-2xl px-4 py-2.5 text-center cursor-pointer transition-all ${
             isDragging
               ? 'border-[#E81A7F] bg-pink-50/50 dark:bg-pink-950/20'
               : 'border-slate-300 dark:border-slate-700 hover:border-[#E81A7F] hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -209,14 +209,16 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
               }
             }}
           />
-          <div className="flex flex-row items-center justify-center gap-2 text-slate-500 dark:text-slate-400">
-            <div className="w-7 h-7 shrink-0 rounded-full bg-pink-50 dark:bg-pink-950/40 text-[#E81A7F] flex items-center justify-center">
-              <Upload className="w-3.5 h-3.5" />
+          <div className="flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400">
+            <div className="w-8 h-8 shrink-0 rounded-full bg-pink-50 dark:bg-pink-950/40 text-[#E81A7F] flex items-center justify-center">
+              <Upload className="w-4 h-4" />
             </div>
-            <div className="text-xs font-semibold">
-              <span className="text-[#E81A7F] font-bold">Nhấn để chọn ảnh</span> hoặc kéo thả file vào đây
+            <div className="text-left">
+              <div className="text-xs font-semibold">
+                <span className="text-[#E81A7F] font-bold">Nhấn để chọn ảnh</span> hoặc kéo thả file vào đây
+              </div>
+              <p className="text-[10px] text-slate-400">Hỗ trợ PNG, JPG, JPEG, WEBP tối đa 5MB</p>
             </div>
-            <p className="text-[10px] text-slate-400 hidden sm:block">(PNG, JPG, WEBP tối đa 5MB)</p>
           </div>
         </div>
       )}
@@ -227,12 +229,15 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
           onClick={handlePasteFromClipboardBtn}
           tabIndex={0}
           onPaste={handlePaste}
-          className="border-2 border-dashed border-purple-300 bg-purple-50/50 hover:bg-purple-50 rounded-xl p-2.5 text-center cursor-pointer transition-all focus:ring-2 focus:ring-purple-400 focus:outline-hidden"
+          className="border-2 border-dashed border-purple-300 bg-purple-50/50 hover:bg-purple-50 rounded-2xl px-4 py-2.5 text-center cursor-pointer transition-all focus:ring-2 focus:ring-purple-400 focus:outline-hidden"
         >
-          <div className="flex flex-row items-center justify-center gap-2 text-purple-800">
-            <div className="text-base shrink-0">📋</div>
-            <div className="text-xs font-bold text-purple-900">
-              Nhấn rồi bấm <kbd className="px-1.5 py-0.5 bg-white border border-purple-300 rounded font-mono text-[11px]">Ctrl + V</kbd> để dán ảnh
+          <div className="flex items-center justify-center gap-3 text-purple-800">
+            <div className="text-xl shrink-0">📋</div>
+            <div className="text-left">
+              <div className="text-xs font-bold text-purple-900">
+                Nhấn vào đây rồi bấm <kbd className="px-1.5 py-0.5 bg-white border border-purple-300 rounded font-mono text-[11px]">Ctrl + V</kbd> để dán ảnh
+              </div>
+              <p className="text-[10px] text-purple-600">Hoặc click để tự động dán ảnh từ bộ nhớ tạm (Clipboard)</p>
             </div>
           </div>
         </div>
@@ -274,7 +279,7 @@ export const ImageUploadWidget: React.FC<ImageUploadWidgetProps> = ({
           <img
             src={previewUrl}
             alt="Preview"
-            className="w-full h-12 object-cover"
+            className="w-full h-36 object-cover"
             onError={() => setError('Không thể tải ảnh từ đường dẫn đã cung cấp')}
           />
           <button

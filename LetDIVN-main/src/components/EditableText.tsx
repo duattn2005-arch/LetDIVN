@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Edit3, Check, X, Palette, AlignLeft, AlignCenter, AlignRight, AlignJustify, RotateCcw, MoveHorizontal } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Edit3, Check, X, Palette, AlignLeft, AlignCenter, AlignRight, AlignJustify, RotateCcw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { dbService } from '../services/dbService';
@@ -15,13 +15,6 @@ interface EditableTextProps {
   multiline?: boolean;
   /** Custom renderer, e.g. to keep the value inside an <a href="mailto:..."> */
   render?: (value: string) => React.ReactNode;
-  /**
-   * Lets an admin drag a handle to set how wide this block is allowed to
-   * grow before wrapping — e.g. deciding whether a paragraph reads as one
-   * short line or wraps to two. Off by default so the hundreds of existing
-   * call sites keep rendering exactly as before; opt in per call site.
-   */
-  resizable?: boolean;
 }
 
 export const EditableText: React.FC<EditableTextProps> = ({
@@ -31,7 +24,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
   className = '',
   multiline = false,
   render,
-  resizable = false,
 }) => {
   const { isAdmin } = useAuth();
   const { language } = useLanguage();
@@ -39,65 +31,39 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const langSpecificKey = language === 'vi' ? contentKey : `${contentKey}__${language}`;
   const colorKey = `${contentKey}__color`;
   const alignKey = `${contentKey}__align`;
-  const colorsKey = `${contentKey}__colors`;
-  const widthKey = `${contentKey}__width`;
   const fontSizeKey = `${contentKey}__fontSize`;
-
-  const parseColors = (raw: string): string[] => {
-    try {
-      const arr = JSON.parse(raw || '[]');
-      return Array.isArray(arr) ? arr.filter((c) => typeof c === 'string') : [];
-    } catch {
-      return [];
-    }
-  };
 
   // `value` starts as defaultValue (known synchronously) so there's no flash
   // of blank content while the first fetch is in flight.
   const [value, setValue] = useState(defaultValue);
   const [color, setColor] = useState('');
   const [align, setAlign] = useState('');
-  // Custom "chạy nhiều màu" set — 2+ hex colors the gradient animation cycles
-  // through. Empty means "use the default built-in rainbow (or the single
-  // static `color` above, if one is set)".
-  const [colors, setColors] = useState<string[]>([]);
-  // Empty string = no admin override yet, render at its natural width.
-  const [width, setWidth] = useState('');
-  // Empty string = no admin override yet, render at the className's own size.
   const [fontSize, setFontSize] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const [draftColor, setDraftColor] = useState(color);
   const [draftAlign, setDraftAlign] = useState(align);
-  const [draftColors, setDraftColors] = useState<string[]>(colors);
   const [draftFontSize, setDraftFontSize] = useState(fontSize);
-  const resizeElRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let cancelled = false;
     const refresh = async () => {
-      const [nextVal, nextColor, nextAlign, nextColorsRaw, nextWidth, nextFontSize] = await Promise.all([
+      const [nextVal, nextColor, nextAlign, nextFontSize] = await Promise.all([
         dbService.getContent(langSpecificKey, defaultValue),
         dbService.getContent(colorKey, ''),
         dbService.getContent(alignKey, ''),
-        dbService.getContent(colorsKey, ''),
-        resizable ? dbService.getContent(widthKey, '') : Promise.resolve(''),
         dbService.getContent(fontSizeKey, ''),
       ]);
       if (cancelled) return;
-      const nextColors = parseColors(nextColorsRaw);
       setValue(nextVal);
       setColor(nextColor);
       setAlign(nextAlign);
-      setColors(nextColors);
-      setWidth(nextWidth);
       setFontSize(nextFontSize);
       setIsEditing((editing) => {
         if (!editing) {
           setDraft(nextVal);
           setDraftColor(nextColor);
           setDraftAlign(nextAlign);
-          setDraftColors(nextColors);
           setDraftFontSize(nextFontSize);
         }
         return editing;
@@ -109,17 +75,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       cancelled = true;
       unsub();
     };
-  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, colorsKey, widthKey, fontSizeKey, resizable]);
-
-  // CSS `resize` mutates the element's own inline `style.width` as the admin
-  // drags — just read that back once they let go and persist it.
-  const handleResizeMouseUp = () => {
-    const el = resizeElRef.current;
-    if (el && el.style.width) {
-      dbService.setContent(widthKey, el.style.width);
-      setWidth(el.style.width);
-    }
-  };
+  }, [langSpecificKey, defaultValue, contentKey, language, colorKey, alignKey, fontSizeKey]);
 
   const handleSave = async () => {
     // An accidentally-cleared field must fall back to the default text, not
@@ -129,7 +85,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
       draft.trim() ? dbService.setContent(langSpecificKey, draft) : dbService.resetContent(langSpecificKey),
       draftColor ? dbService.setContent(colorKey, draftColor) : dbService.resetContent(colorKey),
       draftAlign ? dbService.setContent(alignKey, draftAlign) : dbService.resetContent(alignKey),
-      draftColors.length >= 2 ? dbService.setContent(colorsKey, JSON.stringify(draftColors)) : dbService.resetContent(colorsKey),
       draftFontSize ? dbService.setContent(fontSizeKey, draftFontSize) : dbService.resetContent(fontSizeKey),
     ]);
     setIsEditing(false);
@@ -139,7 +94,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraft(value);
     setDraftColor(color);
     setDraftAlign(align);
-    setDraftColors(colors);
     setDraftFontSize(fontSize);
     setIsEditing(false);
   };
@@ -149,20 +103,15 @@ export const EditableText: React.FC<EditableTextProps> = ({
       dbService.resetContent(langSpecificKey),
       dbService.resetContent(colorKey),
       dbService.resetContent(alignKey),
-      dbService.resetContent(colorsKey),
       dbService.resetContent(fontSizeKey),
-      resizable ? dbService.resetContent(widthKey) : Promise.resolve(),
     ]);
     setDraft(defaultValue);
     setDraftColor('');
     setDraftAlign('');
-    setDraftColors([]);
     setDraftFontSize('');
     setValue(defaultValue);
     setColor('');
     setAlign('');
-    setColors([]);
-    setWidth('');
     setFontSize('');
     setIsEditing(false);
   };
@@ -176,7 +125,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
       setDraft(value);
       setDraftColor(color);
       setDraftAlign(align);
-      setDraftColors(colors);
       setDraftFontSize(fontSize);
       setIsEditing(true);
     }
@@ -186,7 +134,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setDraft(value);
     setDraftColor(color);
     setDraftAlign(align);
-    setDraftColors(colors);
     setDraftFontSize(fontSize);
     setIsEditing(true);
   };
@@ -201,22 +148,9 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
   const resolvedValue = (value && value.trim()) ? value : defaultValue;
 
-  // Priority: 2+ custom "running colors" > single static color > (fall through
-  // to the default built-in rainbow CSS class, when neither is set).
-  const displayStyle: React.CSSProperties | undefined = (colors.length >= 2 || color || align || (resizable && width) || fontSize)
+  const displayStyle: React.CSSProperties | undefined = (color || align || fontSize)
     ? {
-        ...(colors.length >= 2
-          ? {
-              backgroundImage: `linear-gradient(90deg, ${[...colors, colors[0]].join(', ')})`,
-              backgroundSize: '800px 100%',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              color: 'transparent',
-              animation: 'gradient-flow-pixel 3.5s linear infinite',
-              display: 'inline-block',
-            }
-          : color
+        ...(color
           ? {
               color,
               WebkitTextFillColor: color,
@@ -226,16 +160,13 @@ export const EditableText: React.FC<EditableTextProps> = ({
             }
           : {}),
         ...(align ? { textAlign: align as React.CSSProperties['textAlign'] } : {}),
-        // An admin-set width makes this a shrunk block centered in its
-        // parent — the surrounding layout no longer dictates its width.
-        ...(resizable && width ? { maxWidth: width, marginLeft: 'auto', marginRight: 'auto' } : {}),
-        ...(fontSize ? { fontSize } : {}),
+        ...(fontSize ? { fontSize: `${fontSize}px` } : {}),
       }
     : undefined;
 
   if (!isAdmin) {
     return render ? (
-      <span style={displayStyle}>{render(resolvedValue)}</span>
+      <span className={className} style={displayStyle}>{render(resolvedValue)}</span>
     ) : (
       <Tag className={`whitespace-pre-line ${className}`} style={displayStyle}>{resolvedValue}</Tag>
     );
@@ -253,22 +184,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
       { name: 'Tím', hex: '#7c3aed' },
       { name: 'Cam', hex: '#d97706' },
     ];
-    // Colors available for the custom "chạy nhiều màu" mode — the same 8 stops
-    // the default built-in rainbow uses, so any subset still looks cohesive.
-    const RUN_COLOR_PALETTE = [
-      { name: 'Hồng', hex: '#E81A7F' },
-      { name: 'Đỏ hồng', hex: '#FF0055' },
-      { name: 'Cam', hex: '#FF5E00' },
-      { name: 'Vàng', hex: '#FFB700' },
-      { name: 'Xanh lá', hex: '#00E676' },
-      { name: 'Xanh dương', hex: '#00B0FF' },
-      { name: 'Tím', hex: '#7C4DFF' },
-      { name: 'Hồng tím', hex: '#E040FB' },
-    ];
-    const toggleRunColor = (hex: string) => {
-      setDraftColor('');
-      setDraftColors((prev) => (prev.includes(hex) ? prev.filter((c) => c !== hex) : [...prev, hex]));
-    };
 
     return (
       <span className="relative inline-block w-full align-top bg-purple-50 ring-2 ring-purple-400 rounded-xl p-2.5 not-italic z-30 shadow-lg">
@@ -282,37 +197,37 @@ export const EditableText: React.FC<EditableTextProps> = ({
           style={{
             ...(draftColor ? { color: draftColor, WebkitTextFillColor: draftColor } : {}),
             ...(draftAlign ? { textAlign: draftAlign as React.CSSProperties['textAlign'] } : {}),
-            ...(draftFontSize ? { fontSize: draftFontSize } : {}),
+            ...(draftFontSize ? { fontSize: `${draftFontSize}px` } : {}),
           }}
           className="w-full bg-white border border-purple-300 rounded-lg p-2 text-sm font-sans resize min-h-[2.5rem] min-w-[10rem]"
           title="Kéo góc dưới bên phải để chỉnh chiều rộng/chiều cao khung"
         />
         <div className="flex items-center flex-wrap justify-between gap-1.5 mt-1.5">
           <div className="flex items-center flex-wrap gap-1.5">
-            {/* Rainbow Animated Flowing Gradient Button — resets to the default 8-color rainbow */}
+            {/* Rainbow Animated Flowing Gradient Button */}
             <button
               type="button"
-              onClick={() => { setDraftColor(''); setDraftColors([]); }}
+              onClick={() => setDraftColor('')}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
-                !draftColor && draftColors.length === 0
+                !draftColor
                   ? 'bg-gradient-to-r from-pink-500 via-yellow-400 to-cyan-400 text-white shadow-xs border-transparent scale-105'
                   : 'bg-white border-purple-200 text-slate-700 hover:bg-purple-50'
               }`}
-              title="Bật hiệu ứng chữ chạy biến màu cầu vồng mặc định"
+              title="Bật hiệu ứng chữ chạy biến màu cầu vồng"
             >
-              <span>🌈 Chạy màu mặc định</span>
+              <span>🌈 Chạy màu</span>
             </button>
 
-            {/* Quick Color Swatches — one static color, disables running colors */}
+            {/* Quick Color Swatches */}
             <div className="flex items-center gap-1 bg-white border border-purple-200 rounded-lg p-1">
               {PRESET_COLORS.map((c) => (
                 <button
                   key={c.hex}
                   type="button"
-                  onClick={() => { setDraftColor(c.hex); setDraftColors([]); }}
+                  onClick={() => setDraftColor(c.hex)}
                   title={`Chọn màu ${c.name} (${c.hex})`}
                   className={`w-4 h-4 rounded-full transition-transform cursor-pointer border ${
-                    draftColors.length === 0 && draftColor.toLowerCase() === c.hex.toLowerCase()
+                    draftColor.toLowerCase() === c.hex.toLowerCase()
                       ? 'scale-125 ring-2 ring-purple-500 border-white shadow-xs'
                       : 'border-slate-300 hover:scale-115'
                   }`}
@@ -334,7 +249,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
               <input
                 type="color"
                 value={draftColor || '#0f172a'}
-                onChange={(e) => { setDraftColor(e.target.value); setDraftColors([]); }}
+                onChange={(e) => setDraftColor(e.target.value)}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
             </label>
@@ -373,27 +288,20 @@ export const EditableText: React.FC<EditableTextProps> = ({
               ))}
             </div>
 
-            <div
-              className="flex items-center gap-1 bg-white border border-purple-300 rounded-lg pl-2 pr-1 py-0.5"
-              title="Type any font size in pixels, or pick one from the list"
+            {/* Font Size */}
+            <select
+              value={draftFontSize}
+              onChange={(e) => setDraftFontSize(e.target.value)}
+              title="Cỡ chữ"
+              className="px-2 py-1 bg-white border border-purple-300 rounded-lg text-xs font-bold text-purple-700 cursor-pointer focus:outline-hidden focus:border-purple-500"
             >
-              <input
-                type="number"
-                min={1}
-                max={300}
-                value={draftFontSize ? parseFloat(draftFontSize) || '' : ''}
-                onChange={(e) => setDraftFontSize(e.target.value ? `${e.target.value}px` : '')}
-                list={`fontSizeSuggestions-${contentKey}`}
-                placeholder="Default"
-                className="w-11 text-[11px] font-bold text-purple-700 placeholder:text-purple-300 placeholder:font-semibold outline-none"
-              />
-              <span className="text-[10px] text-purple-400 font-semibold">px</span>
-              <datalist id={`fontSizeSuggestions-${contentKey}`}>
-                {[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72].map((n) => (
-                  <option key={n} value={n} />
-                ))}
-              </datalist>
-            </div>
+              <option value="">Cỡ mặc định</option>
+              {[8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 60, 72].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex items-center gap-1.5">
             <button
@@ -425,67 +333,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Custom multi-color running gradient — pick any 2+ colors (or all 8) to cycle through */}
-        <div className="w-full flex flex-col gap-1.5 mt-2 pt-2 border-t border-purple-200">
-          <div className="flex items-center justify-between flex-wrap gap-1">
-            <span className="text-[10px] font-bold text-purple-800">
-              🎨 Chạy nhiều màu tùy chọn (chọn 2 → 8 màu, hoặc để trống dùng mặc định):
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => { setDraftColors(RUN_COLOR_PALETTE.map((c) => c.hex)); setDraftColor(''); }}
-                className="px-2 py-0.5 text-[10px] font-bold text-purple-700 hover:text-purple-900 hover:bg-purple-100 rounded-md cursor-pointer"
-              >
-                Chọn tất cả
-              </button>
-              <button
-                type="button"
-                onClick={() => setDraftColors([])}
-                className="px-2 py-0.5 text-[10px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md cursor-pointer"
-              >
-                Bỏ chọn
-              </button>
-            </div>
-          </div>
-          <div className="flex items-center flex-wrap gap-1.5">
-            {RUN_COLOR_PALETTE.map((c) => {
-              const order = draftColors.indexOf(c.hex);
-              const selected = order !== -1;
-              return (
-                <button
-                  key={c.hex}
-                  type="button"
-                  onClick={() => toggleRunColor(c.hex)}
-                  title={selected ? `Bỏ ${c.name} khỏi dải chạy màu` : `Thêm ${c.name} vào dải chạy màu`}
-                  className={`relative w-6 h-6 rounded-full border-2 cursor-pointer transition-transform ${
-                    selected ? 'scale-110 border-white ring-2 ring-purple-500 shadow-xs' : 'border-slate-300 hover:scale-105'
-                  }`}
-                  style={{ backgroundColor: c.hex }}
-                >
-                  {selected && (
-                    <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-purple-700 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
-                      {order + 1}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          {draftColors.length === 1 && (
-            <p className="text-[10px] text-amber-600 font-semibold">Chọn thêm ít nhất 1 màu nữa để chạy màu (1 màu sẽ hiển thị tĩnh).</p>
-          )}
-          {draftColors.length >= 2 && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-purple-700 font-semibold shrink-0">Xem trước ({draftColors.length} màu):</span>
-              <span
-                className="flex-1 h-2.5 rounded-full"
-                style={{ background: `linear-gradient(90deg, ${draftColors.join(', ')})` }}
-              />
-            </div>
-          )}
-        </div>
       </span>
     );
   }
@@ -506,16 +353,26 @@ export const EditableText: React.FC<EditableTextProps> = ({
         }
       }}
       title="Sửa nội dung (Admin)"
-      className="inline-flex ml-1.5 align-middle p-0.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full ring-1 ring-purple-300 cursor-pointer shadow-2xs transition-all hover:scale-110"
+      className="hidden group-hover/edit:inline-flex ml-1.5 align-middle p-0.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded cursor-pointer shadow-2xs transition-all"
     >
       <Edit3 className="w-3 h-3" />
     </span>
   );
 
   if (render) {
+    // `inline-flex` and a caller-supplied `block` (to force stacking, e.g. a
+    // heading above another heading) both set `display` — Tailwind emits the
+    // flex-family utilities after the block-family ones in its stylesheet, so
+    // `inline-flex` always wins the cascade regardless of class order in the
+    // string. When the caller asked for `block`, use plain `block` (not
+    // `flex` — a flex box ignores `text-align` and defaults its content to
+    // the start edge, which silently breaks a `text-center` ancestor) so the
+    // wrapper both stacks onto its own line and still centers/aligns its
+    // text the normal way.
+    const wantsBlock = /(^|\s)block(\s|$)/.test(className);
     return (
       <span
-        className="group/edit inline-flex items-center gap-0.5 whitespace-pre-line cursor-text"
+        className={`group/edit ${wantsBlock ? 'block' : 'inline-flex items-center gap-0.5'} whitespace-pre-line cursor-text ${className}`}
         style={displayStyle}
         onMouseUp={handleMouseUpToEdit}
         title="Bôi đen chữ hoặc bấm bút chì để sửa"
@@ -526,7 +383,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
     );
   }
 
-  const editableTag = (
+  return (
     <Tag
       className={`group/edit relative whitespace-pre-line cursor-text ${className}`}
       style={displayStyle}
@@ -536,23 +393,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
       {resolvedValue}
       {editBtn}
     </Tag>
-  );
-
-  if (!resizable) {
-    return editableTag;
-  }
-
-  return (
-    <div
-      ref={resizeElRef as React.RefObject<HTMLDivElement>}
-      onMouseUp={handleResizeMouseUp}
-      style={{ width: width || undefined, maxWidth: '100%', resize: 'horizontal', overflow: 'auto' }}
-      className="group/resize relative mx-auto border border-dashed border-transparent hover:border-purple-300 rounded"
-      title="Kéo góc dưới bên phải để chỉnh độ rộng của đoạn văn này"
-    >
-      {editableTag}
-      <MoveHorizontal className="hidden group-hover/resize:block absolute -bottom-0.5 -right-0.5 w-3 h-3 text-purple-500 pointer-events-none" />
-    </div>
   );
 };
 

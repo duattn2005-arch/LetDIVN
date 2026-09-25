@@ -12,7 +12,6 @@ import {
   saveResetCode,
   verifyResetCode,
   clearResetCode,
-  verifyGoogleIdToken,
   SESSION_COOKIE,
 } from '../auth.js';
 import { db } from '../db/index.js';
@@ -123,7 +122,12 @@ async function fetchGoogleProfile(accessToken: string): Promise<{ email: string;
   }
 }
 
-function upsertGoogleUser(profile: { email: string; name: string; picture?: string }): UserProfile {
+router.post('/google', async (req, res) => {
+  const { accessToken } = req.body || {};
+  if (!accessToken) return res.status(400).json({ error: 'Thiếu accessToken' });
+  const profile = await fetchGoogleProfile(accessToken);
+  if (!profile) return res.status(401).json({ error: 'Không xác thực được tài khoản Google' });
+
   let user = getUserByEmail(profile.email);
   const role = roleFor(profile.email, user?.role || 'volunteer');
   if (user) {
@@ -138,48 +142,6 @@ function upsertGoogleUser(profile: { email: string; name: string; picture?: stri
       joinedAt: new Date().toISOString(),
     });
   }
-  return user;
-}
-
-router.post('/google', async (req, res) => {
-  const { accessToken } = req.body || {};
-  if (!accessToken) return res.status(400).json({ error: 'Thiếu accessToken' });
-  const profile = await fetchGoogleProfile(accessToken);
-  if (!profile) return res.status(401).json({ error: 'Không xác thực được tài khoản Google' });
-
-  const user = upsertGoogleUser(profile);
-  const token = createSession(user.id);
-  setSessionCookie(res, token);
-  res.json({ user: withEligibility(user) });
-});
-
-// Redirect-mode Google sign-in — used when the popup flow can't work (in-app
-// browsers like Messenger/Zalo sever the popup's connection back to the
-// opener). The client does a full top-level navigation to Google itself
-// (see AuthContext.tsx) and Google redirects back with the ID token in the
-// URL fragment, which never reaches the server — so the client reads it and
-// posts it here as plain JSON, same shape as the accessToken /google route.
-//
-// GOOGLE_CLIENT_ID is read lazily (per-request), not as a module-level
-// const: apiRouter.ts calls process.loadEnvFile() itself, but ES module
-// imports are hoisted and fully evaluated before the importing module's own
-// top-level code runs — so a top-level `const` here would have captured
-// process.env before .env was ever loaded, always reading empty.
-// envAdminEmails() next door already dodges this the same way.
-function googleClientId(): string {
-  return process.env.VITE_GOOGLE_CLIENT_ID || '';
-}
-
-router.post('/google-idtoken', async (req, res) => {
-  const { idToken, nonce } = req.body || {};
-  const clientId = googleClientId();
-  if (!idToken || !clientId) {
-    return res.status(400).json({ error: 'Thiếu idToken hoặc chưa cấu hình Client ID' });
-  }
-  const profile = await verifyGoogleIdToken(idToken, clientId, nonce);
-  if (!profile) return res.status(401).json({ error: 'Không xác thực được tài khoản Google' });
-
-  const user = upsertGoogleUser(profile);
   const token = createSession(user.id);
   setSessionCookie(res, token);
   res.json({ user: withEligibility(user) });

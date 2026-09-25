@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Newspaper, Check, FileText, Upload, Loader2 } from 'lucide-react';
+import { X, Sparkles, Check } from 'lucide-react';
 import { MediaCoverageEntry } from '../types';
 import { ImageUploadWidget } from './ImageUploadWidget';
-import { dbService } from '../services/dbService';
 
 interface MediaCoverageEditorModalProps {
   isOpen: boolean;
@@ -19,65 +18,43 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
   onSave,
 }) => {
   const [title, setTitle] = useState('');
+  const [articles, setArticles] = useState('0');
+  const [segments, setSegments] = useState('0');
   const [image, setImage] = useState('');
-  const [articleCount, setArticleCount] = useState('0');
-  const [segmentCount, setSegmentCount] = useState('0');
-  const [pdfUrl, setPdfUrl] = useState('');
-  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
-  const pdfInputRef = useRef<HTMLInputElement>(null);
+  const [pdf, setPdf] = useState('');
 
   useEffect(() => {
     if (itemToEdit) {
       setTitle(itemToEdit.title || '');
+      setArticles(String(itemToEdit.articleCount ?? 0));
+      setSegments(String(itemToEdit.segmentCount ?? 0));
       setImage(itemToEdit.image || '');
-      setArticleCount(String(itemToEdit.articleCount ?? 0));
-      setSegmentCount(String(itemToEdit.segmentCount ?? 0));
-      setPdfUrl(itemToEdit.pdfUrl || '');
+      setPdf(itemToEdit.pdfUrl || '');
     } else {
       setTitle('');
+      setArticles('0');
+      setSegments('0');
       setImage('');
-      setArticleCount('0');
-      setSegmentCount('0');
-      setPdfUrl('');
+      setPdf('');
     }
   }, [itemToEdit, isOpen]);
 
   if (!isOpen) return null;
 
-  const handlePdfFileChange = async (file: File) => {
-    if (file.type !== 'application/pdf') {
-      alert('Please select a PDF file');
-      return;
-    }
-    setIsUploadingPdf(true);
-    try {
-      const url = await dbService.uploadFile(file);
-      setPdfUrl(url);
-    } catch (err: any) {
-      alert(err?.message || 'Failed to upload the PDF. Please try again.');
-    } finally {
-      setIsUploadingPdf(false);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert('Please enter a title (e.g. World Cleanup Day 2026)!');
-      return;
-    }
-    if (!pdfUrl.trim()) {
-      alert('Please upload or paste a link to the press-coverage PDF!');
+      alert('Vui lòng nhập tên chiến dịch!');
       return;
     }
 
     const payload = {
       ...(itemToEdit ? { id: itemToEdit.id } : {}),
       title: title.trim(),
-      image: image.trim() || 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80',
-      articleCount: Math.max(0, parseInt(articleCount, 10) || 0),
-      segmentCount: Math.max(0, parseInt(segmentCount, 10) || 0),
-      pdfUrl: pdfUrl.trim(),
+      articleCount: Number(articles) || 0,
+      segmentCount: Number(segments) || 0,
+      image: image.trim() || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&auto=format&fit=crop&q=90',
+      pdfUrl: pdf.trim(),
     };
 
     onSave(payload as any);
@@ -88,17 +65,17 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
     ? createPortal(
         <div className="fixed inset-0 z-[999999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <div
-            className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-100 my-8 animate-in zoom-in-95 duration-200"
+            className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-100 my-8 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-                  <Newspaper className="w-4 h-4 text-[#E81A7F]" />
-                  <span>{itemToEdit ? 'Edit Press Coverage Entry (Admin)' : 'Add New Press Coverage Entry (Admin)'}</span>
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-[#E81A7F]" />
+                  <span>{itemToEdit ? 'Chỉnh Sửa Mục Truyền Thông (Admin)' : 'Thêm Mục Truyền Thông Mới (Admin)'}</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Each entry is one campaign/year, with counts and a PDF listing the press coverage
+                  Nhập thông tin để hiển thị trên trang Media on Us
                 </p>
               </div>
               <button
@@ -110,108 +87,75 @@ export const MediaCoverageEditorModal: React.FC<MediaCoverageEditorModalProps> =
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
-              {/* Title */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Title (button label) *</label>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Tên chiến dịch *</label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. World Cleanup Day 2026"
-                  className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                  placeholder="VD: World Cleanup Day 2026"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                 />
               </div>
 
-              {/* Article & Segment counts */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Article count</label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">Số bài báo (Article)</label>
                   <input
                     type="number"
                     min={0}
-                    value={articleCount}
-                    onChange={(e) => setArticleCount(e.target.value)}
-                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                    value={articles}
+                    onChange={(e) => setArticles(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Segment count</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">Số phóng sự (Segment)</label>
                   <input
                     type="number"
                     min={0}
-                    value={segmentCount}
-                    onChange={(e) => setSegmentCount(e.target.value)}
-                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                    value={segments}
+                    onChange={(e) => setSegments(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
                   />
                 </div>
               </div>
 
-              {/* Image */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Cover image</label>
-                <ImageUploadWidget currentImageUrl={image} onImageSelected={(url) => setImage(url)} label="" />
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Hình ảnh</label>
+                <ImageUploadWidget
+                  currentImageUrl={image}
+                  onImageSelected={(url) => setImage(url)}
+                />
               </div>
 
-              {/* PDF Upload */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Press coverage PDF *</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={pdfUrl}
-                    onChange={(e) => setPdfUrl(e.target.value)}
-                    placeholder="Paste a PDF link or upload a file..."
-                    className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
-                  />
-                  <input
-                    ref={pdfInputRef}
-                    type="file"
-                    accept="application/pdf"
-                    className="hidden"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files[0]) handlePdfFileChange(e.target.files[0]);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => pdfInputRef.current?.click()}
-                    disabled={isUploadingPdf}
-                    className="shrink-0 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
-                  >
-                    {isUploadingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                    <span>Upload</span>
-                  </button>
-                </div>
-                {pdfUrl && (
-                  <a
-                    href={pdfUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold hover:underline"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>View current PDF</span>
-                  </a>
-                )}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Link PDF / bài viết truyền thông</label>
+                <input
+                  type="text"
+                  value={pdf}
+                  onChange={(e) => setPdf(e.target.value)}
+                  placeholder="https://... hoặc /media-coverage/ten-file.pdf"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-[#E81A7F] focus:ring-2 focus:ring-[#E81A7F]/20 transition-all outline-none"
+                />
               </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-xl bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
-                  <span>{itemToEdit ? 'Save Changes' : 'Add New Entry'}</span>
+                  <span>{itemToEdit ? 'Lưu Thay Đổi' : 'Thêm Mục Này'}</span>
                 </button>
               </div>
             </form>
