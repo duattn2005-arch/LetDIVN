@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { dbService } from '../../services/dbService';
 import { MediaCoverageEntry } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { TakeActionStrip } from '../TakeActionStrip';
-import { CmsEditLink } from '../CmsEditLink';
 
 const BRAND_PINK = '#F1138D';
 
 export const MediaOnUsPage: React.FC = () => {
-  const { isAdmin } = useAuth();
   const [entries, setEntries] = useState<MediaCoverageEntry[]>([]);
 
   useEffect(() => {
@@ -50,11 +47,6 @@ export const MediaOnUsPage: React.FC = () => {
             multiline
           />
 
-          {isAdmin && (
-            <div className="pt-2 flex justify-center">
-              <CmsEditLink collection="media-coverage" label="Add New Coverage Entry (CMS)" />
-            </div>
-          )}
         </div>
 
         <div className="max-w-6xl mx-auto space-y-12">
@@ -89,11 +81,6 @@ export const MediaOnUsPage: React.FC = () => {
                   <span className="ref-body text-sm italic text-slate-400">Click to see media coverage on activities</span>
                 </a>
 
-                {isAdmin && entry.slug && (
-                  <div className="absolute top-0 right-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <CmsEditLink collection="media-coverage" slug={entry.slug} />
-                  </div>
-                )}
               </div>
             );
           })}

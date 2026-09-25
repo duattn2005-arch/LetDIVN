@@ -1,19 +1,3 @@
-export type UserRole = 'admin' | 'coordinator' | 'volunteer' | 'guest';
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  avatar: string;
-  role: UserRole;
-  provider: 'google' | 'facebook' | 'phone' | 'email';
-  joinedAt: string;
-  eventsAttended?: number;
-  trashCollectedKg?: number;
-  city?: string;
-}
-
 export interface VolunteerRegistration {
   id: string;
   fullName: string;

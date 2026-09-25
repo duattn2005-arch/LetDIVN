@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Settings2 } from 'lucide-react';
+
 import { dbService } from '../services/dbService';
 import { NewsArticle } from '../types';
-import { useAuth } from '../context/AuthContext';
 import { EditableText } from './EditableText';
 import { EditableImage } from './EditableImage';
-import { SelectHomeNewsModal } from './SelectHomeNewsModal';
 
 const BRAND_PINK = '#F1138D';
 const SELECTION_KEY = 'home.quickLinks.selectedNews';
@@ -28,9 +26,7 @@ function formatDate(dateStr: string) {
  * News preview, mirrored from the top of letsdoitvietnam.org's homepage.
  */
 export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraId?: string) => void }> = ({ onNavigate }) => {
-  const { isAdmin } = useAuth();
   const [latestNews, setLatestNews] = useState<NewsArticle[]>([]);
-  const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
 
   const refreshNews = () => {
     Promise.all([
@@ -41,6 +37,7 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraI
         .filter((n) => n.status !== 'Pending')
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+      // Picked in Decap ("Nội dung các trang" -> Trang chủ): news slugs, or ids of older picks.
       let selectedIds: string[] = [];
       try {
         const parsed = raw ? JSON.parse(raw) : [];
@@ -51,7 +48,7 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraI
 
       if (selectedIds.length > 0) {
         const manual = selectedIds
-          .map((id) => published.find((n) => n.id === id))
+          .map((id) => published.find((n) => n.slug === id || n.id === id))
           .filter((n): n is NewsArticle => !!n);
         if (manual.length > 0) {
           setLatestNews(manual);
@@ -114,16 +111,6 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraI
               className="ref-heading text-3xl sm:text-4xl"
               render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
             />
-            {isAdmin && (
-              <button
-                type="button"
-                onClick={() => setIsSelectModalOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#E81A7F] cursor-pointer"
-              >
-                <Settings2 className="w-3.5 h-3.5" />
-                <span>Chọn bài viết hiển thị (Admin)</span>
-              </button>
-            )}
           </div>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-8 px-4 sm:px-8 lg:px-12">
@@ -150,13 +137,6 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraI
         </>
       )}
 
-      {isAdmin && (
-        <SelectHomeNewsModal
-          isOpen={isSelectModalOpen}
-          onClose={() => setIsSelectModalOpen(false)}
-          onSaved={refreshNews}
-        />
-      )}
     </div>
   );
 };

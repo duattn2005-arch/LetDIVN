@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { dbService } from '../../services/dbService';
 import { WhatWeDoItem } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
-import { CmsEditLink } from '../CmsEditLink';
 import { TakeActionStrip } from '../TakeActionStrip';
 
 const BRAND_PINK = '#F1138D';
 
 export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
-  const { isAdmin } = useAuth();
   const [items, setItems] = useState<WhatWeDoItem[]>([]);
 
   useEffect(() => {
@@ -59,11 +56,6 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
           />
 
           {/* Activities are managed in Decap CMS */}
-          {isAdmin && (
-            <div className="pt-4 flex justify-center">
-              <CmsEditLink collection="what-we-do" label="Add New Activity (CMS)" />
-            </div>
-          )}
         </div>
       </div>
 
@@ -97,12 +89,6 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
                 </div>
               </div>
 
-              {/* Admin: edit in Decap CMS */}
-              {isAdmin && item.slug && (
-                <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <CmsEditLink collection="what-we-do" slug={item.slug} />
-                </div>
-              )}
             </div>
           );
         })}

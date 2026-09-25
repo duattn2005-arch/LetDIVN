@@ -1,34 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { dbService } from '../../services/dbService';
 import { CleanupEvent } from '../../types';
-import { 
-  MapPin, 
-  Layers, 
-  Search, 
-  Calendar, 
-  Users, 
-  Sparkles, 
-  ArrowRight, 
-  Filter, 
-  Compass, 
-  ZoomIn, 
-  ZoomOut,
-  Plus,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  X,
-  Navigation,
-  Loader2,
-  Building,
-  School,
-  Landmark,
-  ChevronDown
-} from 'lucide-react';
+import { MapPin, Search, Compass, ZoomIn, ZoomOut, X, Navigation, Loader2, Building, School, ChevronDown } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { EventEditorModal } from '../EventEditorModal';
-import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
 import { VIETNAM_PROVINCES_DATA } from '../../data/vietnamAdministrativeData';
@@ -68,7 +43,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   onSelectCampaign,
   onRegisterVolunteer
 }) => {
-  const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
   const [activeEvent, setActiveEvent] = useState<CleanupEvent | null>(null);
@@ -88,7 +62,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
 
   // Modal create/edit state
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -98,11 +71,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const boundaryLayerRef = useRef<L.Layer | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  // Expose global modal triggers for Leaflet popups
+  // Expose global triggers for Leaflet popups
   useEffect(() => {
-    (window as any).__openCreateSpotModal = () => {
-      setIsEditorOpen(true);
-    };
     (window as any).__selectProject = (id: string) => {
       onSelectProject(id);
     };
@@ -112,18 +82,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     (window as any).__registerVolunteer = (id: string) => {
       onRegisterVolunteer(id);
     };
-    (window as any).__approveEvent = async (id: string) => {
-      await dbService.approveEvent(id);
-      alert('Cleanup spot approved successfully!');
-      dbService.getEvents().then(setEvents);
-    };
 
     return () => {
-      delete (window as any).__openCreateSpotModal;
       delete (window as any).__selectProject;
       delete (window as any).__selectCampaign;
       delete (window as any).__registerVolunteer;
-      delete (window as any).__approveEvent;
     };
   }, [onSelectProject, onSelectCampaign, onRegisterVolunteer]);
 
@@ -499,12 +462,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         <div class="text-xs text-slate-600 mb-2 leading-relaxed">
           ${fullAddress}
         </div>
-        <div class="text-[10px] text-slate-500 mb-3">
+        <div class="text-[10px] text-slate-500">
           Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}
         </div>
-        <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
-          Post Cleanup Spot at This Location
-        </button>
       </div>
     `).openPopup();
 
@@ -630,12 +590,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         <div class="text-xs text-slate-600 mb-2 leading-relaxed">
           ${sug.subAddress}
         </div>
-        <div class="text-[10px] text-slate-500 mb-3">
+        <div class="text-[10px] text-slate-500">
           Coordinates: ${sug.lat.toFixed(5)}, ${sug.lng.toFixed(5)}
         </div>
-        <button onclick="window.__openCreateSpotModal()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center">
-          Post Cleanup Spot at This Location
-        </button>
       </div>
     `).openPopup();
 
@@ -719,12 +676,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             <div class="text-xs text-slate-600 mb-1 leading-relaxed">
               ${geo.address}
             </div>
-            <div class="text-[10px] text-slate-500 mb-3">
+            <div class="text-[10px] text-slate-500">
               Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}
             </div>
-            <button onclick="window.__openCreateSpotModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md transition-colors cursor-pointer text-center flex items-center justify-center gap-1">
-              <span>Post Cleanup Spot & Photos Here</span>
-            </button>
           </div>
         `;
 
@@ -850,7 +804,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         setActiveEvent(evt);
       });
     });
-  }, [events, activeEvent, isAdmin, selectedYear]);
+  }, [events, activeEvent, selectedYear]);
 
   const handleFlyToEvent = (evt: CleanupEvent) => {
     setActiveEvent(evt);
@@ -956,20 +910,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               ))}
             </select>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-
-          {/* Header Action Buttons */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              onClick={() => {
-                setPinnedLocation(null);
-                setIsEditorOpen(true);
-              }}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-              <span>{isAdmin ? 'Add New Spot (Admin)' : <EditableText contentKey="cleanupMap.addSpotBtn" defaultValue="Report Cleanup Spot" as="span" />}</span>
-            </button>
           </div>
 
           {/* Mobile Tab Switcher (Visible only on mobile/tablet screens < lg) */}
@@ -1277,17 +1217,9 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               <div className="text-xs text-slate-300 mb-1 leading-relaxed">
                 {pinnedLocation.address}
               </div>
-              <div className="text-[10px] text-slate-400 mb-3">
+              <div className="text-[10px] text-slate-400">
                 Coordinates: {pinnedLocation.lat.toFixed(5)}, {pinnedLocation.lng.toFixed(5)} • {pinnedLocation.city}
               </div>
-
-              <button
-                onClick={() => setIsEditorOpen(true)}
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <Plus className="w-4 h-4" />
-                <EditableText contentKey="cleanupMap.pinnedSubmitBtn" defaultValue="Post Cleanup Spot & Photos at This Location" as="span" />
-              </button>
             </div>
           )}
 
@@ -1351,17 +1283,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         </div>
 
       </div>
-
-      {/* Create/Edit Spot Modal */}
-      <EventEditorModal
-        isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        onSaved={refreshEvents}
-        initialCoordinates={pinnedLocation ? { lat: pinnedLocation.lat, lng: pinnedLocation.lng } : undefined}
-        initialTitle={pinnedLocation ? `Cleanup Spot: ${pinnedLocation.placeName}` : ''}
-        initialLocation={pinnedLocation ? pinnedLocation.address : ''}
-        initialCity={pinnedLocation ? pinnedLocation.city : ''}
-      />
 
     </div>
     </>

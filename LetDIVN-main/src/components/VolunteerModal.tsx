@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { X, Sparkles, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { CleanupEvent } from '../types';
-import { useAuth } from '../context/AuthContext';
 import { saveToGoogleSheet, getGoogleAppsScriptUrl } from '../services/googleSheetsService';
 
 interface VolunteerModalProps {
@@ -17,7 +16,6 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
   onClose,
   selectedEventId
 }) => {
-  const { user } = useAuth();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
   const currentYear = new Date().getFullYear();
 
@@ -25,10 +23,10 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
     dbService.getEvents().then(setEvents);
   }, []);
 
-  const [fullName, setFullName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [phone, setPhone] = useState(user?.phone ? user.phone.replace(/\D/g, '').slice(0, 10) : '');
-  const [address, setAddress] = useState(user?.city || 'Hanoi');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('Hanoi');
   const [eventId, setEventId] = useState(selectedEventId || events[0]?.id || '');
   const [birthYear, setBirthYear] = useState<string>('2004');
   const [selectedSkills, setSelectedSkills] = useState<string[]>(['Logistics & Waste Sorting']);
@@ -64,17 +62,10 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({
       } else if (events.length > 0) {
         setEventId(events[0].id);
       }
-      if (user) {
-        setFullName(user.name || '');
-        setEmail(user.email || '');
-        setPhone(user.phone ? user.phone.replace(/\D/g, '').slice(0, 10) : '');
-        setAddress(user.city || 'Hanoi');
-      } else {
-        resetFormState();
-      }
+      resetFormState();
       setPhoneError(null);
     }
-  }, [isOpen, selectedEventId, user, events]);
+  }, [isOpen, selectedEventId, events]);
 
   if (!isOpen) return null;
 

@@ -1,17 +1,6 @@
 import React from 'react';
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Instagram, 
-  Facebook, 
-  Youtube, 
-  Database,
-  ArrowRight,
-  Heart
-} from 'lucide-react';
+import { Phone, Mail, MapPin, Instagram, Facebook, ArrowRight } from 'lucide-react';
 import { ActiveView } from '../types';
-import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { EditableText } from './EditableText';
 import { GrowingTree } from './GrowingTree';
@@ -20,11 +9,9 @@ interface FooterProps {
   onNavigate: (view: any, extraId?: string) => void;
   onOpenVolunteer?: () => void;
   onOpenPartner?: () => void;
-  onOpenDbAdmin: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenDbAdmin }) => {
-  const { isAdmin } = useAuth();
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const { t } = useLanguage();
 
   return (
@@ -218,18 +205,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenDbAdmin }) => 
                 </button>
               </li>
 
-              {/* Only show DB Studio if Admin */}
-              {isAdmin && (
-                <li>
-                  <button
-                    onClick={onOpenDbAdmin}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#E81A7F] hover:underline cursor-pointer pt-1"
-                  >
-                    <Database className="w-3.5 h-3.5" />
-                    <span>{t.adminDb}</span>
-                  </button>
-                </li>
-              )}
             </ul>
           </div>
 

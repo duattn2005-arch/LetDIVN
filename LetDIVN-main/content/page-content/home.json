@@ -1,0 +1,15 @@
+{
+  "quickLinks": {
+    "title": "Cultivating the Beautiful in Vietnam",
+    "whoWeAreImage": "/images/home-quicklinks/who-we-are.jpg",
+    "whoWeAreLabel": "Who We Are",
+    "whatWeDoImage": "/images/home-quicklinks/what-we-do.jpg",
+    "whatWeDoLabel": "What We Do",
+    "ourPartnersImage": "/images/home-quicklinks/our-partners.jpg",
+    "ourPartnersLabel": "Our Partners",
+    "mediaOnUsImage": "/images/home-quicklinks/media-on-us.jpg",
+    "mediaOnUsLabel": "Media on Us",
+    "newsTitle": "News",
+    "selectedNews": []
+  }
+}

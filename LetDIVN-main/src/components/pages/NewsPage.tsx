@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
-import { ArrowRight, ArrowLeft, Plus, Edit3, Clock } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { ArrowRight, ArrowLeft, Clock } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
@@ -25,7 +24,6 @@ const DECAP_NEW_ARTICLE_URL = '/admin/index.html#/collections/news/new';
 const decapEditUrl = (article: NewsArticle) => `/admin/index.html#/collections/news/entries/${encodeURIComponent(article.slug)}`;
 
 export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', initialArticleId }) => {
-  const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState<string>('');
@@ -75,10 +73,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
     }
   }, [initialArticleId, newsList]);
 
-  const visibleNews = newsList.filter(n => {
-    if (isAdmin) return true;
-    return n.status !== 'Pending';
-  });
+  const visibleNews = newsList.filter(n => n.status !== 'Pending');
 
   const filteredNews = visibleNews.filter(n => {
     const matchesCat = selectedCat === 'All' || n.category === selectedCat;
@@ -124,17 +119,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
                 <EditableText contentKey="newsPage.backToListBtn" defaultValue={t.newsPageBackToListBtn} as="span" />
               </button>
 
-              {isAdmin && (
-                <a
-                  href={decapEditUrl(selectedArticle)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit this article</span>
-                </a>
-              )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -217,27 +201,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
             />
           )}
 
-          {/* Add Article Button (Admin only) */}
-          {isAdmin && (
-            <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
-              <a
-                href={DECAP_NEW_ARTICLE_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="px-5 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
-              >
-                <Plus className="w-4 h-4" />
-                <span><EditableText contentKey="newsPage.addArticleBtn" defaultValue={t.newsPageAddArticleBtn} as="span" /></span>
-              </a>
-
-              {pendingCount > 0 && (
-                <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold px-3.5 py-2.5 rounded-full animate-pulse">
-                  <Clock className="w-4 h-4 text-amber-600" />
-                  <span>{language === 'vi' ? `Có ${pendingCount} bài viết đang chờ duyệt!` : `${pendingCount} article(s) pending review!`}</span>
-                </span>
-              )}
-            </div>
-          )}
         </div>
 
         {/* News Grid */}
@@ -267,19 +230,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
                       </div>
                     )}
 
-                    {/* Admin: edit in Decap CMS */}
-                    {isAdmin && (
-                      <a
-                        href={decapEditUrl(item)}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        title="Edit article"
-                        className="absolute top-3 right-3 z-10 p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-lg"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </a>
-                    )}
                   </div>
 
                   <div className="p-6 space-y-3">

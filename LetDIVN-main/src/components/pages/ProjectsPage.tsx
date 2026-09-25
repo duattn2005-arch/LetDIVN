@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { CleanupEvent } from '../../types';
-import { Calendar, MapPin, Users, ArrowRight, Sparkles, Filter, Plus, Edit3, Trash2, CheckCircle2, Clock } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Calendar, MapPin, Users, Clock } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { EventEditorModal } from '../EventEditorModal';
 import { EditableText } from '../EditableText';
 
 interface ProjectsPageProps {
@@ -16,13 +14,8 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   onSelectProject,
   onRegisterVolunteer 
 }) => {
-  const { isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
-
-  // Modal states
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<CleanupEvent | null>(null);
 
   useEffect(() => {
     const refresh = () => { dbService.getEvents().then(setEvents); };
@@ -31,38 +24,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
     return () => unsubscribe();
   }, []);
 
-  const handleAddNew = () => {
-    setEditingEvent(null);
-    setIsEditorOpen(true);
-  };
-
-  const handleEdit = (evt: CleanupEvent, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingEvent(evt);
-    setIsEditorOpen(true);
-  };
-
-  const handleApprove = (id: string, title: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    dbService.approveEvent(id);
-    alert(language === 'vi' ? `Đã phê duyệt chiến dịch "${title}" thành công!` : `Approved campaign "${title}" successfully!`);
-  };
-
-  const handleDelete = (id: string, title: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (window.confirm(language === 'vi' ? `Bạn có chắc chắn muốn xóa chiến dịch "${title}" không?` : `Are you sure you want to delete campaign "${title}"?`)) {
-      dbService.deleteEvent(id);
-    }
-  };
-
-
-  // For regular visitors, only show approved events (not Pending).
-  const visibleEvents = events.filter(e => {
-    if (isAdmin) return true;
-    return e.status !== 'Pending';
-  });
-
-  const pendingCount = events.filter(e => e.status === 'Pending').length;
+  const visibleEvents = events.filter(e => e.status !== 'Pending');
 
   // Registration only stays open through the event's own date — once it's
   // passed, "Register to Participate" is disabled rather than hidden, so the
@@ -94,27 +56,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
             multiline
             className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
           />
-
-          {/* Add Project Button */}
-          <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
-            <button
-              onClick={() => {
-                setEditingEvent(null);
-                setIsEditorOpen(true);
-              }}
-              className="px-5 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span><EditableText contentKey="projects.addBtn" defaultValue={t.projectsAddBtn} as="span" /></span>
-            </button>
-
-            {isAdmin && pendingCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold px-3.5 py-2.5 rounded-full animate-pulse">
-                <Clock className="w-4 h-4 text-amber-600" />
-                <span>{language === 'vi' ? `Có ${pendingCount} chiến dịch đang chờ duyệt!` : `${pendingCount} campaign(s) pending review!`}</span>
-              </span>
-            )}
-          </div>
         </div>
 
         {/* Event Cards Grid */}
@@ -128,35 +69,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
                 key={evt.id}
                 className={`bg-white rounded-3xl border ${isPending ? 'border-amber-400 ring-2 ring-amber-300/60 bg-amber-50/20' : 'border-slate-200/80'} overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative`}
               >
-                {/* Admin quick action buttons */}
-                {isAdmin && (
-                  <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/70 backdrop-blur-xs p-1.5 rounded-xl shadow-lg">
-                    {isPending && (
-                      <button
-                        onClick={(e) => handleApprove(evt.id, evt.title, e)}
-                        title="Duyệt chiến dịch này ngay"
-                        className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-extrabold rounded-lg transition-all cursor-pointer flex items-center gap-1 shadow-sm"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Duyệt</span>
-                      </button>
-                    )}
-                    <button
-                      onClick={(e) => handleEdit(evt, e)}
-                      title="Sửa chiến dịch"
-                      className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={(e) => handleDelete(evt.id, evt.title, e)}
-                      title="Xóa chiến dịch"
-                      className="p-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
 
                 <div>
                   <div className="relative aspect-16/10 overflow-hidden bg-slate-900">
@@ -243,19 +155,6 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
         </div>
 
       </div>
-
-      {/* Event Editor Modal */}
-      <EventEditorModal
-        isOpen={isEditorOpen}
-        onClose={() => {
-          setIsEditorOpen(false);
-          setEditingEvent(null);
-        }}
-        eventToEdit={editingEvent}
-        onSaved={() => {
-          dbService.getEvents().then(setEvents);
-        }}
-      />
     </div>
   );
 };

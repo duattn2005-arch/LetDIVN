@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { dbService } from '../../services/dbService';
 import { GalleryItem } from '../../types';
-import { MapPin, X, Edit3 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { MapPin, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { CmsEditLink, cmsUrl } from '../CmsEditLink';
 import { EditableText } from '../EditableText';
 
 export const FullGalleryPage: React.FC = () => {
-  const { isAdmin } = useAuth();
   const { t } = useLanguage();
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>('All');
@@ -49,7 +46,7 @@ export const FullGalleryPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Year Filter & Admin Upload Bar */}
+        {/* Year Filter */}
         <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
           <div className="flex flex-wrap gap-2">
             {years.map(y => (
@@ -71,7 +68,6 @@ export const FullGalleryPage: React.FC = () => {
             ))}
           </div>
 
-          {isAdmin && <CmsEditLink collection="gallery" label={`${t.fullGalleryUploadBtn} (CMS)`} />}
         </div>
 
         {/* Masonry / Photo Grid */}
@@ -88,12 +84,6 @@ export const FullGalleryPage: React.FC = () => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
 
-              {/* Admin: edit in CMS */}
-              {isAdmin && item.slug && (
-                <div className="absolute top-3 right-3 z-20">
-                  <CmsEditLink collection="gallery" slug={item.slug} />
-                </div>
-              )}
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 text-white">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-pink-400 mb-1">{item.category} • {item.year}</span>
@@ -147,17 +137,6 @@ export const FullGalleryPage: React.FC = () => {
                 </p>
               </div>
 
-              {isAdmin && selectedImage.slug && (
-                <a
-                  href={cmsUrl('gallery', selectedImage.slug)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2 bg-white/10 hover:bg-[#E81A7F] text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-auto border border-white/20"
-                >
-                  <Edit3 className="w-4 h-4" />
-                  <span>Sửa / xóa trên CMS</span>
-                </a>
-              )}
             </div>
           </div>
         </div>,

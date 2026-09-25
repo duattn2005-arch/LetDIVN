@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
@@ -9,11 +8,8 @@ import { GetInvolvedSection } from './components/GetInvolvedSection';
 import { Footer } from './components/Footer';
 
 // Modals
-import { AuthModal } from './components/AuthModal';
-import { DatabaseAdminModal } from './components/DatabaseAdminModal';
 import { VolunteerModal } from './components/VolunteerModal';
 import { PartnerModal } from './components/PartnerModal';
-import { UserProfileModal } from './components/UserProfileModal';
 
 // Dedicated Sub-Pages
 import { WhoWeArePage } from './components/pages/WhoWeArePage';
@@ -81,13 +77,9 @@ export function AppContent() {
   const [events, setEvents] = useState<CleanupEvent[]>([]);
 
   // Modals state
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authInitialTab, setAuthInitialTab] = useState<'login' | 'register'>('login');
-  const [isDbAdminModalOpen, setIsDbAdminModalOpen] = useState(false);
   const [isVolunteerModalOpen, setIsVolunteerModalOpen] = useState(false);
   const [volunteerEventId, setVolunteerEventId] = useState<string | undefined>(undefined);
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   // Scroll to top whenever active view changes
   useEffect(() => {
@@ -221,11 +213,6 @@ export function AppContent() {
     }
   };
 
-  const handleOpenAuth = (tab: 'login' | 'register' = 'login') => {
-    setAuthInitialTab(tab);
-    setIsAuthModalOpen(true);
-  };
-
   const handleOpenVolunteerModal = (eventId?: string) => {
     setVolunteerEventId(eventId);
     setIsVolunteerModalOpen(true);
@@ -241,10 +228,7 @@ export function AppContent() {
       <Header
         activeView={activeView}
         onNavigate={handleNavigate}
-        onOpenAuth={handleOpenAuth}
-        onOpenDbAdmin={() => setIsDbAdminModalOpen(true)}
         onOpenVolunteer={() => handleOpenVolunteerModal()}
-        onOpenProfile={() => setIsProfileModalOpen(true)}
       />
 
       {/* Main View Router */}
@@ -352,7 +336,6 @@ export function AppContent() {
         onNavigate={handleNavigate}
         onOpenVolunteer={() => handleOpenVolunteerModal()}
         onOpenPartner={() => setIsPartnerModalOpen(true)}
-        onOpenDbAdmin={() => setIsDbAdminModalOpen(true)}
       />
 
       {/* Floating Quick Contact Bubble Widget at Bottom Right */}
@@ -361,17 +344,6 @@ export function AppContent() {
 
 
       {/* All System Modals */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        initialTab={authInitialTab}
-      />
-
-      <DatabaseAdminModal
-        isOpen={isDbAdminModalOpen}
-        onClose={() => setIsDbAdminModalOpen(false)}
-      />
-
       <VolunteerModal
         isOpen={isVolunteerModalOpen}
         onClose={() => setIsVolunteerModalOpen(false)}
@@ -383,11 +355,6 @@ export function AppContent() {
         onClose={() => setIsPartnerModalOpen(false)}
       />
 
-      <UserProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-      />
-
     </div>
   );
 }
@@ -395,9 +362,7 @@ export function AppContent() {
 export default function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <AppContent />
     </LanguageProvider>
   );
 }

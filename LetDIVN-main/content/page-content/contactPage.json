@@ -1,0 +1,19 @@
+{
+  "title": "Contact Us",
+  "subtitle": "Have a question, want to report a waste hotspot, or interested in a local campaign partnership? Send us your details.",
+  "findUsTitle": "You can find us at",
+  "emailLabel": "EMAIL ADDRESS",
+  "phoneLabel1": "PHONE NUMBER",
+  "phoneLabel2": "PHONE NUMBER",
+  "formTitle": "Send a Message to Our Team",
+  "nameLabel": "Full Name *",
+  "emailFieldLabel": "Email Address *",
+  "phoneFieldLabel": "Phone Number (10 digits)",
+  "subjectLabel": "Subject",
+  "messageLabel": "Message *",
+  "submitBtn": "Send Message",
+  "thankYouTitle": "Thank You for Reaching Out!",
+  "thankYouMsgPrefix": "Your message has been received. Our team will reply via email ",
+  "thankYouMsgSuffix": " as soon as possible.",
+  "sendAnotherBtn": "Send Another Message"
+}

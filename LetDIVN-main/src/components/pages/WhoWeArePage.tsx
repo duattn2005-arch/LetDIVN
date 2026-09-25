@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Leaf, TreePine, PersonStanding, ShieldCheck } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Leaf, TreePine, PersonStanding } from 'lucide-react';
 import { dbService } from '../../services/dbService';
 import { WhoWeAreItem } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
-import { CmsEditLink } from '../CmsEditLink';
 
 const BRAND_PINK = '#F1138D';
 
 export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
-  const { isAdmin } = useAuth();
   const [sections, setSections] = useState<WhoWeAreItem[]>([]);
 
   useEffect(() => {
@@ -50,15 +47,6 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
             multiline
             className="ref-body text-base sm:text-lg text-slate-500 leading-relaxed [text-wrap:balance]"
           />
-          {isAdmin && (
-            <div className="flex flex-col items-center gap-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-full text-xs font-bold text-purple-700">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Hover over an image/text to edit (Admin)</span>
-              </div>
-              <CmsEditLink collection="who-we-are" label="Add New Section (CMS)" />
-            </div>
-          )}
         </div>
 
         {/* Core Values: Clean / Natural / Authentic */}
@@ -192,7 +180,7 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
         />
       </div>
 
-      {/* Admin-added extra sections: alternating image-left / image-right bands */}
+      {/* Extra sections from Decap: alternating image-left / image-right bands */}
       {sections.map((item, idx) => {
         const isImageLeft = item.layout !== 'image-right';
 
@@ -217,11 +205,6 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
               </div>
             </div>
 
-            {isAdmin && item.slug && (
-              <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                <CmsEditLink collection="who-we-are" slug={item.slug} />
-              </div>
-            )}
           </div>
         );
       })}

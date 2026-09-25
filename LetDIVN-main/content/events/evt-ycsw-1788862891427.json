@@ -1,0 +1,43 @@
+{
+  "id": "evt-ycsw-1788862891427",
+  "title": "Young Conservationists to Save the Wildlife (YCSW) - Cuc Phuong National Park",
+  "category": "Wildlife & Nature",
+  "status": "Upcoming",
+  "date": "2026-11-14",
+  "time": "06:00 - 18:00",
+  "location": "Cuc Phuong National Park, Ninh Binh",
+  "city": "Ninh Binh",
+  "coordinates": {
+    "lat": 20.2477,
+    "lng": 105.7147
+  },
+  "image": "/images/projects/ycsw-hero.jpg",
+  "description": "A 5-day volunteering experience for 24 selected young conservationists at Cuc Phuong National Park - cleaning enclosures, supporting wildlife rescue centers, and learning directly from conservation experts.",
+  "targetVolunteers": 24,
+  "trashCollectedKg": 0,
+  "leader": "Nguyen Thi Cam Tu",
+  "meetingPoint": "Cuc Phuong National Park Museum entrance, Nho Quan, Ninh Binh",
+  "schedule": [
+    {
+      "time": "06:00",
+      "activity": "Breakfast and morning briefing"
+    },
+    {
+      "time": "07:00 - 11:00",
+      "activity": "Wildlife rescue center volunteering and enclosure maintenance"
+    },
+    {
+      "time": "12:00",
+      "activity": "Lunch break"
+    },
+    {
+      "time": "13:30 - 17:00",
+      "activity": "Nature trekking and conservation education session"
+    },
+    {
+      "time": "17:30",
+      "activity": "Evening reflection and wrap-up"
+    }
+  ],
+  "order": 1
+}

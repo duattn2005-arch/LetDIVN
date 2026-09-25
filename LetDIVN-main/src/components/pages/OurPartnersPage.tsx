@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { Partner } from '../../types';
-import { useAuth } from '../../context/AuthContext';
 import { Globe } from 'lucide-react';
-import { CmsEditLink } from '../CmsEditLink';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { TakeActionStrip } from '../TakeActionStrip';
@@ -11,7 +9,6 @@ import { TakeActionStrip } from '../TakeActionStrip';
 const BRAND_PINK = '#F1138D';
 
 export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => {
-  const { isAdmin } = useAuth();
   const [partners, setPartners] = useState<Partner[]>([]);
   const loadPartners = () => {
     dbService.getPartners().then(setPartners);
@@ -59,11 +56,6 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => 
             className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
           />
 
-          {isAdmin && (
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-              <CmsEditLink collection="partners" label="Add Partner / Sponsor (CMS)" />
-            </div>
-          )}
         </div>
 
         {/* Clean Modern Logo Showcase Grid with Flowing Rainbow Border & Drag & Drop */}
@@ -77,12 +69,6 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => 
                 key={p.id}
                 className="relative group w-full max-w-[240px] h-32 sm:h-36 rainbow-border-card transition-all duration-200"
               >
-                {/* Admin: edit in Decap CMS */}
-                {isAdmin && p.slug && (
-                  <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-30">
-                    <CmsEditLink collection="partners" slug={p.slug} />
-                  </div>
-                )}
 
                 {/* Clickable Logo Inner Container */}
                 <div className="rainbow-border-inner overflow-hidden">

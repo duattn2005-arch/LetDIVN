@@ -1,0 +1,39 @@
+{
+  "id": "evt-nhatrang-coral",
+  "title": "Blue Ocean Journey - Coral Reef Cleanup at Nha Trang Bay",
+  "category": "Green Ocean Campaign",
+  "status": "Upcoming",
+  "date": "2026-07-28",
+  "time": "06:00 - 11:00",
+  "location": "Along Tran Phu Beach & Hon Tre Island, Nha Trang",
+  "city": "Khanh Hoa",
+  "coordinates": {
+    "lat": 12.2388,
+    "lng": 109.1967
+  },
+  "image": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=1000&auto=format&fit=crop&q=80",
+  "description": "A diving campaign to collect ocean-floor debris and clean tourist beaches, protecting the marine ecosystem of Nha Trang Bay.",
+  "targetVolunteers": 800,
+  "trashCollectedKg": 2100,
+  "leader": "Le Hoang Long",
+  "meetingPoint": "April 2 Square, Tran Phu Street, Loc Tho, Nha Trang",
+  "schedule": [
+    {
+      "time": "06:00",
+      "activity": "Gather at April 2 Square, check-in and safety briefing"
+    },
+    {
+      "time": "06:30",
+      "activity": "Depart to Nha Trang Bay by boat"
+    },
+    {
+      "time": "07:00 - 10:00",
+      "activity": "Underwater and coastal cleanup, coral reef monitoring"
+    },
+    {
+      "time": "10:30",
+      "activity": "Return to shore, waste sorting, and group debrief"
+    }
+  ],
+  "order": 5
+}

@@ -6,7 +6,6 @@ import {
   TeamMember,
   VolunteerRegistration,
   ContactMessage,
-  UserProfile,
   MediaVideo,
   WhatWeDoItem,
   WhoWeAreItem,
@@ -16,14 +15,10 @@ import {
 type Listener = () => void;
 
 /**
- * Thin REST API client — this used to be a localStorage wrapper (everything
- * client-side, nothing shared between visitors). It's now a real shared
- * backend (SQLite via Express, see server/). Method names are kept the same
- * as before wherever practical so callers barely changed, just added
- * `await`. `subscribe`/notify still exists so already-mounted components in
- * the same tab refetch right after a mutation, same UX as before — it's
- * just no longer backed by a `storage` write, it's called manually after
- * each successful request.
+ * Thin REST API client for server/. Everything shown on the site is read-only
+ * here: content is edited in Decap CMS (/admin). The only writes are the two
+ * public forms (volunteer sign-up, contact message). `subscribe` lets mounted
+ * components refetch after one of those, e.g. an event's sign-up count.
  */
 class DatabaseService {
   private listeners: Set<Listener> = new Set();
@@ -60,15 +55,15 @@ class DatabaseService {
     return this.request<T>(path);
   }
 
-  private async mutate<T>(path: string, method: 'POST' | 'PUT' | 'DELETE', body?: unknown): Promise<T> {
-    const result = await this.request<T>(path, { method, body: body !== undefined ? JSON.stringify(body) : undefined });
+  private async post<T>(path: string, body: unknown): Promise<T> {
+    const result = await this.request<T>(path, { method: 'POST', body: JSON.stringify(body) });
     this.notify();
     return result;
   }
 
-  // --- SITE CONTENT ---
-  // The whole table is fetched once and cached, since a page can have 10-20+
-  // editable text/image slots — one request beats one-per-slot.
+  // --- PAGE TEXT & IMAGES (Decap "Nội dung các trang") ---
+  // Fetched once and cached, since a page can have 10-20+ text/image slots —
+  // one request beats one per slot.
   private contentCache: Record<string, string> | null = null;
   private contentPromise: Promise<Record<string, string>> | null = null;
 
@@ -89,47 +84,14 @@ class DatabaseService {
     return stored ? stored : fallback;
   }
 
-  public async setContent(key: string, value: string): Promise<void> {
-    await this.mutate(`/content/${encodeURIComponent(key)}`, 'PUT', { value });
-    if (this.contentCache) this.contentCache[key] = value;
-  }
-
-  public async resetContent(key: string): Promise<void> {
-    await this.mutate(`/content/${encodeURIComponent(key)}`, 'DELETE');
-    if (this.contentCache) delete this.contentCache[key];
-  }
-
   // --- EVENTS ---
   public getEvents(): Promise<CleanupEvent[]> {
     return this.get('/events');
   }
-  public addEvent(event: Omit<CleanupEvent, 'id'>): Promise<CleanupEvent> {
-    return this.mutate('/events', 'POST', event);
-  }
-  public updateEvent(id: string, updates: Partial<CleanupEvent>): Promise<CleanupEvent> {
-    return this.mutate(`/events/${encodeURIComponent(id)}`, 'PUT', updates);
-  }
-  public approveEvent(id: string): Promise<CleanupEvent> {
-    return this.updateEvent(id, { status: 'Upcoming' });
-  }
-  public async deleteEvent(id: string): Promise<boolean> {
-    await this.mutate(`/events/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
-  }
 
   // --- VOLUNTEERS ---
-  public getVolunteers(): Promise<VolunteerRegistration[]> {
-    return this.get('/volunteers');
-  }
-  public addVolunteer(volunteer: Omit<VolunteerRegistration, 'id' | 'registeredAt'>): Promise<VolunteerRegistration> {
-    return this.mutate('/volunteers', 'POST', volunteer);
-  }
-  public updateVolunteer(id: string, updates: Partial<VolunteerRegistration>): Promise<VolunteerRegistration> {
-    return this.mutate(`/volunteers/${encodeURIComponent(id)}`, 'PUT', updates);
-  }
-  public async deleteVolunteer(id: string): Promise<boolean> {
-    await this.mutate(`/volunteers/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
+  public addVolunteer(volunteer: Omit<VolunteerRegistration, 'id' | 'registeredAt'>): Promise<{ id: string }> {
+    return this.post('/volunteers', volunteer);
   }
 
   // --- NEWS ---
@@ -154,18 +116,8 @@ class DatabaseService {
   }
 
   // --- CONTACTS ---
-  public getContacts(): Promise<ContactMessage[]> {
-    return this.get('/contacts');
-  }
-  public addContact(contact: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>): Promise<ContactMessage> {
-    return this.mutate('/contacts', 'POST', contact);
-  }
-  public updateContactStatus(id: string, status: 'Read' | 'Replied' | 'Unread'): Promise<ContactMessage> {
-    return this.mutate(`/contacts/${encodeURIComponent(id)}`, 'PUT', { status });
-  }
-  public async deleteContact(id: string): Promise<boolean> {
-    await this.mutate(`/contacts/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
+  public addContact(contact: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>): Promise<{ id: string }> {
+    return this.post('/contacts', contact);
   }
 
   // --- VIDEOS ---
@@ -188,26 +140,6 @@ class DatabaseService {
     return this.get('/media-coverage');
   }
 
-  // --- USERS (admin dashboard) ---
-  public getUsers(): Promise<(UserProfile & { hasPassword: boolean })[]> {
-    return this.get('/users');
-  }
-  public async deleteUser(id: string): Promise<boolean> {
-    await this.mutate(`/users/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
-  }
-
-  // --- GRANTED ADMINS ---
-  public getGrantedAdminEmails(): Promise<string[]> {
-    return this.get('/admins');
-  }
-  public async grantAdmin(email: string): Promise<void> {
-    await this.mutate('/admins', 'POST', { email });
-  }
-  public async revokeAdmin(email: string): Promise<void> {
-    await this.mutate(`/admins/${encodeURIComponent(email)}`, 'DELETE');
-  }
-
   // --- STATS ---
   public getStats(): Promise<{
     totalTrashKg: number;
@@ -217,24 +149,11 @@ class DatabaseService {
     totalProvinces: number;
     totalPartners: number;
     totalNews: number;
-    pendingVolunteersCount: number;
     upcomingEventsCount: number;
   }> {
     return this.get('/stats');
   }
 
-  // --- FILE UPLOAD ---
-  public async uploadFile(file: File | Blob): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file, (file as File).name || `pasted-image.${(file.type.split('/')[1] || 'png')}`);
-    const res = await fetch('/api/upload', { method: 'POST', credentials: 'include', body: formData });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || 'Tải ảnh lên thất bại');
-    }
-    const data = await res.json();
-    return data.url;
-  }
 }
 
 export const dbService = new DatabaseService();

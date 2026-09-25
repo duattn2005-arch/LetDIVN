@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { PlayCircle, Youtube, Edit3 } from 'lucide-react';
+import { PlayCircle, Youtube } from 'lucide-react';
 import { dbService } from '../../services/dbService';
 import { MediaVideo } from '../../types';
-import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
-import { CmsEditLink, cmsUrl } from '../CmsEditLink';
 import { getYouTubeEmbedUrl } from '../../utils/youtube';
 
 export const MediaVideosPage: React.FC = () => {
-  const { isAdmin } = useAuth();
   const { t } = useLanguage();
   const [videos, setVideos] = useState<MediaVideo[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<MediaVideo | null>(null);
@@ -53,11 +50,6 @@ export const MediaVideosPage: React.FC = () => {
             className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]"
           />
 
-          {isAdmin && (
-            <div className="pt-1">
-              <CmsEditLink collection="videos" label={t.videosPageAddBtn} />
-            </div>
-          )}
         </div>
 
         {videos.length === 0 ? (
@@ -65,11 +57,6 @@ export const MediaVideosPage: React.FC = () => {
             <Youtube className="w-10 h-10 text-slate-300 mx-auto" />
             <div className="text-sm font-bold text-slate-700">{t.videosPageEmptyTitle}</div>
             <p className="text-xs text-slate-400 max-w-md mx-auto">{t.videosPageEmptyDesc}</p>
-            {isAdmin && (
-              <div className="pt-2">
-                <CmsEditLink collection="videos" label={t.videosPageAddBtn} />
-              </div>
-            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
@@ -105,20 +92,6 @@ export const MediaVideosPage: React.FC = () => {
                         {v.title}
                       </div>
                     </div>
-                    {isAdmin && v.slug && (
-                      <span
-                        role="link"
-                        tabIndex={0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.open(cmsUrl('videos', v.slug), '_blank', 'noopener');
-                        }}
-                        title="Sửa trên CMS"
-                        className="p-1.5 text-slate-400 hover:text-[#E81A7F] hover:bg-pink-50 rounded-lg transition-colors cursor-pointer shrink-0"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </span>
-                    )}
                   </button>
                 ))}
               </div>

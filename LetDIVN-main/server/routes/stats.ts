@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { events, volunteers } from '../db/collections.js';
-import { getNews, getPartners } from '../cmsContent.js';
+import { volunteers } from '../db/collections.js';
+import { getEvents, getNews, getPartners } from '../cmsContent.js';
 
 const router = Router();
 
 router.get('/stats', async (req, res) => {
-  const allEvents = events.getAll();
+  const allEvents = await getEvents();
   const allVolunteers = volunteers.getAll();
   const allPartners = await getPartners();
   const allNews = await getNews();
@@ -22,7 +22,6 @@ router.get('/stats', async (req, res) => {
     totalProvinces: 63,
     totalPartners: partnerCount,
     totalNews: allNews.length,
-    pendingVolunteersCount: allVolunteers.filter((v) => v.status === 'Pending').length,
     upcomingEventsCount: allEvents.filter((e) => e.status === 'Upcoming').length,
   });
 });

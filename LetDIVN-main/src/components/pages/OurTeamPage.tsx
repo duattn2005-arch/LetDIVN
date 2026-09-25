@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { TeamMember } from '../../types';
-import { useAuth } from '../../context/AuthContext';
-import { ShieldCheck } from 'lucide-react';
-import { CmsEditLink } from '../CmsEditLink';
+
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { TakeActionStrip } from '../TakeActionStrip';
@@ -11,7 +9,6 @@ import { TakeActionStrip } from '../TakeActionStrip';
 const BRAND_PINK = '#F1138D';
 
 export const OurTeamPage: React.FC = () => {
-  const { isAdmin } = useAuth();
   const [team, setTeam] = useState<TeamMember[]>([]);
 
   const loadTeam = () => {
@@ -54,16 +51,6 @@ export const OurTeamPage: React.FC = () => {
             className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
           />
 
-          {/* Admin Management Bar */}
-          {isAdmin && (
-            <div className="pt-2 flex items-center justify-center gap-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 border border-purple-200 rounded-full text-xs font-bold text-purple-700">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Admin Management Mode</span>
-              </div>
-              <CmsEditLink collection="team" label="Add New Member (CMS)" />
-            </div>
-          )}
         </div>
 
         {/* Team Grid: photo, name, role — matching the reference site's simple card */}
@@ -73,11 +60,6 @@ export const OurTeamPage: React.FC = () => {
               key={member.id}
               className="relative group rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
             >
-              {isAdmin && member.slug && (
-                <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <CmsEditLink collection="team" slug={member.slug} />
-                </div>
-              )}
 
               <div className="aspect-4/3 bg-slate-100 overflow-hidden">
                 <img

@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Router } from 'express';
 import type {
+  CleanupEvent,
   NewsArticle,
   NewsContentBlock,
   MediaVideo,
@@ -281,6 +282,62 @@ export const getMediaCoverage = () =>
     pdfUrl: str(doc.pdfUrl),
     order: num(doc.order),
   }));
+
+export const getEvents = () =>
+  getList<CleanupEvent>('events', 'evt', (doc) => {
+    const lat = Number(doc.coordinates?.lat);
+    const lng = Number(doc.coordinates?.lng);
+    return {
+      title: str(doc.title),
+      category: doc.category || 'World Cleanup Day',
+      date: str(doc.date),
+      time: str(doc.time),
+      location: str(doc.location),
+      city: str(doc.city),
+      coordinates: Number.isFinite(lat) && Number.isFinite(lng) && (lat || lng) ? { lat, lng } : undefined,
+      image: str(doc.image),
+      bannerImage: str(doc.bannerImage) || undefined,
+      description: str(doc.description),
+      targetVolunteers: num(doc.targetVolunteers, 100),
+      // Filled in by the /events route from the volunteer sign-ups in SQLite.
+      registeredCount: 0,
+      trashCollectedKg: num(doc.trashCollectedKg),
+      status: ['Ongoing', 'Completed'].includes(doc.status) ? doc.status : 'Upcoming',
+      leader: str(doc.leader),
+      meetingPoint: str(doc.meetingPoint),
+      googleMapsUrl: str(doc.googleMapsUrl) || undefined,
+      sheetUrl: str(doc.sheetUrl) || undefined,
+      schedule: Array.isArray(doc.schedule)
+        ? doc.schedule.map((s: any) => ({ time: str(s?.time), activity: str(s?.activity) })).filter((s: { time: string; activity: string }) => s.time || s.activity)
+        : undefined,
+    };
+  });
+
+// --- Page text and images ------------------------------------------------------
+
+/**
+ * Every EditableText / EditableImage / EditableGalleryGrid value, as
+ * { contentKey: value }. content/page-content/<prefix>.json holds the fields of
+ * one page nested by the rest of the key, e.g. project.wildlife-nature.json ->
+ * { section1: { p0 } } is "project.wildlife-nature.section1.p0". Image lists
+ * (galleries, the homepage news picks) come back as a JSON array string. Empty
+ * fields are left out so the page falls back to the text built into the code.
+ */
+export async function getPageContent(): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  const walk = (key: string, value: unknown) => {
+    if (Array.isArray(value)) {
+      const list = value.map(str).filter(Boolean);
+      if (list.length) out[key] = JSON.stringify(list);
+    } else if (value && typeof value === 'object') {
+      for (const [name, child] of Object.entries(value)) walk(`${key}.${name}`, child);
+    } else if (str(value).trim()) {
+      out[key] = str(value);
+    }
+  };
+  for (const [prefix, doc] of await getFolder('page-content')) walk(prefix, doc);
+  return out;
+}
 
 // --- Images uploaded through Decap -------------------------------------------
 

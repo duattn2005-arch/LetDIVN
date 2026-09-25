@@ -1,0 +1,29 @@
+{
+  "hero": "/images/projects/envday-hero.jpg",
+  "title": "Environmental Day",
+  "section0": {
+    "p0": "It's a universal experience. Getting hands dirty, nurturing growth. Pausing to absorb its beauty and draw inspiration. Encouraging our community to appreciate nature's wonders – that's our mission! And thus, we are forming alliances with like-minded individuals who share our passion."
+  },
+  "section1": {
+    "image": "/images/projects/envday-1.jpg",
+    "p0": "Our focus is on blending the boundaries between nature and urban development, inviting nature into the city to influence how we design our urban environments. We are particularly enthusiastic about projects that incorporate elements such as native plants, trash sorting, and diverse environmental activities into our collaborations."
+  },
+  "section2": {
+    "image": "/images/projects/envday-2.jpg",
+    "p0": "We are firm believers in ensuring that every individual in our community has the opportunity to embrace the wonders of nature on a daily basis. Whether it involves cultivating your own food, exploring the flora of the prairie, or seeking tranquility in a meditative garden, our goal is to enhance our community's accessibility to these enriching experiences."
+  },
+  "section3": {
+    "heading": "Create Valuable Sustainable Lifestyle",
+    "p0": "We offer a range of programs and initiatives designed to bring nature closer to everyone. For those interested in sustainable living, our urban workshops teach the basics of green lifestyle, even in small spaces. Our guided nature walks provide a deeper appreciation for the eco-friendly life that thrives in our region."
+  },
+  "section4": {
+    "gallery": [
+      "/images/projects/gallery/envday-g1.jpg",
+      "/images/projects/gallery/envday-g2.jpg",
+      "/images/projects/gallery/envday-g3.jpg",
+      "/images/projects/gallery/envday-g4.jpg",
+      "/images/projects/gallery/envday-g5.jpg",
+      "/images/projects/gallery/envday-g6.jpg"
+    ]
+  }
+}

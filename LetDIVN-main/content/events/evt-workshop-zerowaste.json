@@ -1,0 +1,39 @@
+{
+  "id": "evt-workshop-zerowaste",
+  "title": "Plastic Recycling & Zero Waste Lifestyle Workshop",
+  "category": "Workshop & Education",
+  "status": "Upcoming",
+  "date": "2026-05-25",
+  "time": "14:00 - 17:30",
+  "location": "Da Lat Student Cultural Center",
+  "city": "Lam Dong",
+  "coordinates": {
+    "lat": 11.9404,
+    "lng": 108.4583
+  },
+  "image": "https://images.unsplash.com/photo-1528190336454-13cd56b45b5a?w=1000&auto=format&fit=crop&q=80",
+  "description": "An in-depth training course on the circular economy, hands-on source waste-sorting practice, and making organic soap from used cooking oil.",
+  "targetVolunteers": 300,
+  "trashCollectedKg": 450,
+  "leader": "Do Huu Duc",
+  "meetingPoint": "2nd Floor Hall, Da Lat Student Cultural Center",
+  "schedule": [
+    {
+      "time": "14:00",
+      "activity": "Check-in and welcome refreshments"
+    },
+    {
+      "time": "14:30",
+      "activity": "Opening talk: the plastic crisis in Vietnam"
+    },
+    {
+      "time": "15:00 - 16:30",
+      "activity": "Hands-on plastic recycling and upcycling workshop"
+    },
+    {
+      "time": "17:00",
+      "activity": "Zero-waste lifestyle sharing circle and closing"
+    }
+  ],
+  "order": 4
+}

@@ -1,0 +1,21 @@
+{
+  "heroImage": "/images/who-we-are/hero.jpg",
+  "title": "WHO WE ARE",
+  "intro": "We're a diverse group of people, all bound together by something even bigger than collecting trash: working together to engage the Vietnam communities and share our passion for the beauty of the natural world.",
+  "value1Title": "Clean",
+  "value1Desc": "We take pride in engaging with beauty and its power to ignite inspiration.",
+  "value2Title": "Natural",
+  "value2Desc": "We draw inspiration from the unparalleled beauty of the natural world and promote its integration into our constructed surroundings.",
+  "value3Title": "Authentic",
+  "value3Desc": "Embracing our identity, we proudly showcase our passion as a local, ethical, imperfect, and \nauthentic entity.",
+  "stripImage1": "/images/who-we-are/strip1.jpg",
+  "stripImage2": "/images/who-we-are/strip2.jpg",
+  "sustainabilityTitle": "Promoting Sustainability and Community Action",
+  "sustainabilityDesc": "Let's Do It Vietnam is a vibrant and dedicated organization committed to environmental sustainability and community action. As part of the global Let's Do It World movement, we focus on addressing waste management issues, promoting recycling, and fostering a cleaner, greener Vietnam. Our activities range from large-scale cleanup events to educational campaigns, engaging volunteers and communities across the country.",
+  "sustainabilityImage": "/images/who-we-are/sustainability.jpg",
+  "beganTitle": "Where It All Began",
+  "beganDesc": "Let's Do It Vietnam began as part of the global Let's Do It World movement, which originated in Estonia in 2008 with a massive cleanup event that inspired millions worldwide. Recognizing the urgent need for action in Vietnam, a group of passionate environmentalists and community leaders established Let's Do It Vietnam in 2015.",
+  "todayTitle": "Let's Do It Vietnam Today",
+  "todayDesc": "Since its inception, Let's Do It Vietnam has grown exponentially, organizing nationwide cleanup events, educational workshops, and awareness campaigns to combat waste and promote environmental sustainability. The organization has mobilized thousands of volunteers, collaborated with local governments, businesses, and schools, and played a pivotal role in shaping a greener future for Vietnam. Through relentless dedication and community engagement, Let's Do It Vietnam continues to inspire positive change and environmental stewardship across the country.",
+  "todayImage": "/images/who-we-are/today.jpg"
+}

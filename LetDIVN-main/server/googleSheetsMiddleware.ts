@@ -88,36 +88,15 @@ async function getFirstSheetMeta(spreadsheetId: string, token: string): Promise<
 }
 
 /**
- * Connect/Express-compatible middleware implementing the /api/sheets/* routes.
- * Shared by the Vite dev server (vite.config.ts) and the standalone production
- * server (server.ts) so the two never drift apart.
+ * Connect/Express-compatible middleware implementing POST /api/sheets/append,
+ * which adds a volunteer sign-up to the Google Sheet. Shared by the Vite dev
+ * server (vite.config.ts) and the standalone production server (server.ts).
+ *
+ * There is deliberately no endpoint that reads, clears or deletes sheet rows:
+ * nothing on the site is logged in any more, so anyone could call it. The
+ * sign-ups are read in Google Sheets itself.
  */
 export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse, next: () => void) {
-  // Read data endpoint for live sheet rendering
-  if (req.url?.startsWith('/api/sheets/read') && req.method === 'GET') {
-    (async () => {
-      try {
-        const urlObj = new URL(req.url!, 'http://localhost');
-        const spreadsheetId = urlObj.searchParams.get('spreadsheetId') || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
-        const token = await getGoogleOAuthToken();
-        const { title: sheetTitle } = await getFirstSheetMeta(spreadsheetId, token);
-        const sheetsRes = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetTitle)}!A1:Z500`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-        const data = await sheetsRes.json();
-        res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(data));
-      } catch (err: any) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err?.message || 'Server error' }));
-      }
-    })();
-    return;
-  }
-
   if (req.url?.startsWith('/api/sheets/append') && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -166,133 +145,6 @@ export function googleSheetsMiddleware(req: IncomingMessage, res: ServerResponse
         const sheetsData = await sheetsRes.json();
         res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(sheetsData));
-      } catch (err: any) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err?.message || 'Server error' }));
-      }
-    });
-    return;
-  }
-
-  if (req.url?.startsWith('/api/sheets/sync-all') && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const parsed = JSON.parse(body || '{}');
-        const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
-        const rows = parsed.rows;
-
-        if (!rows || !Array.isArray(rows)) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Missing rows' }));
-          return;
-        }
-
-        const token = await getGoogleOAuthToken();
-        const { title: sheetTitle } = await getFirstSheetMeta(spreadsheetId, token);
-
-        const sheetsRes = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetTitle)}!A1:append?valueInputOption=USER_ENTERED`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              values: rows,
-            }),
-          }
-        );
-
-        const sheetsData = await sheetsRes.json();
-        res.writeHead(sheetsRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(sheetsData));
-      } catch (err: any) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err?.message || 'Server error' }));
-      }
-    });
-    return;
-  }
-
-  if (req.url?.startsWith('/api/sheets/clear') && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const parsed = JSON.parse(body || '{}');
-        const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
-
-        const token = await getGoogleOAuthToken();
-        const { title: sheetTitle } = await getFirstSheetMeta(spreadsheetId, token);
-
-        // Clear every data row but keep the header row (row 1) intact.
-        const clearRes = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetTitle)}!A2:Z10000:clear`,
-          {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const clearData = await clearRes.json();
-        res.writeHead(clearRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(clearData));
-      } catch (err: any) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: err?.message || 'Server error' }));
-      }
-    });
-    return;
-  }
-
-  if (req.url?.startsWith('/api/sheets/delete-row') && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const parsed = JSON.parse(body || '{}');
-        const spreadsheetId = parsed.spreadsheetId || '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
-        const rowNumber = Number(parsed.rowNumber);
-
-        if (!rowNumber || rowNumber < 2) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Missing or invalid rowNumber (must be >= 2, row 1 is the header)' }));
-          return;
-        }
-
-        const token = await getGoogleOAuthToken();
-        const { sheetId } = await getFirstSheetMeta(spreadsheetId, token);
-
-        // Delete a single row in-place (shifts every row below it up by one).
-        const deleteRes = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              requests: [{
-                deleteDimension: {
-                  range: {
-                    sheetId,
-                    dimension: 'ROWS',
-                    startIndex: rowNumber - 1,
-                    endIndex: rowNumber
-                  }
-                }
-              }]
-            }),
-          }
-        );
-
-        const deleteData = await deleteRes.json();
-        res.writeHead(deleteRes.ok ? 200 : 400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(deleteData));
       } catch (err: any) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err?.message || 'Server error' }));
