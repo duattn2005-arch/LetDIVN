@@ -1,0 +1,11 @@
+{
+  "id": "ptn-10",
+  "name": "USAID Vietnam",
+  "tier": "Diamond",
+  "type": "International Organization",
+  "logo": "/partners/usaid.png",
+  "website": "https://www.usaid.gov/vietnam",
+  "description": "The U.S. Agency for International Development supports programs to reduce ocean plastic waste.",
+  "joinedYear": 2018,
+  "order": 10
+}

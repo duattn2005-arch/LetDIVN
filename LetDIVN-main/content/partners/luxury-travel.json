@@ -1,0 +1,11 @@
+{
+  "id": "ptn-20",
+  "name": "Luxury Travel",
+  "tier": "Silver",
+  "type": "Travel",
+  "logo": "/partners/luxury-travel.png",
+  "website": "https://luxurytravelvietnam.com",
+  "description": "A premium travel service supporting Vietnam's ecological conservation activities.",
+  "joinedYear": 2020,
+  "order": 20
+}

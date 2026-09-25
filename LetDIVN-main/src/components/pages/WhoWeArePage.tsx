@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Leaf, TreePine, PersonStanding, ShieldCheck, Plus, Edit3, Trash2, ArrowLeftRight } from 'lucide-react';
+import { Leaf, TreePine, PersonStanding, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { dbService } from '../../services/dbService';
 import { WhoWeAreItem } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
-import { WhoWeAreSectionEditorModal } from '../WhoWeAreSectionEditorModal';
+import { CmsEditLink } from '../CmsEditLink';
 
 const BRAND_PINK = '#F1138D';
 
 export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
   const { isAdmin } = useAuth();
   const [sections, setSections] = useState<WhoWeAreItem[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<WhoWeAreItem | null>(null);
 
   useEffect(() => {
     const refresh = () => { dbService.getWhoWeAreSections().then(setSections); };
@@ -21,35 +19,6 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
     const unsub = dbService.subscribe(refresh);
     return unsub;
   }, []);
-
-  const handleOpenAdd = () => {
-    setEditingItem(null);
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEdit = (item: WhoWeAreItem) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (id: string, title: string) => {
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      dbService.deleteWhoWeAreSection(id);
-    }
-  };
-
-  const handleToggleLayout = (item: WhoWeAreItem) => {
-    const newLayout = item.layout === 'image-left' ? 'image-right' : 'image-left';
-    dbService.updateWhoWeAreSection({ ...item, layout: newLayout });
-  };
-
-  const handleSaveItem = (data: Omit<WhoWeAreItem, 'id'> | WhoWeAreItem) => {
-    if ('id' in data && data.id) {
-      dbService.updateWhoWeAreSection(data as WhoWeAreItem);
-    } else {
-      dbService.addWhoWeAreSection(data);
-    }
-  };
 
   return (
     <div className="bg-white">
@@ -87,14 +56,7 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
                 <ShieldCheck className="w-4 h-4" />
                 <span>Hover over an image/text to edit (Admin)</span>
               </div>
-              <button
-                type="button"
-                onClick={handleOpenAdd}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer border border-emerald-500/50 hover:scale-[1.02]"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add New Section (Image & Text)</span>
-              </button>
+              <CmsEditLink collection="who-we-are" label="Add New Section (CMS)" />
             </div>
           )}
         </div>
@@ -241,75 +203,28 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 grid grid-cols-1 md:grid-cols-[0.85fr_1.15fr] gap-10 items-center">
               <div className={isImageLeft ? 'order-1' : 'order-1 md:order-2'}>
-                <EditableImage
-                  contentKey={`whoWeAre.section.${item.id}.img`}
-                  defaultValue={item.image}
-                  alt={item.title}
-                  wrapperClassName="aspect-3/2 p-2 bg-white border border-slate-200 shadow-lg rounded-sm"
-                  className="w-full h-full object-cover"
-                />
+                <div className="aspect-3/2 p-2 bg-white border border-slate-200 shadow-lg rounded-sm">
+                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                </div>
               </div>
               <div className={`space-y-3 ${isImageLeft ? 'order-2' : 'order-2 md:order-1'}`}>
-                <h2 className="ref-heading text-2xl sm:text-3xl lg:text-[45px] [text-wrap:balance]">
-                  <EditableText
-                    contentKey={`whoWeAre.section.${item.id}.title`}
-                    defaultValue={item.title}
-                    as="span"
-                    render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
-                  />
+                <h2 className="ref-heading text-2xl sm:text-3xl lg:text-[45px] [text-wrap:balance]" style={{ color: BRAND_PINK }}>
+                  {item.title}
                 </h2>
                 <div className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed">
-                  <EditableText
-                    contentKey={`whoWeAre.section.${item.id}.desc`}
-                    defaultValue={item.desc}
-                    as="p"
-                    multiline
-                  />
+                  <p className="whitespace-pre-line">{item.desc}</p>
                 </div>
               </div>
             </div>
 
-            {isAdmin && (
-              <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-700 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  type="button"
-                  onClick={() => handleToggleLayout(item)}
-                  className="p-1.5 text-slate-300 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                  title="Swap image side (left / right)"
-                >
-                  <ArrowLeftRight className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Swap side</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleOpenEdit(item)}
-                  className="p-1.5 text-slate-300 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                  title="Edit content & image"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Edit</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(item.id, item.title)}
-                  className="p-1.5 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                  title="Delete this section"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Delete</span>
-                </button>
+            {isAdmin && item.slug && (
+              <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                <CmsEditLink collection="who-we-are" slug={item.slug} />
               </div>
             )}
           </div>
         );
       })}
-
-      <WhoWeAreSectionEditorModal
-        isOpen={isModalOpen}
-        onClose={() => { setIsModalOpen(false); setEditingItem(null); }}
-        itemToEdit={editingItem}
-        onSave={handleSaveItem}
-      />
 
     </div>
   );

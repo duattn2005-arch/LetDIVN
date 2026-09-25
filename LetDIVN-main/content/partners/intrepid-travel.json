@@ -1,0 +1,11 @@
+{
+  "id": "ptn-19",
+  "name": "Intrepid Travel",
+  "tier": "Gold",
+  "type": "Travel",
+  "logo": "/partners/intrepid.png",
+  "website": "https://www.intrepidtravel.com",
+  "description": "One of the world's leading sustainable adventure-travel organizations, with zero-waste tours.",
+  "joinedYear": 2018,
+  "order": 19
+}

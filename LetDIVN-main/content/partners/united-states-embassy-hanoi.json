@@ -1,0 +1,11 @@
+{
+  "id": "ptn-12",
+  "name": "United States Embassy Hanoi",
+  "tier": "Diamond",
+  "type": "Diplomatic Mission",
+  "logo": "/partners/us-embassy.png",
+  "website": "https://vn.usembassy.gov/",
+  "description": "The U.S. Embassy in Hanoi sponsors environmental and community education programs.",
+  "joinedYear": 2017,
+  "order": 12
+}

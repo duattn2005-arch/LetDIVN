@@ -1,0 +1,11 @@
+{
+  "id": "ptn-23",
+  "name": "TH School",
+  "tier": "Gold",
+  "type": "Education",
+  "logo": "/partners/th-school.png",
+  "website": "https://thschool.edu.vn",
+  "description": "An eco-school system launching waste-sorting and nature-protection movements for students.",
+  "joinedYear": 2021,
+  "order": 23
+}

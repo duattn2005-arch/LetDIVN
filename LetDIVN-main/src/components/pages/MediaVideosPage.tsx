@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Plus, Trash2, PlayCircle, Youtube } from 'lucide-react';
+import { PlayCircle, Youtube, Edit3 } from 'lucide-react';
 import { dbService } from '../../services/dbService';
 import { MediaVideo } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
-import { VideoAddModal } from '../VideoAddModal';
+import { CmsEditLink, cmsUrl } from '../CmsEditLink';
 import { getYouTubeEmbedUrl } from '../../utils/youtube';
 
 export const MediaVideosPage: React.FC = () => {
   const { isAdmin } = useAuth();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [videos, setVideos] = useState<MediaVideo[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<MediaVideo | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const refreshVideos = () => {
     dbService.getVideos().then(setVideos);
@@ -33,14 +32,6 @@ export const MediaVideosPage: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videos]);
-
-  const handleDeleteVideo = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    const confirmMsg = language === 'vi' ? 'Bạn có chắc chắn muốn xóa video này?' : 'Are you sure you want to delete this video?';
-    if (window.confirm(confirmMsg)) {
-      dbService.deleteVideo(id);
-    }
-  };
 
   return (
     <div className="py-10 sm:py-14 relative z-10">
@@ -64,13 +55,7 @@ export const MediaVideosPage: React.FC = () => {
 
           {isAdmin && (
             <div className="pt-1">
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="btn-pill-3d px-6 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs shadow-lg flex items-center gap-2 cursor-pointer mx-auto"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{t.videosPageAddBtn}</span>
-              </button>
+              <CmsEditLink collection="videos" label={t.videosPageAddBtn} />
             </div>
           )}
         </div>
@@ -80,15 +65,11 @@ export const MediaVideosPage: React.FC = () => {
             <Youtube className="w-10 h-10 text-slate-300 mx-auto" />
             <div className="text-sm font-bold text-slate-700">{t.videosPageEmptyTitle}</div>
             <p className="text-xs text-slate-400 max-w-md mx-auto">{t.videosPageEmptyDesc}</p>
-            <div className="pt-2">
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="btn-pill-3d px-5 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs shadow-md inline-flex items-center gap-2 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{t.videosPageAddBtn}</span>
-              </button>
-            </div>
+            {isAdmin && (
+              <div className="pt-2">
+                <CmsEditLink collection="videos" label={t.videosPageAddBtn} />
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
@@ -124,15 +105,18 @@ export const MediaVideosPage: React.FC = () => {
                         {v.title}
                       </div>
                     </div>
-                    {isAdmin && (
+                    {isAdmin && v.slug && (
                       <span
-                        role="button"
+                        role="link"
                         tabIndex={0}
-                        onClick={(e) => handleDeleteVideo(e, v.id)}
-                        title="Xóa video"
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(cmsUrl('videos', v.slug), '_blank', 'noopener');
+                        }}
+                        title="Sửa trên CMS"
+                        className="p-1.5 text-slate-400 hover:text-[#E81A7F] hover:bg-pink-50 rounded-lg transition-colors cursor-pointer shrink-0"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Edit3 className="w-3.5 h-3.5" />
                       </span>
                     )}
                   </button>
@@ -172,15 +156,6 @@ export const MediaVideosPage: React.FC = () => {
         )}
 
       </div>
-
-      <VideoAddModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSaved={(savedVideo) => {
-          setSelectedVideo(savedVideo);
-          refreshVideos();
-        }}
-      />
     </div>
   );
 };

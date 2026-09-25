@@ -40,9 +40,7 @@ import {
 import {
   INITIAL_USERS,
   INITIAL_VOLUNTEERS,
-  INITIAL_EVENTS,
-  INITIAL_PARTNERS,
-  INITIAL_GALLERY
+  INITIAL_EVENTS
 } from '../data/initialData';
 import {
   fetchDataFromSheets,
@@ -78,8 +76,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const [volunteers, setVolunteers] = useState<VolunteerRegistration[]>(() => INITIAL_VOLUNTEERS);
   const [events, setEvents] = useState<CleanupEvent[]>(() => INITIAL_EVENTS);
   const [news, setNews] = useState<NewsArticle[]>([]);
-  const [partners, setPartners] = useState<Partner[]>(() => INITIAL_PARTNERS);
-  const [gallery, setGallery] = useState<GalleryItem[]>(() => INITIAL_GALLERY);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [stats, setStats] = useState<Awaited<ReturnType<typeof dbService.getStats>> | null>(null);
 
   // Search & Filter
@@ -193,14 +191,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const handleDeleteEvent = async (id: string) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
       await dbService.deleteEvent(id);
-      refreshData();
-    }
-  };
-
-  // Partner CRUD
-  const handleDeletePartner = async (id: string) => {
-    if (window.confirm('Bạn có chắc muốn xóa đối tác này?')) {
-      await dbService.deletePartner(id);
       refreshData();
     }
   };

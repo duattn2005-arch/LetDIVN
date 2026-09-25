@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { TeamMember } from '../../types';
 import { useAuth } from '../../context/AuthContext';
-import { Plus, Edit3, Trash2, ShieldCheck } from 'lucide-react';
-import { TeamMemberEditorModal } from '../TeamMemberEditorModal';
+import { ShieldCheck } from 'lucide-react';
+import { CmsEditLink } from '../CmsEditLink';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { TakeActionStrip } from '../TakeActionStrip';
@@ -13,8 +13,6 @@ const BRAND_PINK = '#F1138D';
 export const OurTeamPage: React.FC = () => {
   const { isAdmin } = useAuth();
   const [team, setTeam] = useState<TeamMember[]>([]);
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const loadTeam = () => {
     dbService.getTeam().then(setTeam);
@@ -25,23 +23,6 @@ export const OurTeamPage: React.FC = () => {
     const unsub = dbService.subscribe(loadTeam);
     return () => unsub();
   }, []);
-
-  const handleAddNew = () => {
-    setSelectedMember(null);
-    setIsEditorOpen(true);
-  };
-
-  const handleEdit = (member: TeamMember) => {
-    setSelectedMember(member);
-    setIsEditorOpen(true);
-  };
-
-  const handleDelete = (member: TeamMember) => {
-    if (window.confirm(`Are you sure you want to remove "${member.name}" from the team list?`)) {
-      dbService.deleteTeamMember(member.id);
-      loadTeam();
-    }
-  };
 
   return (
     <div className="bg-white">
@@ -80,14 +61,7 @@ export const OurTeamPage: React.FC = () => {
                 <ShieldCheck className="w-4 h-4" />
                 <span>Admin Management Mode</span>
               </div>
-              <button
-                id="admin-add-team-btn"
-                onClick={handleAddNew}
-                className="btn-pill-3d inline-flex items-center gap-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs sm:text-sm px-6 py-2.5 shadow-lg cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add New Member</span>
-              </button>
+              <CmsEditLink collection="team" label="Add New Member (CMS)" />
             </div>
           )}
         </div>
@@ -99,22 +73,9 @@ export const OurTeamPage: React.FC = () => {
               key={member.id}
               className="relative group rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
             >
-              {isAdmin && (
-                <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => handleEdit(member)}
-                    className="p-1.5 bg-white/90 hover:bg-white text-slate-700 hover:text-[#E81A7F] rounded-full shadow-md transition-colors cursor-pointer border border-slate-200"
-                    title="Edit information"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(member)}
-                    className="p-1.5 bg-white/90 hover:bg-white text-slate-700 hover:text-red-600 rounded-full shadow-md transition-colors cursor-pointer border border-slate-200"
-                    title="Remove member"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+              {isAdmin && member.slug && (
+                <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <CmsEditLink collection="team" slug={member.slug} />
                 </div>
               )}
 
@@ -141,14 +102,6 @@ export const OurTeamPage: React.FC = () => {
       </div>
 
       <TakeActionStrip contentKeyPrefix="ourTeam" />
-
-      {/* Team Member Editor Modal */}
-      <TeamMemberEditorModal
-        isOpen={isEditorOpen}
-        onClose={() => { setIsEditorOpen(false); setSelectedMember(null); }}
-        memberToEdit={selectedMember}
-        onSaved={() => loadTeam()}
-      />
     </div>
   );
 };

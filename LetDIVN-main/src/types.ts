@@ -79,6 +79,8 @@ export interface NewsArticle {
 
 export interface Partner {
   id: string;
+  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
+  slug?: string;
   name: string;
   tier: 'Diamond' | 'Gold' | 'Silver' | 'Community' | 'Media';
   logo: string;
@@ -94,6 +96,8 @@ export interface Partner {
 
 export interface GalleryItem {
   id: string;
+  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
+  slug?: string;
   title: string;
   eventName: string;
   year: number;
@@ -117,6 +121,8 @@ export interface ContactMessage {
 
 export interface MediaVideo {
   id: string;
+  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
+  slug?: string;
   youtubeId: string;
   title: string;
   thumbnailUrl: string;
@@ -125,6 +131,8 @@ export interface MediaVideo {
 
 export interface TeamMember {
   id: string;
+  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
+  slug?: string;
   name: string;
   role: string;
   department: string;
@@ -152,6 +160,8 @@ export type ActiveView =
 
 export interface WhatWeDoItem {
   id: string;
+  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
+  slug?: string;
   badge?: string;
   title: string;
   desc: string;
@@ -163,6 +173,8 @@ export interface WhatWeDoItem {
 
 export interface WhoWeAreItem {
   id: string;
+  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
+  slug?: string;
   title: string;
   desc: string;
   image: string;
@@ -172,6 +184,8 @@ export interface WhoWeAreItem {
 
 export interface MediaCoverageEntry {
   id: string;
+  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
+  slug?: string;
   title: string;
   articleCount: number;
   segmentCount: number;

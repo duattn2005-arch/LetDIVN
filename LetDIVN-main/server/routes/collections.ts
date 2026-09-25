@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { getNews } from '../newsContent.js';
-import { events, volunteers, partners, gallery, team, contacts, videos, whatWeDo, whoWeAreSections, mediaCoverage } from '../db/collections.js';
+import { getNews, getPartners, getGallery, getTeam, getVideos, getWhatWeDo, getWhoWeAre, getMediaCoverage } from '../cmsContent.js';
+import { events, volunteers, contacts } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -55,59 +55,18 @@ router.delete('/volunteers/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// --- News ---
-// Articles are managed in Decap CMS (/admin) and stored as files in the repo;
-// see server/newsContent.ts. There are no write endpoints here any more.
+// --- Content managed in Decap CMS (/admin) ---
+// News, partners, gallery, team, videos, What We Do, Who We Are sections and
+// Media on Us entries are JSON files in the repo (see server/cmsContent.ts).
+// They are read-only here: all editing happens in Decap.
 router.get('/news', async (req, res) => res.json(await getNews()));
-
-// --- Partners (supports bulk reorder via PUT /partners) ---
-router.get('/partners', (req, res) => res.json(partners.getAll()));
-router.post('/partners', requireAdmin, (req, res) => {
-  res.json(partners.insert(req.body, { sortOrder: -1 })); // new partners lead the list, like the old prepend behavior
-});
-router.put('/partners/reorder', requireAdmin, (req, res) => {
-  partners.replaceAll(req.body.partners || []);
-  res.json({ ok: true });
-});
-router.put('/partners/:id', requireAdmin, (req, res) => {
-  const updated = partners.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy đối tác' });
-  res.json(updated);
-});
-router.delete('/partners/:id', requireAdmin, (req, res) => {
-  partners.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
-// --- Gallery ---
-router.get('/gallery', (req, res) => res.json(gallery.getAll()));
-router.post('/gallery', requireAdmin, (req, res) => {
-  res.json(gallery.insert({ ...req.body, likes: 0 }));
-});
-router.put('/gallery/:id', requireAdmin, (req, res) => {
-  const updated = gallery.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy ảnh' });
-  res.json(updated);
-});
-router.delete('/gallery/:id', requireAdmin, (req, res) => {
-  gallery.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
-// --- Team ---
-router.get('/team', (req, res) => res.json(team.getAll()));
-router.post('/team', requireAdmin, (req, res) => {
-  res.json(team.insert(req.body));
-});
-router.put('/team/:id', requireAdmin, (req, res) => {
-  const updated = team.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy thành viên' });
-  res.json(updated);
-});
-router.delete('/team/:id', requireAdmin, (req, res) => {
-  team.delete(String(req.params.id));
-  res.json({ ok: true });
-});
+router.get('/partners', async (req, res) => res.json(await getPartners()));
+router.get('/gallery', async (req, res) => res.json(await getGallery()));
+router.get('/team', async (req, res) => res.json(await getTeam()));
+router.get('/videos', async (req, res) => res.json(await getVideos()));
+router.get('/what-we-do', async (req, res) => res.json(await getWhatWeDo()));
+router.get('/who-we-are-sections', async (req, res) => res.json(await getWhoWeAre()));
+router.get('/media-coverage', async (req, res) => res.json(await getMediaCoverage()));
 
 // --- Contacts ---
 router.get('/contacts', requireAdmin, (req, res) => res.json(contacts.getAll()));
@@ -121,74 +80,6 @@ router.put('/contacts/:id', requireAdmin, (req, res) => {
 });
 router.delete('/contacts/:id', requireAdmin, (req, res) => {
   contacts.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
-// --- Videos ---
-router.get('/videos', (req, res) => res.json(videos.getAll()));
-router.post('/videos', (req, res) => {
-  const { youtubeId, title, thumbnailUrl } = req.body || {};
-  if (!youtubeId) {
-    return res.status(400).json({ error: 'Thiếu mã video YouTube' });
-  }
-  const created = videos.insert({
-    youtubeId,
-    title: title || 'Video Let\'s do it! Vietnam',
-    thumbnailUrl: thumbnailUrl || `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`,
-    addedAt: new Date().toISOString()
-  });
-  res.json(created);
-});
-router.delete('/videos/:id', (req, res) => {
-  videos.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
-// --- What We Do ---
-router.get('/what-we-do', (req, res) => res.json(whatWeDo.getAll()));
-router.post('/what-we-do', requireAdmin, (req, res) => {
-  const all = whatWeDo.getAll();
-  res.json(whatWeDo.insert({ ...req.body, order: all.length + 1 }));
-});
-router.put('/what-we-do/:id', requireAdmin, (req, res) => {
-  const updated = whatWeDo.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
-  res.json(updated);
-});
-router.delete('/what-we-do/:id', requireAdmin, (req, res) => {
-  whatWeDo.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
-// --- Who We Are (extra sections) ---
-router.get('/who-we-are-sections', (req, res) => res.json(whoWeAreSections.getAll()));
-router.post('/who-we-are-sections', requireAdmin, (req, res) => {
-  const all = whoWeAreSections.getAll();
-  res.json(whoWeAreSections.insert({ ...req.body, order: all.length + 1 }));
-});
-router.put('/who-we-are-sections/:id', requireAdmin, (req, res) => {
-  const updated = whoWeAreSections.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
-  res.json(updated);
-});
-router.delete('/who-we-are-sections/:id', requireAdmin, (req, res) => {
-  whoWeAreSections.delete(String(req.params.id));
-  res.json({ ok: true });
-});
-
-// --- Media Coverage (Media on Us entries) ---
-router.get('/media-coverage', (req, res) => res.json(mediaCoverage.getAll()));
-router.post('/media-coverage', requireAdmin, (req, res) => {
-  const all = mediaCoverage.getAll();
-  res.json(mediaCoverage.insert({ ...req.body, order: all.length + 1 }));
-});
-router.put('/media-coverage/:id', requireAdmin, (req, res) => {
-  const updated = mediaCoverage.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy mục' });
-  res.json(updated);
-});
-router.delete('/media-coverage/:id', requireAdmin, (req, res) => {
-  mediaCoverage.delete(String(req.params.id));
   res.json({ ok: true });
 });
 

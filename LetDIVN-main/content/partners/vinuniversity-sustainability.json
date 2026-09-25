@@ -1,0 +1,11 @@
+{
+  "id": "ptn-06",
+  "name": "VinUniversity Sustainability",
+  "tier": "Gold",
+  "type": "University",
+  "logo": "/partners/vinuniversity.png",
+  "website": "https://vinuni.edu.vn",
+  "description": "VinUniversity’s research institute and center for sustainable development.",
+  "joinedYear": 2021,
+  "order": 6
+}

@@ -142,48 +142,15 @@ class DatabaseService {
   public getPartners(): Promise<Partner[]> {
     return this.get('/partners');
   }
-  public addPartner(partner: Omit<Partner, 'id'>): Promise<Partner> {
-    return this.mutate('/partners', 'POST', partner);
-  }
-  public updatePartner(id: string, updates: Partial<Partner>): Promise<Partner> {
-    return this.mutate(`/partners/${encodeURIComponent(id)}`, 'PUT', updates);
-  }
-  public async savePartners(partners: Partner[]): Promise<void> {
-    await this.mutate('/partners/reorder', 'PUT', { partners });
-  }
-  public async deletePartner(id: string): Promise<boolean> {
-    await this.mutate(`/partners/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
-  }
 
   // --- GALLERY ---
   public getGallery(): Promise<GalleryItem[]> {
     return this.get('/gallery');
   }
-  public addGalleryItem(item: Omit<GalleryItem, 'id' | 'likes'>): Promise<GalleryItem> {
-    return this.mutate('/gallery', 'POST', item);
-  }
-  public updateGalleryItem(id: string, updates: Partial<GalleryItem>): Promise<GalleryItem> {
-    return this.mutate(`/gallery/${encodeURIComponent(id)}`, 'PUT', updates);
-  }
-  public async deleteGalleryItem(id: string): Promise<boolean> {
-    await this.mutate(`/gallery/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
-  }
 
   // --- TEAM ---
   public getTeam(): Promise<TeamMember[]> {
     return this.get('/team');
-  }
-  public addTeamMember(member: Omit<TeamMember, 'id'>): Promise<TeamMember> {
-    return this.mutate('/team', 'POST', member);
-  }
-  public updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember> {
-    return this.mutate(`/team/${encodeURIComponent(id)}`, 'PUT', updates);
-  }
-  public async deleteTeamMember(id: string): Promise<boolean> {
-    await this.mutate(`/team/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
   }
 
   // --- CONTACTS ---
@@ -205,57 +172,20 @@ class DatabaseService {
   public getVideos(): Promise<MediaVideo[]> {
     return this.get('/videos');
   }
-  public addVideo(video: Omit<MediaVideo, 'id' | 'addedAt'>): Promise<MediaVideo> {
-    return this.mutate('/videos', 'POST', video);
-  }
-  public async deleteVideo(id: string): Promise<boolean> {
-    await this.mutate(`/videos/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
-  }
 
   // --- WHAT WE DO ---
   public getWhatWeDo(): Promise<WhatWeDoItem[]> {
     return this.get('/what-we-do');
-  }
-  public addWhatWeDo(item: Omit<WhatWeDoItem, 'id'>): Promise<WhatWeDoItem> {
-    return this.mutate('/what-we-do', 'POST', item);
-  }
-  public updateWhatWeDo(item: WhatWeDoItem): Promise<WhatWeDoItem> {
-    return this.mutate(`/what-we-do/${encodeURIComponent(item.id)}`, 'PUT', item);
-  }
-  public async deleteWhatWeDo(id: string): Promise<boolean> {
-    await this.mutate(`/what-we-do/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
   }
 
   // --- WHO WE ARE (extra sections) ---
   public getWhoWeAreSections(): Promise<WhoWeAreItem[]> {
     return this.get('/who-we-are-sections');
   }
-  public addWhoWeAreSection(item: Omit<WhoWeAreItem, 'id'>): Promise<WhoWeAreItem> {
-    return this.mutate('/who-we-are-sections', 'POST', item);
-  }
-  public updateWhoWeAreSection(item: WhoWeAreItem): Promise<WhoWeAreItem> {
-    return this.mutate(`/who-we-are-sections/${encodeURIComponent(item.id)}`, 'PUT', item);
-  }
-  public async deleteWhoWeAreSection(id: string): Promise<boolean> {
-    await this.mutate(`/who-we-are-sections/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
-  }
 
   // --- MEDIA COVERAGE (Media on Us entries) ---
   public getMediaCoverage(): Promise<MediaCoverageEntry[]> {
     return this.get('/media-coverage');
-  }
-  public addMediaCoverage(item: Omit<MediaCoverageEntry, 'id'>): Promise<MediaCoverageEntry> {
-    return this.mutate('/media-coverage', 'POST', item);
-  }
-  public updateMediaCoverage(item: MediaCoverageEntry): Promise<MediaCoverageEntry> {
-    return this.mutate(`/media-coverage/${encodeURIComponent(item.id)}`, 'PUT', item);
-  }
-  public async deleteMediaCoverage(id: string): Promise<boolean> {
-    await this.mutate(`/media-coverage/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
   }
 
   // --- USERS (admin dashboard) ---

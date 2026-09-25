@@ -22,17 +22,14 @@ export const PartnerModal: React.FC<PartnerModalProps> = ({ isOpen, onClose }) =
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    dbService.addPartner({
-      name: companyName,
-      tier: 'Silver',
-      logo: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=300&auto=format&fit=crop&q=80',
-      website: 'https://example.com',
-      type: type,
-      description: `${partnershipType} - Contact: ${contactPerson} (${phone})`,
-      joinedYear: new Date().getFullYear(),
-      contactPerson,
+    // Partners shown on the site are managed in Decap CMS, so a request from
+    // a visitor goes to the admin inbox (contact messages) for follow-up.
+    dbService.addContact({
+      name: contactPerson || companyName,
       email,
-      phone
+      phone,
+      subject: `Partnership request: ${companyName}`,
+      message: [`Organization: ${companyName}`, `Type: ${type}`, `Partnership: ${partnershipType}`, '', message].join('\n'),
     });
     setSubmitted(true);
   };

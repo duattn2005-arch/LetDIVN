@@ -1,0 +1,11 @@
+{
+  "id": "ptn-09",
+  "name": "Easia Travel",
+  "tier": "Silver",
+  "type": "Travel",
+  "logo": "/partners/easia-travel.jpg",
+  "website": "https://www.easia-travel.com",
+  "description": "Sustainable green travel and cleanup of eco-tourism destinations.",
+  "joinedYear": 2021,
+  "order": 9
+}

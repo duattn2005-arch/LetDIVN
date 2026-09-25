@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import { events, volunteers, partners } from '../db/collections.js';
-import { getNews } from '../newsContent.js';
+import { events, volunteers } from '../db/collections.js';
+import { getNews, getPartners } from '../cmsContent.js';
 
 const router = Router();
 
 router.get('/stats', async (req, res) => {
   const allEvents = events.getAll();
   const allVolunteers = volunteers.getAll();
-  const allPartners = partners.getAll();
+  const allPartners = await getPartners();
   const allNews = await getNews();
 
   const trashKg = allEvents.reduce((sum, e) => sum + (e.trashCollectedKg || 0), 0);

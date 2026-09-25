@@ -5,7 +5,7 @@ import { defineConfig, Plugin } from 'vite';
 import { googleSheetsMiddleware } from './server/googleSheetsMiddleware';
 import { apiRouter } from './server/apiRouter';
 import { uploadsDir } from './server/routes/upload';
-import { newsMediaRouter } from './server/newsContent';
+import { cmsMediaRouter } from './server/cmsContent';
 import express from 'express';
 
 function googleSheetsApiPlugin(): Plugin {
@@ -21,9 +21,9 @@ function backendApiPlugin(): Plugin {
   return {
     name: 'backend-api-plugin',
     configureServer(server) {
-      // In dev, news comes from content/news/ on disk (what Decap's
-      // local_backend edits) instead of GitHub — see server/newsContent.ts.
-      process.env.NEWS_SOURCE ??= 'local';
+      // In dev, CMS content comes from content/ on disk (what Decap's
+      // local_backend edits) instead of GitHub — see server/cmsContent.ts.
+      process.env.CMS_SOURCE ??= 'local';
       // Vite's dev middleware stack is bare Connect — a standalone Express
       // Router mounted directly onto it never gets res.json/res.status (those
       // come from a full express() app's response-prototype augmentation).
@@ -33,7 +33,7 @@ function backendApiPlugin(): Plugin {
       apiApp.use('/api', apiRouter);
       server.middlewares.use(apiApp);
       server.middlewares.use('/uploads', express.static(uploadsDir));
-      server.middlewares.use(newsMediaRouter);
+      server.middlewares.use(cmsMediaRouter);
     },
   };
 }

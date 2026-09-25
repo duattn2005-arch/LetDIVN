@@ -1,0 +1,11 @@
+{
+  "id": "ptn-08",
+  "name": "The Body Shop",
+  "tier": "Silver",
+  "type": "Retail",
+  "logo": "/partners/the-body-shop.png",
+  "website": "https://www.thebodyshop.com.vn",
+  "description": "A pioneering vegan cosmetics brand recycling plastic packaging in Vietnam.",
+  "joinedYear": 2020,
+  "order": 8
+}

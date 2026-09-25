@@ -1,6 +1,7 @@
-# Decap CMS — where articles for the News page are written.
+# Decap CMS — where the site's lists are edited: News, Videos, Partners, Team,
+# Gallery, What We Do, Who We Are sections and Media on Us.
 # Every save is a commit to the GitHub repo below; the live site reads the
-# articles from GitHub (server/newsContent.ts), so there is no rebuild step.
+# content from GitHub (server/cmsContent.ts), so there is no rebuild step.
 #
 # Paths are relative to the REPO root, which contains this app in LetDIVN-main/.
 
@@ -13,9 +14,9 @@ backend:
   auth_endpoint: api/decap/auth
   auth_scope: public_repo
   commit_messages:
-    create: 'Đăng bài: {{slug}}'
-    update: 'Sửa bài: {{slug}}'
-    delete: 'Xóa bài: {{slug}}'
+    create: 'Thêm {{collection}}: {{slug}}'
+    update: 'Sửa {{collection}}: {{slug}}'
+    delete: 'Xóa {{collection}}: {{slug}}'
     uploadMedia: 'Tải ảnh: {{path}}'
     deleteMedia: 'Xóa ảnh: {{path}}'
 
@@ -27,8 +28,9 @@ locale: vi
 site_url: https://letsdoitvietnam.online
 display_url: https://letsdoitvietnam.online
 
-media_folder: LetDIVN-main/public/images/news
-public_folder: /images/news
+# Uploads go to public/images/cms/ (News keeps its own folder, see below).
+media_folder: LetDIVN-main/public/images/cms
+public_folder: /images/cms
 
 # Vietnamese titles -> plain ascii file names (e.g. "Ngày hội" -> "ngay-hoi").
 slug:
@@ -41,6 +43,8 @@ collections:
     label_singular: bài viết
     description: Các bài viết hiển thị ở trang News của website.
     folder: LetDIVN-main/content/news
+    media_folder: /LetDIVN-main/public/images/news
+    public_folder: /images/news
     format: json
     extension: json
     create: true
@@ -99,3 +103,179 @@ collections:
         options:
           - { label: 'Đã đăng', value: 'Published' }
           - { label: 'Chờ duyệt (chỉ admin thấy)', value: 'Pending' }
+
+  # --- Lists below are shown in the order of the "Thứ tự" (order) field, smallest first.
+
+  - name: videos
+    label: Videos
+    label_singular: video
+    description: Video YouTube ở mục "Capturing Change, One Frame at a Time".
+    folder: LetDIVN-main/content/videos
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Link YouTube, name: youtube, widget: string, hint: 'Dán link dạng https://www.youtube.com/watch?v=... hoặc https://youtu.be/...' }
+      - { label: Thứ tự, name: order, widget: number, default: 0, value_type: int, hint: 'Số nhỏ hiện trước. Để 0 để video mới lên đầu.' }
+      - { label: Ngày thêm, name: addedAt, widget: hidden, required: false }
+
+  - name: partners
+    label: Đối tác
+    label_singular: đối tác
+    description: Logo đối tác ở trang Our Partners.
+    folder: LetDIVN-main/content/partners
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{name}}'
+    identifier_field: name
+    summary: '{{order}} · {{name}}'
+    sortable_fields: [order, name]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tên, name: name, widget: string }
+      - { label: Logo, name: logo, widget: image }
+      - { label: Website, name: website, widget: string, required: false }
+      - label: Hạng
+        name: tier
+        widget: select
+        default: Community
+        options: [Diamond, Gold, Silver, Community, Media]
+      - { label: Loại hình, name: type, widget: string, required: false, hint: 'Ví dụ: Corporate, NGO, University' }
+      - { label: Mô tả, name: description, widget: text, required: false }
+      - { label: Năm bắt đầu hợp tác, name: joinedYear, widget: number, value_type: int, required: false }
+      - { label: Tỉ lệ logo (%), name: scale, widget: number, value_type: int, default: 100, min: 50, max: 180, required: false, hint: 'Phóng to/thu nhỏ logo. 100 = kích thước chuẩn.' }
+      - { label: Thứ tự, name: order, widget: number, default: 0, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: team
+    label: Đội ngũ
+    label_singular: thành viên
+    description: Thành viên ở trang Our Team.
+    folder: LetDIVN-main/content/team
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{name}}'
+    identifier_field: name
+    summary: '{{order}} · {{name}} — {{role}}'
+    sortable_fields: [order, name]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Họ tên, name: name, widget: string }
+      - { label: Chức vụ, name: role, widget: string }
+      - { label: Ảnh, name: avatar, widget: image }
+      - { label: Bộ phận, name: department, widget: string, required: false }
+      - { label: Giới thiệu, name: bio, widget: text, required: false }
+      - { label: LinkedIn, name: linkedin, widget: string, required: false }
+      - { label: Facebook, name: facebook, widget: string, required: false }
+      - { label: Email, name: email, widget: string, required: false }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: gallery
+    label: Thư viện ảnh
+    label_singular: ảnh
+    description: Ảnh ở trang Gallery.
+    folder: LetDIVN-main/content/gallery
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{year}} · {{title}}'
+    sortable_fields: [order, year, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Ảnh, name: imageUrl, widget: image }
+      - { label: Năm, name: year, widget: number, value_type: int }
+      - { label: Tỉnh / thành phố, name: city, widget: string, required: false }
+      - { label: Sự kiện, name: eventName, widget: string, required: false }
+      - { label: Chủ đề, name: category, widget: string, required: false }
+      - { label: Chú thích, name: caption, widget: text, required: false }
+      - { label: Thứ tự, name: order, widget: number, default: 0, value_type: int, hint: 'Số nhỏ hiện trước. Để 0 để ảnh mới lên đầu.' }
+
+  - name: what-we-do
+    label: What We Do
+    label_singular: hoạt động
+    description: Các khối ảnh + chữ ở trang What We Do.
+    folder: LetDIVN-main/content/what-we-do
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Nội dung, name: desc, widget: text }
+      - { label: Ảnh, name: image, widget: image }
+      - label: Vị trí ảnh
+        name: layout
+        widget: select
+        default: image-left
+        options:
+          - { label: 'Ảnh bên trái', value: image-left }
+          - { label: 'Ảnh bên phải', value: image-right }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: who-we-are
+    label: Who We Are
+    label_singular: mục
+    description: Các khối ảnh + chữ bổ sung ở cuối trang Who We Are.
+    folder: LetDIVN-main/content/who-we-are
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Nội dung, name: desc, widget: text }
+      - { label: Ảnh, name: image, widget: image }
+      - label: Vị trí ảnh
+        name: layout
+        widget: select
+        default: image-left
+        options:
+          - { label: 'Ảnh bên trái', value: image-left }
+          - { label: 'Ảnh bên phải', value: image-right }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: media-coverage
+    label: Media on Us
+    label_singular: mục báo chí
+    description: Các năm báo chí đưa tin ở trang Media on Us.
+    folder: LetDIVN-main/content/media-coverage
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề (chữ trên nút), name: title, widget: string }
+      - { label: Ảnh, name: image, widget: image }
+      - { label: Số bài báo, name: articleCount, widget: number, value_type: int, default: 0 }
+      - { label: Số phóng sự, name: segmentCount, widget: number, value_type: int, default: 0 }
+      - { label: File PDF / link tổng hợp, name: pdfUrl, widget: file, hint: 'Tải file PDF lên hoặc dán link.' }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }

@@ -2,19 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { dbService } from '../../services/dbService';
 import { GalleryItem } from '../../types';
-import { Sparkles, MapPin, Calendar, Image as ImageIcon, X, Plus, Trash2, ShieldCheck } from 'lucide-react';
+import { MapPin, X, Edit3 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { GalleryUploadModal } from '../GalleryUploadModal';
+import { CmsEditLink, cmsUrl } from '../CmsEditLink';
 import { EditableText } from '../EditableText';
 
 export const FullGalleryPage: React.FC = () => {
   const { isAdmin } = useAuth();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>('All');
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const refreshGallery = () => {
     dbService.getGallery().then(setGallery);
@@ -32,17 +31,6 @@ export const FullGalleryPage: React.FC = () => {
     if (selectedYear === 'All') return true;
     return item.year.toString() === selectedYear;
   });
-
-  const handleDeleteItem = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (window.confirm(language === 'vi' ? 'Bạn có chắc chắn muốn xóa bức ảnh này khỏi thư viện?' : 'Are you sure you want to delete this photo?')) {
-      dbService.deleteGalleryItem(id);
-      if (selectedImage?.id === id) {
-        setSelectedImage(null);
-      }
-      refreshGallery();
-    }
-  };
 
   return (
     <div className="py-16 bg-white">
@@ -83,15 +71,7 @@ export const FullGalleryPage: React.FC = () => {
             ))}
           </div>
 
-          {isAdmin && (
-            <button
-              onClick={() => setIsUploadModalOpen(true)}
-              className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span><EditableText contentKey="fullGallery.uploadBtn" defaultValue={t.fullGalleryUploadBtn} as="span" /> (Admin)</span>
-            </button>
-          )}
+          {isAdmin && <CmsEditLink collection="gallery" label={`${t.fullGalleryUploadBtn} (CMS)`} />}
         </div>
 
         {/* Masonry / Photo Grid */}
@@ -108,15 +88,11 @@ export const FullGalleryPage: React.FC = () => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
 
-              {/* Admin delete button on card */}
-              {isAdmin && (
-                <button
-                  onClick={(e) => handleDeleteItem(e, item.id)}
-                  title="Xóa ảnh"
-                  className="absolute top-3 right-3 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg z-20 shadow cursor-pointer transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+              {/* Admin: edit in CMS */}
+              {isAdmin && item.slug && (
+                <div className="absolute top-3 right-3 z-20">
+                  <CmsEditLink collection="gallery" slug={item.slug} />
+                </div>
               )}
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 text-white">
@@ -171,27 +147,22 @@ export const FullGalleryPage: React.FC = () => {
                 </p>
               </div>
 
-              {isAdmin && (
-                <button
-                  onClick={(e) => handleDeleteItem(e, selectedImage.id)}
-                  className="px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto border border-red-500/30"
+              {isAdmin && selectedImage.slug && (
+                <a
+                  href={cmsUrl('gallery', selectedImage.slug)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2 bg-white/10 hover:bg-[#E81A7F] text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 self-start sm:self-auto border border-white/20"
                 >
-                  <Trash2 className="w-4 h-4" />
-                  <span>Xóa ảnh khỏi thư viện</span>
-                </button>
+                  <Edit3 className="w-4 h-4" />
+                  <span>Sửa / xóa trên CMS</span>
+                </a>
               )}
             </div>
           </div>
         </div>,
         document.body
       )}
-
-      {/* Upload Modal */}
-      <GalleryUploadModal
-        isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
-        onSaved={refreshGallery}
-      />
     </div>
   );
 };

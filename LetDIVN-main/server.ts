@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { googleSheetsMiddleware } from './server/googleSheetsMiddleware';
 import { apiRouter } from './server/apiRouter';
 import { uploadsDir } from './server/routes/upload';
-import { newsMediaRouter } from './server/newsContent';
+import { cmsMediaRouter } from './server/cmsContent';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,8 +24,8 @@ app.use('/uploads', express.static(uploadsDir));
 const distDir = path.join(__dirname, 'dist');
 app.use(express.static(distDir));
 
-// News images committed by Decap after the last deploy (fetched from GitHub).
-app.use(newsMediaRouter);
+// Images committed by Decap CMS after the last deploy (fetched from GitHub).
+app.use(cmsMediaRouter);
 
 // SPA fallback: any other GET request serves index.html.
 // (Plain app.use instead of a '*' path pattern — Express 5's path-to-regexp
