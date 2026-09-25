@@ -1,12 +1,11 @@
 import { db } from './index.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, whoWeAre } from './collections.js';
+import { events, volunteers, partners, gallery, team, contacts, videos, whatWeDo, whoWeAre } from './collections.js';
 import { insertUser } from './users.js';
 import { hashPassword } from '../auth.js';
 import {
   INITIAL_USERS,
   INITIAL_EVENTS,
   INITIAL_VOLUNTEERS,
-  INITIAL_NEWS,
   INITIAL_PARTNERS,
   INITIAL_GALLERY,
   INITIAL_TEAM,
@@ -22,7 +21,6 @@ export function seedIfEmpty(): void {
   try {
     if (events.count() === 0) INITIAL_EVENTS.forEach((item, i) => events.seedRaw(item, i));
     if (volunteers.count() === 0) INITIAL_VOLUNTEERS.forEach((item, i) => volunteers.seedRaw(item, i));
-    if (news.count() === 0) INITIAL_NEWS.forEach((item, i) => news.seedRaw(item, i));
     if (partners.count() === 0) INITIAL_PARTNERS.forEach((item, i) => partners.seedRaw(item, i));
     if (gallery.count() === 0) INITIAL_GALLERY.forEach((item, i) => gallery.seedRaw(item, i));
     if (team.count() === 0) INITIAL_TEAM.forEach((item, i) => team.seedRaw(item, i));

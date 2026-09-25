@@ -42,7 +42,6 @@ import {
   INITIAL_USERS,
   INITIAL_VOLUNTEERS,
   INITIAL_EVENTS,
-  INITIAL_NEWS,
   INITIAL_PARTNERS,
   INITIAL_GALLERY
 } from '../data/initialData';
@@ -82,7 +81,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   );
   const [volunteers, setVolunteers] = useState<VolunteerRegistration[]>(() => INITIAL_VOLUNTEERS);
   const [events, setEvents] = useState<CleanupEvent[]>(() => INITIAL_EVENTS);
-  const [news, setNews] = useState<NewsArticle[]>(() => INITIAL_NEWS);
+  const [news, setNews] = useState<NewsArticle[]>([]);
   const [partners, setPartners] = useState<Partner[]>(() => INITIAL_PARTNERS);
   const [gallery, setGallery] = useState<GalleryItem[]>(() => INITIAL_GALLERY);
   const [stats, setStats] = useState<Awaited<ReturnType<typeof dbService.getStats>> | null>(null);
@@ -263,14 +262,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
   const handleDeleteEvent = async (id: string) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) {
       await dbService.deleteEvent(id);
-      refreshData();
-    }
-  };
-
-  // News CRUD
-  const handleDeleteNews = async (id: string) => {
-    if (window.confirm('Bạn có chắc muốn xóa bài viết này?')) {
-      await dbService.deleteNews(id);
       refreshData();
     }
   };
@@ -1021,8 +1012,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
           {/* TAB 3: NEWS */}
           {activeTab === 'news' && (
             <div className="space-y-4">
-              <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                <h4 className="font-bold text-base text-white">Tin Tức &amp; Báo Chí Viết Về Chúng Tôi</h4>
+              <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h4 className="font-bold text-base text-white">Tin Tức &amp; Báo Chí Viết Về Chúng Tôi</h4>
+                  <p className="text-xs text-slate-400 mt-0.5">Bài viết được đăng và chỉnh sửa trên Decap CMS (đăng nhập bằng GitHub).</p>
+                </div>
+                <a
+                  href="/admin/index.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3.5 py-2 bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Mở Decap CMS</span>
+                </a>
               </div>
               <div className="space-y-3">
                 {news.map((item) => (
@@ -1034,12 +1037,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                         <h5 className="font-bold text-sm text-white truncate">{item.title}</h5>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleDeleteNews(item.id)}
-                      className="p-2 bg-red-950/60 hover:bg-red-900 text-red-400 rounded-xl transition-colors cursor-pointer"
+                    <a
+                      href={`/admin/index.html#/collections/news/entries/${encodeURIComponent(item.slug)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Sửa trên Decap CMS"
+                      className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-colors cursor-pointer"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                      <Edit3 className="w-4 h-4" />
+                    </a>
                   </div>
                 ))}
               </div>

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAdmin } from '../auth.js';
-import { events, volunteers, news, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage, whoWeAre, campaignSections } from '../db/collections.js';
+import { getNews } from '../newsContent.js';
+import { events, volunteers, partners, gallery, team, contacts, videos, whatWeDo, mediaCoverage, whoWeAre, campaignSections } from '../db/collections.js';
 import type { CleanupEvent, VolunteerRegistration } from '../../src/types.js';
 
 const router = Router();
@@ -55,20 +56,9 @@ router.delete('/volunteers/:id', requireAdmin, (req, res) => {
 });
 
 // --- News ---
-router.get('/news', (req, res) => res.json(news.getAll()));
-router.post('/news', requireAdmin, (req, res) => {
-  const body = { ...req.body, views: Math.floor(Math.random() * 50) + 10, status: req.body.status || 'Published' };
-  res.json(news.insert(body));
-});
-router.put('/news/:id', requireAdmin, (req, res) => {
-  const updated = news.update(String(req.params.id), req.body);
-  if (!updated) return res.status(404).json({ error: 'Không tìm thấy bài viết' });
-  res.json(updated);
-});
-router.delete('/news/:id', requireAdmin, (req, res) => {
-  news.delete(String(req.params.id));
-  res.json({ ok: true });
-});
+// Articles are managed in Decap CMS (/admin) and stored as files in the repo;
+// see server/newsContent.ts. There are no write endpoints here any more.
+router.get('/news', async (req, res) => res.json(await getNews()));
 
 // --- Partners (supports bulk reorder via PUT /partners) ---
 router.get('/partners', (req, res) => res.json(partners.getAll()));

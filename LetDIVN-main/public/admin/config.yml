@@ -1,0 +1,99 @@
+# Decap CMS — where articles for the News page are written.
+# Every save is a commit to the GitHub repo below; the live site reads the
+# articles from GitHub (server/newsContent.ts), so there is no rebuild step.
+#
+# Paths are relative to the REPO root, which contains this app in LetDIVN-main/.
+
+backend:
+  name: github
+  repo: duattn2005-arch/LetDIVN
+  branch: main
+  # GitHub login goes through our own server (server/routes/decapAuth.ts).
+  base_url: https://letsdoitvietnam.online
+  auth_endpoint: api/decap/auth
+  auth_scope: public_repo
+  commit_messages:
+    create: 'Đăng bài: {{slug}}'
+    update: 'Sửa bài: {{slug}}'
+    delete: 'Xóa bài: {{slug}}'
+    uploadMedia: 'Tải ảnh: {{path}}'
+    deleteMedia: 'Xóa ảnh: {{path}}'
+
+# On localhost only: edit the files on disk instead of GitHub.
+# Run `npx decap-server` from the repo root alongside `npm run dev`.
+local_backend: true
+
+locale: vi
+site_url: https://letsdoitvietnam.online
+display_url: https://letsdoitvietnam.online
+
+media_folder: LetDIVN-main/public/images/news
+public_folder: /images/news
+
+# Vietnamese titles -> plain ascii file names (e.g. "Ngày hội" -> "ngay-hoi").
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: news
+    label: Tin tức
+    label_singular: bài viết
+    description: Các bài viết hiển thị ở trang News của website.
+    folder: LetDIVN-main/content/news
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: title
+    summary: '{{date}} · {{title}}'
+    sortable_fields: [date, title]
+    fields:
+      - { label: Tiêu đề, name: title, widget: string }
+      - label: Chuyên mục
+        name: category
+        widget: select
+        default: News
+        options:
+          - { label: 'Tin tức (News)', value: 'News' }
+          - { label: 'Báo chí viết về chúng tôi (Media On Us)', value: 'Media On Us' }
+          - { label: 'Thông cáo báo chí (Press Release)', value: 'Press Release' }
+          - { label: 'Câu chuyện tác động (Impact Story)', value: 'Impact Story' }
+      - label: Ngày đăng
+        name: date
+        widget: datetime
+        format: 'YYYY-MM-DD'
+        date_format: 'DD/MM/YYYY'
+        time_format: false
+      - { label: Tác giả, name: author, widget: string, required: false }
+      - { label: Ảnh đại diện, name: image, widget: image, hint: 'Ảnh hiển thị trên thẻ bài viết.' }
+      - { label: Tóm tắt, name: summary, widget: text, hint: 'Vài câu ngắn hiển thị dưới tiêu đề trong danh sách bài viết.' }
+      - label: Nội dung
+        name: contentBlocks
+        widget: list
+        label_singular: khối
+        hint: 'Thêm đoạn văn và ảnh theo đúng thứ tự muốn hiển thị. Kéo để sắp xếp lại.'
+        types:
+          - label: Đoạn văn
+            name: text
+            widget: object
+            summary: '{{fields.value}}'
+            fields:
+              - { label: Đoạn văn, name: value, widget: text }
+          - label: Ảnh
+            name: image
+            widget: object
+            summary: '{{fields.value}}'
+            fields:
+              - { label: Ảnh, name: value, widget: image }
+      - { label: Nguồn (tên báo), name: source, widget: string, required: false }
+      - { label: Link bài gốc, name: sourceUrl, widget: string, required: false }
+      - { label: Nổi bật, name: featured, widget: boolean, default: false, required: false }
+      - label: Trạng thái
+        name: status
+        widget: select
+        default: Published
+        options:
+          - { label: 'Đã đăng', value: 'Published' }
+          - { label: 'Chờ duyệt (chỉ admin thấy)', value: 'Pending' }

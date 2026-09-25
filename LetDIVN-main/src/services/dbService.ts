@@ -140,21 +140,9 @@ class DatabaseService {
   }
 
   // --- NEWS ---
+  // Read-only: articles are published through Decap CMS (/admin).
   public getNews(): Promise<NewsArticle[]> {
     return this.get('/news');
-  }
-  public addNews(article: Omit<NewsArticle, 'id' | 'views'>): Promise<NewsArticle> {
-    return this.mutate('/news', 'POST', article);
-  }
-  public updateNews(id: string, updates: Partial<NewsArticle>): Promise<NewsArticle> {
-    return this.mutate(`/news/${encodeURIComponent(id)}`, 'PUT', updates);
-  }
-  public approveNews(id: string): Promise<NewsArticle> {
-    return this.updateNews(id, { status: 'Published' });
-  }
-  public async deleteNews(id: string): Promise<boolean> {
-    await this.mutate(`/news/${encodeURIComponent(id)}`, 'DELETE');
-    return true;
   }
 
   // --- PARTNERS ---

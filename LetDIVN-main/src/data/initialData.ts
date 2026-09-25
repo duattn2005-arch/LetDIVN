@@ -1,6 +1,5 @@
 import {
   CleanupEvent,
-  NewsArticle,
   Partner,
   GalleryItem,
   TeamMember,
@@ -127,77 +126,6 @@ export const INITIAL_EVENTS: CleanupEvent[] = [
 ];
 
 export const INITIAL_VOLUNTEERS: VolunteerRegistration[] = [];
-
-export const INITIAL_NEWS: NewsArticle[] = [
-  {
-    id: 'news-001',
-    title: 'Let\'s do it! Vietnam officially launches the World Cleanup Day 2026 campaign nationwide',
-    slug: 'lets-do-it-vietnam-launches-world-cleanup-day-2026',
-    category: 'Press Release',
-    summary: 'World Cleanup Day 2026 aims to attract over 100,000 participants across 63 provinces and cities, working toward a green Vietnam free of plastic waste.',
-    content: `Hanoi, April 15, 2026 — The non-profit organization Let's do it! Vietnam today officially announced its rollout plan for World Cleanup Day 2026.
-
-Founded in 2015, Let's do it! Vietnam has become a leading force in Vietnam's community environmental movement. This year, under the message "Global Impact, Local Action," the program focuses not only on cleaning up pollution hotspots but also on training in source-sorting and building a circular recycling network.
-
-The organizing committee calls on government agencies, businesses, universities, and individuals to join hands in creating the largest environmental event of the year.`,
-    author: 'Let\'s do it! Vietnam Communications Team',
-    date: '2026-04-15',
-    image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80',
-    source: 'Vietnam News Agency',
-    sourceUrl: 'https://vietnamplus.vn',
-    views: 4520,
-    featured: true
-  },
-  {
-    id: 'news-002',
-    title: 'National broadcaster VTV1 covers Let\'s do it! Vietnam\'s 10-year environmental journey',
-    slug: 'vtv1-covers-lets-do-it-vietnam-10-year-journey',
-    category: 'Media On Us',
-    summary: 'A special feature on the "For a Green Future" program honors the tireless contributions of tens of thousands of young volunteers.',
-    content: `The "For a Green Future" program, aired on VTV1, devoted 15 minutes to a vivid portrayal of Let's do it! Vietnam's 10-year journey (2015-2026).
-
-From a small group of passionate young people in Hanoi and Ho Chi Minh City, the organization has grown to a coordinator network spanning more than 40 provinces, safely collecting and processing over 5,000 tons of waste of all kinds. The feature highlighted the marked shift in community awareness at waste hotspots after each cleanup drive.`,
-    author: 'VTV News',
-    date: '2026-03-28',
-    image: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800&auto=format&fit=crop&q=80',
-    source: 'VTV1 - Science & Education Department',
-    sourceUrl: 'https://vtv.vn',
-    views: 8900,
-    featured: true
-  },
-  {
-    id: 'news-003',
-    title: 'Over 3 tons of plastic waste cleared from Cat Ba coastline during the Green Summer campaign',
-    slug: 'over-3-tons-plastic-waste-cleared-cat-ba-coastline',
-    category: 'News',
-    summary: 'A joint event between Let\'s do it! Vietnam and the Cat Ba National Park Management Board drew 350 volunteers to clean up 4km of coastline.',
-    content: `Over the past weekend, 350 young volunteers from the Let's do it! Vietnam network joined local residents and forest rangers in a cleanup campaign along Lan Ha Bay and Cat Ba Island.
-
-The total waste collected was estimated at over 3.2 tons, mostly broken styrofoam floats, old fishing nets, plastic bottles, and drifting plastic bags. All recyclable waste was handed over to a specialized processing unit.`,
-    author: 'Pham Thu Hang',
-    date: '2026-04-02',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
-    source: 'Environment & Urban Newspaper',
-    sourceUrl: 'https://moitruongvadothi.vn',
-    views: 3120,
-    featured: false
-  },
-  {
-    id: 'news-004',
-    title: 'Dan Tri Newspaper: Vietnamese youth and the dream of an ocean free of plastic waste',
-    slug: 'dan-tri-vietnamese-youth-dream-ocean-free-plastic',
-    category: 'Media On Us',
-    summary: 'An interview with Let\'s do it! Vietnam\'s coordination team leaders about their strategy for using digital mapping technology to locate and address informal dump sites.',
-    content: `Dan Tri Newspaper's April 22 issue highlighted the innovative initiatives of Let's do it! Vietnam's young tech team. Applying a digital map of pollution hotspots together with a real-time volunteer data management system has boosted coordination efficiency threefold compared to traditional methods.`,
-    author: 'Dan Tri Newspaper',
-    date: '2026-04-22',
-    image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&auto=format&fit=crop&q=80',
-    source: 'Dan Tri Online Newspaper',
-    sourceUrl: 'https://dantri.com.vn',
-    views: 5410,
-    featured: false
-  }
-];
 
 export const INITIAL_PARTNERS: Partner[] = [
   {

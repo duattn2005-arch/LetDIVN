@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
-import { Calendar, Eye, ArrowLeft, Share2, Sparkles, Plus, Edit3, Trash2, Search, CheckCircle2, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import { ArticleEditorModal } from '../ArticleEditorModal';
+import { Calendar, ArrowLeft, Plus, Edit3, Search, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
-import { ClickToChangeImage } from '../ClickToChangeImage';
 import { TiltCard } from '../TiltCard';
+
+// Articles are written and edited in Decap CMS (public/admin/), not on the page.
+const DECAP_NEW_ARTICLE_URL = '/admin/index.html#/collections/news/new';
+const decapEditUrl = (article: NewsArticle) => `/admin/index.html#/collections/news/entries/${encodeURIComponent(article.slug)}`;
 
 interface NewsPageProps {
   initialCategory?: 'All' | 'Media On Us' | 'News';
@@ -23,10 +25,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const ARTICLES_PER_PAGE = 9;
-
-  // Editor Modal states
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [articleToEdit, setArticleToEdit] = useState<NewsArticle | null>(null);
 
   const categoryMap: Record<string, string> = {
     'All': t.newsCatAll,
@@ -60,35 +58,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCat, search]);
-
-  const handleDeleteArticle = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (window.confirm(language === 'vi' ? 'Bạn có chắc chắn muốn xóa bài viết này không?' : 'Are you sure you want to delete this article?')) {
-      await dbService.deleteNews(id);
-      if (selectedArticle?.id === id) {
-        setSelectedArticle(null);
-      }
-      refreshNews();
-    }
-  };
-
-  const handleApproveArticle = async (e: React.MouseEvent, article: NewsArticle) => {
-    e.stopPropagation();
-    await dbService.approveNews(article.id);
-    alert(language === 'vi' ? `Đã phê duyệt bài viết "${article.title}" thành công!` : `Article "${article.title}" approved successfully!`);
-    refreshNews();
-  };
-
-  const handleOpenEdit = (e: React.MouseEvent, article: NewsArticle) => {
-    e.stopPropagation();
-    setArticleToEdit(article);
-    setIsEditorOpen(true);
-  };
-
-  const handleOpenCreate = () => {
-    setArticleToEdit(null);
-    setIsEditorOpen(true);
-  };
 
   const openArticle = (article: NewsArticle) => {
     setSelectedArticle(article);
@@ -134,13 +103,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                 </button>
 
                 {isAdmin && (
-                  <button
-                    onClick={(e) => handleOpenEdit(e, selectedArticle)}
+                  <a
+                    href={decapEditUrl(selectedArticle)}
+                    target="_blank"
+                    rel="noreferrer"
                     className="px-3 py-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     <span>Edit this article</span>
-                  </button>
+                  </a>
                 )}
               </div>
 
@@ -166,17 +137,9 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                         {block.value}
                       </p>
                     ) : (
-                      <ClickToChangeImage
-                        key={index}
-                        src={block.value}
-                        alt={`${selectedArticle.title} - ${index + 1}`}
-                        wrapperClassName="rounded-2xl overflow-hidden shadow-md"
-                        className="w-full h-auto object-cover"
-                        onChange={(url) => {
-                          const updatedBlocks = selectedArticle.contentBlocks!.map((b, i) => (i === index ? { ...b, value: url } : b));
-                          dbService.updateNews(selectedArticle.id, { contentBlocks: updatedBlocks });
-                        }}
-                      />
+                      <div key={index} className="rounded-2xl overflow-hidden shadow-md">
+                        <img src={block.value} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
+                      </div>
                     )
                   )}
                 </div>
@@ -189,17 +152,9 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                   {selectedArticle.images && selectedArticle.images.length > 0 && (
                     <div className="space-y-4">
                       {selectedArticle.images.map((url, index) => (
-                        <ClickToChangeImage
-                          key={index}
-                          src={url}
-                          alt={`${selectedArticle.title} - ${index + 1}`}
-                          wrapperClassName="rounded-2xl overflow-hidden shadow-md"
-                          className="w-full h-auto object-cover"
-                          onChange={(newUrl) => {
-                            const updatedImages = selectedArticle.images!.map((u, i) => (i === index ? newUrl : u));
-                            dbService.updateNews(selectedArticle.id, { images: updatedImages });
-                          }}
-                        />
+                        <div key={index} className="rounded-2xl overflow-hidden shadow-md">
+                          <img src={url} alt={`${selectedArticle.title} - ${index + 1}`} className="w-full h-auto object-cover" />
+                        </div>
                       ))}
                     </div>
                   )}
@@ -252,14 +207,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
             </div>
           </div>
         </div>
-
-        {/* Article Editor Modal */}
-        <ArticleEditorModal
-          isOpen={isEditorOpen}
-          onClose={() => setIsEditorOpen(false)}
-          articleToEdit={articleToEdit}
-          onSaved={refreshNews}
-        />
       </div>
     );
   }
@@ -295,13 +242,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
           {/* Add Article Button (Admin only) */}
           <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
             {isAdmin && (
-              <button
-                onClick={handleOpenCreate}
+              <a
+                href={DECAP_NEW_ARTICLE_URL}
+                target="_blank"
+                rel="noreferrer"
                 className="px-5 py-2.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span><EditableText contentKey="newsPage.addArticleBtn" defaultValue={t.newsPageAddArticleBtn} as="span" /></span>
-              </button>
+              </a>
             )}
 
             {isAdmin && pendingCount > 0 && (
@@ -384,34 +333,18 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
                       </div>
                     )}
 
-                    {/* Admin Direct Action Buttons on Card */}
+                    {/* Admin: edit in Decap CMS */}
                     {isAdmin && (
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10 bg-black/70 backdrop-blur-xs p-1.5 rounded-xl shadow-lg">
-                        {isPending && (
-                          <button
-                            onClick={(e) => handleApproveArticle(e, item)}
-                            title="Approve this article now"
-                            className="px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-extrabold rounded-lg transition-all cursor-pointer flex items-center gap-1 shadow-sm"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Approve</span>
-                          </button>
-                        )}
-                        <button
-                          onClick={(e) => handleOpenEdit(e, item)}
-                          title="Edit article"
-                          className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={(e) => handleDeleteArticle(e, item.id)}
-                          title="Delete article"
-                          className="p-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-xs"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      <a
+                        href={decapEditUrl(item)}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        title="Edit article"
+                        className="absolute top-3 right-3 z-10 p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-lg backdrop-blur-xs transition-colors cursor-pointer shadow-lg"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </a>
                     )}
                   </div>
 
@@ -479,14 +412,6 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All' }) =
         )}
 
       </div>
-
-      {/* Article Editor Modal */}
-      <ArticleEditorModal
-        isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        articleToEdit={articleToEdit}
-        onSaved={refreshNews}
-      />
 
     </div>
   );
