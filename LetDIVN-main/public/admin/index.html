@@ -8,6 +8,15 @@
   </head>
   <body>
     <!-- Decap CMS: reads config.yml next to this file. -->
+    <script>window.CMS_MANUAL_INIT = true;</script>
     <script src="https://unpkg.com/decap-cms@^3.16.0/dist/decap-cms.js"></script>
+    <script>
+      // The login popup asks for the admin username/password first
+      // (server/routes/decapAuth.ts), so the button just says "Đăng nhập".
+      var vi = CMS.getLocale('vi');
+      vi.auth.loginWithGitHub = 'Đăng nhập';
+      CMS.registerLocale('vi', vi);
+      CMS.init();
+    </script>
   </body>
 </html>

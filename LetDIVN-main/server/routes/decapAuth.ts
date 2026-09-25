@@ -1,5 +1,5 @@
-import { randomBytes } from 'crypto';
-import { Router, type Response } from 'express';
+import { createHash, randomBytes, timingSafeEqual } from 'crypto';
+import express, { Router, type Response } from 'express';
 
 // GitHub OAuth for Decap CMS (/admin). Decap opens /api/decap/auth in a popup;
 // we send the user to GitHub, GitHub returns to /api/decap/callback, and the
@@ -9,12 +9,58 @@ import { Router, type Response } from 'express';
 //
 // Needs DECAP_GITHUB_CLIENT_ID / DECAP_GITHUB_CLIENT_SECRET from a GitHub
 // OAuth App whose callback URL is https://<your domain>/api/decap/callback.
+//
+// The popup first offers a shared admin login instead: with the right
+// DECAP_ADMIN_USERNAME / DECAP_ADMIN_PASSWORD it hands Decap the server's own
+// DECAP_ADMIN_GITHUB_TOKEN, so editors need no GitHub account of their own.
 
 const STATE_COOKIE = 'decap_oauth_state';
 
 const router = Router();
 
+const MAX_FAILED_LOGINS = 5;
+const LOCKOUT_MS = 15 * 60 * 1000;
+const failedLogins = new Map<string, { count: number; until: number }>();
+
 router.get('/decap/auth', (req, res) => {
+  if (!process.env.DECAP_ADMIN_PASSWORD || !process.env.DECAP_ADMIN_GITHUB_TOKEN) {
+    res.redirect(`/api/decap/github?scope=${req.query.scope === 'public_repo' ? 'public_repo' : 'repo'}`);
+    return;
+  }
+  sendLoginForm(res);
+});
+
+router.post('/decap/login', express.urlencoded({ extended: false }), (req, res) => {
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+  const record = failedLogins.get(ip);
+  if (record && record.count >= MAX_FAILED_LOGINS && record.until > now) {
+    sendLoginForm(res, 'Sai quá nhiều lần. Vui lòng thử lại sau 15 phút.');
+    return;
+  }
+
+  const username = String(req.body?.username ?? '');
+  const password = String(req.body?.password ?? '');
+  const expectedUsername = process.env.DECAP_ADMIN_USERNAME || 'admin';
+  const expectedPassword = process.env.DECAP_ADMIN_PASSWORD;
+  const token = process.env.DECAP_ADMIN_GITHUB_TOKEN;
+  if (!expectedPassword || !token) {
+    sendLoginForm(res, 'Chưa cấu hình tài khoản admin trên server.');
+    return;
+  }
+
+  if (!safeEqual(username, expectedUsername) || !safeEqual(password, expectedPassword)) {
+    const count = record && record.until > now ? record.count + 1 : 1;
+    failedLogins.set(ip, { count, until: now + LOCKOUT_MS });
+    sendLoginForm(res, 'Sai tên đăng nhập hoặc mật khẩu.');
+    return;
+  }
+
+  failedLogins.delete(ip);
+  sendResult(res, 'success', { token, provider: 'github' });
+});
+
+router.get('/decap/github', (req, res) => {
   const clientId = process.env.DECAP_GITHUB_CLIENT_ID;
   if (!clientId) {
     res.status(500).send('Chưa cấu hình DECAP_GITHUB_CLIENT_ID trên server.');
@@ -62,6 +108,43 @@ router.get('/decap/callback', async (req, res) => {
     sendResult(res, 'error', { message: 'Không kết nối được tới GitHub.' });
   }
 });
+
+/** Compares via fixed-length digests so neither length nor content leaks through timing. */
+function safeEqual(a: string, b: string): boolean {
+  const digest = (v: string) => createHash('sha256').update(v).digest();
+  return timingSafeEqual(digest(a), digest(b));
+}
+
+function escapeHtml(v: string): string {
+  return v.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+}
+
+/** The popup's admin login form; GitHub login stays available as a link. */
+function sendLoginForm(res: Response, error?: string) {
+  res.type('html').send(`<!doctype html><html lang="vi"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng nhập quản trị</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #eff0f4; font-family: system-ui, sans-serif; color: #1e293b; }
+  form { width: 100%; max-width: 320px; margin: 16px; padding: 28px 24px; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+  h1 { margin: 0 0 20px; font-size: 20px; text-align: center; }
+  label { display: block; margin: 12px 0 4px; font-size: 14px; font-weight: 600; }
+  input { box-sizing: border-box; width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; }
+  button { width: 100%; margin-top: 20px; padding: 11px; border: 0; border-radius: 8px; background: #E81A7F; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .error { margin: 0 0 8px; padding: 8px 10px; border-radius: 8px; background: #fee2e2; color: #b91c1c; font-size: 14px; }
+  .alt { display: block; margin-top: 16px; text-align: center; font-size: 13px; color: #64748b; }
+</style>
+<form method="post" action="/api/decap/login">
+  <h1>Đăng nhập quản trị</h1>
+  ${error ? `<p class="error">${escapeHtml(error)}</p>` : ''}
+  <label for="username">Tên đăng nhập</label>
+  <input id="username" name="username" autocomplete="username" required autofocus>
+  <label for="password">Mật khẩu</label>
+  <input id="password" name="password" type="password" autocomplete="current-password" required>
+  <button type="submit">Đăng nhập</button>
+  <a class="alt" href="/api/decap/github">Hoặc đăng nhập bằng GitHub</a>
+</form></html>`);
+}
 
 /** The popup page: announce itself to the Decap window, then reply with the result once Decap answers. */
 function sendResult(res: Response, status: 'success' | 'error', payload: Record<string, string>) {
