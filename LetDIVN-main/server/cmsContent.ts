@@ -68,9 +68,13 @@ function readLocalSnapshot(): Snapshot {
 
 function githubHeaders(extra: Record<string, string> = {}): Record<string, string> {
   const headers: Record<string, string> = { 'User-Agent': 'letsdoitvietnam-site', ...extra };
-  // Optional: raises GitHub's limit from 60 to 5000 requests/hour.
+  // Unauthenticated calls share a 60 requests/hour limit per server IP, which
+  // the polling alone can use up. A token, or else the Decap OAuth App's own
+  // client id/secret, raises that to 5000/hour.
   const token = process.env.CMS_GITHUB_TOKEN || process.env.NEWS_GITHUB_TOKEN;
+  const { DECAP_GITHUB_CLIENT_ID: clientId, DECAP_GITHUB_CLIENT_SECRET: clientSecret } = process.env;
   if (token) headers.Authorization = `Bearer ${token}`;
+  else if (clientId && clientSecret) headers.Authorization = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
   return headers;
 }
 
