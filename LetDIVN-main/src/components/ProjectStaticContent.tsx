@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CircleDot, PersonStanding } from 'lucide-react';
-import { PROJECT_STATIC_CONTENT } from '../data/projectStaticContent';
-import { EditableText } from './EditableText';
-import { EditableImage } from './EditableImage';
-import { EditableGalleryGrid } from './EditableGalleryGrid';
+import { dbService } from '../services/dbService';
+import { ProjectStaticContent as ProjectPage } from '../types';
 
 const BRAND_PINK = '#F1138D';
 const BRAND_AMBER = '#FEAC13';
 const BAND_GRAY = '#F2F2F2';
 const BULLET_BLUE = '#6EC1E4';
 
-function aspectClass(a) {
+function aspectClass(a?: string) {
   switch (a) {
     case '7/2': return 'aspect-[7/2]';
     case '4/3': return 'aspect-4/3';
@@ -19,14 +17,22 @@ function aspectClass(a) {
   }
 }
 
-function galleryColsClass(n) {
+function galleryColsClass(n: number) {
   if (n <= 1) return 'grid-cols-1';
   if (n === 2) return 'grid-cols-1 sm:grid-cols-2';
   if (n === 3) return 'grid-cols-1 sm:grid-cols-3';
   return 'grid-cols-2 sm:grid-cols-3';
 }
 
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const Gallery: React.FC<{ images: string[]; alt: string; aspect?: string; className: string }> = ({ images, alt, aspect, className }) => (
+  <div className={`grid ${galleryColsClass(images.length)} gap-2.5 ${className}`}>
+    {images.map((src, i) => (
+      <div key={i} className={`${aspectClass(aspect)} bg-slate-900 overflow-hidden`}>
+        <img src={src} alt={alt} className="w-full h-full object-cover" />
+      </div>
+    ))}
+  </div>
+);
 
 /**
  * Renders the "about this campaign" content mirrored from the matching page
@@ -36,15 +42,23 @@ const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').repla
  * Typography and layout are matched to the reference site's Elementor/Divi
  * build: "Chau Philomene One" (weight 500) for every heading, "Poppins" for
  * body copy, plain (non-rounded, no shadow) photos, and full-bleed
- * alternating gray/white bands for each image+text section. All text/images
- * are wired through EditableText/EditableImage so admins can edit them.
+ * alternating gray/white bands for each image+text section. The whole page —
+ * sections, paragraphs, images — is edited in Decap ("Dự án"), stored in
+ * content/project-pages/<slug>.json.
  */
 export const ProjectStaticContent: React.FC<{ category: string }> = ({ category }) => {
-  const content = PROJECT_STATIC_CONTENT[category];
+  const [pages, setPages] = useState<Record<string, ProjectPage> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    dbService.getProjectPages().then((p) => { if (!cancelled) setPages(p); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const content = pages?.[category];
   if (!content) return null;
 
   const titleColor = content.titleColor || BRAND_PINK;
-  const keyBase = `project.${slugify(category)}`;
   // Left/right alternation only counts sections that actually have an image —
   // a heading-only or gallery-only section in between (verified against the
   // reference site) doesn't flip the side of the next real image band.
@@ -52,31 +66,15 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
 
   return (
     <div className="bg-white">
-      <EditableImage
-        contentKey={`${keyBase}.hero`}
-        defaultValue={content.hero}
-        alt={content.title}
-        wrapperClassName="w-full aspect-21/9 sm:h-[420px] sm:aspect-auto bg-slate-900"
-        className="w-full h-full object-cover"
-      />
+      <div className="w-full aspect-21/9 sm:h-[420px] sm:aspect-auto bg-slate-900">
+        <img src={content.hero} alt={content.title} className="w-full h-full object-cover" style={{ objectPosition: content.heroPosition || '50% 50%' }} />
+      </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3 text-center">
         {content.kicker && (
-          <EditableText
-            contentKey={`${keyBase}.kicker`}
-            defaultValue={content.kicker}
-            as="h3"
-            className="block ref-heading text-xl sm:text-2xl"
-            render={(v) => <span style={{ color: BRAND_AMBER }}>{v}</span>}
-          />
+          <h3 className="block ref-heading text-xl sm:text-2xl whitespace-pre-line" style={{ color: BRAND_AMBER }}>{content.kicker}</h3>
         )}
-        <EditableText
-          contentKey={`${keyBase}.title`}
-          defaultValue={content.title}
-          as="h2"
-          className="block ref-heading text-3xl sm:text-4xl lg:text-[45px]"
-          render={(v) => <span style={{ color: titleColor }}>{v}</span>}
-        />
+        <h2 className="block ref-heading text-3xl sm:text-4xl lg:text-[45px] whitespace-pre-line" style={{ color: titleColor }}>{content.title}</h2>
       </div>
 
       <div>
@@ -92,17 +90,10 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           // (under a regular amber sub-heading, e.g. "Background") is left-aligned too.
           const textAlign = hasImage || (section.heading && !section.headingAsTitle) ? 'text-left' : 'text-center';
           const bandBg = section.band ? (section.band === 'gray' ? BAND_GRAY : 'transparent') : idx % 2 === 0 ? BAND_GRAY : 'transparent';
-          const sectionKey = `${keyBase}.section${idx}`;
+          const paragraphStyle = section.textAlign ? { textAlign: section.textAlign } : undefined;
 
           const galleryBlock = section.gallery && section.gallery.length > 0 && (
-            <div className={`grid ${galleryColsClass(section.gallery.length)} gap-2.5 mt-6`}>
-              <EditableGalleryGrid
-                contentKey={`${sectionKey}.gallery`}
-                defaultImages={section.gallery}
-                alt={section.heading || content.title}
-                cellClassName={aspectClass(section.galleryAspect)}
-              />
-            </div>
+            <Gallery images={section.gallery} alt={section.heading || content.title} aspect={section.galleryAspect} className="mt-6" />
           );
 
           // Two side-by-side sub-columns (e.g. "Main activities" | "Direct target audience")
@@ -111,30 +102,19 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
               <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                   {section.heading && (
-                    <EditableText
-                      contentKey={`${sectionKey}.heading`}
-                      defaultValue={section.heading}
-                      as="h3"
-                      className="block ref-heading text-xl sm:text-2xl text-left"
-                      render={(v) => <span style={{ color: BRAND_AMBER }}>{v}</span>}
-                    />
+                    <h3 className="block ref-heading text-xl sm:text-2xl text-left whitespace-pre-line" style={{ color: BRAND_AMBER }}>{section.heading}</h3>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {section.columns.map((col, ci) => (
                       <div key={ci} className="space-y-2">
                         {col.heading && (
-                          <EditableText
-                            contentKey={`${sectionKey}.col${ci}.heading`}
-                            defaultValue={col.heading}
-                            as="h4"
-                            className="ref-body font-semibold text-slate-800 text-left"
-                          />
+                          <h4 className="ref-body font-semibold text-slate-800 text-left whitespace-pre-line">{col.heading}</h4>
                         )}
                         <ul className="space-y-1.5 text-left">
                           {col.paragraphs.map((p, pi) => (
                             <li key={pi} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
                               <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
-                              <EditableText contentKey={`${sectionKey}.col${ci}.p${pi}`} defaultValue={p} as="span" multiline />
+                              <span className="whitespace-pre-line">{p}</span>
                             </li>
                           ))}
                         </ul>
@@ -155,13 +135,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
               <div key={idx} style={{ backgroundColor: bandBg }} className="py-16">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
                   <PersonStanding className="w-6.5 h-6.5 shrink-0" style={{ color: BRAND_PINK }} />
-                  <EditableText
-                    contentKey={`${sectionKey}.personListItem`}
-                    defaultValue={section.personListItem}
-                    as="span"
-                    className="ref-body text-base"
-                    render={(v) => <span style={{ color: '#54595F' }}>{v}</span>}
-                  />
+                  <span className="ref-body text-base" style={{ color: '#54595F' }}>{section.personListItem}</span>
                 </div>
               </div>
             );
@@ -170,37 +144,31 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const textBlock = (
             <div className={`space-y-3 ${textAlign}`}>
               {section.heading && (
-                <EditableText
-                  contentKey={`${sectionKey}.heading`}
-                  defaultValue={section.heading}
-                  as="h3"
-                  className={
+                <h3
+                  className={`whitespace-pre-line ${
                     section.headingAsTitle
                       ? 'block ref-heading text-3xl sm:text-4xl lg:text-[45px] text-center'
                       : 'block ref-heading text-xl sm:text-2xl text-left'
-                  }
-                  render={(v) => <span style={{ color: section.headingAsTitle ? titleColor : BRAND_AMBER }}>{v}</span>}
-                />
+                  }`}
+                  style={{ color: section.headingAsTitle ? titleColor : BRAND_AMBER }}
+                >
+                  {section.heading}
+                </h3>
               )}
               {isBulletList ? (
                 <ul className="space-y-2 text-left">
                   {section.paragraphs.map((p, i) => (
                     <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
                       <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
-                      <EditableText contentKey={`${sectionKey}.p${i}`} defaultValue={p} as="span" multiline />
+                      <span className="whitespace-pre-line">{p}</span>
                     </li>
                   ))}
                 </ul>
               ) : (
                 section.paragraphs.map((p, i) => (
-                  <EditableText
-                    key={i}
-                    contentKey={`${sectionKey}.p${i}`}
-                    defaultValue={p}
-                    as="p"
-                    multiline
-                    className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
-                  />
+                  <p key={i} className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed" style={paragraphStyle}>
+                    {p}
+                  </p>
                 ))
               )}
 
@@ -208,74 +176,40 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 <div className="text-left space-y-8 pt-2">
                   {section.subBlocks.map((block, bi) => (
                     <div key={bi} className="space-y-2">
-                      <EditableText
-                        contentKey={`${sectionKey}.sub${bi}.title`}
-                        defaultValue={block.title}
-                        as="p"
-                        className="ref-body text-sm sm:text-base font-bold text-slate-700"
-                      />
-                      <EditableText
-                        contentKey={`${sectionKey}.sub${bi}.text`}
-                        defaultValue={block.text}
-                        as="p"
-                        multiline
-                        className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
-                      />
+                      {block.title && <p className="whitespace-pre-line ref-body text-sm sm:text-base font-bold text-slate-700">{block.title}</p>}
+                      {block.text && <p className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed">{block.text}</p>}
                       {block.gallery && block.gallery.length > 0 && (
-                        <div className={`grid ${galleryColsClass(block.gallery.length)} gap-2.5 pt-2`}>
-                          <EditableGalleryGrid
-                            contentKey={`${sectionKey}.sub${bi}.gallery`}
-                            defaultImages={block.gallery}
-                            alt={block.title}
-                            cellClassName={aspectClass(block.galleryAspect)}
-                          />
-                        </div>
+                        <Gallery images={block.gallery} alt={block.title} aspect={block.galleryAspect} className="pt-2" />
                       )}
                     </div>
                   ))}
                 </div>
               )}
 
-              {(section.closingParagraphs?.length || section.closingBullets?.length) && (
+              {((section.closingParagraphs?.length ?? 0) > 0 || (section.closingBullets?.length ?? 0) > 0) && (
                 <div className="text-left space-y-3 pt-2">
                   {section.closingParagraphs?.[0] && (
-                    <EditableText
-                      contentKey={`${sectionKey}.closing.p0`}
-                      defaultValue={section.closingParagraphs[0]}
-                      as="p"
-                      multiline
-                      className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
-                    />
+                    <p className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed">{section.closingParagraphs[0]}</p>
                   )}
                   {section.closingBullets && section.closingBullets.length > 0 && (
                     <>
                       {section.closingBulletsLabel && (
-                        <EditableText
-                          contentKey={`${sectionKey}.closing.bulletsLabel`}
-                          defaultValue={section.closingBulletsLabel}
-                          as="p"
-                          className="ref-body text-sm sm:text-base font-bold text-slate-700"
-                        />
+                        <p className="whitespace-pre-line ref-body text-sm sm:text-base font-bold text-slate-700">{section.closingBulletsLabel}</p>
                       )}
                       <ul className="space-y-1.5">
                         {section.closingBullets.map((p, i) => (
                           <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
                             <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
-                            <EditableText contentKey={`${sectionKey}.closing.bullet${i}`} defaultValue={p} as="span" multiline />
+                            <span className="whitespace-pre-line">{p}</span>
                           </li>
                         ))}
                       </ul>
                     </>
                   )}
                   {section.closingParagraphs?.slice(1).map((p, i) => (
-                    <EditableText
-                      key={i}
-                      contentKey={`${sectionKey}.closing.p${i + 1}`}
-                      defaultValue={p}
-                      as="p"
-                      multiline
-                      className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
-                    />
+                    <p key={i} className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed">
+                      {p}
+                    </p>
                   ))}
                 </div>
               )}
@@ -299,13 +233,9 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 }`}
               >
                 <div className={isImageLeft ? 'order-1' : 'order-1 md:order-2'}>
-                  <EditableImage
-                    contentKey={`${sectionKey}.image`}
-                    defaultValue={section.image!}
-                    alt={section.heading || content.title}
-                    wrapperClassName="aspect-3/2 bg-slate-900"
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="aspect-3/2 bg-slate-900">
+                    <img src={section.image} alt={section.heading || content.title} className="w-full h-full object-cover" />
+                  </div>
                 </div>
                 <div className={isImageLeft ? 'order-2' : 'order-2 md:order-1'}>{textBlock}</div>
               </div>

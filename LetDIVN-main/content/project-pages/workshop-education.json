@@ -1,0 +1,35 @@
+{
+  "category": "Workshop & Education",
+  "hero": "/images/projects/cw-hero.jpg",
+  "title": "Community Workshop",
+  "sections": [
+    {
+      "paragraphs": [
+        "The Community Workshop is part of a broader initiative aimed at environmental protection and sustainability. These workshops are organized under the umbrella of the global Let's Do It! World movement, which focuses on tackling environmental issues through community-driven efforts."
+      ],
+      "bulletList": false,
+      "band": "white"
+    },
+    {
+      "personListItem": "Collaboration Betters The World (CBTW APAC)",
+      "band": "white"
+    },
+    {
+      "personListItem": "Viet Duc High school",
+      "band": "gray"
+    },
+    {
+      "personListItem": "University of Social Sciences and Humanities",
+      "band": "white"
+    },
+    {
+      "personListItem": "Youth Volunteers and Team Member",
+      "band": "gray"
+    },
+    {
+      "personListItem": "Duong Lieu Secondary School",
+      "band": "white"
+    }
+  ],
+  "order": 5
+}

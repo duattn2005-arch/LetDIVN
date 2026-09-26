@@ -178,4 +178,62 @@ export interface MediaCoverageEntry {
   order?: number;
 }
 
+// --- Project story pages ---
 
+export interface ProjectSubColumn {
+  heading?: string;
+  paragraphs: string[];
+}
+
+export interface ProjectSubBlock {
+  /** Bold lead-in label — its own short sentence, not inline within `text` (e.g. "Opening Program, Visiting the National Park Museum..." on the YCSW page). */
+  title: string;
+  text: string;
+  gallery?: string[];
+  /** Aspect ratio for this sub-block's gallery cells: '3/2' (default), '4/3', '7/2' (wide screenshots), or 'square'. */
+  galleryAspect?: '3/2' | '4/3' | '7/2' | 'square';
+}
+
+export interface ProjectSection {
+  heading?: string;
+  paragraphs: string[];
+  image?: string;
+  /** A photo gallery grid shown under this section's text (e.g. an Elementor gallery widget on the source page). */
+  gallery?: string[];
+  /** Aspect ratio for this section's gallery cells: '3/2' (default), '4/3', '7/2' (wide screenshots), or 'square'. */
+  galleryAspect?: '3/2' | '4/3' | '7/2' | 'square';
+  /** Two side-by-side sub-blocks (e.g. "Main activities" | "Direct target audience" on the Green Ocean page). */
+  columns?: ProjectSubColumn[];
+  /** Render `paragraphs` as a bulleted list (dot-circle icon) instead of plain paragraphs. Explicit, not inferred from length. */
+  bulletList?: boolean;
+  /** Paragraph alignment; unset uses the layout's default. */
+  textAlign?: 'left' | 'center' | 'justify';
+  /** Render `heading` like the page's main title (large, centered, title color) instead of the regular small amber sub-heading — matches mid-page "title-style" headings like World Cleanup Day's "From Now and Forever". */
+  headingAsTitle?: boolean;
+  /** Explicit gray/white band background. The reference site doesn't alternate these on a fixed idx%2 rule — it's per-section design — so default (unset) falls back to alternating by section index, and this overrides it when that default doesn't match. */
+  band?: 'gray' | 'white';
+  /** Vertically-stacked labeled sub-blocks, each with its own bold title, paragraph, and photo gallery — e.g. YCSW Activity 4's five day-by-day write-ups. Rendered after `paragraphs`. */
+  subBlocks?: ProjectSubBlock[];
+  /** Extra left-aligned paragraphs rendered after subBlocks — closingParagraphs[0] comes before closingBullets, the rest come after (e.g. a closing summary that mentions a bulleted list in the middle). */
+  closingParagraphs?: string[];
+  /** A left-aligned bulleted list rendered right after closingParagraphs[0], introduced by closingBulletsLabel. */
+  closingBullets?: string[];
+  /** Short lead-in line shown directly above closingBullets (e.g. "Key takeaways included:"). */
+  closingBulletsLabel?: string;
+  /** Renders this section as a single left-aligned "icon + label" row instead of the normal heading/paragraph layout — e.g. each participating organization on the Community Workshop page is its own full-width alternating-band row, not a bulleted list. Ignores heading/paragraphs/image/gallery. */
+  personListItem?: string;
+}
+
+/** One project story page (/world-cleanup-day/, ...), edited in Decap: content/project-pages/<slug>.json. */
+export interface ProjectStaticContent {
+  /** CleanupEvent.category this page belongs to. */
+  category: string;
+  hero: string;
+  /** object-position of the hero photo, e.g. "47% 32%". */
+  heroPosition?: string;
+  kicker?: string;
+  title: string;
+  /** Main title color, matching each campaign's brand accent on letsdoitvietnam.org. Defaults to brand pink. */
+  titleColor?: string;
+  sections: ProjectSection[];
+}

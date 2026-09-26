@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getNews, getPartners, getGallery, getTeam, getVideos, getWhatWeDo, getWhoWeAre, getMediaCoverage, getEvents } from '../cmsContent.js';
+import { getNews, getPartners, getGallery, getTeam, getVideos, getWhatWeDo, getWhoWeAre, getMediaCoverage, getEvents, getProjectPages } from '../cmsContent.js';
 import { events, volunteers, contacts } from '../db/collections.js';
 import type { VolunteerRegistration } from '../../src/types.js';
 
@@ -42,6 +42,7 @@ router.get('/videos', async (req, res) => res.json(await getVideos()));
 router.get('/what-we-do', async (req, res) => res.json(await getWhatWeDo()));
 router.get('/who-we-are-sections', async (req, res) => res.json(await getWhoWeAre()));
 router.get('/media-coverage', async (req, res) => res.json(await getMediaCoverage()));
+router.get('/project-pages', async (req, res) => res.json(await getProjectPages()));
 
 // --- Contacts ---
 router.post('/contacts', (req, res) => {

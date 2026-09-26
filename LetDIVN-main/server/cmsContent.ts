@@ -13,6 +13,8 @@ import type {
   WhatWeDoItem,
   WhoWeAreItem,
   MediaCoverageEntry,
+  ProjectSection,
+  ProjectStaticContent,
 } from '../src/types.js';
 import { extractYouTubeId, getYouTubeThumbnail } from '../src/utils/youtube.js';
 
@@ -312,6 +314,52 @@ export const getEvents = () =>
         : undefined,
     };
   });
+
+// --- Project story pages -------------------------------------------------------
+
+const strList = (v: unknown) => (Array.isArray(v) ? v.map(str).filter((s) => s.trim()) : []);
+const aspect = (v: unknown) => (['3/2', '4/3', '7/2', 'square'].includes(v as string) ? (v as ProjectSection['galleryAspect']) : undefined);
+
+/** content/project-pages/<slug>.json, keyed by the CleanupEvent.category each page belongs to. */
+export async function getProjectPages(): Promise<Record<string, ProjectStaticContent>> {
+  const pages: Record<string, ProjectStaticContent> = {};
+  for (const [, doc] of await getFolder('project-pages')) {
+    const category = str(doc.category);
+    if (!category) continue;
+    const sections: ProjectSection[] = (Array.isArray(doc.sections) ? doc.sections : []).map((s: Doc) => ({
+      heading: str(s.heading) || undefined,
+      headingAsTitle: !!s.headingAsTitle || undefined,
+      paragraphs: strList(s.paragraphs),
+      bulletList: typeof s.bulletList === 'boolean' ? s.bulletList : undefined,
+      textAlign: ['left', 'center', 'justify'].includes(s.textAlign) ? s.textAlign : undefined,
+      image: str(s.image) || undefined,
+      gallery: strList(s.gallery),
+      galleryAspect: aspect(s.galleryAspect),
+      columns: (Array.isArray(s.columns) ? s.columns : []).map((c: Doc) => ({ heading: str(c.heading) || undefined, paragraphs: strList(c.paragraphs) })),
+      subBlocks: (Array.isArray(s.subBlocks) ? s.subBlocks : []).map((b: Doc) => ({
+        title: str(b.title),
+        text: str(b.text),
+        gallery: strList(b.gallery),
+        galleryAspect: aspect(b.galleryAspect),
+      })),
+      closingParagraphs: strList(s.closingParagraphs),
+      closingBulletsLabel: str(s.closingBulletsLabel) || undefined,
+      closingBullets: strList(s.closingBullets),
+      band: s.band === 'gray' || s.band === 'white' ? s.band : undefined,
+      personListItem: str(s.personListItem) || undefined,
+    }));
+    pages[category] = {
+      category,
+      hero: str(doc.hero),
+      heroPosition: str(doc.heroPosition) || undefined,
+      kicker: str(doc.kicker) || undefined,
+      title: str(doc.title),
+      titleColor: str(doc.titleColor) || undefined,
+      sections,
+    };
+  }
+  return pages;
+}
 
 // --- Page text and images ------------------------------------------------------
 

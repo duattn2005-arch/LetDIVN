@@ -9,7 +9,8 @@ import {
   MediaVideo,
   WhatWeDoItem,
   WhoWeAreItem,
-  MediaCoverageEntry
+  MediaCoverageEntry,
+  ProjectStaticContent
 } from '../types';
 
 type Listener = () => void;
@@ -138,6 +139,16 @@ class DatabaseService {
   // --- MEDIA COVERAGE (Media on Us entries) ---
   public getMediaCoverage(): Promise<MediaCoverageEntry[]> {
     return this.get('/media-coverage');
+  }
+
+  // --- PROJECT STORY PAGES (keyed by event category) ---
+  private projectPagesPromise: Promise<Record<string, ProjectStaticContent>> | null = null;
+  public getProjectPages(): Promise<Record<string, ProjectStaticContent>> {
+    this.projectPagesPromise ??= this.get<Record<string, ProjectStaticContent>>('/project-pages').catch((err) => {
+      this.projectPagesPromise = null;
+      throw err;
+    });
+    return this.projectPagesPromise;
   }
 
   // --- STATS ---
