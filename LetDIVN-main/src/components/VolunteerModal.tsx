@@ -84,7 +84,7 @@ const LeafArt: React.FC<{ className?: string; style?: React.CSSProperties }> = (
 );
 
 const SectionTitle: React.FC<{ icon: IconName; children: React.ReactNode; note?: string }> = ({ icon, children, note }) => (
-  <h4 className="flex items-center gap-3 mb-3 text-lg sm:text-[22px] font-bold" style={{ color: NAVY }}>
+  <h4 className="flex items-center gap-3 mb-3 lg:mb-2.5 text-lg sm:text-[22px] lg:text-xl lg:[@media(max-height:820px)]:text-lg font-bold" style={{ color: NAVY }}>
     <Icon name={icon} color={NAVY} className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
     <span>
       {children}
@@ -94,14 +94,14 @@ const SectionTitle: React.FC<{ icon: IconName; children: React.ReactNode; note?:
 );
 
 const FieldLabel: React.FC<{ htmlFor: string; children: React.ReactNode; required?: boolean }> = ({ htmlFor, children, required }) => (
-  <label htmlFor={htmlFor} className="block mb-1.5 text-[15px] sm:text-base font-medium" style={{ color: NAVY }}>
+  <label htmlFor={htmlFor} className="block mb-1.5 lg:[@media(max-height:820px)]:mb-1 text-[15px] sm:text-base font-medium" style={{ color: NAVY }}>
     {children}
     {required && <span style={{ color: PINK }}> *</span>}
   </label>
 );
 
 const fieldClass =
-  'w-full h-12 pl-12 pr-4 rounded-lg border border-[#cfd6e4] bg-white text-[15px] outline-none transition placeholder:text-slate-400 focus:border-[#e8197c] focus:ring-4 focus:ring-[#e8197c]/10';
+  'w-full h-12 lg:[@media(max-height:820px)]:h-10 pl-12 pr-4 rounded-lg border border-[#cfd6e4] bg-white text-[15px] outline-none transition placeholder:text-slate-400 focus:border-[#e8197c] focus:ring-4 focus:ring-[#e8197c]/10';
 
 const IconField: React.FC<{ icon: IconName; children: React.ReactNode; chevron?: boolean }> = ({ icon, children, chevron }) => (
   <div className="relative">
@@ -247,7 +247,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   };
 
   const overlay =
-    'fixed inset-0 z-[999999] bg-slate-900/55 backdrop-blur-md flex items-start sm:items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200';
+    'fixed inset-0 z-[999999] bg-slate-900/55 backdrop-blur-md flex items-start sm:items-center justify-center p-3 sm:p-4 lg:p-3 overflow-y-auto animate-in fade-in duration-200';
   const card = 'relative my-auto w-full rounded-[26px] overflow-hidden bg-white shadow-[0_30px_80px_-20px_rgba(15,31,75,0.45)] animate-in zoom-in-95 duration-200';
 
   const closeButton = (
@@ -302,11 +302,11 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
 
   return createPortal(
     <div className={overlay} onMouseDown={(e) => e.target === e.currentTarget && handleCloseModal()}>
-      <div role="dialog" aria-modal="true" aria-labelledby="volunteer-modal-title" className={`${card} max-w-[960px]`} onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" aria-labelledby="volunteer-modal-title" className={`${card} max-w-[960px] lg:max-w-[1320px] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto`} onClick={(e) => e.stopPropagation()}>
         {closeButton}
 
         {/* Header: sky, greenery and leaves on the left, volunteers in a circle on the right */}
-        <div className="relative px-5 sm:px-10 pt-7 pb-8 text-center overflow-hidden" style={{ background: 'linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #ffffff 100%)' }}>
+        <div className="relative px-5 sm:px-10 pt-7 pb-8 lg:pt-5 lg:pb-8 lg:[@media(max-height:820px)]:pt-3 lg:[@media(max-height:820px)]:pb-6 text-center overflow-hidden" style={{ background: 'linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #ffffff 100%)' }}>
           <div className="absolute left-2 top-4 w-40 h-16 rounded-full bg-white/80 blur-xl pointer-events-none" />
           <div className="absolute -left-12 top-28 w-48 h-40 rounded-full bg-[#5e9e45]/50 blur-2xl pointer-events-none" />
           <div className="absolute left-20 top-36 w-44 h-32 rounded-full bg-[#8fc26f]/45 blur-2xl pointer-events-none" />
@@ -318,241 +318,246 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
           <LeafArt className="hidden sm:block absolute left-14 top-16 w-16 h-20 pointer-events-none" style={{ transform: 'rotate(-35deg)' }} />
           <LeafArt className="hidden sm:block absolute left-36 top-24 w-8 h-11 pointer-events-none" style={{ transform: 'rotate(25deg)' }} />
 
-          <div className="hidden sm:block absolute -right-10 -top-8 w-[250px] h-[250px] rounded-full overflow-hidden pointer-events-none">
+          <div className="hidden sm:block absolute -right-10 -top-8 w-[250px] h-[250px] lg:-top-12 lg:w-[200px] lg:h-[200px] rounded-full overflow-hidden pointer-events-none">
             <img src="/images/who-we-are/hero.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: '60% 40%' }} />
           </div>
-          <div className="hidden sm:block absolute right-[235px] top-8 pointer-events-none" aria-hidden>
+          <div className="hidden sm:block absolute right-[235px] top-8 lg:right-[185px] lg:top-5 pointer-events-none" aria-hidden>
             <span className="absolute block w-2 h-7 rounded-full rotate-[-30deg]" style={{ backgroundColor: PINK, left: 18, top: 0 }} />
             <span className="absolute block w-2 h-7 rounded-full rotate-[-60deg]" style={{ backgroundColor: PINK, left: 0, top: 22 }} />
             <span className="absolute block w-7 h-2 rounded-full" style={{ backgroundColor: PINK, left: -6, top: 50 }} />
           </div>
-          <LeafArt className="hidden sm:block absolute right-[215px] top-[165px] w-9 h-12 pointer-events-none" style={{ transform: 'rotate(-60deg)' }} />
+          <LeafArt className="hidden sm:block absolute right-[215px] top-[165px] lg:right-[170px] lg:top-[105px] w-9 h-12 pointer-events-none" style={{ transform: 'rotate(-60deg)' }} />
 
-          <div className="relative">
+          <div className="relative lg:flex lg:items-center lg:justify-center lg:gap-10">
             {logo}
-            <h3 id="volunteer-modal-title" className="mt-4 text-[28px] sm:text-[40px] leading-tight font-extrabold" style={{ color: NAVY }}>
-              Register to Volunteer
-            </h3>
-            <p className="mt-1 text-[15px] sm:text-[17px]" style={{ color: '#34406b' }}>
-              Be part of a cleaner, greener and more beautiful Vietnam!
-            </p>
-            <div className="mx-auto mt-4 w-16 h-1 rounded-full" style={{ backgroundColor: PINK }} />
+            <div className="lg:text-left">
+              <h3 id="volunteer-modal-title" className="mt-4 lg:mt-0 text-[28px] sm:text-[40px] lg:text-[38px] leading-tight font-extrabold" style={{ color: NAVY }}>
+                Register to Volunteer
+              </h3>
+              <p className="mt-1 text-[15px] sm:text-[17px]" style={{ color: '#34406b' }}>
+                Be part of a cleaner, greener and more beautiful Vietnam!
+              </p>
+              <div className="mx-auto lg:mx-0 mt-4 lg:mt-3 w-16 h-1 rounded-full" style={{ backgroundColor: PINK }} />
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-5 sm:px-10 pb-8 space-y-6">
-          {/* Join as */}
-          <section>
-            <SectionTitle icon="groups">Join as</SectionTitle>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5" role="radiogroup" aria-label="Join as">
-              {JOIN_OPTIONS.map(({ value, title, desc, icon }) => {
-                const checked = joinAs === value;
-                return (
-                  <label
-                    key={value}
-                    className="relative flex items-center gap-4 p-4 min-h-[88px] rounded-xl border cursor-pointer transition-colors"
-                    style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
-                  >
-                    <input type="radio" name="joinAs" value={value} checked={checked} onChange={() => setJoinAs(value)} className="sr-only" />
-                    <Icon name={icon} color={checked ? PINK : NAVY} className="w-12 h-12 shrink-0" />
-                    <span className="flex-1 pr-6">
-                      <span className="block font-bold text-[16px] sm:text-[17px]" style={{ color: NAVY }}>
-                        {title}
+        <form onSubmit={handleSubmit} className="px-5 sm:px-10 lg:px-12 pb-8 lg:pb-6 lg:[@media(max-height:820px)]:pb-4 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-x-12 gap-y-6 lg:gap-y-5 lg:[@media(max-height:820px)]:gap-y-4">
+          {/* Desktop: two columns (choices | details), so the whole form fits on one screen. */}
+          <div className="space-y-6 lg:space-y-5 lg:[@media(max-height:820px)]:space-y-4">
+            {/* Join as */}
+            <section>
+              <SectionTitle icon="groups">Join as</SectionTitle>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5" role="radiogroup" aria-label="Join as">
+                {JOIN_OPTIONS.map(({ value, title, desc, icon }) => {
+                  const checked = joinAs === value;
+                  return (
+                    <label
+                      key={value}
+                      className="relative flex items-center lg:flex-col lg:items-start gap-4 lg:gap-1.5 p-4 lg:p-3 min-h-[88px] lg:min-h-0 rounded-xl border cursor-pointer transition-colors"
+                      style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
+                    >
+                      <input type="radio" name="joinAs" value={value} checked={checked} onChange={() => setJoinAs(value)} className="sr-only" />
+                      <Icon name={icon} color={checked ? PINK : NAVY} className="w-12 h-12 lg:w-9 lg:h-9 lg:[@media(max-height:820px)]:w-8 lg:[@media(max-height:820px)]:h-8 shrink-0" />
+                      <span className="flex-1 pr-6 lg:pr-0">
+                        <span className="block font-bold text-[16px] sm:text-[17px]" style={{ color: NAVY }}>
+                          {title}
+                        </span>
+                        <span className="block text-sm lg:text-[13px] text-slate-500 leading-snug">{desc}</span>
                       </span>
-                      <span className="block text-sm text-slate-500 leading-snug">{desc}</span>
-                    </span>
-                    <span className="absolute top-4 right-4">
-                      <RadioMark checked={checked} />
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          </section>
+                      <span className="absolute top-4 right-4 lg:top-3 lg:right-3">
+                        <RadioMark checked={checked} />
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </section>
 
-          {/* Project */}
-          <section>
-            <SectionTitle icon="assignment">Project or campaign</SectionTitle>
-            <IconField icon="calendar" chevron>
-              <select
-                required
-                value={eventId}
-                onChange={(e) => setEventId(e.target.value)}
-                className={`${fieldClass} appearance-none cursor-pointer pr-12 truncate ${eventId ? '' : 'text-slate-400'}`}
-                style={eventId ? { color: NAVY } : undefined}
-                aria-label="Project or campaign"
-              >
-                <option value="" disabled>
-                  Select a project or campaign
-                </option>
-                {events.map((evt) => (
-                  <option key={evt.id} value={evt.id} style={{ color: NAVY }}>
-                    {evt.title}
+            {/* Project */}
+            <section>
+              <SectionTitle icon="assignment">Project or campaign</SectionTitle>
+              <IconField icon="calendar" chevron>
+                <select
+                  required
+                  value={eventId}
+                  onChange={(e) => setEventId(e.target.value)}
+                  className={`${fieldClass} appearance-none cursor-pointer pr-12 truncate ${eventId ? '' : 'text-slate-400'}`}
+                  style={eventId ? { color: NAVY } : undefined}
+                  aria-label="Project or campaign"
+                >
+                  <option value="" disabled>
+                    Select a project or campaign
                   </option>
-                ))}
-              </select>
-            </IconField>
-          </section>
+                  {events.map((evt) => (
+                    <option key={evt.id} value={evt.id} style={{ color: NAVY }}>
+                      {evt.title}
+                    </option>
+                  ))}
+                </select>
+              </IconField>
+            </section>
 
-          <hr className="border-[#e3e8f0]" />
+            {/* Preferred role */}
+            <section>
+              <SectionTitle icon="work">Preferred role</SectionTitle>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5" role="radiogroup" aria-label="Preferred role">
+                {ROLES.map(({ value, icon }) => {
+                  const checked = role === value;
+                  return (
+                    <label
+                      key={value}
+                      className="relative flex flex-col items-center justify-center gap-1.5 h-[78px] lg:h-[74px] lg:[@media(max-height:820px)]:h-[68px] rounded-xl border cursor-pointer transition-colors"
+                      style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
+                    >
+                      <input type="radio" name="role" value={value} checked={checked} onChange={() => setRole(value)} className="sr-only" />
+                      <Icon name={icon} color={checked ? PINK : NAVY} className="w-8 h-8 lg:[@media(max-height:820px)]:w-7 lg:[@media(max-height:820px)]:h-7" />
+                      <span className="font-bold text-[15px] sm:text-base" style={{ color: NAVY }}>
+                        {value}
+                      </span>
+                      <span className="absolute top-3 right-3">
+                        <RadioMark checked={checked} />
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
 
-          {/* Personal information */}
-          <section>
-            <SectionTitle icon="person">Personal information</SectionTitle>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-              <div>
-                <FieldLabel htmlFor="vm-name" required>
-                  {isTeam ? 'Contact person' : 'Full name'}
-                </FieldLabel>
-                <IconField icon="person">
-                  <input
-                    id="vm-name"
-                    required
-                    autoComplete="name"
-                    placeholder={isTeam ? 'Enter the contact person’s full name' : 'Enter your full name'}
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className={fieldClass}
-                  />
-                </IconField>
-              </div>
-              <div>
-                <FieldLabel htmlFor="vm-phone" required>
-                  Phone number
-                </FieldLabel>
-                <IconField icon="phone">
-                  <input
-                    id="vm-phone"
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel"
-                    required
-                    maxLength={10}
-                    placeholder="Enter your phone number"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    className={`${fieldClass} ${phoneError ? '!border-red-400 !bg-red-50/40' : ''}`}
-                  />
-                </IconField>
-                {phoneError && (
-                  <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    {phoneError}
-                  </p>
-                )}
-              </div>
-              <div>
-                <FieldLabel htmlFor="vm-email" required>
-                  Email address
-                </FieldLabel>
-                <IconField icon="mail">
-                  <input id="vm-email" type="email" required autoComplete="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldClass} />
-                </IconField>
-              </div>
-              {/* A group or organization has no birth year: its name goes here instead. */}
-              {isTeam ? (
+          <div className="space-y-6 lg:space-y-5 lg:[@media(max-height:820px)]:space-y-4">
+            <hr className="border-[#e3e8f0] lg:hidden" />
+
+            {/* Personal information */}
+            <section>
+              <SectionTitle icon="person">Personal information</SectionTitle>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 lg:[@media(max-height:820px)]:gap-y-2.5">
                 <div>
-                  <FieldLabel htmlFor="vm-org" required>
-                    {teamWord} name
+                  <FieldLabel htmlFor="vm-name" required>
+                    {isTeam ? 'Contact person' : 'Full name'}
                   </FieldLabel>
-                  <IconField icon={joinAs === 'organization' ? 'apartment' : 'groups'}>
+                  <IconField icon="person">
                     <input
-                      id="vm-org"
+                      id="vm-name"
                       required
-                      autoComplete="organization"
-                      placeholder={joinAs === 'organization' ? 'Enter your company or organization name' : 'Enter your group name'}
-                      value={organizationName}
-                      onChange={(e) => setOrganizationName(e.target.value)}
+                      autoComplete="name"
+                      placeholder={isTeam ? 'Enter the contact person’s full name' : 'Enter your full name'}
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       className={fieldClass}
                     />
                   </IconField>
                 </div>
-              ) : (
                 <div>
-                  <FieldLabel htmlFor="vm-birth" required>
-                    Year of birth
+                  <FieldLabel htmlFor="vm-phone" required>
+                    Phone number
                   </FieldLabel>
-                  <IconField icon="calendar" chevron>
-                    <select
-                      id="vm-birth"
+                  <IconField icon="phone">
+                    <input
+                      id="vm-phone"
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel"
                       required
-                      value={birthYear}
-                      onChange={(e) => setBirthYear(e.target.value)}
-                      className={`${fieldClass} appearance-none cursor-pointer pr-12 ${birthYear ? '' : 'text-slate-400'}`}
-                      style={birthYear ? { color: NAVY } : undefined}
-                    >
-                      <option value="" disabled>
-                        Select your year of birth
-                      </option>
-                      {years.map((y) => (
-                        <option key={y} value={y} style={{ color: NAVY }}>
-                          {y}
-                        </option>
-                      ))}
-                    </select>
+                      maxLength={10}
+                      placeholder="Enter your phone number"
+                      value={phone}
+                      onChange={handlePhoneChange}
+                      className={`${fieldClass} ${phoneError ? '!border-red-400 !bg-red-50/40' : ''}`}
+                    />
+                  </IconField>
+                  {phoneError && (
+                    <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      {phoneError}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <FieldLabel htmlFor="vm-email" required>
+                    Email address
+                  </FieldLabel>
+                  <IconField icon="mail">
+                    <input id="vm-email" type="email" required autoComplete="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldClass} />
                   </IconField>
                 </div>
-              )}
-              <div className="sm:col-span-2">
-                <FieldLabel htmlFor="vm-address" required>
-                  Address
-                </FieldLabel>
-                <IconField icon="place">
-                  <input id="vm-address" required autoComplete="street-address" placeholder="Enter your address" value={address} onChange={(e) => setAddress(e.target.value)} className={fieldClass} />
-                </IconField>
+                {/* A group or organization has no birth year: its name goes here instead. */}
+                {isTeam ? (
+                  <div>
+                    <FieldLabel htmlFor="vm-org" required>
+                      {teamWord} name
+                    </FieldLabel>
+                    <IconField icon={joinAs === 'organization' ? 'apartment' : 'groups'}>
+                      <input
+                        id="vm-org"
+                        required
+                        autoComplete="organization"
+                        placeholder={joinAs === 'organization' ? 'Enter your company or organization name' : 'Enter your group name'}
+                        value={organizationName}
+                        onChange={(e) => setOrganizationName(e.target.value)}
+                        className={fieldClass}
+                      />
+                    </IconField>
+                  </div>
+                ) : (
+                  <div>
+                    <FieldLabel htmlFor="vm-birth" required>
+                      Year of birth
+                    </FieldLabel>
+                    <IconField icon="calendar" chevron>
+                      <select
+                        id="vm-birth"
+                        required
+                        value={birthYear}
+                        onChange={(e) => setBirthYear(e.target.value)}
+                        className={`${fieldClass} appearance-none cursor-pointer pr-12 ${birthYear ? '' : 'text-slate-400'}`}
+                        style={birthYear ? { color: NAVY } : undefined}
+                      >
+                        <option value="" disabled>
+                          Select your year of birth
+                        </option>
+                        {years.map((y) => (
+                          <option key={y} value={y} style={{ color: NAVY }}>
+                            {y}
+                          </option>
+                        ))}
+                      </select>
+                    </IconField>
+                  </div>
+                )}
+                <div className="sm:col-span-2">
+                  <FieldLabel htmlFor="vm-address" required>
+                    Address
+                  </FieldLabel>
+                  <IconField icon="place">
+                    <input id="vm-address" required autoComplete="street-address" placeholder="Enter your address" value={address} onChange={(e) => setAddress(e.target.value)} className={fieldClass} />
+                  </IconField>
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <hr className="border-[#e3e8f0]" />
+            {/* Number of participants */}
+            <section>
+              <SectionTitle icon="groups" note="(Only required for Group or Organization)">
+                Number of participants
+              </SectionTitle>
+              <IconField icon="groups">
+                <input
+                  type="number"
+                  min={1}
+                  required={isTeam}
+                  inputMode="numeric"
+                  placeholder="Enter number of participants"
+                  value={participants}
+                  onChange={(e) => setParticipants(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                  className={fieldClass}
+                  aria-label="Number of participants"
+                />
+              </IconField>
+            </section>
+          </div>
 
-          {/* Preferred role */}
-          <section>
-            <SectionTitle icon="work">Preferred role</SectionTitle>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5" role="radiogroup" aria-label="Preferred role">
-              {ROLES.map(({ value, icon }) => {
-                const checked = role === value;
-                return (
-                  <label
-                    key={value}
-                    className="relative flex flex-col items-center justify-center gap-1.5 h-[78px] rounded-xl border cursor-pointer transition-colors"
-                    style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
-                  >
-                    <input type="radio" name="role" value={value} checked={checked} onChange={() => setRole(value)} className="sr-only" />
-                    <Icon name={icon} color={checked ? PINK : NAVY} className="w-8 h-8" />
-                    <span className="font-bold text-[15px] sm:text-base" style={{ color: NAVY }}>
-                      {value}
-                    </span>
-                    <span className="absolute top-3 right-3">
-                      <RadioMark checked={checked} />
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* Number of participants */}
-          <section>
-            <SectionTitle icon="groups" note="(Only required for Group or Organization)">
-              Number of participants
-            </SectionTitle>
-            <IconField icon="groups">
-              <input
-                type="number"
-                min={1}
-                required={isTeam}
-                inputMode="numeric"
-                placeholder="Enter number of participants"
-                value={participants}
-                onChange={(e) => setParticipants(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                className={fieldClass}
-                aria-label="Number of participants"
-              />
-            </IconField>
-          </section>
-
-          <div className="flex justify-center pt-1">
+          <div className="lg:col-span-2 flex justify-center pt-1 lg:pt-0">
             <button
               type="submit"
               className="w-full sm:w-[430px] h-12 rounded-full text-white font-bold text-base sm:text-lg shadow-lg shadow-[#e8197c]/30 hover:brightness-110 transition cursor-pointer flex items-center justify-center gap-2.5"
