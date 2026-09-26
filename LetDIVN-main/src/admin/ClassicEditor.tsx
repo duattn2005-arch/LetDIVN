@@ -25,6 +25,7 @@ import 'tinymce/plugins/visualblocks';
 import 'tinymce/plugins/wordcount';
 import 'tinymce-i18n/langs6/vi';
 import 'tinymce/skins/ui/oxide/skin.min.css';
+import './tinymce-wp.css';
 import contentUiCss from 'tinymce/skins/ui/oxide/content.min.css?inline';
 import contentCss from 'tinymce/skins/content/default/content.min.css?inline';
 import { api } from './api';
@@ -58,6 +59,7 @@ tinymce.addI18n('vi', {
   'Special character...': 'Ký tự đặc biệt...',
   'Horizontal line': 'Đường kẻ ngang',
   'Words: {0}': 'Số từ: {0}',
+  '{0} words': 'Số từ: {0}',
   'Bullet list': 'Danh sách không thứ tự',
   'Numbered list': 'Danh sách có thứ tự',
 });
@@ -115,9 +117,10 @@ export default function ClassicEditor({ blocks, onChange }: { blocks: Block[]; o
           file: { title: 'File', items: 'preview | print' },
           insert: { title: 'Insert', items: 'image link | charmap hr anchor insertdatetime nonbreaking | inserttable' },
         },
+        // WordPress's two rows; full screen sits at the right end of row 1 (tinymce-wp.css).
         toolbar: [
-          'blocks | bold underline italic blockquote | bullist numlist | alignleft alignjustify aligncenter alignright | link unlink | undo redo | fullscreen',
-          'fontfamily fontsize | outdent indent | pastetext removeformat | charmap hr | forecolor backcolor | table image | help',
+          'blocks bold underline italic blockquote bullist numlist alignleft alignjustify aligncenter alignright link unlink undo redo | fullscreen',
+          'fontfamily fontsize outdent indent pastetext removeformat charmap hr forecolor table help',
         ],
         toolbar_mode: 'wrap',
         toolbar_sticky: true,
@@ -129,7 +132,7 @@ export default function ClassicEditor({ blocks, onChange }: { blocks: Block[]; o
         block_formats:
           'Đoạn văn=p; Tiêu đề 1=h1; Tiêu đề 2=h2; Tiêu đề 3=h3; Tiêu đề 4=h4; Tiêu đề 5=h5; Tiêu đề 6=h6; Định dạng sẵn=pre',
         font_family_formats:
-          'Mặc định (Poppins)=Poppins,Arial,sans-serif; Arial=arial,helvetica,sans-serif; Roboto=Roboto,sans-serif; Georgia=georgia,serif; Tahoma=tahoma,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,sans-serif',
+          'Poppins=Poppins,Arial,sans-serif; Arial=arial,helvetica,sans-serif; Roboto=Roboto,sans-serif; Georgia=georgia,serif; Tahoma=tahoma,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,sans-serif',
         font_size_formats: '12px 14px 16px 18px 20px 24px 28px 32px 36px 48px',
         color_map: [
           '000000', 'Đen', '3C434A', 'Xám đậm', '7A7A7A', 'Xám', 'FFFFFF', 'Trắng',
@@ -148,6 +151,8 @@ export default function ClassicEditor({ blocks, onChange }: { blocks: Block[]; o
         link_default_protocol: 'https',
         link_assume_external_targets: true,
         convert_urls: false,
+        // Keep "…", "à", "ệ" as they are instead of &hellip; &agrave; ...
+        entity_encoding: 'raw',
         paste_data_images: true,
         automatic_uploads: true,
         // Images dropped or pasted into the editor go to the media library.
@@ -259,8 +264,8 @@ export default function ClassicEditor({ blocks, onChange }: { blocks: Block[]; o
   return (
     <div className="wp-classic-editor">
       <div className="flex items-end justify-between gap-2 flex-wrap">
-        <button type="button" className="wp-btn mb-2" onClick={() => setPicker({ mode: 'insert' })} disabled={!ready}>
-          <ImagePlus className="w-4 h-4" /> Thêm tệp
+        <button type="button" className="wp-btn wp-btn-lg mb-2 !bg-white" onClick={() => setPicker({ mode: 'insert' })} disabled={!ready}>
+          <ImagePlus className="w-5 h-5" /> Thêm tệp
         </button>
         <div className="flex">
           {(['visual', 'code'] as const).map((m) => (
@@ -268,9 +273,7 @@ export default function ClassicEditor({ blocks, onChange }: { blocks: Block[]; o
               key={m}
               type="button"
               onClick={() => switchMode(m)}
-              className={`px-3 py-1.5 text-[13px] border border-b-0 -mb-px relative ${
-                mode === m ? 'bg-[#f6f7f7] border-[#dcdcde] text-[#1d2327] z-[1]' : 'bg-[#ebebeb] border-[#dcdcde] text-[var(--wp-muted)] hover:text-[#1d2327]'
-              }`}
+              className={`wp-switch-editor ${mode === m ? 'is-active' : ''} ${m === 'code' ? 'is-code' : ''}`}
             >
               {m === 'visual' ? 'Trực quan' : 'Mã'}
             </button>

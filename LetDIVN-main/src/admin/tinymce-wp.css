@@ -1,0 +1,214 @@
+/*
+ * TinyMCE 6 dressed as WordPress's classic editor (TinyMCE 4 with the WP
+ * skin): white menu bar with ▾ carets, grey toolbar rows of small square
+ * buttons, white boxed dropdowns, and no rounded corners or shadows.
+ * Everything is scoped to .wp-classic-editor so TinyMCE's own menus and
+ * dialogs keep their normal look.
+ */
+
+.wp-classic-editor .tox.tox-tinymce {
+  border: 1px solid #dcdcde;
+  border-radius: 0;
+}
+
+.wp-classic-editor .tox .tox-editor-header {
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid #dcdcde !important;
+  background: #f6f7f7;
+}
+
+/* Menu bar: Tệp tin ▾  Chỉnh sửa ▾  Xem ▾ ... */
+.wp-classic-editor .tox .tox-menubar {
+  background: #fff;
+  border-bottom: 1px solid #dcdcde;
+  padding: 3px 4px;
+}
+.wp-classic-editor .tox .tox-mbtn {
+  height: 30px;
+  padding: 0 7px;
+  margin: 0 1px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: #1d2327;
+  font-size: 15px;
+}
+.wp-classic-editor .tox .tox-mbtn:hover:not(:disabled):not(.tox-mbtn--active),
+.wp-classic-editor .tox .tox-mbtn--active {
+  background: #f6f7f7;
+  border-color: #c3c4c7;
+  color: #1d2327;
+}
+.wp-classic-editor .tox .tox-mbtn__select-label {
+  margin: 0;
+  cursor: pointer;
+}
+.wp-classic-editor .tox .tox-mbtn__select-label::after {
+  content: '';
+  display: inline-block;
+  margin-left: 7px;
+  vertical-align: 2px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #50575e;
+}
+
+/* Toolbar rows */
+.wp-classic-editor .tox .tox-toolbar-overlord,
+.wp-classic-editor .tox .tox-toolbar,
+.wp-classic-editor .tox .tox-toolbar__primary,
+.wp-classic-editor .tox .tox-toolbar__overflow {
+  background: #f6f7f7 none !important;
+}
+.wp-classic-editor .tox .tox-toolbar-overlord {
+  padding: 2px 4px;
+}
+.wp-classic-editor .tox .tox-toolbar__group {
+  padding: 0 !important;
+  margin: 0;
+  border: 0 !important;
+}
+/* Row 1 ends with the full-screen button, pushed to the right edge. */
+.wp-classic-editor .tox .tox-toolbar:first-child {
+  display: flex;
+}
+.wp-classic-editor .tox .tox-toolbar:first-child .tox-toolbar__group:last-child:not(:first-child) {
+  margin-left: auto;
+}
+
+.wp-classic-editor .tox .tox-tbtn {
+  width: 32px;
+  height: 32px;
+  margin: 2px 1px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: #3c434a;
+}
+.wp-classic-editor .tox .tox-tbtn svg {
+  fill: #3c434a;
+}
+.wp-classic-editor .tox .tox-tbtn:hover:not(.tox-tbtn--disabled),
+.wp-classic-editor .tox .tox-tbtn:focus:not(.tox-tbtn--disabled) {
+  background: #fff;
+  border-color: #8c8f94;
+  color: #1d2327;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+.wp-classic-editor .tox .tox-tbtn--enabled,
+.wp-classic-editor .tox .tox-tbtn--enabled:hover {
+  background: #f0f0f1;
+  border-color: #50575e;
+  box-shadow: inset 0 2px 5px -3px rgba(0, 0, 0, 0.3);
+}
+.wp-classic-editor .tox .tox-tbtn--disabled svg,
+.wp-classic-editor .tox .tox-tbtn:disabled svg {
+  fill: #a7aaad;
+}
+
+/* Menu buttons with an icon (table "▦ ▾"): a normal button plus a caret. */
+.wp-classic-editor .tox .tox-tbtn--select:not(.tox-tbtn--bespoke) {
+  width: auto;
+  padding: 0 3px;
+}
+
+/* Boxed dropdowns: "Đoạn văn ▾", "Arial ▾", "20px ▾" */
+.wp-classic-editor .tox .tox-tbtn--bespoke {
+  width: 150px;
+  margin: 2px 8px 2px 1px;
+  padding: 0 6px 0 9px;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 2px;
+}
+.wp-classic-editor .tox .tox-tbtn--bespoke .tox-tbtn__select-label {
+  flex: 1;
+  width: auto;
+  margin: 0;
+  text-align: left;
+  font-size: 15px;
+  color: #2c3338;
+}
+.wp-classic-editor .tox .tox-tbtn__select-chevron svg,
+.wp-classic-editor .tox .tox-split-button__chevron svg {
+  display: none;
+}
+.wp-classic-editor .tox .tox-tbtn__select-chevron::after,
+.wp-classic-editor .tox .tox-split-button__chevron::after {
+  content: '';
+  display: block;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #50575e;
+}
+.wp-classic-editor .tox .tox-tbtn__select-chevron {
+  width: 10px;
+}
+
+/* Split buttons: lists "☰ ▾", text colour "A ▾", table "▦ ▾" */
+.wp-classic-editor .tox .tox-split-button {
+  margin: 2px 1px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  box-shadow: none;
+}
+.wp-classic-editor .tox .tox-split-button:hover,
+.wp-classic-editor .tox .tox-split-button:focus {
+  background: #fff;
+  border-color: #8c8f94;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+.wp-classic-editor .tox .tox-split-button .tox-tbtn {
+  margin: 0;
+  border: 0;
+  box-shadow: none;
+}
+.wp-classic-editor .tox .tox-split-button .tox-tbtn:hover {
+  border: 0;
+  box-shadow: none;
+}
+.wp-classic-editor .tox .tox-split-button__chevron {
+  width: 16px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Status bar: element path + "Số từ" */
+.wp-classic-editor .tox .tox-statusbar {
+  border-top: 1px solid #dcdcde;
+  background: #f6f7f7;
+  color: #50575e;
+  font-size: 13px;
+}
+.wp-classic-editor .tox .tox-statusbar a,
+.wp-classic-editor .tox .tox-statusbar__wordcount {
+  color: #50575e;
+}
+
+/* "Trực quan" / "Mã" tabs, sitting on the editor's top border */
+.wp-classic-editor .wp-switch-editor {
+  position: relative;
+  top: 1px;
+  margin-left: 5px;
+  padding: 4px 10px 5px;
+  border: 1px solid #dcdcde;
+  background: #f0f0f1;
+  color: #646970;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.wp-classic-editor .wp-switch-editor:hover {
+  color: #1d2327;
+}
+.wp-classic-editor .wp-switch-editor.is-active {
+  background: #fff;
+  color: #50575e;
+  border-bottom-color: #fff;
+  z-index: 1;
+}
+.wp-classic-editor .wp-switch-editor.is-active.is-code {
+  background: #f6f7f7;
+  border-bottom-color: #f6f7f7;
+}
