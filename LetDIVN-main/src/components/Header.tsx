@@ -285,14 +285,24 @@ export const Header: React.FC<HeaderProps> = ({
 
           </nav>
 
-          {/* Right Action Controls: Contact Us */}
+          {/* Right Action Controls: Volunteer sign-up + Contact Us */}
           <div className="hidden xl:flex items-center space-x-2.5 2xl:space-x-4 shrink-0">
+
+            {/* Volunteer registration button */}
+            <button
+              id="header-volunteer-btn"
+              onClick={onOpenVolunteer}
+              className="flex items-center gap-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-3 2xl:px-4 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t.joinVolunteer}</span>
+            </button>
 
             {/* Contact Us button */}
             <button
               id="header-contact-btn"
               onClick={() => onNavigate('contact')}
-              className="bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-3 2xl:px-4 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
+              className="bg-white border border-[#E81A7F] text-[#E81A7F] hover:bg-pink-50 font-bold text-xs px-3 2xl:px-4 py-1.5 rounded-full shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
             >
               {t.navContactUs}
             </button>
