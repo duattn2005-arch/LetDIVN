@@ -227,6 +227,9 @@ export async function getNews(): Promise<NewsArticle[]> {
       views: 0,
       featured: !!doc.featured,
       status: doc.status === 'Pending' ? 'Pending' : 'Published',
+      tags: Array.isArray(doc.tags) ? doc.tags.map(str).filter(Boolean) : undefined,
+      seoTitle: str(doc.seoTitle) || undefined,
+      seoDescription: str(doc.seoDescription) || undefined,
     };
   });
   return articles.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));

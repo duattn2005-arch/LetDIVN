@@ -71,6 +71,17 @@ export const formatBytes = (n: number) =>
 
 export const isImageUrl = (url: string) => /\.(jpe?g|png|webp|gif|avif|svg)(\?.*)?$/i.test(url) || url.startsWith('data:image/');
 
+/** WordPress's own words for the collections that match its "Bài viết" and "Trang". */
+const WP_LABELS: Record<string, { menu: string; singular: string; all: string; add: string }> = {
+  news: { menu: 'Bài viết', singular: 'bài viết', all: 'Tất cả bài viết', add: 'Viết bài mới' },
+  pages: { menu: 'Trang', singular: 'trang', all: 'Tất cả các trang', add: 'Thêm trang mới' },
+};
+
+export function labelsFor(c: Collection) {
+  const singular = c.label_singular || c.label;
+  return WP_LABELS[c.name] ?? { menu: c.label, singular, all: `Tất cả ${singular}`, add: `Thêm ${singular} mới` };
+}
+
 /** Where each collection shows up on the live site ("Xem" links). */
 export const SITE_PATHS: Record<string, string> = {
   news: '/news/',

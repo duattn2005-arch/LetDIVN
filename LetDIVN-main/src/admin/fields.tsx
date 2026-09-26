@@ -189,6 +189,24 @@ function ListInput({ field, value, onChange }: { field: Field; value: any; onCha
     </div>
   );
 
+  // A plain list (Decap's list without sub-fields): comma-separated words, like tags.
+  if (!field.field && !field.fields && !field.types) {
+    return (
+      <div>
+        <label className="block font-semibold text-[#1d2327] mb-1">{field.label || field.name}</label>
+        <input
+          className="wp-input"
+          defaultValue={items.join(', ')}
+          onBlur={(e) => {
+            const list = e.target.value.split(',').map((s) => s.trim()).filter(Boolean);
+            onChange(list.length ? list : undefined);
+          }}
+        />
+        <p className="mt-1 mb-0 text-[13px] italic text-[var(--wp-muted)]">Phân cách bằng dấu phẩy</p>
+      </div>
+    );
+  }
+
   // A list of images (photo galleries): a thumbnail grid, filled from the media library.
   if (field.field && field.field.widget === 'image') {
     return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import DOMPurify from 'dompurify';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
@@ -10,8 +10,45 @@ import { TakeActionStrip } from '../TakeActionStrip';
 
 interface NewsPageProps {
   initialCategory?: 'All' | 'Media On Us' | 'News';
-  /** Jump straight to this article's detail view (e.g. clicked from a homepage news card) instead of the list. */
+  /** Show this article (its slug, or its id when clicked from a homepage news card) instead of the list. */
   initialArticleId?: string;
+  /** An article was opened (its slug) or closed (undefined), so the URL can follow: /news/<slug>/. */
+  onArticleChange?: (slug?: string) => void;
+}
+
+/**
+ * "Xem trước" in the admin editor opens /news/<slug>/?preview=1 and hands the
+ * unsaved article over through localStorage (same site, so same storage).
+ */
+function readPreview(): NewsArticle | null {
+  if (typeof window === 'undefined' || !new URLSearchParams(window.location.search).has('preview')) return null;
+  try {
+    const p = JSON.parse(localStorage.getItem('wp-admin-preview') || 'null');
+    const d = p?.data;
+    if (!d) return null;
+    return {
+      id: 'preview',
+      slug: String(p.slug || 'xem-truoc'),
+      title: String(d.title || ''),
+      category: d.category || 'News',
+      summary: String(d.summary || ''),
+      content: '',
+      contentBlocks: Array.isArray(d.contentBlocks) ? d.contentBlocks.filter((b: any) => b && typeof b.value === 'string' && b.value) : [],
+      author: String(d.author || ''),
+      date: String(d.date || ''),
+      image: String(d.image || ''),
+      source: d.source || undefined,
+      sourceUrl: d.sourceUrl || undefined,
+      views: 0,
+      featured: !!d.featured,
+      status: d.status === 'Pending' ? 'Pending' : 'Published',
+      tags: Array.isArray(d.tags) ? d.tags : undefined,
+      seoTitle: d.seoTitle || undefined,
+      seoDescription: d.seoDescription || undefined,
+    };
+  } catch {
+    return null;
+  }
 }
 
 function formatDate(dateStr: string) {
@@ -20,16 +57,15 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-// Articles are written and edited in Decap CMS (public/admin/), not on the page.
-const DECAP_NEW_ARTICLE_URL = '/admin/index.html#/collections/news/new';
-const decapEditUrl = (article: NewsArticle) => `/admin/index.html#/collections/news/entries/${encodeURIComponent(article.slug)}`;
+// Articles are written and edited in the admin (/admin/), not on the page.
 
-export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', initialArticleId }) => {
+export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', initialArticleId, onArticleChange }) => {
   const { t, language } = useLanguage();
   const [selectedCat, setSelectedCat] = useState<string>(initialCategory);
   const [search, setSearch] = useState<string>('');
   const [newsList, setNewsList] = useState<NewsArticle[]>([]);
-  const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
+  const preview = useMemo(readPreview, []);
+  const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(preview);
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 6;
 
@@ -60,19 +96,46 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
     return () => unsub();
   }, []);
 
-  // Deep-link into one article's detail view (e.g. clicked from a homepage
-  // news card). A ref tracks which id we've already applied so a later
-  // background refresh doesn't keep snapping the user back to it after
-  // they've clicked "Back to List".
-  const appliedArticleIdRef = React.useRef<string | undefined>(undefined);
+  // The article in the URL (/news/<slug>/), or the list when there is none.
+  // Drafts ("Pending") are never shown this way, only through a preview.
   useEffect(() => {
-    if (!initialArticleId || appliedArticleIdRef.current === initialArticleId) return;
-    const found = newsList.find((a) => a.id === initialArticleId);
+    if (preview) return;
+    if (!initialArticleId) {
+      setSelectedArticle(null);
+      return;
+    }
+    const found = newsList.find((a) => a.status !== 'Pending' && (a.slug === initialArticleId || a.id === initialArticleId));
     if (found) {
       setSelectedArticle(found);
-      appliedArticleIdRef.current = initialArticleId;
+      // Opened by id (a homepage news card): show the article's real address.
+      if (initialArticleId !== found.slug) window.history.replaceState(null, '', `/news/${found.slug}/`);
     }
-  }, [initialArticleId, newsList]);
+  }, [initialArticleId, newsList, preview]);
+
+  const openArticle = (article: NewsArticle | null) => {
+    setSelectedArticle(article);
+    if (onArticleChange) onArticleChange(article?.slug);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Browser tab title and search/social description of the open article.
+  useEffect(() => {
+    if (!selectedArticle) return;
+    const previousTitle = document.title;
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    const previousDescription = meta?.content;
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'description';
+      document.head.appendChild(meta);
+    }
+    document.title = `${selectedArticle.seoTitle || selectedArticle.title} – Let's do it! Vietnam`;
+    meta.content = selectedArticle.seoDescription || selectedArticle.summary || '';
+    return () => {
+      document.title = previousTitle;
+      if (meta) meta.content = previousDescription ?? '';
+    };
+  }, [selectedArticle]);
 
   const visibleNews = newsList.filter(n => n.status !== 'Pending');
 
@@ -111,9 +174,14 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
 
         {selectedArticle ? (
           <div className="space-y-6">
+            {preview && selectedArticle.id === 'preview' && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <strong>Bản xem trước</strong> — nội dung đang soạn trong trang quản trị, có thể chưa được lưu lên website.
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <button
-                onClick={() => setSelectedArticle(null)}
+                onClick={() => openArticle(null)}
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -157,6 +225,17 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
                   </div>
                 )}
 
+                {selectedArticle.tags && selectedArticle.tags.length > 0 && (
+                  <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+                    <span className="text-slate-500">Tags:</span>
+                    {selectedArticle.tags.map((tag) => (
+                      <span key={tag} className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {selectedArticle.sourceUrl && (
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                     <EditableText contentKey="newsPage.sourceOriginalLabel" defaultValue={t.newsPageSourceOriginalLabel} as="span" className="text-slate-500" />
@@ -174,7 +253,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
 
               <div className="space-y-8">
                 {visibleNews.filter((a) => a.id !== selectedArticle.id).slice(0, 5).map((a) => (
-                  <div key={a.id} onClick={() => setSelectedArticle(a)} className="space-y-2 cursor-pointer group">
+                  <div key={a.id} onClick={() => openArticle(a)} className="space-y-2 cursor-pointer group">
                     <div className="aspect-16/10 overflow-hidden bg-slate-900">
                       <img src={a.image} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
@@ -219,7 +298,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
             return (
               <article
                 key={item.id}
-                onClick={() => setSelectedArticle(item)}
+                onClick={() => openArticle(item)}
                 className={`bg-white rounded-3xl border ${isPending ? 'border-amber-400 ring-2 ring-amber-300/60 bg-amber-50/20' : 'border-slate-200/80'} overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer relative`}
               >
                 <div>

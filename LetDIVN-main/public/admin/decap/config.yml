@@ -559,6 +559,11 @@ collections:
         options:
           - { label: 'Đã đăng', value: 'Published' }
           - { label: 'Chờ duyệt (chỉ admin thấy)', value: 'Pending' }
+      - { label: Thẻ, name: tags, widget: list, required: false, hint: 'Các thẻ, phân cách bằng dấu phẩy.' }
+      # SEO: the page title / description search engines and Facebook show for /news/<slug>/.
+      - { label: Cụm từ khóa chính (SEO), name: seoKeyphrase, widget: string, required: false }
+      - { label: Tiêu đề SEO, name: seoTitle, widget: string, required: false, hint: 'Để trống = dùng tiêu đề bài viết.' }
+      - { label: Mô tả meta (SEO), name: seoDescription, widget: text, required: false, hint: 'Để trống = dùng phần tóm tắt.' }
 
   - name: events
     label: Sự kiện (Cleanup Map)

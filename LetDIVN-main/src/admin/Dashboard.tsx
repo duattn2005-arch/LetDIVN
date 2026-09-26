@@ -3,7 +3,7 @@ import { CalendarDays, FileText, HeartHandshake, Image as ImageIcon, Mail, PenLi
 import { api, type Entry } from './api';
 import { useAdmin } from './AdminApp';
 import { MetaBox, PageTitle } from './Layout';
-import { formatDate, navigate, slugify, today } from './util';
+import { formatDate, labelsFor, navigate, slugify, today } from './util';
 
 // "Bảng tin": welcome panel, at-a-glance counts, recent activity and the
 // quick draft box — the WordPress dashboard.
@@ -82,7 +82,7 @@ export function Dashboard() {
       key: c.name,
       icon: c.name === 'news' ? Pin : c.name === 'events' ? CalendarDays : c.name === 'gallery' ? ImageIcon : FileText,
       href: `#/c/${c.name}`,
-      label: c.label,
+      label: labelsFor(c).menu,
     })),
     { key: '#volunteers', icon: HeartHandshake, href: '#/volunteers', label: 'Tình nguyện viên' },
     { key: '#contacts', icon: Mail, href: '#/contacts', label: 'Tin nhắn liên hệ' },

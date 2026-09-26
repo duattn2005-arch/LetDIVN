@@ -26,6 +26,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useAdmin, type Notice } from './AdminApp';
+import { labelsFor } from './util';
 
 const ICONS: Record<string, LucideIcon> = {
   news: Pin,
@@ -73,13 +74,13 @@ export function Layout({
 
   const collectionItems: MenuItem[] = collections.map((c) => ({
     key: c.name,
-    label: c.label,
+    label: labelsFor(c).menu,
     icon: ICONS[c.name] || FileText,
     href: `#/c/${c.name}`,
     sub: c.folder
       ? [
-          { label: `Tất cả ${c.label_singular || c.label}`, href: `#/c/${c.name}` },
-          ...(c.create !== false ? [{ label: 'Thêm mới', href: `#/c/${c.name}/new` }] : []),
+          { label: labelsFor(c).all, href: `#/c/${c.name}` },
+          ...(c.create !== false ? [{ label: labelsFor(c).add, href: `#/c/${c.name}/new` }] : []),
         ]
       : undefined,
   }));
@@ -171,7 +172,7 @@ export function Layout({
                     onClick={() => setNewOpen(false)}
                     className="block px-4 py-1.5 text-[#f0f0f1] no-underline hover:text-[#72aee6] first-letter:uppercase"
                   >
-                    {c.label_singular || c.label}
+                    {labelsFor(c).singular}
                   </a>
                 </li>
               ))}
@@ -293,26 +294,77 @@ export function PageTitle({ children, action }: { children: React.ReactNode; act
   );
 }
 
-/** A collapsible WordPress metabox. */
+const readStored = <T,>(key: string, fallback: T): T => {
+  try {
+    const v = localStorage.getItem(key);
+    return v == null ? fallback : (JSON.parse(v) as T);
+  } catch {
+    return fallback;
+  }
+};
+const writeStored = (key: string, value: unknown) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // private mode: the layout just isn't remembered
+  }
+};
+export const storage = { read: readStored, write: writeStored };
+
+/**
+ * A WordPress metabox: title bar with move up / move down / collapse
+ * buttons. With an `id`, whether it is collapsed is remembered.
+ */
 export function MetaBox({
+  id,
   title,
   children,
   defaultOpen = true,
   className = '',
+  onMoveUp,
+  onMoveDown,
+  flush = false,
 }: {
+  id?: string;
   title: React.ReactNode;
   children: React.ReactNode;
   defaultOpen?: boolean;
   className?: string;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  /** No padding around the content (it brings its own). */
+  flush?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const storeKey = id ? `wp-admin-closed:${id}` : '';
+  const [open, setOpen] = useState(() => (storeKey ? !readStored(storeKey, !defaultOpen) : defaultOpen));
+  const toggle = () => {
+    setOpen(!open);
+    if (storeKey) writeStored(storeKey, open);
+  };
+  const arrow = 'w-7 h-7 flex items-center justify-center text-[#787c82] hover:text-[#1d2327] disabled:opacity-30';
   return (
     <div className={`wp-box ${className}`}>
-      <button type="button" className="wp-box-title w-full text-left" style={open ? undefined : { borderBottom: 0 }} onClick={() => setOpen(!open)}>
-        <span>{title}</span>
-        <ChevronDown className={`w-4 h-4 text-[#787c82] transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && <div className="p-3">{children}</div>}
+      <div className="wp-box-title !p-0" style={open ? undefined : { borderBottom: 0 }}>
+        <button type="button" className="flex-1 text-left px-3 py-2.5 font-semibold" onClick={toggle}>
+          {title}
+        </button>
+        <div className="flex items-center pr-1.5">
+          {(onMoveUp || onMoveDown) && (
+            <>
+              <button type="button" className={arrow} onClick={onMoveUp} disabled={!onMoveUp} aria-label="Di chuyển lên" title="Di chuyển lên">
+                <ChevronDown className="w-4 h-4 rotate-180" />
+              </button>
+              <button type="button" className={arrow} onClick={onMoveDown} disabled={!onMoveDown} aria-label="Di chuyển xuống" title="Di chuyển xuống">
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </>
+          )}
+          <button type="button" className={arrow} onClick={toggle} aria-label={open ? 'Thu gọn' : 'Mở rộng'} aria-expanded={open}>
+            <span className={`block w-0 h-0 border-x-[5px] border-x-transparent ${open ? 'border-b-[6px] border-b-current' : 'border-t-[6px] border-t-current'}`} />
+          </button>
+        </div>
+      </div>
+      {open && <div className={flush ? '' : 'p-3'}>{children}</div>}
     </div>
   );
 }

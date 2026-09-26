@@ -37,6 +37,19 @@ h1, h2, h3, h4 {
 .news-html blockquote { border-left: 4px solid #E81A7F; padding-left: 1em; font-style: italic; }
 .news-html a { color: #E81A7F; text-decoration: underline; }
 .news-html hr { border-top: 1px solid #e2e8f0; }
+.news-html h1 { font-size: 1.8em; font-weight: 700; color: #54595F; }
+.news-html h5, .news-html h6 { font-size: 1em; font-weight: 700; color: #54595F; }
+.news-html pre { white-space: pre-wrap; font-family: monospace; font-size: 0.85em; background: #f8fafc; padding: 0.75em 1em; }
+.news-html img { max-width: 100%; height: auto; display: inline-block; }
+.news-html .alignleft { float: left; margin: 0.3em 1.4em 0.8em 0; }
+.news-html .alignright { float: right; margin: 0.3em 0 0.8em 1.4em; }
+.news-html .aligncenter { display: block; margin-left: auto; margin-right: auto; }
+.news-html::after { content: ''; display: table; clear: both; }
+.news-html figure.image { display: table; margin-left: auto; margin-right: auto; }
+.news-html figure.image figcaption { display: table-caption; caption-side: bottom; text-align: center; font-size: 0.8em; color: #94a3b8; padding-top: 0.4em; }
+.news-html table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+.news-html td, .news-html th { border: 1px solid #e2e8f0; padding: 0.4em 0.6em; vertical-align: top; }
+.news-html th { background: #f8fafc; font-weight: 600; }
 
 /* Reference-site News card typography (letsdoitvietnam.org/news/) */
 .ref-news-title {

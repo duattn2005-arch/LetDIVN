@@ -276,7 +276,7 @@ export function MediaLibrary({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-stretch justify-center p-0 sm:p-8" onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}>
+    <div className="fixed inset-0 z-[1400] bg-black/70 flex items-stretch justify-center p-0 sm:p-8" onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}>
       <div className="bg-white w-full max-w-[1400px] flex flex-col shadow-2xl">
         <div className="flex items-center justify-between px-4 h-[50px] border-b border-[#dcdcde] shrink-0">
           <h2 className="text-[20px] font-semibold text-[#1d2327] m-0">{title || (kind === 'file' ? 'Chọn tập tin' : 'Chọn ảnh')}</h2>

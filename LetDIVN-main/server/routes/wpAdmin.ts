@@ -1,3 +1,4 @@
+import { execFileSync } from 'child_process';
 import { createHash, createHmac, timingSafeEqual } from 'crypto';
 import fs from 'fs';
 import path from 'path';
@@ -351,6 +352,75 @@ router.delete(
     await store.remove(file, req.body.sha, commitMessage('Xóa', collection, slug));
     invalidateCmsSnapshot();
     res.json({ ok: true });
+  })
+);
+
+// --- Revisions: the file's commit history ("Bản sửa đổi") -----------------------
+
+interface Revision {
+  sha: string;
+  date: string;
+  author: string;
+  message: string;
+}
+
+/** The repo checkout this app lives in (for CMS_SOURCE=local). */
+const git = (...args: string[]) => execFileSync('git', args, { cwd: appRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+
+async function listRevisions(file: string): Promise<Revision[]> {
+  if (isLocal()) {
+    try {
+      return git('log', '-n', '50', '--format=%H%x1f%an%x1f%aI%x1f%s', '--', file)
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+          const [sha, author, date, message] = line.split('\x1f');
+          return { sha, author, date, message };
+        });
+    } catch {
+      return [];
+    }
+  }
+  const res = await github('GET', `commits?path=${encodeURIComponent(repoPath(file))}&sha=${encodeURIComponent(BRANCH)}&per_page=50`);
+  if (!res.ok) throw new Error(`GitHub trả về ${res.status}`);
+  const commits = (await res.json()) as { sha: string; commit: { message: string; author: { name: string; date: string } } }[];
+  return commits.map((c) => ({ sha: c.sha, author: c.commit.author.name, date: c.commit.author.date, message: c.commit.message.split('\n')[0] }));
+}
+
+async function readRevision(file: string, sha: string): Promise<any> {
+  if (isLocal()) return JSON.parse(git('show', `${sha}:${repoPath(file)}`));
+  const res = await github('GET', `${contentsUrl(file)}?ref=${sha}`);
+  if (!res.ok) throw new Error(`GitHub trả về ${res.status}`);
+  const item = (await res.json()) as { content: string };
+  return JSON.parse(Buffer.from(item.content, 'base64').toString('utf8'));
+}
+
+router.get(
+  '/wp/revisions/:collection/:slug',
+  handle(async (req, res) => {
+    const collection = findCollection(req, res);
+    if (!collection) return;
+    const file = entryFile(collection, String(req.params.slug));
+    if (!file) {
+      res.status(400).json({ error: 'Không có mục này.' });
+      return;
+    }
+    res.json(await listRevisions(file));
+  })
+);
+
+router.get(
+  '/wp/revisions/:collection/:slug/:sha',
+  handle(async (req, res) => {
+    const collection = findCollection(req, res);
+    if (!collection) return;
+    const file = entryFile(collection, String(req.params.slug));
+    const sha = String(req.params.sha);
+    if (!file || !/^[0-9a-f]{7,40}$/.test(sha)) {
+      res.status(400).json({ error: 'Không có bản sửa đổi này.' });
+      return;
+    }
+    res.json({ data: await readRevision(file, sha) });
   })
 );
 

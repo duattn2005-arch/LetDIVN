@@ -60,6 +60,10 @@ export interface NewsArticle {
   views: number;
   featured: boolean;
   status?: 'Published' | 'Pending';
+  tags?: string[];
+  /** Search engines / social previews; empty = the title and summary. */
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export interface Partner {

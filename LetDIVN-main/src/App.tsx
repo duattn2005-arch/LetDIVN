@@ -68,6 +68,13 @@ const campaignSlugFromPath = (pathname: string): string | undefined => {
   return normalized.slice(CAMPAIGN_BASE_PATH.length).replace(/\/+$/, '');
 };
 
+// /news/<slug>/ is one article: the file name of its content/news/<slug>.json.
+const newsSlugFromPath = (pathname: string): string | undefined => {
+  const normalized = normalizePath(pathname);
+  if (normalized === VIEW_PATHS.news || !normalized.startsWith(VIEW_PATHS.news)) return undefined;
+  return normalized.slice(VIEW_PATHS.news.length).replace(/\/+$/, '') || undefined;
+};
+
 export function AppContent() {
   const [activeView, setActiveView] = useState<string>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
@@ -109,6 +116,13 @@ export function AppContent() {
   // Resolve the current pathname to a campaign, a static view, or a project,
   // used both on initial load and on browser back/forward.
   const applyPath = (pathname: string) => {
+    const newsSlug = newsSlugFromPath(pathname);
+    if (newsSlug) {
+      setSelectedNewsArticleId(newsSlug);
+      setActiveView('news');
+      return;
+    }
+    if (viewForPath(pathname) === 'news') setSelectedNewsArticleId(undefined);
     const campaignSlug = campaignSlugFromPath(pathname);
     if (campaignSlug) {
       const match = resolveCampaignSlug(campaignSlug, events);
@@ -139,6 +153,12 @@ export function AppContent() {
   // /who-we-are/) opens that page immediately — doesn't need event data.
   useEffect(() => {
     if (campaignSlugFromPath(window.location.pathname)) return;
+    const newsSlug = newsSlugFromPath(window.location.pathname);
+    if (newsSlug) {
+      setSelectedNewsArticleId(newsSlug);
+      setActiveView('news');
+      return;
+    }
     const staticView = viewForPath(window.location.pathname);
     if (staticView && staticView !== 'home') setActiveView(staticView);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -160,7 +180,7 @@ export function AppContent() {
       return;
     }
     const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-    if (path && !viewForPath(window.location.pathname)) {
+    if (path && !viewForPath(window.location.pathname) && !newsSlugFromPath(window.location.pathname)) {
       const match = resolveSlugToEvent(path, events);
       if (match) {
         setSelectedProjectId(match.id);
@@ -307,7 +327,14 @@ export function AppContent() {
         )}
 
         {activeView === 'news' && (
-          <NewsPage initialCategory="All" initialArticleId={selectedNewsArticleId} />
+          <NewsPage
+            initialCategory="All"
+            initialArticleId={selectedNewsArticleId}
+            onArticleChange={(slug) => {
+              setSelectedNewsArticleId(slug);
+              window.history.pushState(null, '', slug ? `${VIEW_PATHS.news}${slug}/` : VIEW_PATHS.news);
+            }}
+          />
         )}
 
         {activeView === 'media-on-us' && (

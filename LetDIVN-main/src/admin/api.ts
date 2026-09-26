@@ -47,6 +47,14 @@ export interface Entry {
   data: Record<string, any>;
 }
 
+/** One commit of an entry's file = one WordPress "bản sửa đổi". */
+export interface Revision {
+  sha: string;
+  date: string;
+  author: string;
+  message: string;
+}
+
 export interface MediaItem {
   url: string;
   size: number;
@@ -93,6 +101,10 @@ export const api = {
     request<{ slug: string; sha: string }>('PUT', `/entries/${collection}/${encodeURIComponent(slug)}`, { data, sha }),
   remove: (collection: string, slug: string, sha: string) =>
     request('DELETE', `/entries/${collection}/${encodeURIComponent(slug)}`, { sha }),
+  revisions: (collection: string, slug: string) =>
+    request<Revision[]>('GET', `/revisions/${collection}/${encodeURIComponent(slug)}`),
+  revision: (collection: string, slug: string, sha: string) =>
+    request<{ data: Record<string, any> }>('GET', `/revisions/${collection}/${encodeURIComponent(slug)}/${sha}`),
   media: () => request<MediaItem[]>('GET', '/media'),
   upload: (file: File) => {
     const form = new FormData();
