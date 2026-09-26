@@ -3,7 +3,6 @@ import { LanguageProvider } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { AboutSection } from './components/AboutSection';
-import { GallerySection } from './components/GallerySection';
 import { GetInvolvedSection } from './components/GetInvolvedSection';
 import { Footer } from './components/Footer';
 
@@ -246,9 +245,6 @@ export function AppContent() {
               onLearnMore={() => handleNavigate('who-we-are')}
             />
             <MediaVideosPage />
-            <GallerySection 
-              onViewAllGallery={() => handleNavigate('gallery')}
-            />
             <GetInvolvedSection
               onRegisterVolunteer={() => handleOpenVolunteerModal()}
               onJoinVolunteer={() => handleOpenVolunteerModal()}
