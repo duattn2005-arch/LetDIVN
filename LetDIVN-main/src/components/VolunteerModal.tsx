@@ -127,6 +127,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   const [role, setRole] = useState('Clean-up');
   const [participants, setParticipants] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [birthError, setBirthError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const isTeam = joinAs !== 'individual';
@@ -143,6 +144,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
     setRole('Clean-up');
     setParticipants('');
     setPhoneError(null);
+    setBirthError(null);
   };
 
   // Reset the form when it opens; a "Register" button on a campaign preselects it.
@@ -177,6 +179,17 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
     setPhoneError(digits.length > 0 && digits.length < 10 ? `Phone number must be exactly 10 digits (${digits.length}/10)` : null);
   };
 
+  const birthYearProblem = (value: string) => {
+    const year = Number(value);
+    return /^\d{4}$/.test(value) && year >= 1900 && year <= currentYear ? null : `Please enter a 4-digit year between 1900 and ${currentYear}`;
+  };
+
+  const handleBirthYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+    setBirthYear(digits);
+    setBirthError(digits.length === 4 ? birthYearProblem(digits) : null);
+  };
+
   const handleCloseModal = () => {
     resetFormState();
     onClose();
@@ -194,6 +207,11 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length !== 10) {
       setPhoneError('Phone number must be exactly 10 digits');
+      return;
+    }
+    const birthProblem = birthYearProblem(birthYear);
+    if (birthProblem) {
+      setBirthError(birthProblem);
       return;
     }
     const people = isTeam ? parseInt(participants, 10) : 1;
@@ -478,25 +496,32 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                   <FieldLabel htmlFor="vm-birth" required>
                     Year of birth
                   </FieldLabel>
-                  <IconField icon="calendar" chevron>
-                    <select
+                  {/* Typed in, or picked from the suggested years. */}
+                  <IconField icon="calendar">
+                    <input
                       id="vm-birth"
                       required
+                      inputMode="numeric"
+                      autoComplete="bday-year"
+                      maxLength={4}
+                      list="vm-birth-years"
+                      placeholder="Enter your year of birth"
                       value={birthYear}
-                      onChange={(e) => setBirthYear(e.target.value)}
-                      className={`${fieldClass} appearance-none cursor-pointer pr-12 ${birthYear ? '' : 'text-slate-400'}`}
-                      style={birthYear ? { color: NAVY } : undefined}
-                    >
-                      <option value="" disabled>
-                        Select your year of birth
-                      </option>
+                      onChange={handleBirthYearChange}
+                      className={`${fieldClass} ${birthError ? '!border-red-400 !bg-red-50/40' : ''}`}
+                    />
+                    <datalist id="vm-birth-years">
                       {years.map((y) => (
-                        <option key={y} value={y} style={{ color: NAVY }}>
-                          {y}
-                        </option>
+                        <option key={y} value={y} />
                       ))}
-                    </select>
+                    </datalist>
                   </IconField>
+                  {birthError && (
+                    <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      {birthError}
+                    </p>
+                  )}
                 </div>
                 {/* A group or organization also gives its name, next to the address. */}
                 {isTeam && (
