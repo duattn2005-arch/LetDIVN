@@ -59,13 +59,13 @@ const ROLES: { value: string; icon: IconName }[] = [
 ];
 
 /** The round radio mark in a card's top-right corner. */
-const RadioMark: React.FC<{ checked: boolean }> = ({ checked }) => (
+const RadioMark: React.FC<{ checked: boolean; small?: boolean }> = ({ checked, small }) => (
   <span
-    className="w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center shrink-0 bg-white"
+    className={`${small ? 'w-[18px] h-[18px]' : 'w-[22px] h-[22px]'} rounded-full border-2 flex items-center justify-center shrink-0 bg-white`}
     style={{ borderColor: checked ? PINK : '#8a93a8' }}
     aria-hidden
   >
-    {checked && <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: PINK }} />}
+    {checked && <span className={`${small ? 'w-2 h-2' : 'w-2.5 h-2.5'} rounded-full`} style={{ backgroundColor: PINK }} />}
   </span>
 );
 
@@ -329,8 +329,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
             <path d="M0 80 L0 38 C 120 0, 300 8, 470 60 C 520 74, 560 80, 600 80 Z" fill="#fff" />
             <rect x="0" y="70" width="960" height="10" fill="#fff" />
           </svg>
-          <LeafArt className="hidden sm:block absolute left-14 top-16 w-16 h-20 pointer-events-none" style={{ transform: 'rotate(-35deg)' }} />
-          <LeafArt className="hidden sm:block absolute left-36 top-24 w-8 h-11 pointer-events-none" style={{ transform: 'rotate(25deg)' }} />
+          <LeafArt className="hidden sm:block absolute left-14 top-12 lg:left-0 lg:top-16 w-16 h-20 pointer-events-none" style={{ transform: 'rotate(-35deg)' }} />
+          <LeafArt className="hidden sm:block absolute left-36 top-20 lg:top-24 w-8 h-11 pointer-events-none" style={{ transform: 'rotate(25deg)' }} />
 
           <div className="hidden sm:block absolute -right-10 -top-8 w-[250px] h-[250px] lg:-top-12 lg:w-[200px] lg:h-[200px] rounded-full overflow-hidden pointer-events-none">
             <img src="/images/who-we-are/hero.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: '60% 40%' }} />
@@ -340,12 +340,13 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
             <span className="absolute block w-2 h-7 rounded-full rotate-[-60deg]" style={{ backgroundColor: PINK, left: 0, top: 22 }} />
             <span className="absolute block w-7 h-2 rounded-full" style={{ backgroundColor: PINK, left: -6, top: 50 }} />
           </div>
-          <LeafArt className="hidden sm:block absolute right-[215px] top-[165px] lg:right-[170px] lg:top-[105px] w-9 h-12 pointer-events-none" style={{ transform: 'rotate(-60deg)' }} />
+          <LeafArt className="hidden sm:block absolute right-[190px] top-[170px] lg:right-[170px] lg:top-[105px] w-9 h-12 pointer-events-none" style={{ transform: 'rotate(-60deg)' }} />
 
-          <div className="relative lg:flex lg:items-center lg:justify-center lg:gap-10">
+          {/* The margins keep the text clear of the round photo (shown from sm up) and of the leaves. */}
+          <div className="relative sm:mr-[190px] lg:mr-[175px] lg:flex lg:items-center lg:justify-center lg:gap-10">
             {logo}
             <div className="lg:text-left">
-              <h3 id="volunteer-modal-title" className="mt-4 lg:mt-0 text-[28px] sm:text-[40px] lg:text-[38px] leading-tight font-extrabold" style={{ color: NAVY }}>
+              <h3 id="volunteer-modal-title" className="mt-4 lg:mt-0 text-[28px] sm:text-[34px] lg:text-[38px] leading-tight font-extrabold" style={{ color: NAVY }}>
                 Register to Volunteer
               </h3>
               <p className="mt-1 text-[15px] sm:text-[17px]" style={{ color: '#34406b' }}>
@@ -368,15 +369,15 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                   return (
                     <label
                       key={value}
-                      className="relative flex items-center lg:flex-col lg:items-start gap-3 lg:gap-1 px-4 py-3 lg:p-3 rounded-xl border cursor-pointer transition-colors"
+                      className="relative flex items-center sm:flex-col sm:items-start gap-3 sm:gap-1 px-4 py-3 sm:p-3 rounded-xl border cursor-pointer transition-colors"
                       style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
                     >
                       <input type="radio" name="joinAs" value={value} checked={checked} onChange={() => setJoinAs(value)} className="sr-only" />
                       <Icon name={icon} color={checked ? PINK : NAVY} className="w-9 h-9 lg:[@media(max-height:820px)]:w-8 lg:[@media(max-height:820px)]:h-8 shrink-0" />
-                      <span className="flex-1 pr-6 lg:pr-0 font-bold text-[16px] sm:text-[17px]" style={{ color: NAVY }}>
+                      <span className="flex-1 pr-6 sm:pr-0 font-bold text-[16px] sm:text-[17px]" style={{ color: NAVY }}>
                         {title}
                       </span>
-                      <span className="absolute top-1/2 -translate-y-1/2 right-4 lg:translate-y-0 lg:top-3 lg:right-3">
+                      <span className="absolute top-1/2 -translate-y-1/2 right-4 sm:translate-y-0 sm:top-3 sm:right-3">
                         <RadioMark checked={checked} />
                       </span>
                     </label>
@@ -426,8 +427,9 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                       <span className="font-bold text-[15px] sm:text-base" style={{ color: NAVY }}>
                         {value}
                       </span>
-                      <span className="absolute top-3 right-3">
-                        <RadioMark checked={checked} />
+                      {/* Small and tucked into the corner: on narrow cards it must not cover the icon. */}
+                      <span className="absolute top-2 right-2">
+                        <RadioMark checked={checked} small />
                       </span>
                     </label>
                   );
