@@ -13,7 +13,7 @@ interface CampaignDetailPageProps {
 
 // Schedule/map/registration view for a single dated campaign run — kept
 // entirely separate from ProjectDetailPage (the static per-category "project"
-// story page). Reached only via /explore-campaigns/<slug>, never via /projects/.
+// story page). Reached via /explore-campaigns/<slug> (e.g. from the Cleanup Map).
 export const CampaignDetailPage: React.FC<CampaignDetailPageProps> = ({
   campaignId,
   onBack,
@@ -43,7 +43,7 @@ export const CampaignDetailPage: React.FC<CampaignDetailPageProps> = ({
           className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#E81A7F] transition-colors cursor-pointer mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Campaign List</span>
+          <span>Back to Cleanup Map</span>
         </button>
 
         {/* Hero card: cover photo with the category badge and event title/location overlaid. */}

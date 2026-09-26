@@ -237,7 +237,7 @@ export const Header: React.FC<HeaderProps> = ({
                 id="nav-projects-dropdown-btn"
                 onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
                 className={`shrink-0 flex items-center gap-1.5 px-3.5 2xl:px-4.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-                  currentView === 'projects' || currentView === 'project-detail'
+                  currentView === 'project-detail'
                     ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
                     : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
                 }`}

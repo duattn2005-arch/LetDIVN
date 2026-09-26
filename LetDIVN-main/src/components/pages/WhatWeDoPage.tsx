@@ -7,7 +7,7 @@ import { TakeActionStrip } from '../TakeActionStrip';
 
 const BRAND_PINK = '#F1138D';
 
-export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
+export const WhatWeDoPage: React.FC = () => {
   const [items, setItems] = useState<WhatWeDoItem[]>([]);
 
   useEffect(() => {

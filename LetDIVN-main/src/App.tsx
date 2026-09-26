@@ -16,7 +16,6 @@ import { WhoWeArePage } from './components/pages/WhoWeArePage';
 import { WhatWeDoPage } from './components/pages/WhatWeDoPage';
 import { OurTeamPage } from './components/pages/OurTeamPage';
 import { OurPartnersPage } from './components/pages/OurPartnersPage';
-import { ProjectsPage } from './components/pages/ProjectsPage';
 import { ProjectDetailPage } from './components/pages/ProjectDetailPage';
 import { CampaignDetailPage } from './components/pages/CampaignDetailPage';
 import { NewsPage } from './components/pages/NewsPage';
@@ -39,8 +38,6 @@ const VIEW_PATHS: Record<string, string> = {
   'what-we-do': '/what-we-do/',
   'our-team': '/our-team/',
   'our-partners': '/our-partners/',
-  projects: '/projects/',
-  'explore-campaigns': '/explore-campaigns/',
   map: '/cleanup-map/',
   news: '/news/',
   'media-on-us': '/media-on-us/',
@@ -55,11 +52,14 @@ const normalizePath = (pathname: string) => {
 };
 
 // Addresses the reference site (letsdoitvietnam.org) uses for pages that have
-// another name here, so its links keep working.
+// another name here, so its links keep working. The campaign list pages
+// (/projects/, /explore-campaigns/) were removed: the Cleanup Map lists them.
 const PATH_ALIASES: Record<string, string> = {
   '/ycsw/': '/wildlife-nature/',
   '/community-workshop/': '/workshop-education/',
   '/contact-us/': '/contact/',
+  '/projects/': '/cleanup-map/',
+  '/explore-campaigns/': '/cleanup-map/',
 };
 if (typeof window !== 'undefined') {
   const alias = PATH_ALIASES[normalizePath(window.location.pathname)];
@@ -72,7 +72,7 @@ const viewForPath = (pathname: string): string | undefined => {
 };
 
 // /explore-campaigns/<slug> is its own URL namespace — kept fully separate
-// from /projects/ and per-category project slugs like /world-cleanup-day/.
+// from per-category project slugs like /world-cleanup-day/.
 const CAMPAIGN_BASE_PATH = '/explore-campaigns/';
 
 const campaignSlugFromPath = (pathname: string): string | undefined => {
@@ -250,10 +250,6 @@ export function AppContent() {
     setIsVolunteerModalOpen(true);
   };
 
-  const handleSelectProject = (projectId: string) => {
-    goToProject(projectId);
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 text-slate-800 antialiased font-sans relative selection:bg-[#E81A7F] selection:text-white">
       {/* Global Header */}
@@ -266,11 +262,10 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'projects', 'explore-campaigns', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
-              onExploreProjects={() => handleNavigate('explore-campaigns')}
               onExploreMap={() => handleNavigate('map')}
             />
             <HomeQuickLinksSection onNavigate={handleNavigate} />
@@ -293,7 +288,7 @@ export function AppContent() {
         )}
 
         {activeView === 'what-we-do' && (
-          <WhatWeDoPage onExploreProjects={() => handleNavigate('projects')} />
+          <WhatWeDoPage />
         )}
 
         {activeView === 'our-team' && (
@@ -304,34 +299,17 @@ export function AppContent() {
           <OurPartnersPage onBecomePartner={() => setIsPartnerModalOpen(true)} />
         )}
 
-        {activeView === 'projects' && (
-          <ProjectsPage
-            onSelectProject={handleSelectProject}
-            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
-          />
-        )}
-
-        {/* Same campaign grid as /projects/, but "View Campaign Details" goes
-            straight to the schedule/map/registration page — never the static
-            per-category project story. */}
-        {activeView === 'explore-campaigns' && (
-          <ProjectsPage
-            onSelectProject={goToCampaign}
-            onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
-          />
-        )}
-
         {activeView === 'campaign-detail' && (
           <CampaignDetailPage
             campaignId={selectedCampaignId}
-            onBack={() => handleNavigate('explore-campaigns')}
+            onBack={() => handleNavigate('map')}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
           />
         )}
 
         {activeView === 'map' && (
           <CleanupMapPage
-            onSelectProject={handleSelectProject}
+            onSelectProject={goToProject}
             onSelectCampaign={goToCampaign}
             onRegisterVolunteer={(eventId) => handleOpenVolunteerModal(eventId)}
           />

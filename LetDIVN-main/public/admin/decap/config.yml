@@ -346,26 +346,18 @@ collections:
           - { label: "Address", name: "address", widget: string, required: false }
 
 
-  # --- The Projects list page, and the five project story pages
-  # (/world-cleanup-day/, /wildlife-nature/, ...) in content/project-pages/,
-  # whose sections, paragraphs and photos can be added, removed and reordered.
+  # --- The five project story pages (/world-cleanup-day/, /wildlife-nature/,
+  # ...) in content/project-pages/, whose sections, paragraphs and photos can
+  # be added, removed and reordered.
   - name: projects
     label: Dự án
     label_singular: dự án
-    description: Chữ và ảnh của các trang dự án (World Cleanup Day, YCSW, Green Ocean...) và trang Projects. Sự kiện theo ngày nằm ở mục "Sự kiện (Cleanup Map)".
+    description: Chữ và ảnh của các trang dự án (World Cleanup Day, YCSW, Green Ocean...). Sự kiện theo ngày nằm ở mục "Sự kiện (Cleanup Map)".
     media_folder: /LetDIVN-main/public/images/cms
     public_folder: /images/cms
     editor:
       preview: false
     files:
-      - label: "Trang Projects / Explore Campaigns"
-        name: "projects"
-        file: LetDIVN-main/content/page-content/projects.json
-        fields:
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
-          - { label: "View Details Btn", name: "viewDetailsBtn", widget: string, required: false }
-          - { label: "Register Btn", name: "registerBtn", widget: string, required: false }
       - label: "Dự án · World Cleanup Day"
         name: "world-cleanup-day"
         file: LetDIVN-main/content/project-pages/world-cleanup-day.json

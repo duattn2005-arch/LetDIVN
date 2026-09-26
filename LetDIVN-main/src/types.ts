@@ -146,7 +146,6 @@ export type ActiveView =
   | 'what-we-do'
   | 'our-team'
   | 'our-partners'
-  | 'projects'
   | 'map'
   | 'news'
   | 'media-on-us'

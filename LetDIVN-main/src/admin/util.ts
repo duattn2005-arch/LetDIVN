@@ -93,7 +93,6 @@ export const SITE_PATHS: Record<string, string> = {
   'what-we-do': '/what-we-do/',
   'who-we-are': '/who-we-are/',
   'media-coverage': '/media-on-us/',
-  projects: '/projects/',
   pages: '/',
 };
 
@@ -109,7 +108,6 @@ export const FILE_PATHS: Record<string, string> = {
   fullGallery: '/gallery/',
   contactPage: '/contact/',
   cleanupMap: '/cleanup-map/',
-  projects: '/projects/',
   'world-cleanup-day': '/world-cleanup-day/',
   'environmental-day': '/environmental-day/',
   'green-ocean-campaign': '/green-ocean-campaign/',

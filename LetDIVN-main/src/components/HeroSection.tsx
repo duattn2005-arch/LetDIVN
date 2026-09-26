@@ -6,7 +6,6 @@ import { EditableImage } from './EditableImage';
 
 interface HeroSectionProps {
   onJoinEvent: () => void;
-  onExploreProjects: () => void;
   onExploreMap?: () => void;
 }
 
