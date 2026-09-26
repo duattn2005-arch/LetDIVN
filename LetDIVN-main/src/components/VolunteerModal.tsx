@@ -198,8 +198,9 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   /**
    * Saves the sign-up to the site's database and, in the background (not
    * awaited, so CORS never blocks the form), to the Google Sheet. The sheet
-   * keeps its columns: a group/organization's name and head count go in
-   * "skills". Every field is required.
+   * keeps its columns: a group/organization (which has no year of birth)
+   * shows in "age" (Nhóm / Tổ chức), its name and head count in "skills".
+   * Every field shown is required.
    */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,7 +210,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       setPhoneError('Phone number must be exactly 10 digits');
       return;
     }
-    const birthProblem = birthYearProblem(birthYear);
+    const birthProblem = isTeam ? null : birthYearProblem(birthYear);
     if (birthProblem) {
       setBirthError(birthProblem);
       return;
@@ -232,7 +233,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       city: address.trim(),
       eventId,
       eventName: eventTitle,
-      ageGroup: birthYear,
+      ageGroup: isTeam ? '' : birthYear,
       tshirtSize: 'L',
       emergencyContact: cleanPhone,
       skills: [role],
@@ -250,7 +251,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
         phone: cleanPhone,
         email: email.trim(),
         city: address.trim(),
-        age: birthYear,
+        age: isTeam ? teamLabel : birthYear,
         project: eventTitle,
         skills: sheetSkills,
       },
@@ -276,10 +277,10 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   );
 
   const logo = (
-    <div className="flex items-center justify-center gap-2.5">
+    <div className="flex shrink-0 items-center justify-center gap-2.5">
       <img src="/logo-icon-light.png" alt="" className="h-12 w-12 sm:h-[60px] sm:w-[60px] object-contain" />
       <div className="text-left leading-none" style={{ color: NAVY }}>
-        <div className="font-serif font-black text-2xl sm:text-[30px] tracking-tight">Let’s do it!</div>
+        <div className="font-serif font-black text-2xl sm:text-[30px] tracking-tight whitespace-nowrap">Let’s do it!</div>
         <div className="font-serif text-lg sm:text-xl mt-1 ml-3">Vietnam</div>
       </div>
     </div>
@@ -319,40 +320,41 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       <div role="dialog" aria-modal="true" aria-labelledby="volunteer-modal-title" className={`${card} max-w-[960px] lg:max-w-[1320px] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto`} onClick={(e) => e.stopPropagation()}>
         {closeButton}
 
-        {/* Header: sky, greenery and leaves on the left, volunteers in a circle on the right */}
-        <div className="relative px-5 sm:px-10 pt-7 pb-8 lg:pt-5 lg:pb-8 lg:[@media(max-height:820px)]:pt-3 lg:[@media(max-height:820px)]:pb-6 text-center overflow-hidden" style={{ background: 'linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #ffffff 100%)' }}>
+        {/* Header: soft sky and greenery; logo and title, then the volunteers' photo
+            as a whole circle (from sm up) with its leaves and pink rays around it,
+            so nothing is cut off at any width. */}
+        <div className="relative px-5 sm:px-10 lg:px-12 pt-7 pb-9 sm:pt-6 sm:pb-10 lg:pt-5 lg:[@media(max-height:820px)]:pt-3 lg:[@media(max-height:820px)]:pb-8 overflow-hidden" style={{ background: 'linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #ffffff 100%)' }}>
           <div className="absolute left-2 top-4 w-40 h-16 rounded-full bg-white/80 blur-xl pointer-events-none" />
-          <div className="absolute -left-12 top-28 w-48 h-40 rounded-full bg-[#5e9e45]/50 blur-2xl pointer-events-none" />
-          <div className="absolute left-20 top-36 w-44 h-32 rounded-full bg-[#8fc26f]/45 blur-2xl pointer-events-none" />
-          <div className="absolute left-48 top-44 w-40 h-24 rounded-full bg-[#b9d99b]/40 blur-2xl pointer-events-none" />
-          <svg viewBox="0 0 960 80" preserveAspectRatio="none" className="absolute left-0 bottom-0 w-full h-16 pointer-events-none" aria-hidden>
+          <div className="absolute -left-12 top-28 w-48 h-40 rounded-full bg-[#5e9e45]/40 blur-2xl pointer-events-none" />
+          <div className="absolute left-20 top-36 w-44 h-32 rounded-full bg-[#8fc26f]/35 blur-2xl pointer-events-none" />
+          <svg viewBox="0 0 960 80" preserveAspectRatio="none" className="absolute left-0 bottom-0 w-full h-12 pointer-events-none" aria-hidden>
             <path d="M0 80 L0 38 C 120 0, 300 8, 470 60 C 520 74, 560 80, 600 80 Z" fill="#fff" />
             <rect x="0" y="70" width="960" height="10" fill="#fff" />
           </svg>
-          <LeafArt className="hidden sm:block absolute left-14 top-12 lg:left-0 lg:top-16 w-16 h-20 pointer-events-none" style={{ transform: 'rotate(-35deg)' }} />
-          <LeafArt className="hidden sm:block absolute left-36 top-20 lg:top-24 w-8 h-11 pointer-events-none" style={{ transform: 'rotate(25deg)' }} />
 
-          <div className="hidden sm:block absolute -right-10 -top-8 w-[250px] h-[250px] lg:-top-12 lg:w-[200px] lg:h-[200px] rounded-full overflow-hidden pointer-events-none">
-            <img src="/images/who-we-are/hero.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: '60% 40%' }} />
-          </div>
-          <div className="hidden sm:block absolute right-[235px] top-8 lg:right-[185px] lg:top-5 pointer-events-none" aria-hidden>
-            <span className="absolute block w-2 h-7 rounded-full rotate-[-30deg]" style={{ backgroundColor: PINK, left: 18, top: 0 }} />
-            <span className="absolute block w-2 h-7 rounded-full rotate-[-60deg]" style={{ backgroundColor: PINK, left: 0, top: 22 }} />
-            <span className="absolute block w-7 h-2 rounded-full" style={{ backgroundColor: PINK, left: -6, top: 50 }} />
-          </div>
-          <LeafArt className="hidden sm:block absolute right-[190px] top-[170px] lg:right-[170px] lg:top-[105px] w-9 h-12 pointer-events-none" style={{ transform: 'rotate(-60deg)' }} />
+          {/* Right padding: room for the close button, which sits in the top-right corner. */}
+          <div className="relative flex items-center gap-6 lg:gap-10 sm:pr-12">
+            <div className="flex-1 min-w-0 text-center lg:flex lg:items-center lg:justify-center lg:gap-6 xl:gap-10 lg:text-left">
+              {logo}
+              <div>
+                <h3 id="volunteer-modal-title" className="mt-4 lg:mt-0 text-[28px] sm:text-[34px] lg:text-[38px] leading-tight font-extrabold" style={{ color: NAVY }}>
+                  Register to Volunteer
+                </h3>
+                <p className="mt-1 text-[15px] sm:text-[17px]" style={{ color: '#34406b' }}>
+                  Be part of a cleaner, greener and more beautiful Vietnam!
+                </p>
+              </div>
+            </div>
 
-          {/* The margins keep the text clear of the round photo (shown from sm up) and of the leaves. */}
-          <div className="relative sm:mr-[190px] lg:mr-[175px] lg:flex lg:items-center lg:justify-center lg:gap-10">
-            {logo}
-            <div className="lg:text-left">
-              <h3 id="volunteer-modal-title" className="mt-4 lg:mt-0 text-[28px] sm:text-[34px] lg:text-[38px] leading-tight font-extrabold" style={{ color: NAVY }}>
-                Register to Volunteer
-              </h3>
-              <p className="mt-1 text-[15px] sm:text-[17px]" style={{ color: '#34406b' }}>
-                Be part of a cleaner, greener and more beautiful Vietnam!
-              </p>
-              <div className="mx-auto lg:mx-0 mt-4 lg:mt-3 w-16 h-1 rounded-full" style={{ backgroundColor: PINK }} />
+            <div className="hidden sm:block relative shrink-0 mr-2 w-[132px] h-[132px] xl:w-[150px] xl:h-[150px] lg:[@media(max-height:820px)]:w-[112px] lg:[@media(max-height:820px)]:h-[112px] pointer-events-none" aria-hidden>
+              <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-[0_10px_30px_-8px_rgba(15,31,75,0.35)]">
+                <img src="/images/who-we-are/hero.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: '60% 40%' }} />
+              </div>
+              <span className="absolute block w-1.5 h-6 rounded-full rotate-[-30deg]" style={{ backgroundColor: PINK, left: -6, top: -4 }} />
+              <span className="absolute block w-1.5 h-6 rounded-full rotate-[-65deg]" style={{ backgroundColor: PINK, left: -20, top: 16 }} />
+              <span className="absolute block w-6 h-1.5 rounded-full" style={{ backgroundColor: PINK, left: -30, top: 44 }} />
+              <LeafArt className="absolute -left-5 -bottom-1 w-8 h-11" style={{ transform: 'rotate(-55deg)' }} />
+              <LeafArt className="absolute -right-2 bottom-2 w-6 h-8" style={{ transform: 'rotate(35deg)' }} />
             </div>
           </div>
         </div>
@@ -494,39 +496,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                     <input id="vm-email" type="email" required autoComplete="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldClass} />
                   </IconField>
                 </div>
-                <div>
-                  <FieldLabel htmlFor="vm-birth" required>
-                    Year of birth
-                  </FieldLabel>
-                  {/* Typed in, or picked from the suggested years. */}
-                  <IconField icon="calendar">
-                    <input
-                      id="vm-birth"
-                      required
-                      inputMode="numeric"
-                      autoComplete="bday-year"
-                      maxLength={4}
-                      list="vm-birth-years"
-                      placeholder="Enter your year of birth"
-                      value={birthYear}
-                      onChange={handleBirthYearChange}
-                      className={`${fieldClass} ${birthError ? '!border-red-400 !bg-red-50/40' : ''}`}
-                    />
-                    <datalist id="vm-birth-years">
-                      {years.map((y) => (
-                        <option key={y} value={y} />
-                      ))}
-                    </datalist>
-                  </IconField>
-                  {birthError && (
-                    <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                      {birthError}
-                    </p>
-                  )}
-                </div>
-                {/* A group or organization also gives its name, next to the address. */}
-                {isTeam && (
+                {/* A group or organization has no year of birth: its name goes here instead. */}
+                {isTeam ? (
                   <div>
                     <FieldLabel htmlFor="vm-org" required>
                       {teamWord} name
@@ -543,8 +514,40 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                       />
                     </IconField>
                   </div>
+                ) : (
+                  <div>
+                    <FieldLabel htmlFor="vm-birth" required>
+                      Year of birth
+                    </FieldLabel>
+                    {/* Typed in, or picked from the suggested years. */}
+                    <IconField icon="calendar">
+                      <input
+                        id="vm-birth"
+                        required
+                        inputMode="numeric"
+                        autoComplete="bday-year"
+                        maxLength={4}
+                        list="vm-birth-years"
+                        placeholder="Enter your year of birth"
+                        value={birthYear}
+                        onChange={handleBirthYearChange}
+                        className={`${fieldClass} ${birthError ? '!border-red-400 !bg-red-50/40' : ''}`}
+                      />
+                      <datalist id="vm-birth-years">
+                        {years.map((y) => (
+                          <option key={y} value={y} />
+                        ))}
+                      </datalist>
+                    </IconField>
+                    {birthError && (
+                      <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        {birthError}
+                      </p>
+                    )}
+                  </div>
                 )}
-                <div className={isTeam ? '' : 'sm:col-span-2'}>
+                <div className="sm:col-span-2">
                   <FieldLabel htmlFor="vm-address" required>
                     Address
                   </FieldLabel>

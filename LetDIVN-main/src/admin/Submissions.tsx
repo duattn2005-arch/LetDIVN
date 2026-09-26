@@ -325,6 +325,8 @@ function VolunteerEditRow({
         eventName,
         organizationName: isTeam ? data.organizationName : '',
         participants: isTeam ? data.participants : '1',
+        // A group or organization has no year of birth.
+        ageGroup: isTeam ? '' : data.ageGroup,
       });
       onSaved(saved);
     } catch (err: any) {
@@ -372,7 +374,7 @@ function VolunteerEditRow({
                 <input className="wp-input !bg-[#f0f0f1] text-[var(--wp-muted)]" value="1" readOnly title="Cá nhân luôn là 1 người" />
               </div>
             )}
-            {input('ageGroup', 'Năm sinh')}
+            {!isTeam && input('ageGroup', 'Năm sinh')}
           </div>
           <div className="space-y-2.5">
             <div>
