@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "start": "tsx server.ts",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "build:swap": "sh scripts/build-swap.sh"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
