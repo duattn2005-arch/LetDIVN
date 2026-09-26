@@ -41,21 +41,22 @@ export function EntryList({ collection }: { collection: Collection }) {
   );
 
   useEffect(() => {
-    api.entries(collection.name).then(setEntries, (err) => setError(err.message));
-  }, [collection.name]);
+    // A "files" collection lists its pages straight from the config (below).
+    if (collection.folder) api.entries(collection.name).then(setEntries, (err) => setError(err.message));
+  }, [collection.name, collection.folder]);
 
   const isPublishStatus = statusField && optionList(statusField.options).some((o) => o.value === 'Published');
-  const statusOf = (e: Entry) => (e.data.status === 'Pending' ? 'Pending' : 'Published');
+  const statusOf = (e: Entry) => (e.data?.status === 'Pending' ? 'Pending' : 'Published');
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return (entries ?? [])
       .filter((e) => !status || statusOf(e) === status)
-      .filter((e) => !category || e.data.category === category)
-      .filter((e) => !q || JSON.stringify(e.data).toLowerCase().includes(q) || (e.label ?? '').toLowerCase().includes(q))
+      .filter((e) => !category || e.data?.category === category)
+      .filter((e) => !q || JSON.stringify(e.data ?? {}).toLowerCase().includes(q) || (e.label ?? '').toLowerCase().includes(q))
       .sort((a, b) => {
-        const va = a.data[sort.key] ?? '';
-        const vb = b.data[sort.key] ?? '';
+        const va = a.data?.[sort.key] ?? '';
+        const vb = b.data?.[sort.key] ?? '';
         const cmp = typeof va === 'number' && typeof vb === 'number' ? va - vb : String(va).localeCompare(String(vb), 'vi');
         return cmp * sort.dir;
       });

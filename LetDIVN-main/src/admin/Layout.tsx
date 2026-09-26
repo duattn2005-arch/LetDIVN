@@ -248,11 +248,39 @@ export function Layout({
               </button>
             </div>
           )}
-          {children}
+          <PageErrorBoundary key={route.join('/')}>{children}</PageErrorBoundary>
         </div>
       </main>
     </div>
   );
+}
+
+/**
+ * A page that crashes shows an error here instead of blanking the whole
+ * admin, so the menu keeps working. Keyed by route: navigating away resets it.
+ */
+class PageErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('[admin]', error);
+  }
+
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <div className="wp-notice wp-notice-error">
+        <div>
+          <strong>Trang này gặp lỗi và không hiển thị được.</strong> Bạn vẫn có thể chọn mục khác ở menu bên trái.
+          <div className="mt-1 text-[12px] text-[var(--wp-muted)]">Chi tiết: {this.state.error.message}</div>
+        </div>
+      </div>
+    );
+  }
 }
 
 /** A WordPress page heading: title, plus an outlined "Thêm mới"-style button next to it. */
