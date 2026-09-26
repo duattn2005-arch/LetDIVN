@@ -11,6 +11,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
+// Requests arrive through two proxies: the DDoS-protection service in front of
+// the VPS, then nginx. Trusting exactly those two hops makes req.ip the
+// visitor's real address (from X-Forwarded-For) — e.g. the admin login's
+// "5 wrong passwords" lockout then applies per visitor, not to everyone.
+app.set('trust proxy', 2);
+
 // Google Sheets API routes (same handlers used by `npm run dev`).
 app.use((req, res, next) => googleSheetsMiddleware(req, res, next));
 
