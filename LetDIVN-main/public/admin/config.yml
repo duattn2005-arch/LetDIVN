@@ -221,6 +221,141 @@ collections:
           - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
           - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
           - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+      - label: "Trang Cleanup Map"
+        name: "cleanupMap"
+        file: LetDIVN-main/content/page-content/cleanupMap.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "Mobile Tab Map", name: "mobileTabMap", widget: string, required: false }
+          - { label: "Mobile Tab List", name: "mobileTabList", widget: string, required: false }
+          - { label: "Location Label", name: "locationLabel", widget: string, required: false }
+          - { label: "Search Hint", name: "searchHint", widget: text, required: false }
+          - { label: "Featured Spots Label", name: "featuredSpotsLabel", widget: string, required: false }
+          - { label: "Tap To Zoom Hint", name: "tapToZoomHint", widget: string, required: false }
+          - { label: "Layer Streets", name: "layerStreets", widget: string, required: false }
+          - { label: "Layer Satellite", name: "layerSatellite", widget: string, required: false }
+          - { label: "Layer Terrain", name: "layerTerrain", widget: string, required: false }
+          - { label: "Clear Boundary Btn", name: "clearBoundaryBtn", widget: string, required: false }
+          - { label: "Locating Label", name: "locatingLabel", widget: string, required: false }
+          - { label: "Boundary Drawn Hint", name: "boundaryDrawnHint", widget: text, required: false }
+          - { label: "Suggestions Header", name: "suggestionsHeader", widget: string, required: false }
+          - { label: "Pinned Label", name: "pinnedLabel", widget: string, required: false }
+          - { label: "View Project Btn", name: "viewProjectBtn", widget: string, required: false }
+          - { label: "Register Btn", name: "registerBtn", widget: string, required: false }
+      - label: "Trang News"
+        name: "newsPage"
+        file: LetDIVN-main/content/page-content/newsPage.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Title Default", name: "titleDefault", widget: string, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
+          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
+          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
+          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
+          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
+          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
+          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
+          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+          - { label: "Read More Btn", name: "readMoreBtn", widget: string, required: false }
+          - { label: "Back To List Btn", name: "backToListBtn", widget: string, required: false }
+          - { label: "Source Original Label", name: "sourceOriginalLabel", widget: string, required: false }
+          - { label: "Default Source Label", name: "defaultSourceLabel", widget: string, required: false }
+          - { label: "Title Media", name: "titleMedia", widget: string, required: false }
+      - label: "Trang Media on Us"
+        name: "mediaOnUsPage"
+        file: LetDIVN-main/content/page-content/mediaOnUsPage.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
+          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
+          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
+          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
+          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
+          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
+          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
+          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+      - label: "Trang Photo Gallery"
+        name: "fullGallery"
+        file: LetDIVN-main/content/page-content/fullGallery.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "All Years Label", name: "allYearsLabel", widget: string, required: false }
+          - { label: "Year Prefix", name: "yearPrefix", widget: string, required: false }
+      - label: "Trang Videos"
+        name: "videosPage"
+        file: LetDIVN-main/content/page-content/videosPage.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+      - label: "Trang Contact"
+        name: "contactPage"
+        file: LetDIVN-main/content/page-content/contactPage.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "Find Us Title", name: "findUsTitle", widget: string, required: false }
+          - { label: "Email Label", name: "emailLabel", widget: string, required: false }
+          - { label: "Phone Label1", name: "phoneLabel1", widget: string, required: false }
+          - { label: "Phone Label2", name: "phoneLabel2", widget: string, required: false }
+          - { label: "Form Title", name: "formTitle", widget: string, required: false }
+          - { label: "Name Label", name: "nameLabel", widget: string, required: false }
+          - { label: "Email Field Label", name: "emailFieldLabel", widget: string, required: false }
+          - { label: "Phone Field Label", name: "phoneFieldLabel", widget: string, required: false }
+          - { label: "Subject Label", name: "subjectLabel", widget: string, required: false }
+          - { label: "Message Label", name: "messageLabel", widget: string, required: false }
+          - { label: "Submit Btn", name: "submitBtn", widget: string, required: false }
+          - { label: "Thank You Title", name: "thankYouTitle", widget: string, required: false }
+          - { label: "Thank You Msg Prefix", name: "thankYouMsgPrefix", widget: string, required: false }
+          - { label: "Thank You Msg Suffix", name: "thankYouMsgSuffix", widget: string, required: false }
+          - { label: "Send Another Btn", name: "sendAnotherBtn", widget: string, required: false }
+      - label: "Thông tin liên hệ (chân trang & trang Contact)"
+        name: "contact"
+        file: LetDIVN-main/content/page-content/contact.json
+        fields:
+          - { label: "Phone1", name: "phone1", widget: string, required: false }
+          - { label: "Phone2", name: "phone2", widget: string, required: false }
+          - { label: "Email", name: "email", widget: string, required: false }
+      - label: "Nút liên hệ nổi (góc phải)"
+        name: "contactBubble"
+        file: LetDIVN-main/content/page-content/contactBubble.json
+        fields:
+          - { label: "Fb Label", name: "fbLabel", widget: string, required: false }
+          - { label: "Fb Handle", name: "fbHandle", widget: string, required: false }
+          - { label: "Ig Label", name: "igLabel", widget: string, required: false }
+          - { label: "Ig Handle", name: "igHandle", widget: string, required: false }
+          - { label: "Hotline1 Label", name: "hotline1Label", widget: string, required: false }
+          - { label: "Hotline1 Number", name: "hotline1Number", widget: string, required: false }
+          - { label: "Hotline2 Label", name: "hotline2Label", widget: string, required: false }
+          - { label: "Hotline2 Number", name: "hotline2Number", widget: string, required: false }
+          - { label: "Email Label", name: "emailLabel", widget: string, required: false }
+          - { label: "Email Address", name: "emailAddress", widget: string, required: false }
+      - label: "Chân trang"
+        name: "footer"
+        file: LetDIVN-main/content/page-content/footer.json
+        fields:
+          - { label: "Mô tả", name: "desc", widget: text, required: false }
+          - { label: "Address", name: "address", widget: string, required: false }
+
+
+  # --- The five project story pages (/world-cleanup-day/, /wildlife-nature/, ...)
+  # and the Projects list page. Same format as "Nội dung các trang".
+  - name: projects
+    label: Dự án
+    label_singular: dự án
+    description: Chữ và ảnh của các trang dự án (World Cleanup Day, YCSW, Green Ocean...) và trang Projects. Sự kiện theo ngày nằm ở mục "Sự kiện (Cleanup Map)".
+    media_folder: /LetDIVN-main/public/images/cms
+    public_folder: /images/cms
+    editor:
+      preview: false
+    files:
       - label: "Trang Projects / Explore Campaigns"
         name: "projects"
         file: LetDIVN-main/content/page-content/projects.json
@@ -680,128 +815,6 @@ collections:
             summary: "{{fields.personListItem}}"
             fields:
               - { label: "Person List Item", name: "personListItem", widget: string, required: false }
-      - label: "Trang Cleanup Map"
-        name: "cleanupMap"
-        file: LetDIVN-main/content/page-content/cleanupMap.json
-        fields:
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
-          - { label: "Mobile Tab Map", name: "mobileTabMap", widget: string, required: false }
-          - { label: "Mobile Tab List", name: "mobileTabList", widget: string, required: false }
-          - { label: "Location Label", name: "locationLabel", widget: string, required: false }
-          - { label: "Search Hint", name: "searchHint", widget: text, required: false }
-          - { label: "Featured Spots Label", name: "featuredSpotsLabel", widget: string, required: false }
-          - { label: "Tap To Zoom Hint", name: "tapToZoomHint", widget: string, required: false }
-          - { label: "Layer Streets", name: "layerStreets", widget: string, required: false }
-          - { label: "Layer Satellite", name: "layerSatellite", widget: string, required: false }
-          - { label: "Layer Terrain", name: "layerTerrain", widget: string, required: false }
-          - { label: "Clear Boundary Btn", name: "clearBoundaryBtn", widget: string, required: false }
-          - { label: "Locating Label", name: "locatingLabel", widget: string, required: false }
-          - { label: "Boundary Drawn Hint", name: "boundaryDrawnHint", widget: text, required: false }
-          - { label: "Suggestions Header", name: "suggestionsHeader", widget: string, required: false }
-          - { label: "Pinned Label", name: "pinnedLabel", widget: string, required: false }
-          - { label: "View Project Btn", name: "viewProjectBtn", widget: string, required: false }
-          - { label: "Register Btn", name: "registerBtn", widget: string, required: false }
-      - label: "Trang News"
-        name: "newsPage"
-        file: LetDIVN-main/content/page-content/newsPage.json
-        fields:
-          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
-          - { label: "Title Default", name: "titleDefault", widget: string, required: false }
-          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
-          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
-          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
-          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
-          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
-          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
-          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
-          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
-          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
-          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
-          - { label: "Read More Btn", name: "readMoreBtn", widget: string, required: false }
-          - { label: "Back To List Btn", name: "backToListBtn", widget: string, required: false }
-          - { label: "Source Original Label", name: "sourceOriginalLabel", widget: string, required: false }
-          - { label: "Default Source Label", name: "defaultSourceLabel", widget: string, required: false }
-          - { label: "Title Media", name: "titleMedia", widget: string, required: false }
-      - label: "Trang Media on Us"
-        name: "mediaOnUsPage"
-        file: LetDIVN-main/content/page-content/mediaOnUsPage.json
-        fields:
-          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
-          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
-          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
-          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
-          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
-          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
-          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
-          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
-          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
-          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
-          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
-      - label: "Trang Photo Gallery"
-        name: "fullGallery"
-        file: LetDIVN-main/content/page-content/fullGallery.json
-        fields:
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
-          - { label: "All Years Label", name: "allYearsLabel", widget: string, required: false }
-          - { label: "Year Prefix", name: "yearPrefix", widget: string, required: false }
-      - label: "Trang Videos"
-        name: "videosPage"
-        file: LetDIVN-main/content/page-content/videosPage.json
-        fields:
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
-      - label: "Trang Contact"
-        name: "contactPage"
-        file: LetDIVN-main/content/page-content/contactPage.json
-        fields:
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
-          - { label: "Find Us Title", name: "findUsTitle", widget: string, required: false }
-          - { label: "Email Label", name: "emailLabel", widget: string, required: false }
-          - { label: "Phone Label1", name: "phoneLabel1", widget: string, required: false }
-          - { label: "Phone Label2", name: "phoneLabel2", widget: string, required: false }
-          - { label: "Form Title", name: "formTitle", widget: string, required: false }
-          - { label: "Name Label", name: "nameLabel", widget: string, required: false }
-          - { label: "Email Field Label", name: "emailFieldLabel", widget: string, required: false }
-          - { label: "Phone Field Label", name: "phoneFieldLabel", widget: string, required: false }
-          - { label: "Subject Label", name: "subjectLabel", widget: string, required: false }
-          - { label: "Message Label", name: "messageLabel", widget: string, required: false }
-          - { label: "Submit Btn", name: "submitBtn", widget: string, required: false }
-          - { label: "Thank You Title", name: "thankYouTitle", widget: string, required: false }
-          - { label: "Thank You Msg Prefix", name: "thankYouMsgPrefix", widget: string, required: false }
-          - { label: "Thank You Msg Suffix", name: "thankYouMsgSuffix", widget: string, required: false }
-          - { label: "Send Another Btn", name: "sendAnotherBtn", widget: string, required: false }
-      - label: "Thông tin liên hệ (chân trang & trang Contact)"
-        name: "contact"
-        file: LetDIVN-main/content/page-content/contact.json
-        fields:
-          - { label: "Phone1", name: "phone1", widget: string, required: false }
-          - { label: "Phone2", name: "phone2", widget: string, required: false }
-          - { label: "Email", name: "email", widget: string, required: false }
-      - label: "Nút liên hệ nổi (góc phải)"
-        name: "contactBubble"
-        file: LetDIVN-main/content/page-content/contactBubble.json
-        fields:
-          - { label: "Fb Label", name: "fbLabel", widget: string, required: false }
-          - { label: "Fb Handle", name: "fbHandle", widget: string, required: false }
-          - { label: "Ig Label", name: "igLabel", widget: string, required: false }
-          - { label: "Ig Handle", name: "igHandle", widget: string, required: false }
-          - { label: "Hotline1 Label", name: "hotline1Label", widget: string, required: false }
-          - { label: "Hotline1 Number", name: "hotline1Number", widget: string, required: false }
-          - { label: "Hotline2 Label", name: "hotline2Label", widget: string, required: false }
-          - { label: "Hotline2 Number", name: "hotline2Number", widget: string, required: false }
-          - { label: "Email Label", name: "emailLabel", widget: string, required: false }
-          - { label: "Email Address", name: "emailAddress", widget: string, required: false }
-      - label: "Chân trang"
-        name: "footer"
-        file: LetDIVN-main/content/page-content/footer.json
-        fields:
-          - { label: "Mô tả", name: "desc", widget: text, required: false }
-          - { label: "Address", name: "address", widget: string, required: false }
 
   - name: news
     label: Tin tức
