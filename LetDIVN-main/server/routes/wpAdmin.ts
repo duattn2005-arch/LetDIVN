@@ -8,7 +8,7 @@ import multer from 'multer';
 import { parse as parseYaml } from 'yaml';
 import { BRANCH, REPO, REPO_APP_DIR, repoPath, invalidateCmsSnapshot, rememberCmsMedia } from '../cmsContent.js';
 import { checkAdminLogin } from './decapAuth.js';
-import { volunteers, contacts } from '../db/collections.js';
+import { events, volunteers, contacts } from '../db/collections.js';
 import { slugify } from '../../src/utils/slug.js';
 
 // Backend of the WordPress-style editor at /admin/ (src/admin/). It edits the
@@ -514,8 +514,54 @@ router.get('/wp/volunteers', (req, res) => {
   res.json(volunteers.getAll());
 });
 
+/** The old SQLite events keep a sign-up counter (bumped by POST /api/volunteers). */
+function bumpEventCount(eventId: string | undefined, by: number) {
+  const event = eventId ? events.getById(eventId) : null;
+  if (event) events.update(event.id, { registeredCount: Math.max(0, (event.registeredCount || 0) + by) });
+}
+
+const VOLUNTEER_TEXT = ['fullName', 'email', 'phone', 'city', 'eventId', 'eventName', 'ageGroup', 'organizationName', 'preferredRole', 'notes'] as const;
+const JOIN_AS = ['individual', 'group', 'organization'];
+
+router.put('/wp/volunteers/:id', (req, res) => {
+  const existing = volunteers.getById(String(req.params.id));
+  if (!existing) {
+    res.status(404).json({ error: 'Không tìm thấy tình nguyện viên này (có thể đã bị xóa).' });
+    return;
+  }
+  const body = req.body ?? {};
+  const updates: Record<string, unknown> = {};
+  for (const key of VOLUNTEER_TEXT) {
+    if (typeof body[key] === 'string') updates[key] = body[key].trim().slice(0, key === 'notes' ? 2000 : 300);
+  }
+  if (JOIN_AS.includes(body.joinAs)) updates.joinAs = body.joinAs;
+  if (body.participants !== undefined) {
+    const n = parseInt(body.participants, 10);
+    updates.participants = Number.isFinite(n) && n > 0 ? Math.min(n, 100000) : 1;
+  }
+  if (typeof updates.preferredRole === 'string') updates.skills = updates.preferredRole ? [updates.preferredRole] : [];
+  if (!updates.eventId) delete updates.eventId; // event_id is NOT NULL
+  const saved = volunteers.update(existing.id, updates as any)!;
+  if (saved.eventId !== existing.eventId) {
+    bumpEventCount(existing.eventId, -1);
+    bumpEventCount(saved.eventId, 1);
+  }
+  res.json(saved);
+});
+
+router.delete('/wp/volunteers/:id', (req, res) => {
+  const existing = volunteers.getById(String(req.params.id));
+  if (existing && volunteers.delete(existing.id)) bumpEventCount(existing.eventId, -1);
+  res.json({ ok: true });
+});
+
 router.get('/wp/contacts', (req, res) => {
   res.json(contacts.getAll());
+});
+
+router.delete('/wp/contacts/:id', (req, res) => {
+  contacts.delete(String(req.params.id));
+  res.json({ ok: true });
 });
 
 export default router;

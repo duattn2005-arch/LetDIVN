@@ -133,5 +133,8 @@ export const api = {
     return request<MediaItem>('POST', '/media', form);
   },
   volunteers: () => request<any[]>('GET', '/volunteers'),
+  saveVolunteer: (id: string, data: Record<string, any>) => request<any>('PUT', `/volunteers/${encodeURIComponent(id)}`, data),
   contacts: () => request<any[]>('GET', '/contacts'),
+  /** Deletes a volunteer sign-up or a contact message. */
+  removeSubmission: (kind: 'volunteers' | 'contacts', id: string) => request('DELETE', `/${kind}/${encodeURIComponent(id)}`),
 };
