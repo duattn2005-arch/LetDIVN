@@ -38,7 +38,7 @@ export const FullGalleryPage: React.FC = () => {
             contentKey="fullGallery.title"
             defaultValue={t.fullGalleryTitle}
             as="h1"
-            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            className="ref-heading ref-title-lg"
             render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto [text-wrap:balance]">

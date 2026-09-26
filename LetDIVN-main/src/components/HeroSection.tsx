@@ -21,7 +21,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onJoinEvent }) => {
         contentKey="hero.slide1.bgImage"
         defaultValue="/images/hero/wcd-2025-hanoi.jpg"
         alt="World Cleanup Day 2025 in Hanoi"
-        wrapperClassName="w-full aspect-[2560/1231] max-h-[80vh] overflow-hidden"
+        wrapperClassName="w-full aspect-[2560/1231] sm:aspect-auto sm:h-[570px] overflow-hidden"
         className="w-full h-full object-cover object-center"
       />
 

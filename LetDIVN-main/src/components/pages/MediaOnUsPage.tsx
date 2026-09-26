@@ -25,7 +25,7 @@ export const MediaOnUsPage: React.FC = () => {
         contentKey="mediaOnUsPage.heroImage"
         defaultValue="/images/media-on-us/m07.jpg"
         alt="Media coverage"
-        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        wrapperClassName="w-full aspect-21/9 sm:h-[425px] sm:aspect-auto bg-slate-900"
         className="w-full h-full object-cover"
       />
 
@@ -36,14 +36,14 @@ export const MediaOnUsPage: React.FC = () => {
             contentKey="mediaOnUsPage.title"
             defaultValue="Media on Us"
             as="h1"
-            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            className="ref-heading ref-title-lg"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
             contentKey="mediaOnUsPage.subtitle"
             defaultValue="We are delighted to have received enthusiastic and proactive support from the press network in Vietnam. We firmly believe that achieving significant goals is possible only with community support through the influence of the press and social media."
             as="p"
-            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed [text-wrap:balance]"
+            className="ref-text [text-wrap:balance]"
             multiline
           />
 

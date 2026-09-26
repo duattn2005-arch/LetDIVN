@@ -25,7 +25,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
         contentKey="whatWeDo.heroImage"
         defaultValue="/images/what-we-do/hero.jpg"
         alt="Collected recyclable waste"
-        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        wrapperClassName="w-full aspect-21/9 sm:h-[484px] sm:aspect-auto bg-slate-900"
         className="w-full h-full object-cover"
       />
 
@@ -37,7 +37,7 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
             contentKey="whatWeDo.title"
             defaultValue="WHAT WE DO"
             as="h1"
-            className="ref-heading text-3xl sm:text-4xl lg:text-[45px]"
+            className="ref-heading ref-title-xl"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
 
@@ -46,13 +46,13 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
             defaultValue="At Let's Do It! Vietnam, we're on a mission to transform our beautiful country into a cleaner, greener haven."
             as="p"
             multiline
-            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="ref-text max-w-[878px] mx-auto"
           />
           <EditableText
             contentKey="whatWeDo.differenceSubtitle"
             defaultValue="Here's how we make a difference:"
             as="p"
-            className="ref-body text-sm sm:text-base text-slate-600"
+            className="ref-text"
           />
 
           {/* Activities are managed in Decap CMS */}
@@ -65,26 +65,29 @@ export const WhatWeDoPage: React.FC<{ onExploreProjects: () => void }> = () => {
           const isImageLeft = item.layout !== 'image-right';
 
           return (
-            <div
-              key={item.id}
-              className={`relative group ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}`}
-            >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 md:grid-cols-[0.85fr_1.15fr] gap-10 items-center">
+            // As on the reference: grey band first, then white, alternating; plain
+            // photos (526px left / 550px right) in a 1140px row.
+            <div key={item.id} className={`relative group ${idx % 2 === 0 ? 'bg-[#F2F2F2]' : 'bg-white'}`}>
+              <div
+                className={`max-w-[1140px] mx-auto px-4 xl:px-0 py-5 grid grid-cols-1 gap-x-[14px] gap-y-6 items-center ${
+                  isImageLeft ? 'md:grid-cols-2 lg:grid-cols-[526px_1fr]' : 'md:grid-cols-2 lg:grid-cols-[1fr_550px]'
+                }`}
+              >
 
                 {/* Photo Column */}
                 <div className={isImageLeft ? 'order-1' : 'order-1 md:order-2'}>
-                  <div className="aspect-3/2 p-2 bg-white border border-slate-200 shadow-lg rounded-sm">
+                  <div className={isImageLeft ? 'aspect-3/2' : 'aspect-[550/410]'}>
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                   </div>
                 </div>
 
                 {/* Text Column */}
                 <div className={`space-y-3 ${isImageLeft ? 'order-2' : 'order-2 md:order-1'}`}>
-                  <h2 className="ref-heading text-xl sm:text-2xl" style={{ color: BRAND_PINK }}>
+                  <h2 className="ref-heading ref-title-md" style={{ color: BRAND_PINK }}>
                     {item.title}
                   </h2>
-                  <div className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed">
-                    <p className="whitespace-pre-line text-justify">{item.desc}</p>
+                  <div className="ref-text max-w-[550px]">
+                    <p className="whitespace-pre-line">{item.desc}</p>
                   </div>
                 </div>
               </div>

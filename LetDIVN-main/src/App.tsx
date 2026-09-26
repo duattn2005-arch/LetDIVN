@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { AboutSection } from './components/AboutSection';
 import { GetInvolvedSection } from './components/GetInvolvedSection';
+import { TakeActionStrip } from './components/TakeActionStrip';
 import { Footer } from './components/Footer';
 
 // Modals
@@ -52,6 +53,18 @@ const normalizePath = (pathname: string) => {
   const trimmed = pathname.replace(/^\/+|\/+$/g, '');
   return trimmed ? `/${trimmed}/` : '/';
 };
+
+// Addresses the reference site (letsdoitvietnam.org) uses for pages that have
+// another name here, so its links keep working.
+const PATH_ALIASES: Record<string, string> = {
+  '/ycsw/': '/wildlife-nature/',
+  '/community-workshop/': '/workshop-education/',
+  '/contact-us/': '/contact/',
+};
+if (typeof window !== 'undefined') {
+  const alias = PATH_ALIASES[normalizePath(window.location.pathname)];
+  if (alias) window.history.replaceState(null, '', alias + window.location.search + window.location.hash);
+}
 
 const viewForPath = (pathname: string): string | undefined => {
   const normalized = normalizePath(pathname);
@@ -270,6 +283,8 @@ export function AppContent() {
               onJoinVolunteer={() => handleOpenVolunteerModal()}
               onBecomePartner={() => setIsPartnerModalOpen(true)}
             />
+            {/* The reference homepage ends with the four coloured tiles too. */}
+            <TakeActionStrip contentKeyPrefix="home" photos={false} />
           </>
         )}
 

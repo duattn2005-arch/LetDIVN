@@ -32,7 +32,7 @@ export const GetInvolvedSection: React.FC<GetInvolvedSectionProps> = ({
             contentKey="getInvolved.title"
             defaultValue={t.getInvolvedTitle || 'Get Involved Today'}
             as="h2"
-            className="ref-heading text-2xl sm:text-3xl lg:text-4xl"
+            className="ref-heading ref-title-lg"
             render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <EditableText

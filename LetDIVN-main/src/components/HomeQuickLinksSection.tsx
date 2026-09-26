@@ -73,14 +73,14 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraI
           contentKey="home.quickLinks.title"
           defaultValue="Cultivating the Beautiful in Vietnam"
           as="h2"
-          className="ref-heading text-3xl sm:text-4xl"
+          className="ref-heading ref-title-lg"
           render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
         />
       </div>
 
-      <div className="mt-8 grid grid-cols-2 sm:grid-cols-4">
+      <div className="mt-8 px-[10px] grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-5">
         {QUICK_LINKS.map((link) => (
-          <div key={link.view} className="relative aspect-square sm:aspect-3/4 overflow-hidden group">
+          <div key={link.view} className="relative aspect-square sm:aspect-[339/390] overflow-hidden group">
             <button onClick={() => onNavigate(link.view)} className="absolute inset-0 z-10 cursor-pointer" aria-label={link.label} />
             <EditableImage
               contentKey={`home.quickLinks.${link.key}Image`}
@@ -94,8 +94,8 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraI
               contentKey={`home.quickLinks.${link.key}Label`}
               defaultValue={link.label}
               as="span"
-              className="ref-heading absolute bottom-4 left-4 z-20"
-              render={(v) => <span className="text-white text-base sm:text-lg">{v}</span>}
+              className="ref-body absolute bottom-4 left-4 z-20"
+              render={(v) => <span className="text-white font-medium text-base sm:text-xl">{v}</span>}
             />
           </div>
         ))}
@@ -108,7 +108,7 @@ export const HomeQuickLinksSection: React.FC<{ onNavigate: (view: string, extraI
               contentKey="home.quickLinks.newsTitle"
               defaultValue="News"
               as="h2"
-              className="ref-heading text-3xl sm:text-4xl"
+              className="ref-heading ref-title-lg"
               render={(v) => <span style={{ color: BRAND_PINK, fontWeight: 400 }}>{v}</span>}
             />
           </div>

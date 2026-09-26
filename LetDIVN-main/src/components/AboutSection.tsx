@@ -25,7 +25,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onLearnMore }) => {
               contentKey="about.title"
               defaultValue={t.aboutTitle || "Let's do it! Vietnam Movement"}
               as="h2"
-              className="ref-heading text-2xl sm:text-3xl lg:text-4xl"
+              className="ref-heading ref-title-lg"
               render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
 

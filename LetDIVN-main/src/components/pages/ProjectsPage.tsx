@@ -46,7 +46,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
             contentKey="projects.title"
             defaultValue={t.projectsTitle}
             as="h1"
-            className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+            className="ref-heading ref-title-lg"
             render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
           />
           <EditableText

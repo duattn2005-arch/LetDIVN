@@ -26,6 +26,15 @@ h1, h2, h3, h4 {
   font-family: 'Poppins', sans-serif;
 }
 
+/* Pink section titles, sized like letsdoitvietnam.org — the same size on
+   phones, line height equal to the font size. */
+.ref-title-xl { font-size: 45px; line-height: 1; text-wrap: balance; }
+.ref-title-lg { font-size: 40px; line-height: 1; text-wrap: balance; }
+.ref-title-md { font-size: 30px; line-height: 1; text-wrap: balance; }
+
+/* Body text of the content sections, as on letsdoitvietnam.org: 18px grey. */
+.ref-text { font-family: 'Poppins', sans-serif; font-size: 18px; line-height: 30px; color: #7A7A7A; }
+
 /* Formatted news paragraphs written in the admin editor (NewsContentBlock type "html"). */
 .news-html > * + * { margin-top: 1em; }
 .news-html h2 { font-size: 1.5em; font-weight: 700; color: #54595F; }

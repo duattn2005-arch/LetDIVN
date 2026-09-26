@@ -166,7 +166,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
         contentKey="newsPage.heroImage"
         defaultValue="/images/news/hero.png"
         alt="Collected waste"
-        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        wrapperClassName="w-full aspect-21/9 sm:h-[425px] sm:aspect-auto bg-slate-900"
         className="w-full h-full object-cover"
       />
 
@@ -275,7 +275,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
               contentKey="newsPage.titleMedia"
               defaultValue={t.newsPageTitleMedia || 'Press & TV Coverage About Us'}
               as="h1"
-              className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+              className="ref-heading ref-title-lg"
               render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
           ) : (
@@ -283,7 +283,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
               contentKey="newsPage.titleDefault"
               defaultValue="News"
               as="h1"
-              className="ref-heading text-3xl sm:text-4xl lg:text-[45px] [text-wrap:balance]"
+              className="ref-heading ref-title-lg"
               render={(v) => <span style={{ color: '#F1138D' }}>{v}</span>}
             />
           )}

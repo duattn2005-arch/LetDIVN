@@ -66,15 +66,15 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
 
   return (
     <div className="bg-white">
-      <div className="w-full aspect-21/9 sm:h-[420px] sm:aspect-auto bg-slate-900">
+      <div className="w-full aspect-21/9 sm:h-[484px] sm:aspect-auto bg-slate-900">
         <img src={content.hero} alt={content.title} className="w-full h-full object-cover" style={{ objectPosition: content.heroPosition || '50% 50%' }} />
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3 text-center">
+      <div className="max-w-6xl mx-auto px-[10px] sm:px-6 lg:px-8 py-12 space-y-3 text-center">
         {content.kicker && (
           <h3 className="block ref-heading text-xl sm:text-2xl whitespace-pre-line" style={{ color: BRAND_AMBER }}>{content.kicker}</h3>
         )}
-        <h2 className="block ref-heading text-3xl sm:text-4xl lg:text-[45px] whitespace-pre-line" style={{ color: titleColor }}>{content.title}</h2>
+        <h2 className="block ref-heading ref-title-xl whitespace-pre-line" style={{ color: titleColor }}>{content.title}</h2>
       </div>
 
       <div>
@@ -84,11 +84,17 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           const isImageLeft = imageBandIndex % 2 === 0;
           const isBulletList = section.bulletList ?? (section.paragraphs.length > 2 && section.paragraphs.every((p) => p.length < 160));
           // Reference site centers only the title-adjacent intro blurb (no heading of its own)
-          // and any title-style heading section — UNLESS the paragraph sits in an image+text
-          // band, which is always left-aligned regardless of heading (verified on World Cleanup
-          // Day's "Since 2018" and Environmental Day's image bands). Every other body paragraph
-          // (under a regular amber sub-heading, e.g. "Background") is left-aligned too.
-          const textAlign = hasImage || (section.heading && !section.headingAsTitle) ? 'text-left' : 'text-center';
+          // and any title-style heading section. In an image+text band the text leans towards
+          // the photo: left-aligned when the photo is on its left, right-aligned when the photo
+          // is on its right (World Cleanup Day, Environmental Day); on phones, stacked, it is
+          // left-aligned. Body paragraphs under an amber sub-heading are left-aligned too.
+          const textAlign = hasImage
+            ? isImageLeft
+              ? 'text-left'
+              : 'text-left md:text-right'
+            : section.heading && !section.headingAsTitle
+              ? 'text-left'
+              : 'text-center';
           const bandBg = section.band ? (section.band === 'gray' ? BAND_GRAY : 'transparent') : idx % 2 === 0 ? BAND_GRAY : 'transparent';
           const paragraphStyle = section.textAlign ? { textAlign: section.textAlign } : undefined;
 
@@ -100,7 +106,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           if (section.columns && section.columns.length > 0) {
             return (
               <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div className="max-w-6xl mx-auto px-[10px] sm:px-6 lg:px-8 space-y-8">
                   {section.heading && (
                     <h3 className="block ref-heading text-xl sm:text-2xl text-left whitespace-pre-line" style={{ color: BRAND_AMBER }}>{section.heading}</h3>
                   )}
@@ -112,7 +118,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                         )}
                         <ul className="space-y-1.5 text-left">
                           {col.paragraphs.map((p, pi) => (
-                            <li key={pi} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
+                            <li key={pi} className="ref-text flex gap-2">
                               <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
                               <span className="whitespace-pre-line">{p}</span>
                             </li>
@@ -133,7 +139,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           if (section.personListItem) {
             return (
               <div key={idx} style={{ backgroundColor: bandBg }} className="py-16">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+                <div className="max-w-6xl mx-auto px-[10px] sm:px-6 lg:px-8 flex items-center gap-3">
                   <PersonStanding className="w-6.5 h-6.5 shrink-0" style={{ color: BRAND_PINK }} />
                   <span className="ref-body text-base" style={{ color: '#54595F' }}>{section.personListItem}</span>
                 </div>
@@ -147,7 +153,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 <h3
                   className={`whitespace-pre-line ${
                     section.headingAsTitle
-                      ? 'block ref-heading text-3xl sm:text-4xl lg:text-[45px] text-center'
+                      ? 'block ref-heading ref-title-xl text-center'
                       : 'block ref-heading text-xl sm:text-2xl text-left'
                   }`}
                   style={{ color: section.headingAsTitle ? titleColor : BRAND_AMBER }}
@@ -158,7 +164,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
               {isBulletList ? (
                 <ul className="space-y-2 text-left">
                   {section.paragraphs.map((p, i) => (
-                    <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
+                    <li key={i} className="ref-text flex gap-2">
                       <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
                       <span className="whitespace-pre-line">{p}</span>
                     </li>
@@ -166,7 +172,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 </ul>
               ) : (
                 section.paragraphs.map((p, i) => (
-                  <p key={i} className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed" style={paragraphStyle}>
+                  <p key={i} className="whitespace-pre-line ref-text" style={paragraphStyle}>
                     {p}
                   </p>
                 ))
@@ -177,7 +183,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                   {section.subBlocks.map((block, bi) => (
                     <div key={bi} className="space-y-2">
                       {block.title && <p className="whitespace-pre-line ref-body text-sm sm:text-base font-bold text-slate-700">{block.title}</p>}
-                      {block.text && <p className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed">{block.text}</p>}
+                      {block.text && <p className="whitespace-pre-line ref-text">{block.text}</p>}
                       {block.gallery && block.gallery.length > 0 && (
                         <Gallery images={block.gallery} alt={block.title} aspect={block.galleryAspect} className="pt-2" />
                       )}
@@ -189,7 +195,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
               {((section.closingParagraphs?.length ?? 0) > 0 || (section.closingBullets?.length ?? 0) > 0) && (
                 <div className="text-left space-y-3 pt-2">
                   {section.closingParagraphs?.[0] && (
-                    <p className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed">{section.closingParagraphs[0]}</p>
+                    <p className="whitespace-pre-line ref-text">{section.closingParagraphs[0]}</p>
                   )}
                   {section.closingBullets && section.closingBullets.length > 0 && (
                     <>
@@ -198,7 +204,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                       )}
                       <ul className="space-y-1.5">
                         {section.closingBullets.map((p, i) => (
-                          <li key={i} className="ref-body text-sm text-slate-600 leading-relaxed flex gap-2">
+                          <li key={i} className="ref-text flex gap-2">
                             <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
                             <span className="whitespace-pre-line">{p}</span>
                           </li>
@@ -207,7 +213,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                     </>
                   )}
                   {section.closingParagraphs?.slice(1).map((p, i) => (
-                    <p key={i} className="whitespace-pre-line ref-body text-sm sm:text-base text-slate-600 leading-relaxed">
+                    <p key={i} className="whitespace-pre-line ref-text">
                       {p}
                     </p>
                   ))}
@@ -217,10 +223,12 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           );
 
           if (!hasImage) {
+            // The intro right under the page title sits close to it, as on the reference.
+            const isIntro = idx === 0 && !section.heading;
             return (
-              <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">{textBlock}</div>
-                {galleryBlock && <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">{galleryBlock}</div>}
+              <div key={idx} style={{ backgroundColor: bandBg }} className={isIntro ? '-mt-8 pb-10' : 'py-10'}>
+                <div className="max-w-6xl mx-auto px-[10px] sm:px-6 lg:px-8">{textBlock}</div>
+                {galleryBlock && <div className="max-w-6xl mx-auto px-[10px] sm:px-6 lg:px-8">{galleryBlock}</div>}
               </div>
             );
           }
@@ -228,7 +236,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
           return (
             <div key={idx} style={{ backgroundColor: bandBg }} className="py-10">
               <div
-                className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-10 items-center ${
+                className={`max-w-6xl mx-auto px-[10px] sm:px-6 lg:px-8 grid grid-cols-1 gap-10 items-center ${
                   isImageLeft ? 'md:grid-cols-[0.85fr_1.15fr]' : 'md:grid-cols-[1.15fr_0.85fr]'
                 }`}
               >
@@ -239,7 +247,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                 </div>
                 <div className={isImageLeft ? 'order-2' : 'order-2 md:order-1'}>{textBlock}</div>
               </div>
-              {galleryBlock && <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">{galleryBlock}</div>}
+              {galleryBlock && <div className="max-w-6xl mx-auto px-[10px] sm:px-6 lg:px-8">{galleryBlock}</div>}
             </div>
           );
         })}

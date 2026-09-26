@@ -29,7 +29,7 @@ export const OurTeamPage: React.FC = () => {
         contentKey="ourTeam.heroImage"
         defaultValue="/images/our-team/hero.jpg"
         alt="People for a clean planet"
-        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        wrapperClassName="w-full aspect-21/9 sm:h-[484px] sm:aspect-auto bg-slate-900"
         className="w-full h-full object-cover"
       />
 
@@ -40,7 +40,7 @@ export const OurTeamPage: React.FC = () => {
             contentKey="ourTeam.title"
             defaultValue="OUR TEAM"
             as="h1"
-            className="ref-heading text-3xl sm:text-4xl lg:text-[45px]"
+            className="ref-heading ref-title-xl"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
@@ -48,34 +48,26 @@ export const OurTeamPage: React.FC = () => {
             defaultValue="Meet the passionate individuals behind Let's Do It! Vietnam—a diverse team united by a common purpose: to protect our environment and inspire positive change. 🌿🌏"
             as="p"
             multiline
-            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="ref-text max-w-[878px] mx-auto"
           />
 
         </div>
 
-        {/* Team Grid: photo, name, role — matching the reference site's simple card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {/* Team grid, as on the reference site: photo, then a light grey block
+            with the name (33px pink) and role (18px grey), left-aligned. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-[1140px] mx-auto">
           {team.map((member) => (
-            <div
-              key={member.id}
-              className="relative group rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
-            >
-
-              <div className="aspect-4/3 bg-slate-100 overflow-hidden">
-                <img
-                  src={member.avatar}
-                  alt={member.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+            <div key={member.id} className="overflow-hidden">
+              <div className="aspect-[560/369] bg-slate-100 overflow-hidden">
+                <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
               </div>
-
-              <div className="p-4 bg-slate-50 text-center">
-                <h3 className="ref-heading text-base" style={{ color: BRAND_PINK }}>
+              <div className="px-[15px] pt-6 pb-12 text-left" style={{ backgroundColor: 'rgba(245, 245, 245, 0.97)' }}>
+                <h2 className="ref-heading text-[33px] leading-[33px] pb-2.5" style={{ color: BRAND_PINK }}>
                   {member.name}
-                </h3>
-                <div className="text-xs font-semibold text-slate-600 mt-0.5">
+                </h2>
+                <h4 className="ref-body text-lg leading-[18px] font-medium" style={{ color: '#54595F' }}>
                   {member.role}
-                </div>
+                </h4>
               </div>
             </div>
           ))}

@@ -28,7 +28,7 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => 
         contentKey="ourPartners.heroImage"
         defaultValue="/images/our-partners/hero.jpg"
         alt="Let's Do It Vietnam volunteers"
-        wrapperClassName="w-full aspect-21/9 sm:h-[300px] sm:aspect-auto bg-slate-900"
+        wrapperClassName="w-full aspect-21/9 sm:h-[425px] sm:aspect-auto bg-slate-900"
         className="w-full h-full object-cover"
       />
 
@@ -39,21 +39,21 @@ export const OurPartnersPage: React.FC<{ onBecomePartner: () => void }> = () => 
             contentKey="ourPartners.title"
             defaultValue="We Work With the Best Partners"
             as="h1"
-            className="ref-heading text-2xl sm:text-3xl lg:text-[45px] [text-wrap:balance]"
+            className="ref-heading ref-title-lg"
             render={(v) => <span style={{ color: BRAND_PINK }}>{v}</span>}
           />
           <EditableText
             contentKey="ourPartners.subtitle"
             defaultValue="Working with strong partners can make a significant impact."
             as="p"
-            className="ref-body text-sm sm:text-base text-slate-600"
+            className="ref-text"
           />
           <EditableText
             contentKey="ourPartners.desc"
             defaultValue="We collaborate with local communities, schools, and businesses to organize large-scale clean-up campaigns. We partner with companies to promote sustainable practices within their operations."
             as="p"
             multiline
-            className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed"
+            className="ref-text"
           />
 
         </div>

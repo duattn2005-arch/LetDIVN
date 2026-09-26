@@ -71,17 +71,38 @@ export const setUnauthorizedHandler = (fn: () => void) => {
   onUnauthorized = fn;
 };
 
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function request<T>(method: string, url: string, body?: unknown): Promise<T> {
   const isForm = body instanceof FormData;
-  const res = await fetch(`/api/wp${url}`, {
-    method,
-    credentials: 'same-origin',
-    headers: {
-      'X-Requested-With': 'wp-admin',
-      ...(body && !isForm ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: body ? (isForm ? (body as FormData) : JSON.stringify(body)) : undefined,
-  });
+  const send = () =>
+    fetch(`/api/wp${url}`, {
+      method,
+      credentials: 'same-origin',
+      headers: {
+        'X-Requested-With': 'wp-admin',
+        ...(body && !isForm ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: body ? (isForm ? (body as FormData) : JSON.stringify(body)) : undefined,
+    });
+  // A dropped connection (flaky network, or the server restarting for a few
+  // seconds after an update) is retried for reads. Writes are not: the first
+  // try may have gone through (an upload would then be stored twice).
+  let res: Response | undefined;
+  const attempts = method === 'GET' ? 3 : 1;
+  for (let i = 0; i < attempts && !res; i++) {
+    try {
+      res = await send();
+    } catch {
+      if (i < attempts - 1) await wait(1000 * (i + 1));
+    }
+  }
+  if (!res) {
+    throw new ApiError(
+      'Không kết nối được tới máy chủ. Hãy kiểm tra mạng rồi tải lại trang (Ctrl+F5). Nếu vẫn lỗi, thử tắt trình chặn quảng cáo cho trang này.',
+      0
+    );
+  }
   const json = await res.json().catch(() => ({}));
   if (!res.ok) {
     if (res.status === 401 && url !== '/login') onUnauthorized();

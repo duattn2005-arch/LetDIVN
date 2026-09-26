@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../../services/dbService';
 import { ProjectStaticContent } from '../ProjectStaticContent';
+import { TakeActionStrip } from '../TakeActionStrip';
 import { CleanupEvent } from '../../types';
 import { slugify } from '../../utils/slug';
 
@@ -35,6 +36,8 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
   return (
     <div className="bg-white">
       <ProjectStaticContent category={event.category} />
+      {/* The reference site ends every project page with the four coloured tiles. */}
+      <TakeActionStrip contentKeyPrefix="projectPages" photos={false} />
     </div>
   );
 };

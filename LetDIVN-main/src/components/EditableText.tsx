@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { dbService } from '../services/dbService';
 
 interface EditableTextProps {
-  /** Key this piece of text is stored under in Decap's "Nội dung các trang" (e.g. 'whoWeAre.heroTitle') */
+  /** Key this piece of text is stored under in "Nội dung các trang" (e.g. 'whoWeAre.heroTitle') */
   contentKey: string;
-  /** Text shown until it is changed in Decap */
+  /** Text shown until it is changed in the admin */
   defaultValue: string;
-  /** Wrapper element tag when no custom `render` is given */
+  /** Element tag (also used around a custom `render`) */
   as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'li' | 'label';
   className?: string;
   multiline?: boolean;
@@ -17,10 +17,11 @@ interface EditableTextProps {
 }
 
 /**
- * A piece of page text editable in Decap CMS (/admin -> "Nội dung các trang").
- * A new contentKey also needs a field in public/admin/config.yml, or it can
- * only ever show its defaultValue. Color / alignment / font size set with the
- * old on-page editor still apply (read-only now).
+ * A piece of page text editable in the admin (/admin -> "Trang").
+ * A new contentKey also needs a field in public/admin/decap/config.yml, or it
+ * can only ever show its defaultValue. Its look comes from the code only: the
+ * colour / alignment / size overrides of the old on-page editor are ignored,
+ * so the pages match letsdoitvietnam.org.
  */
 export const EditableText: React.FC<EditableTextProps> = ({
   contentKey,
@@ -30,49 +31,22 @@ export const EditableText: React.FC<EditableTextProps> = ({
   render,
 }) => {
   const [value, setValue] = useState(defaultValue);
-  const [color, setColor] = useState('');
-  const [align, setAlign] = useState('');
-  const [fontSize, setFontSize] = useState('');
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([
-      dbService.getContent(contentKey, defaultValue),
-      dbService.getContent(`${contentKey}__color`, ''),
-      dbService.getContent(`${contentKey}__align`, ''),
-      dbService.getContent(`${contentKey}__fontSize`, ''),
-    ]).then(([nextVal, nextColor, nextAlign, nextFontSize]) => {
-      if (cancelled) return;
-      setValue(nextVal);
-      setColor(nextColor);
-      setAlign(nextAlign);
-      setFontSize(nextFontSize);
+    dbService.getContent(contentKey, defaultValue).then((next) => {
+      if (!cancelled) setValue(next);
     });
     return () => {
       cancelled = true;
     };
   }, [contentKey, defaultValue]);
 
-  const resolvedValue = (value && value.trim()) ? value : defaultValue;
-  const displayStyle: React.CSSProperties | undefined = (color || align || fontSize)
-    ? {
-        ...(color
-          ? {
-              color,
-              WebkitTextFillColor: color,
-              background: 'none',
-              animation: 'none',
-              filter: 'none',
-            }
-          : {}),
-        ...(align ? { textAlign: align as React.CSSProperties['textAlign'] } : {}),
-        ...(fontSize ? { fontSize: `${fontSize}px` } : {}),
-      }
-    : undefined;
+  const resolvedValue = value && value.trim() ? value : defaultValue;
 
   return render ? (
-    <span className={className} style={displayStyle}>{render(resolvedValue)}</span>
+    <Tag className={className}>{render(resolvedValue)}</Tag>
   ) : (
-    <Tag className={`whitespace-pre-line ${className}`} style={displayStyle}>{resolvedValue}</Tag>
+    <Tag className={`whitespace-pre-line ${className}`}>{resolvedValue}</Tag>
   );
 };

@@ -4,9 +4,11 @@ import { getPageContent } from '../cmsContent.js';
 
 const router = Router();
 
-// Colors, alignment, font sizes and image crop positions set with the old
-// on-page editor, kept as they were (they are not editable any more).
-const LEGACY_STYLE_KEY = /__(color|colors|align|fontSize|position|width)$/;
+// Image crop positions set with the old on-page editor, kept as they were
+// (they are not editable any more). Its colour / alignment / size overrides
+// are dropped: the pages take their look from the code, matching the
+// reference site letsdoitvietnam.org.
+const LEGACY_STYLE_KEY = /__position$/;
 
 // All page text and images as one {key: value} object — a page has 10-20+
 // EditableText/EditableImage slots, so one request beats one per slot. Text
