@@ -13,6 +13,14 @@ export interface VolunteerRegistration {
   status: 'Pending' | 'Approved' | 'Checked-In' | 'Completed' | 'Cancelled';
   registeredAt: string;
   notes?: string;
+  /** How they sign up: alone, with a group, or for a company/organization. */
+  joinAs?: 'individual' | 'group' | 'organization';
+  /** Group or organization name (joinAs group/organization). */
+  organizationName?: string;
+  /** How many people come (1 for an individual). */
+  participants?: number;
+  /** Clean-up, Media, Leader or Logistics. */
+  preferredRole?: string;
 }
 
 export interface CleanupEvent {

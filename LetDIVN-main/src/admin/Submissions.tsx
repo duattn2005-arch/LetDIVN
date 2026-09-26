@@ -10,12 +10,15 @@ import { formatDateTime } from './util';
 const COLUMNS = {
   volunteers: [
     { key: 'fullName', label: 'Họ tên' },
+    { key: 'joinAs', label: 'Hình thức' },
+    { key: 'organizationName', label: 'Nhóm / tổ chức' },
+    { key: 'participants', label: 'Số người' },
     { key: 'email', label: 'Email' },
     { key: 'phone', label: 'Điện thoại' },
-    { key: 'city', label: 'Tỉnh / TP' },
+    { key: 'city', label: 'Địa chỉ' },
     { key: 'eventName', label: 'Sự kiện' },
-    { key: 'ageGroup', label: 'Độ tuổi' },
-    { key: 'tshirtSize', label: 'Size áo' },
+    { key: 'preferredRole', label: 'Vai trò' },
+    { key: 'ageGroup', label: 'Năm sinh' },
     { key: 'registeredAt', label: 'Ngày đăng ký' },
   ],
   contacts: [
@@ -29,6 +32,7 @@ const COLUMNS = {
 };
 
 const DATE_KEYS = ['registeredAt', 'createdAt'];
+const JOIN_AS: Record<string, string> = { individual: 'Cá nhân', group: 'Nhóm', organization: 'Tổ chức' };
 
 export function Submissions({ kind }: { kind: 'volunteers' | 'contacts' }) {
   const [rows, setRows] = useState<any[] | null>(null);
@@ -51,6 +55,8 @@ export function Submissions({ kind }: { kind: 'volunteers' | 'contacts' }) {
   const text = (r: any, key: string) => {
     const v = r[key];
     if (DATE_KEYS.includes(key)) return formatDateTime(v);
+    if (key === 'joinAs') return JOIN_AS[v as string] ?? 'Cá nhân';
+    if (key === 'preferredRole' && !v) return Array.isArray(r.skills) ? r.skills.join(', ') : '';
     if (Array.isArray(v)) return v.join(', ');
     return v == null ? '' : String(v);
   };

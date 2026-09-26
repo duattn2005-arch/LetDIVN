@@ -1,29 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  AlertCircle,
-  CalendarDays,
-  Camera,
-  Car,
-  CheckCircle2,
-  ChevronDown,
-  Layers,
-  Mail,
-  MapPin,
-  Megaphone,
-  MessageCircleMore,
-  Pencil,
-  Phone,
-  Plus,
-  Send,
-  Settings,
-  Truck,
-  User,
-  Users,
-  UsersRound,
-  X,
-  type LucideIcon,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle2, ChevronDown, UserPlus, X } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { CleanupEvent } from '../types';
 import { saveToGoogleSheet, getGoogleAppsScriptUrl } from '../services/googleSheetsService';
@@ -34,76 +11,104 @@ interface VolunteerModalProps {
   selectedEventId?: string;
 }
 
-const NAVY = '#1e1b4b';
-const PURPLE = '#6d3fe0';
+type JoinAs = 'individual' | 'group' | 'organization';
 
-/** Skills, in the two-column order of the form, each with its own icon tile colour. */
-const SKILLS: { label: string; Icon: LucideIcon; color: string; tint: string }[] = [
-  { label: 'Logistics & Waste Sorting', Icon: Truck, color: '#7c5cff', tint: '#efeaff' },
-  { label: 'Photography & Media Production', Icon: Camera, color: '#3b82f6', tint: '#e6f0ff' },
-  { label: 'Coordination & Team Management', Icon: Users, color: '#ec4899', tint: '#fde6f1' },
-  { label: 'First Aid & Medical Support', Icon: Plus, color: '#ef4470', tint: '#ffe6ec' },
-  { label: 'Driving & Waste Transport', Icon: Car, color: '#16a34a', tint: '#e3f6ea' },
-  { label: 'English Interpretation', Icon: MessageCircleMore, color: '#14b8a6', tint: '#ddf6f2' },
-  { label: 'MC & Eco Tour Guide', Icon: Megaphone, color: '#f97316', tint: '#fff0e2' },
-];
+const NAVY = '#0f1f4b';
+const PINK = '#e8197c';
 
-/** The hand holding a heart in the header's right corner. */
-const HeartInHand: React.FC = () => (
-  <svg viewBox="0 0 200 160" className="w-full h-full" aria-hidden>
-    <defs>
-      <linearGradient id="vm-heart" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#ffc1d4" />
-        <stop offset="100%" stopColor="#ff5c93" />
-      </linearGradient>
-      <radialGradient id="vm-glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#fff" stopOpacity="0.55" />
-        <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-      </radialGradient>
-    </defs>
-    <circle cx="112" cy="58" r="48" fill="url(#vm-glow)" />
-    {/* sparkle lines around the heart */}
-    <g stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.9">
-      <line x1="112" y1="4" x2="112" y2="14" />
-      <line x1="70" y1="24" x2="78" y2="31" />
-      <line x1="154" y1="24" x2="146" y2="31" />
-      <line x1="60" y1="60" x2="70" y2="60" />
-      <line x1="164" y1="60" x2="154" y2="60" />
-    </g>
-    {/* the heart */}
-    <path d="M112 92 C 72 66, 80 32, 100 32 C 108 32, 112 39, 112 43 C 112 39, 116 32, 124 32 C 144 32, 152 66, 112 92 Z" fill="url(#vm-heart)" />
-    <path d="M96 42 C 90 44, 88 52, 91 58" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.7" />
-    {/* small hearts */}
-    <path d="M40 30 C 30 23, 32 14, 37 14 C 39 14, 40 16, 40 17 C 40 16, 41 14, 43 14 C 48 14, 50 23, 40 30 Z" fill="#ff8fb3" opacity="0.85" />
-    <path d="M182 86 C 174 80, 176 73, 180 73 C 181.5 73, 182 74.5, 182 75.5 C 182 74.5, 182.5 73, 184 73 C 188 73, 190 80, 182 86 Z" fill="#ff8fb3" opacity="0.85" />
-    {/* the open hand, palm up */}
-    <path
-      d="M34 158 L66 124 C 76 113, 90 108, 106 107 L 148 104 C 158 103, 160 115, 150 117 L 124 121 C 140 121, 158 115, 172 106 C 181 100, 190 110, 181 118 C 164 132, 140 141, 110 143 L 82 145 L 64 160 Z"
-      fill="#ffd9e5"
-      opacity="0.95"
-    />
-    <path d="M124 121 L 100 123" stroke="#ff9fbd" strokeWidth="3" strokeLinecap="round" />
+// Solid icons like the design's (paths from Google's Material Icons, Apache-2.0).
+const ICON_PATHS = {
+  person: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
+  groups:
+    'M12 12.75c1.63 0 3.07.39 4.24.9 1.08.48 1.76 1.56 1.76 2.73V18H6v-1.61c0-1.18.68-2.26 1.76-2.73 1.17-.52 2.61-.91 4.24-.91zM4 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm1.13 1.1c-.37-.06-.74-.1-1.13-.1-.99 0-1.93.21-2.78.58A2.01 2.01 0 0 0 0 16.43V18h4.5v-1.61c0-.83.23-1.61.63-2.29zM20 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm4 3.43c0-.81-.48-1.53-1.22-1.85A6.95 6.95 0 0 0 20 14c-.39 0-.76.04-1.13.1.4.68.63 1.46.63 2.29V18H24v-1.57zM12 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z',
+  apartment:
+    'M17 11V3H7v4H3v14h8v-4h2v4h8V11h-4zM7 19H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm4 4H9v-2h2v2zm0-4H9V9h2v2zm0-4H9V5h2v2zm4 8h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm4 12h-2v-2h2v2zm0-4h-2v-2h2v2z',
+  assignment:
+    'M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z',
+  calendar:
+    'M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z',
+  phone:
+    'M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z',
+  mail: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z',
+  place: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z',
+  work: 'M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z',
+  camera:
+    'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z',
+  eco: 'M6.05 8.05a7.007 7.007 0 0 0-.02 9.88c1.47-3.4 4.09-6.24 7.36-7.93A15.952 15.952 0 0 0 8.1 16.2c2.6 1.23 5.8.78 7.95-1.37C19.53 11.35 20 3 20 3s-8.35.47-11.83 3.95z',
+  box: 'M12 2 3 7v10l9 5 9-5V7l-9-5zm0 2.3L18.7 8 12 11.7 5.3 8 12 4.3zM5 9.7l6 3.3v6.6l-6-3.3V9.7zm8 9.9V13l6-3.3v6.6l-6 3.3z',
+};
+type IconName = keyof typeof ICON_PATHS;
+
+const Icon: React.FC<{ name: IconName; color: string; className?: string }> = ({ name, color, className = 'w-6 h-6' }) => (
+  <svg viewBox="0 0 24 24" className={className} style={{ color }} fill="currentColor" aria-hidden>
+    <path d={ICON_PATHS[name]} />
   </svg>
 );
 
-const inputClass =
-  'w-full h-14 px-4 rounded-2xl border border-[#dcd8ee] bg-white text-base text-[#1e1b4b] shadow-[0_1px_2px_rgba(30,27,75,0.04)] outline-none transition focus:border-[#7c4dff] focus:ring-4 focus:ring-[#7c4dff]/10 placeholder:text-slate-400';
+const JOIN_OPTIONS: { value: JoinAs; title: string; desc: string; icon: IconName }[] = [
+  { value: 'individual', title: 'Individual', desc: 'I will join by myself', icon: 'person' },
+  { value: 'group', title: 'Group', desc: 'I will join with a group', icon: 'groups' },
+  { value: 'organization', title: 'Organization', desc: 'I represent a company or organization', icon: 'apartment' },
+];
 
-const Label: React.FC<{ Icon: LucideIcon; children: React.ReactNode; required?: boolean; filled?: boolean; htmlFor?: string }> = ({
-  Icon,
-  children,
-  required,
-  filled,
-  htmlFor,
-}) => (
-  <label htmlFor={htmlFor} className="flex items-center gap-3 mb-2.5 text-[17px] sm:text-lg font-semibold" style={{ color: NAVY }}>
-    {/* Solid icons: the outline takes the background colour, so inner details (the pin's hole) show. */}
-    <Icon className="w-6 h-6 shrink-0" style={{ color: PURPLE }} fill={filled ? 'currentColor' : 'none'} stroke={filled ? '#fff' : 'currentColor'} strokeWidth={filled ? 1.5 : 2} />
+const ROLES: { value: string; icon: IconName }[] = [
+  { value: 'Clean-up', icon: 'eco' },
+  { value: 'Media', icon: 'camera' },
+  { value: 'Leader', icon: 'groups' },
+  { value: 'Logistics', icon: 'box' },
+];
+
+/** The round radio mark in a card's top-right corner. */
+const RadioMark: React.FC<{ checked: boolean }> = ({ checked }) => (
+  <span
+    className="w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center shrink-0 bg-white"
+    style={{ borderColor: checked ? PINK : '#8a93a8' }}
+    aria-hidden
+  >
+    {checked && <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: PINK }} />}
+  </span>
+);
+
+/** A green leaf for the header decoration. */
+const LeafArt: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className, style }) => (
+  <svg viewBox="0 0 60 80" className={className} style={style} aria-hidden>
+    <defs>
+      <linearGradient id="vm-leaf" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#a6dc5a" />
+        <stop offset="100%" stopColor="#3f9a2c" />
+      </linearGradient>
+    </defs>
+    <path d="M30 2 C 58 18, 60 56, 30 78 C 0 56, 2 18, 30 2 Z" fill="url(#vm-leaf)" />
+    <path d="M30 8 C 31 30, 31 52, 30 76" stroke="#2f7d22" strokeWidth="2" fill="none" opacity="0.6" />
+  </svg>
+);
+
+const SectionTitle: React.FC<{ icon: IconName; children: React.ReactNode; note?: string }> = ({ icon, children, note }) => (
+  <h4 className="flex items-center gap-3 mb-3 text-lg sm:text-[22px] font-bold" style={{ color: NAVY }}>
+    <Icon name={icon} color={NAVY} className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
     <span>
       {children}
-      {required && <span className="text-[#ec3a7c]"> *</span>}
+      {note && <span className="ml-2 text-xs sm:text-sm font-normal text-slate-600">{note}</span>}
     </span>
+  </h4>
+);
+
+const FieldLabel: React.FC<{ htmlFor: string; children: React.ReactNode; required?: boolean }> = ({ htmlFor, children, required }) => (
+  <label htmlFor={htmlFor} className="block mb-1.5 text-[15px] sm:text-base font-medium" style={{ color: NAVY }}>
+    {children}
+    {required && <span style={{ color: PINK }}> *</span>}
   </label>
+);
+
+const fieldClass =
+  'w-full h-12 pl-12 pr-4 rounded-lg border border-[#cfd6e4] bg-white text-[15px] outline-none transition placeholder:text-slate-400 focus:border-[#e8197c] focus:ring-4 focus:ring-[#e8197c]/10';
+
+const IconField: React.FC<{ icon: IconName; children: React.ReactNode; chevron?: boolean }> = ({ icon, children, chevron }) => (
+  <div className="relative">
+    <Icon name={icon} color="#4b5570" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none" />
+    {children}
+    {chevron && <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none" style={{ color: NAVY }} />}
+  </div>
 );
 
 export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose, selectedEventId }) => {
@@ -114,46 +119,43 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
     dbService.getEvents().then(setEvents);
   }, []);
 
+  const [joinAs, setJoinAs] = useState<JoinAs>('individual');
+  const [eventId, setEventId] = useState('');
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [birthYear, setBirthYear] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [address, setAddress] = useState('');
-  const [eventId, setEventId] = useState(selectedEventId || events[0]?.id || '');
-  const [birthYear, setBirthYear] = useState<string>('');
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [customRole, setCustomRole] = useState('');
-  const [notes, setNotes] = useState('');
+  const [role, setRole] = useState('Clean-up');
+  const [participants, setParticipants] = useState('');
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  // Age from the birth year
-  const yearNumber = parseInt(birthYear, 10);
-  const calculatedAge = !isNaN(yearNumber) && yearNumber >= 1920 && yearNumber <= currentYear ? currentYear - yearNumber : null;
+  const isTeam = joinAs !== 'individual';
+  const teamWord = joinAs === 'organization' ? 'Organization' : 'Group';
 
   const resetFormState = () => {
+    setJoinAs('individual');
     setFullName('');
-    setEmail('');
     setPhone('');
-    setAddress('');
+    setEmail('');
     setBirthYear('');
-    setSelectedSkills([]);
-    setCustomRole('');
-    setNotes('');
+    setOrganizationName('');
+    setAddress('');
+    setRole('Clean-up');
+    setParticipants('');
     setPhoneError(null);
   };
 
-  // Reset the form when the modal opens
+  // Reset the form when it opens; a "Register" button on a campaign preselects it.
   useEffect(() => {
     if (isOpen) {
       setSubmitted(false);
-      if (selectedEventId) {
-        setEventId(selectedEventId);
-      } else if (events.length > 0) {
-        setEventId(events[0].id);
-      }
+      setEventId(selectedEventId || '');
       resetFormState();
     }
-  }, [isOpen, selectedEventId, events]);
+  }, [isOpen, selectedEventId]);
 
   // Escape closes; the page behind doesn't scroll while the form is open.
   useEffect(() => {
@@ -170,24 +172,12 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
 
   if (!isOpen) return null;
 
-  const handleSkillToggle = (skill: string) => {
-    setSelectedSkills((list) => (list.includes(skill) ? list.filter((s) => s !== skill) : [...list, skill]));
-  };
+  const years = Array.from({ length: currentYear - 6 - 1920 + 1 }, (_, i) => currentYear - 6 - i);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
-    setPhone(digitsOnly);
-    // Optional field — only flag an error once they've typed *something* that
-    // isn't a complete number yet, never for leaving it blank.
-    if (digitsOnly.length > 0 && digitsOnly.length < 10) {
-      setPhoneError(`Phone number must be exactly 10 digits (currently ${digitsOnly.length}/10 digits)`);
-    } else {
-      setPhoneError(null);
-    }
-  };
-
-  const handleBirthYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBirthYear(e.target.value.replace(/\D/g, '').slice(0, 4));
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digits);
+    setPhoneError(digits.length > 0 && digits.length < 10 ? `Phone number must be exactly 10 digits (${digits.length}/10)` : null);
   };
 
   const handleCloseModal = () => {
@@ -197,108 +187,113 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
 
   /**
    * Saves the sign-up to the site's database and, in the background (not
-   * awaited, so CORS never blocks the form), to the Google Sheet.
+   * awaited, so CORS never blocks the form), to the Google Sheet. The sheet
+   * keeps its columns: a group/organization shows in "age" (Nhóm / Tổ chức)
+   * and its name and head count in "skills".
    */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Phone number is optional — only validate its format when entered.
     const cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length > 0 && cleanPhone.length !== 10) {
-      setPhoneError('Phone number must be exactly 10 digits (no more, no less)!');
-      alert('⚠ Invalid phone number!\nPlease enter exactly 10 digits (e.g., 0987654321), or leave it blank.');
+    if (cleanPhone.length !== 10) {
+      setPhoneError('Phone number must be exactly 10 digits');
       return;
     }
-
-    if (calculatedAge === null || calculatedAge < 6 || calculatedAge > 105) {
-      alert(`⚠ Invalid birth year!\nPlease enter a birth year between 1920 and ${currentYear - 6}.`);
+    const entered = parseInt(participants, 10);
+    const people = Number.isFinite(entered) && entered > 0 ? entered : isTeam ? NaN : 1;
+    if (isTeam && !(people >= 1)) {
+      alert('⚠ Please enter the number of participants.');
       return;
     }
 
     const eventObj = events.find((ev) => ev.id === eventId);
-    const finalSkills = [...selectedSkills];
-    if (customRole.trim()) finalSkills.push(customRole.trim());
-
     const eventTitle = eventObj ? eventObj.title : 'World Cleanup Day 2026';
-    // The 'age' field carries the birth year itself (e.g. "2004").
-    const formData = {
-      name: fullName.trim(),
-      phone: cleanPhone,
-      email: email.trim(),
-      city: address.trim() || 'Vietnam',
-      age: birthYear,
-      project: eventTitle,
-      skills: finalSkills,
-    };
+    const teamLabel = joinAs === 'organization' ? 'Tổ chức' : 'Nhóm';
+    const sheetSkills = isTeam ? [role, `${teamLabel}: ${organizationName.trim()}`, `${people} người`] : [role];
 
     dbService.addVolunteer({
-      fullName: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      city: formData.city,
+      fullName: fullName.trim(),
+      email: email.trim(),
+      phone: cleanPhone,
+      city: address.trim(),
       eventId,
-      eventName: formData.project,
-      ageGroup: birthYear,
+      eventName: eventTitle,
+      ageGroup: isTeam ? '' : birthYear,
       tshirtSize: 'L',
-      emergencyContact: formData.phone,
-      skills: finalSkills,
+      emergencyContact: cleanPhone,
+      skills: [role],
       status: 'Approved',
-      notes: notes.trim(),
+      joinAs,
+      organizationName: isTeam ? organizationName.trim() : undefined,
+      participants: people,
+      preferredRole: role,
     });
 
     const effectiveUrl = eventObj?.sheetUrl || getGoogleAppsScriptUrl();
-    saveToGoogleSheet(formData, effectiveUrl).catch((err) => {
-      console.warn('Silent sheet sync:', err);
-    });
+    saveToGoogleSheet(
+      {
+        name: fullName.trim(),
+        phone: cleanPhone,
+        email: email.trim(),
+        city: address.trim(),
+        age: isTeam ? teamLabel : birthYear,
+        project: eventTitle,
+        skills: sheetSkills,
+      },
+      effectiveUrl
+    ).catch((err) => console.warn('Silent sheet sync:', err));
 
     setSubmitted(true);
   };
 
-  const handleDoneAfterSuccess = () => {
-    setSubmitted(false);
-    onClose();
-    resetFormState();
-  };
+  const overlay =
+    'fixed inset-0 z-[999999] bg-slate-900/55 backdrop-blur-md flex items-start sm:items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200';
+  const card = 'relative my-auto w-full rounded-[26px] overflow-hidden bg-white shadow-[0_30px_80px_-20px_rgba(15,31,75,0.45)] animate-in zoom-in-95 duration-200';
 
-  const overlay = 'fixed inset-0 z-[999999] bg-[#0f0c29]/70 backdrop-blur-md flex items-start sm:items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200';
-  const headerGradient = { backgroundImage: 'linear-gradient(100deg, #2a2c7c 0%, #4b35a0 38%, #9b3f9d 68%, #e2508f 88%, #f06a9c 100%)' };
+  const closeButton = (
+    <button
+      type="button"
+      onClick={handleCloseModal}
+      className="absolute top-4 right-4 z-20 w-11 h-11 rounded-full bg-white shadow-md flex items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+      aria-label="Close"
+    >
+      <X className="w-6 h-6" style={{ color: NAVY }} strokeWidth={2.5} />
+    </button>
+  );
 
-  // Soft blobs behind the header text, as in the design.
-  const blobs = (
-    <>
-      <div className="absolute -left-10 bottom-0 w-64 h-32 rounded-full bg-[#5a3fb0]/50 blur-2xl pointer-events-none" />
-      <div className="absolute left-1/3 -top-16 w-72 h-40 rounded-full bg-[#7b45b8]/40 blur-3xl pointer-events-none" />
-      <div className="absolute right-24 top-6 w-56 h-40 rounded-[40%] bg-[#f37bab]/35 blur-2xl pointer-events-none" />
-      <div className="absolute right-0 bottom-2 w-72 h-24 rounded-full bg-[#ff9cc0]/40 blur-2xl pointer-events-none" />
-    </>
+  const logo = (
+    <div className="flex items-center justify-center gap-2.5">
+      <img src="/logo-icon-light.png" alt="" className="h-12 w-12 sm:h-[60px] sm:w-[60px] object-contain" />
+      <div className="text-left leading-none" style={{ color: NAVY }}>
+        <div className="font-serif font-black text-2xl sm:text-[30px] tracking-tight">Let’s do it!</div>
+        <div className="font-serif text-lg sm:text-xl mt-1 ml-3">Vietnam</div>
+      </div>
+    </div>
   );
 
   if (submitted) {
     return createPortal(
       <div className={overlay}>
-        <div className="relative my-auto w-full max-w-md rounded-[28px] overflow-hidden bg-white shadow-2xl border border-white/40 animate-in zoom-in-95 duration-200">
-          <div className="relative px-8 pt-8 pb-14 text-center text-white overflow-hidden" style={headerGradient}>
-            {blobs}
-            <div className="relative w-16 h-16 mx-auto rounded-full bg-white/20 flex items-center justify-center">
-              <CheckCircle2 className="w-9 h-9 text-white" />
-            </div>
+        <div className={`${card} max-w-md px-8 py-9 text-center`}>
+          {closeButton}
+          {logo}
+          <div className="w-16 h-16 mx-auto mt-6 mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#fde7f1' }}>
+            <CheckCircle2 className="w-9 h-9" style={{ color: PINK }} />
           </div>
-          <div className="relative -mt-7 rounded-t-[28px] bg-white px-8 pt-7 pb-8 text-center">
-            <h3 className="text-2xl font-extrabold mb-2" style={{ color: NAVY, fontFamily: 'Poppins, sans-serif' }}>
-              Registration Successful!
-            </h3>
-            <p className="text-[15px] text-slate-600 mb-6">
-              Thank you{fullName ? `, ${fullName}` : ''}! Your registration has been recorded and synced. We'll be in touch soon.
-            </p>
-            <button
-              type="button"
-              onClick={handleDoneAfterSuccess}
-              className="w-full h-14 rounded-2xl text-white font-bold text-base shadow-lg hover:brightness-110 transition cursor-pointer"
-              style={headerGradient}
-            >
-              Done
-            </button>
-          </div>
+          <h3 className="text-2xl font-extrabold mb-2" style={{ color: NAVY }}>
+            Registration successful!
+          </h3>
+          <p className="text-[15px] text-slate-600 mb-6">
+            Thank you{fullName ? `, ${fullName}` : ''}! Your registration has been recorded. We'll be in touch soon.
+          </p>
+          <button
+            type="button"
+            onClick={handleCloseModal}
+            className="w-full h-12 rounded-full text-white font-bold text-base shadow-lg hover:brightness-110 transition cursor-pointer"
+            style={{ backgroundColor: PINK }}
+          >
+            Done
+          </button>
         </div>
       </div>,
       document.body
@@ -307,196 +302,266 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
 
   return createPortal(
     <div className={overlay} onMouseDown={(e) => e.target === e.currentTarget && handleCloseModal()}>
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="volunteer-modal-title"
-        className="relative my-auto w-full max-w-[940px] rounded-[28px] overflow-hidden bg-white shadow-[0_30px_80px_-20px_rgba(15,12,41,0.6)] border border-white/40 animate-in zoom-in-95 duration-200"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="relative px-6 sm:px-11 pt-6 sm:pt-7 pb-14 text-white overflow-hidden" style={headerGradient}>
-          {blobs}
-          <div className="absolute right-3 top-16 w-24 h-20 sm:right-16 sm:top-6 sm:w-44 sm:h-36 pointer-events-none opacity-90 sm:opacity-100">
-            <HeartInHand />
-          </div>
-          <button
-            type="button"
-            onClick={handleCloseModal}
-            className="absolute top-4 right-4 sm:top-5 sm:right-5 z-10 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Close"
-          >
-            <X className="w-6 h-6 text-white" />
-          </button>
+      <div role="dialog" aria-modal="true" aria-labelledby="volunteer-modal-title" className={`${card} max-w-[960px]`} onClick={(e) => e.stopPropagation()}>
+        {closeButton}
 
-          <div className="relative flex items-center gap-3">
-            <img src="/logo-icon-light.png" alt="" className="h-12 w-12 sm:h-16 sm:w-16 object-contain" />
-            <div className="leading-none">
-              <div className="font-serif font-black text-xl sm:text-[28px] tracking-tight">Let’s do it!</div>
-              <div className="font-serif text-base sm:text-[22px] text-white/90 mt-1">Vietnam</div>
-            </div>
+        {/* Header: sky, greenery and leaves on the left, volunteers in a circle on the right */}
+        <div className="relative px-5 sm:px-10 pt-7 pb-8 text-center overflow-hidden" style={{ background: 'linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #ffffff 100%)' }}>
+          <div className="absolute left-2 top-4 w-40 h-16 rounded-full bg-white/80 blur-xl pointer-events-none" />
+          <div className="absolute -left-12 top-28 w-48 h-40 rounded-full bg-[#5e9e45]/50 blur-2xl pointer-events-none" />
+          <div className="absolute left-20 top-36 w-44 h-32 rounded-full bg-[#8fc26f]/45 blur-2xl pointer-events-none" />
+          <div className="absolute left-48 top-44 w-40 h-24 rounded-full bg-[#b9d99b]/40 blur-2xl pointer-events-none" />
+          <svg viewBox="0 0 960 80" preserveAspectRatio="none" className="absolute left-0 bottom-0 w-full h-16 pointer-events-none" aria-hidden>
+            <path d="M0 80 L0 38 C 120 0, 300 8, 470 60 C 520 74, 560 80, 600 80 Z" fill="#fff" />
+            <rect x="0" y="70" width="960" height="10" fill="#fff" />
+          </svg>
+          <LeafArt className="hidden sm:block absolute left-14 top-16 w-16 h-20 pointer-events-none" style={{ transform: 'rotate(-35deg)' }} />
+          <LeafArt className="hidden sm:block absolute left-36 top-24 w-8 h-11 pointer-events-none" style={{ transform: 'rotate(25deg)' }} />
+
+          <div className="hidden sm:block absolute -right-10 -top-8 w-[250px] h-[250px] rounded-full overflow-hidden pointer-events-none">
+            <img src="/images/who-we-are/hero.jpg" alt="" className="w-full h-full object-cover" style={{ objectPosition: '60% 40%' }} />
           </div>
-          <h3
-            id="volunteer-modal-title"
-            className="relative mt-3 sm:mt-4 text-[28px] leading-tight sm:text-[46px] sm:leading-[1.1] font-extrabold tracking-tight pr-24 sm:pr-56"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
-          >
-            Register to Join a Project
-          </h3>
-          <p className="relative mt-1.5 text-sm sm:text-lg text-white/90 pr-24 sm:pr-56">Your information will automatically sync to the Admin's Google Sheets</p>
+          <div className="hidden sm:block absolute right-[235px] top-8 pointer-events-none" aria-hidden>
+            <span className="absolute block w-2 h-7 rounded-full rotate-[-30deg]" style={{ backgroundColor: PINK, left: 18, top: 0 }} />
+            <span className="absolute block w-2 h-7 rounded-full rotate-[-60deg]" style={{ backgroundColor: PINK, left: 0, top: 22 }} />
+            <span className="absolute block w-7 h-2 rounded-full" style={{ backgroundColor: PINK, left: -6, top: 50 }} />
+          </div>
+          <LeafArt className="hidden sm:block absolute right-[215px] top-[165px] w-9 h-12 pointer-events-none" style={{ transform: 'rotate(-60deg)' }} />
+
+          <div className="relative">
+            {logo}
+            <h3 id="volunteer-modal-title" className="mt-4 text-[28px] sm:text-[40px] leading-tight font-extrabold" style={{ color: NAVY }}>
+              Register to Volunteer
+            </h3>
+            <p className="mt-1 text-[15px] sm:text-[17px]" style={{ color: '#34406b' }}>
+              Be part of a cleaner, greener and more beautiful Vietnam!
+            </p>
+            <div className="mx-auto mt-4 w-16 h-1 rounded-full" style={{ backgroundColor: PINK }} />
+          </div>
         </div>
 
-        {/* Body: white panel with rounded top corners over the header */}
-        <form onSubmit={handleSubmit} className="relative -mt-7 rounded-t-[28px] bg-white px-5 sm:px-11 pt-7 sm:pt-8 pb-8 space-y-6">
-          {/* Project */}
-          <div>
-            <Label Icon={Layers} required htmlFor="vm-event">
-              1. Select the Project / Campaign to Join
-            </Label>
-            <div className="relative">
-              <UsersRound className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 pointer-events-none" style={{ color: PURPLE }} fill="currentColor" stroke="#f6f4ff" strokeWidth={1.5} />
-              <select
-                id="vm-event"
-                required
-                value={eventId}
-                onChange={(e) => setEventId(e.target.value)}
-                className="w-full h-[60px] pl-16 pr-12 rounded-2xl border border-[#d9d3f5] bg-[#f6f4ff] text-base sm:text-[17px] font-semibold appearance-none outline-none cursor-pointer truncate focus:border-[#7c4dff] focus:ring-4 focus:ring-[#7c4dff]/10"
-                style={{ color: NAVY }}
-              >
-                {events.map((evt) => (
-                  <option key={evt.id} value={evt.id}>
-                    {evt.title}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none" style={{ color: NAVY }} />
-            </div>
-          </div>
-
-          {/* Name / phone */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-            <div>
-              <Label Icon={User} required filled htmlFor="vm-name">
-                Full Name
-              </Label>
-              <input id="vm-name" type="text" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} />
-            </div>
-            <div>
-              <Label Icon={Phone} filled htmlFor="vm-phone">
-                Phone Number
-              </Label>
-              <input
-                id="vm-phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                maxLength={10}
-                value={phone}
-                onChange={handlePhoneChange}
-                className={`${inputClass} ${phoneError ? '!border-red-400 !bg-red-50/50' : phone.length === 10 ? '!border-emerald-500' : ''}`}
-              />
-              {phoneError && (
-                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                  <span>{phoneError}</span>
-                </p>
-              )}
-            </div>
-
-            {/* Email / birth year */}
-            <div>
-              <Label Icon={Mail} required htmlFor="vm-email">
-                Email Address
-              </Label>
-              <input id="vm-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
-            </div>
-            <div>
-              <Label Icon={CalendarDays} required htmlFor="vm-birth">
-                Birth Year
-              </Label>
-              <input
-                id="vm-birth"
-                type="number"
-                required
-                min="1920"
-                max={currentYear - 6}
-                value={birthYear}
-                onChange={handleBirthYearChange}
-                className={inputClass}
-              />
-              {birthYear.length === 4 && calculatedAge === null && (
-                <p className="text-xs text-red-500 mt-1.5 font-medium">Invalid birth year (must be between 1920 and {currentYear - 6})</p>
-              )}
-            </div>
-          </div>
-
-          {/* Address */}
-          <div>
-            <Label Icon={MapPin} required filled htmlFor="vm-address">
-              Address / City
-            </Label>
-            <input id="vm-address" type="text" required autoComplete="address-level2" value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
-          </div>
-
-          {/* Skills */}
-          <div>
-            <Label Icon={Settings}>Skills or roles you'd like to help with:</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-              {SKILLS.map(({ label, Icon, color, tint }) => {
-                const checked = selectedSkills.includes(label);
+        <form onSubmit={handleSubmit} className="px-5 sm:px-10 pb-8 space-y-6">
+          {/* Join as */}
+          <section>
+            <SectionTitle icon="groups">Join as</SectionTitle>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5" role="radiogroup" aria-label="Join as">
+              {JOIN_OPTIONS.map(({ value, title, desc, icon }) => {
+                const checked = joinAs === value;
                 return (
                   <label
-                    key={label}
-                    className={`flex items-center gap-4 h-[60px] px-5 rounded-2xl border cursor-pointer transition-colors ${
-                      checked ? 'border-[#7c4dff] bg-[#faf7ff]' : 'border-[#e6e3f3] bg-white hover:bg-[#fbfaff]'
-                    }`}
+                    key={value}
+                    className="relative flex items-center gap-4 p-4 min-h-[88px] rounded-xl border cursor-pointer transition-colors"
+                    style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
                   >
-                    <input type="checkbox" checked={checked} onChange={() => handleSkillToggle(label)} className="w-5 h-5 shrink-0 accent-[#6d3fe0] cursor-pointer" />
-                    <span className="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" style={{ backgroundColor: tint }}>
-                      <Icon
-                        className="w-6 h-6"
-                        style={{ color }}
-                        fill={Icon === Plus ? 'none' : 'currentColor'}
-                        stroke={Icon === Plus ? 'currentColor' : tint}
-                        strokeWidth={Icon === Plus ? 4 : 1.5}
-                      />
+                    <input type="radio" name="joinAs" value={value} checked={checked} onChange={() => setJoinAs(value)} className="sr-only" />
+                    <Icon name={icon} color={checked ? PINK : NAVY} className="w-12 h-12 shrink-0" />
+                    <span className="flex-1 pr-6">
+                      <span className="block font-bold text-[16px] sm:text-[17px]" style={{ color: NAVY }}>
+                        {title}
+                      </span>
+                      <span className="block text-sm text-slate-500 leading-snug">{desc}</span>
                     </span>
-                    <span className="text-[15px] sm:text-base" style={{ color: '#2b2a4a' }}>
-                      {label}
+                    <span className="absolute top-4 right-4">
+                      <RadioMark checked={checked} />
                     </span>
                   </label>
                 );
               })}
             </div>
-            <div className="relative mt-3">
-              <Pencil className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Other role / skill (if any)..."
-                value={customRole}
-                onChange={(e) => setCustomRole(e.target.value)}
-                className={`${inputClass} !pl-14 placeholder:!text-[#2b2a4a]`}
-              />
+          </section>
+
+          {/* Project */}
+          <section>
+            <SectionTitle icon="assignment">Project or campaign</SectionTitle>
+            <IconField icon="calendar" chevron>
+              <select
+                required
+                value={eventId}
+                onChange={(e) => setEventId(e.target.value)}
+                className={`${fieldClass} appearance-none cursor-pointer pr-12 truncate ${eventId ? '' : 'text-slate-400'}`}
+                style={eventId ? { color: NAVY } : undefined}
+                aria-label="Project or campaign"
+              >
+                <option value="" disabled>
+                  Select a project or campaign
+                </option>
+                {events.map((evt) => (
+                  <option key={evt.id} value={evt.id} style={{ color: NAVY }}>
+                    {evt.title}
+                  </option>
+                ))}
+              </select>
+            </IconField>
+          </section>
+
+          <hr className="border-[#e3e8f0]" />
+
+          {/* Personal information */}
+          <section>
+            <SectionTitle icon="person">Personal information</SectionTitle>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+              <div>
+                <FieldLabel htmlFor="vm-name" required>
+                  {isTeam ? 'Contact person' : 'Full name'}
+                </FieldLabel>
+                <IconField icon="person">
+                  <input
+                    id="vm-name"
+                    required
+                    autoComplete="name"
+                    placeholder={isTeam ? 'Enter the contact person’s full name' : 'Enter your full name'}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className={fieldClass}
+                  />
+                </IconField>
+              </div>
+              <div>
+                <FieldLabel htmlFor="vm-phone" required>
+                  Phone number
+                </FieldLabel>
+                <IconField icon="phone">
+                  <input
+                    id="vm-phone"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel"
+                    required
+                    maxLength={10}
+                    placeholder="Enter your phone number"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    className={`${fieldClass} ${phoneError ? '!border-red-400 !bg-red-50/40' : ''}`}
+                  />
+                </IconField>
+                {phoneError && (
+                  <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {phoneError}
+                  </p>
+                )}
+              </div>
+              <div>
+                <FieldLabel htmlFor="vm-email" required>
+                  Email address
+                </FieldLabel>
+                <IconField icon="mail">
+                  <input id="vm-email" type="email" required autoComplete="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldClass} />
+                </IconField>
+              </div>
+              {/* A group or organization has no birth year: its name goes here instead. */}
+              {isTeam ? (
+                <div>
+                  <FieldLabel htmlFor="vm-org" required>
+                    {teamWord} name
+                  </FieldLabel>
+                  <IconField icon={joinAs === 'organization' ? 'apartment' : 'groups'}>
+                    <input
+                      id="vm-org"
+                      required
+                      autoComplete="organization"
+                      placeholder={joinAs === 'organization' ? 'Enter your company or organization name' : 'Enter your group name'}
+                      value={organizationName}
+                      onChange={(e) => setOrganizationName(e.target.value)}
+                      className={fieldClass}
+                    />
+                  </IconField>
+                </div>
+              ) : (
+                <div>
+                  <FieldLabel htmlFor="vm-birth" required>
+                    Year of birth
+                  </FieldLabel>
+                  <IconField icon="calendar" chevron>
+                    <select
+                      id="vm-birth"
+                      required
+                      value={birthYear}
+                      onChange={(e) => setBirthYear(e.target.value)}
+                      className={`${fieldClass} appearance-none cursor-pointer pr-12 ${birthYear ? '' : 'text-slate-400'}`}
+                      style={birthYear ? { color: NAVY } : undefined}
+                    >
+                      <option value="" disabled>
+                        Select your year of birth
+                      </option>
+                      {years.map((y) => (
+                        <option key={y} value={y} style={{ color: NAVY }}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </IconField>
+                </div>
+              )}
+              <div className="sm:col-span-2">
+                <FieldLabel htmlFor="vm-address" required>
+                  Address
+                </FieldLabel>
+                <IconField icon="place">
+                  <input id="vm-address" required autoComplete="street-address" placeholder="Enter your address" value={address} onChange={(e) => setAddress(e.target.value)} className={fieldClass} />
+                </IconField>
+              </div>
             </div>
-          </div>
+          </section>
 
-          {/* Notes */}
-          <div>
-            <Label Icon={MessageCircleMore} filled htmlFor="vm-notes">
-              Notes / Additional Message (optional)
-            </Label>
-            <textarea id="vm-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className={`${inputClass} !h-auto py-3 resize-y`} />
-          </div>
+          <hr className="border-[#e3e8f0]" />
 
-          <button
-            type="submit"
-            disabled={phone.length > 0 && phone.length !== 10}
-            className="w-full h-14 rounded-2xl text-white font-bold text-base sm:text-lg shadow-lg shadow-[#9b3f9d]/25 hover:brightness-110 transition cursor-pointer flex items-center justify-center gap-2.5 disabled:opacity-60 disabled:cursor-not-allowed"
-            style={headerGradient}
-          >
-            <span>Confirm Volunteer Registration</span>
-            <Send className="w-5 h-5" />
-          </button>
+          {/* Preferred role */}
+          <section>
+            <SectionTitle icon="work">Preferred role</SectionTitle>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5" role="radiogroup" aria-label="Preferred role">
+              {ROLES.map(({ value, icon }) => {
+                const checked = role === value;
+                return (
+                  <label
+                    key={value}
+                    className="relative flex flex-col items-center justify-center gap-1.5 h-[78px] rounded-xl border cursor-pointer transition-colors"
+                    style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
+                  >
+                    <input type="radio" name="role" value={value} checked={checked} onChange={() => setRole(value)} className="sr-only" />
+                    <Icon name={icon} color={checked ? PINK : NAVY} className="w-8 h-8" />
+                    <span className="font-bold text-[15px] sm:text-base" style={{ color: NAVY }}>
+                      {value}
+                    </span>
+                    <span className="absolute top-3 right-3">
+                      <RadioMark checked={checked} />
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Number of participants */}
+          <section>
+            <SectionTitle icon="groups" note="(Only required for Group or Organization)">
+              Number of participants
+            </SectionTitle>
+            <IconField icon="groups">
+              <input
+                type="number"
+                min={1}
+                required={isTeam}
+                inputMode="numeric"
+                placeholder="Enter number of participants"
+                value={participants}
+                onChange={(e) => setParticipants(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                className={fieldClass}
+                aria-label="Number of participants"
+              />
+            </IconField>
+          </section>
+
+          <div className="flex justify-center pt-1">
+            <button
+              type="submit"
+              className="w-full sm:w-[430px] h-12 rounded-full text-white font-bold text-base sm:text-lg shadow-lg shadow-[#e8197c]/30 hover:brightness-110 transition cursor-pointer flex items-center justify-center gap-2.5"
+              style={{ backgroundColor: PINK }}
+            >
+              <UserPlus className="w-5 h-5" />
+              <span>Register to Volunteer</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>,
