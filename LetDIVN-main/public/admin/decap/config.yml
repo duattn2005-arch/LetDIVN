@@ -1,6 +1,9 @@
-# Decap CMS — the only place the site is edited: the text and images of every
-# page, Cleanup Map events, News, Videos, Partners, Team, Gallery, What We Do,
-# Who We Are sections and Media on Us. The site itself has no login.
+# Decap CMS (/admin/decap/) — the text and images of every page, Cleanup Map
+# events, News, Videos, Partners, Team, Gallery, What We Do, Who We Are
+# sections and Media on Us. The site itself has no login.
+# This file also describes the collections and fields of the WordPress-style
+# editor at /admin/ (server/routes/wpAdmin.ts reads it), which commits to the
+# same files — so both editors always show the same content.
 # Every save is a commit to the GitHub repo below; the live site reads the
 # content from GitHub (server/cmsContent.ts), so there is no rebuild step.
 #
@@ -533,6 +536,13 @@ collections:
             summary: '{{fields.value}}'
             fields:
               - { label: Đoạn văn, name: value, widget: text }
+          # Paragraphs with bold/headings/lists, written in the WordPress-style editor at /admin/.
+          - label: Đoạn văn có định dạng (HTML)
+            name: html
+            widget: object
+            summary: '{{fields.value}}'
+            fields:
+              - { label: HTML, name: value, widget: text }
           - label: Ảnh
             name: image
             widget: object

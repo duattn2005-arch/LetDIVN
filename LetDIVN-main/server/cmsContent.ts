@@ -34,13 +34,13 @@ const localContentDir = path.join(appRoot, 'content');
 const localPublicDir = path.join(appRoot, 'public');
 const mediaCacheDir = path.join(__dirname, 'data', 'cms-media-cache');
 
-const REPO = process.env.CMS_GITHUB_REPO || 'duattn2005-arch/LetDIVN';
-const BRANCH = process.env.CMS_GITHUB_BRANCH || 'main';
+export const REPO = process.env.CMS_GITHUB_REPO || 'duattn2005-arch/LetDIVN';
+export const BRANCH = process.env.CMS_GITHUB_BRANCH || 'main';
 /** Folder of this app inside the repo (the repo root holds LetDIVN-main/, code/, ...). */
-const REPO_APP_DIR = process.env.CMS_GITHUB_APP_DIR ?? 'LetDIVN-main';
+export const REPO_APP_DIR = process.env.CMS_GITHUB_APP_DIR ?? 'LetDIVN-main';
 const CACHE_TTL_MS = 90 * 1000;
 
-const repoPath = (p: string) => (REPO_APP_DIR ? `${REPO_APP_DIR}/${p}` : p);
+export const repoPath = (p: string) => (REPO_APP_DIR ? `${REPO_APP_DIR}/${p}` : p);
 
 type Doc = Record<string, any>;
 type Folder = Map<string, Doc>; // file slug -> parsed JSON
@@ -160,6 +160,11 @@ async function getSnapshot(): Promise<Snapshot> {
   return githubSnapshot ?? readLocalSnapshot();
 }
 
+/** Called after the admin editor commits: the next request re-reads GitHub instead of waiting out the cache. */
+export function invalidateCmsSnapshot() {
+  fetchedAt = 0;
+}
+
 async function getFolder(name: string): Promise<[string, Doc][]> {
   return [...((await getSnapshot()).get(name) ?? new Map())];
 }
@@ -181,10 +186,25 @@ async function getList<T>(folder: string, idPrefix: string, map: (doc: Doc) => O
     .map((x) => x.item);
 }
 
+/** Formatted paragraphs (written in the admin editor) as plain text. */
+const htmlToText = (html: string) =>
+  html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|h[1-6]|li|blockquote)>/gi, '\n\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
 export async function getNews(): Promise<NewsArticle[]> {
   const articles = (await getFolder('news')).map(([slug, doc]): NewsArticle => {
     const contentBlocks: NewsContentBlock[] = (Array.isArray(doc.contentBlocks) ? doc.contentBlocks : []).filter(
-      (b: any): b is NewsContentBlock => !!b && (b.type === 'text' || b.type === 'image') && typeof b.value === 'string' && b.value !== ''
+      (b: any): b is NewsContentBlock => !!b && ['text', 'html', 'image'].includes(b.type) && typeof b.value === 'string' && b.value !== ''
     );
     return {
       // Migrated articles keep their original id: the homepage news picker stores selections by id.
@@ -194,7 +214,10 @@ export async function getNews(): Promise<NewsArticle[]> {
       category: doc.category || 'News',
       summary: str(doc.summary),
       // Plain-text copy of the body, for consumers that search/preview text.
-      content: contentBlocks.filter((b) => b.type === 'text').map((b) => b.value).join('\n\n'),
+      content: contentBlocks
+        .filter((b) => b.type !== 'image')
+        .map((b) => (b.type === 'html' ? htmlToText(b.value) : b.value))
+        .join('\n\n'),
       contentBlocks,
       author: str(doc.author),
       date: str(doc.date),
@@ -406,6 +429,20 @@ const IMAGE_TYPES: Record<string, string> = {
  * once from GitHub and cached on disk. Mounted after the static-file handler,
  * so deployed images never reach this.
  */
+/**
+ * Puts a file just committed under public/images/{cms,news}/ into the media
+ * cache, so it is served right away instead of waiting for GitHub's raw CDN.
+ */
+export function rememberCmsMedia(publicPath: string, body: Buffer) {
+  const match = /^\/images\/(cms|news)\/(.+)$/.exec(publicPath);
+  if (!match) return;
+  const parts = match[2].split('/');
+  if (parts.some((p) => !p || p === '.' || p === '..' || p.includes('\\'))) return;
+  const cached = path.join(mediaCacheDir, match[1], ...parts);
+  fs.mkdirSync(path.dirname(cached), { recursive: true });
+  fs.writeFileSync(cached, body);
+}
+
 export const cmsMediaRouter = Router();
 cmsMediaRouter.get(['/images/news/*file', '/images/cms/*file'], async (req, res, next) => {
   const top = req.path.startsWith('/images/news/') ? 'news' : 'cms';

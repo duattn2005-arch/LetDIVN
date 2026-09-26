@@ -16,6 +16,7 @@ import contentRoutes from './routes/content.js';
 import statsRoutes from './routes/stats.js';
 import geocodeRoutes from './routes/geocode.js';
 import decapAuthRoutes from './routes/decapAuth.js';
+import wpAdminRoutes from './routes/wpAdmin.js';
 
 // Single router mounted at /api in both the Vite dev server plugin and the
 // production server.ts, mirroring how googleSheetsMiddleware is dual-mounted
@@ -28,3 +29,4 @@ apiRouter.use(contentRoutes);
 apiRouter.use(statsRoutes);
 apiRouter.use(geocodeRoutes);
 apiRouter.use(decapAuthRoutes);
+apiRouter.use(wpAdminRoutes);

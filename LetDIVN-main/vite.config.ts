@@ -46,6 +46,15 @@ export default defineConfig(() => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    // Two pages: the site, and the WordPress-style editor at /admin/ (src/admin/).
+    build: {
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+          admin: path.resolve(__dirname, 'admin/index.html'),
+        },
+      },
+    },
     server: {
       host: true,
       hmr: process.env.DISABLE_HMR !== 'true',

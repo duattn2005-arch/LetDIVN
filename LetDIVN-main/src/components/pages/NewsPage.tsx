@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { dbService } from '../../services/dbService';
 import { NewsArticle } from '../../types';
 import { ArrowRight, ArrowLeft, Clock } from 'lucide-react';
@@ -133,6 +134,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
                     {selectedArticle.contentBlocks.map((block, i) =>
                       block.type === 'image' ? (
                         <img key={i} src={block.value} alt={selectedArticle.title} className="w-full" />
+                      ) : block.type === 'html' ? (
+                        <div
+                          key={i}
+                          className="ref-body news-html"
+                          style={{ color: '#7A7A7A', fontSize: '18px', lineHeight: 1.32 }}
+                          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.value) }}
+                        />
                       ) : (
                         <p key={i} className="ref-body whitespace-pre-line" style={{ color: '#7A7A7A', fontSize: '18px', lineHeight: 1.32 }}>
                           {block.value}

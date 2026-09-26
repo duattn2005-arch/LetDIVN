@@ -30,34 +30,41 @@ router.get('/decap/auth', (req, res) => {
   sendLoginForm(res);
 });
 
-router.post('/decap/login', express.urlencoded({ extended: false }), (req, res) => {
-  const ip = req.ip || 'unknown';
+/**
+ * Checks the shared admin username/password (also used by the editor at
+ * /admin/, see wpAdmin.ts), locking an IP out for 15 minutes after 5 misses.
+ * Returns an error message, or null when the login is right.
+ */
+export function checkAdminLogin(ip: string, username: string, password: string): string | null {
   const now = Date.now();
   const record = failedLogins.get(ip);
   if (record && record.count >= MAX_FAILED_LOGINS && record.until > now) {
-    sendLoginForm(res, 'Sai quá nhiều lần. Vui lòng thử lại sau 15 phút.');
-    return;
+    return 'Sai quá nhiều lần. Vui lòng thử lại sau 15 phút.';
   }
 
-  const username = String(req.body?.username ?? '');
-  const password = String(req.body?.password ?? '');
   const expectedUsername = process.env.DECAP_ADMIN_USERNAME || 'admin';
   const expectedPassword = process.env.DECAP_ADMIN_PASSWORD;
-  const token = process.env.DECAP_ADMIN_GITHUB_TOKEN;
-  if (!expectedPassword || !token) {
-    sendLoginForm(res, 'Chưa cấu hình tài khoản admin trên server.');
-    return;
+  if (!expectedPassword || !process.env.DECAP_ADMIN_GITHUB_TOKEN) {
+    return 'Chưa cấu hình tài khoản admin trên server.';
   }
 
   if (!safeEqual(username, expectedUsername) || !safeEqual(password, expectedPassword)) {
     const count = record && record.until > now ? record.count + 1 : 1;
     failedLogins.set(ip, { count, until: now + LOCKOUT_MS });
-    sendLoginForm(res, 'Sai tên đăng nhập hoặc mật khẩu.');
-    return;
+    return 'Sai tên đăng nhập hoặc mật khẩu.';
   }
 
   failedLogins.delete(ip);
-  sendResult(res, 'success', { token, provider: 'github' });
+  return null;
+}
+
+router.post('/decap/login', express.urlencoded({ extended: false }), (req, res) => {
+  const error = checkAdminLogin(req.ip || 'unknown', String(req.body?.username ?? ''), String(req.body?.password ?? ''));
+  if (error) {
+    sendLoginForm(res, error);
+    return;
+  }
+  sendResult(res, 'success', { token: process.env.DECAP_ADMIN_GITHUB_TOKEN!, provider: 'github' });
 });
 
 router.get('/decap/github', (req, res) => {
@@ -110,7 +117,7 @@ router.get('/decap/callback', async (req, res) => {
 });
 
 /** Compares via fixed-length digests so neither length nor content leaks through timing. */
-function safeEqual(a: string, b: string): boolean {
+export function safeEqual(a: string, b: string): boolean {
   const digest = (v: string) => createHash('sha256').update(v).digest();
   return timingSafeEqual(digest(a), digest(b));
 }

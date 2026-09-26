@@ -39,7 +39,8 @@ export interface CleanupEvent {
 }
 
 export interface NewsContentBlock {
-  type: 'text' | 'image';
+  /** text = plain paragraphs; html = formatted paragraphs from the admin editor. */
+  type: 'text' | 'html' | 'image';
   value: string;
 }
 

@@ -26,6 +26,18 @@ h1, h2, h3, h4 {
   font-family: 'Poppins', sans-serif;
 }
 
+/* Formatted news paragraphs written in the admin editor (NewsContentBlock type "html"). */
+.news-html > * + * { margin-top: 1em; }
+.news-html h2 { font-size: 1.5em; font-weight: 700; color: #54595F; }
+.news-html h3 { font-size: 1.25em; font-weight: 700; color: #54595F; }
+.news-html h4 { font-size: 1.1em; font-weight: 700; color: #54595F; }
+.news-html ul { list-style: disc; padding-left: 1.5em; }
+.news-html ol { list-style: decimal; padding-left: 1.5em; }
+.news-html li + li { margin-top: 0.25em; }
+.news-html blockquote { border-left: 4px solid #E81A7F; padding-left: 1em; font-style: italic; }
+.news-html a { color: #E81A7F; text-decoration: underline; }
+.news-html hr { border-top: 1px solid #e2e8f0; }
+
 /* Reference-site News card typography (letsdoitvietnam.org/news/) */
 .ref-news-title {
   font-family: 'Roboto', sans-serif;
