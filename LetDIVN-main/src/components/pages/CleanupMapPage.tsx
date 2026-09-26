@@ -946,23 +946,21 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           mobileTab === 'map' ? 'hidden lg:flex' : 'flex flex-1 max-h-full lg:max-h-[calc(100vh-140px)]'
         }`}>
           
-          {/* Quick Info & Selected Boundary Status */}
-          <div className="p-4 border-b border-slate-800 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">
-                <EditableText contentKey="cleanupMap.locationLabel" defaultValue="Map Location" as="span" />
-              </span>
-              {searchedPlaceName && (
+          {/* The searched place's boundary status: only shown once a place was searched. */}
+          {searchedPlaceName && (
+            <div className="p-4 border-b border-slate-800 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">
+                  <EditableText contentKey="cleanupMap.locationLabel" defaultValue="Map Location" as="span" />
+                </span>
                 <button
                   onClick={handleResetView}
                   className="text-[11px] font-bold text-pink-400 hover:text-pink-300 cursor-pointer"
                 >
                   <EditableText contentKey="cleanupMap.clearBoundaryBtn" defaultValue="Clear boundary" as="span" />
                 </button>
-              )}
-            </div>
+              </div>
 
-            {searchedPlaceName ? (
               <div className="p-3 rounded-2xl bg-red-950/40 border border-red-500/50 text-white space-y-1">
                 <div className="flex items-center gap-1.5 text-red-400 font-extrabold text-xs">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
@@ -973,12 +971,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 </div>
                 <EditableText contentKey="cleanupMap.boundaryDrawnHint" defaultValue="A red dashed boundary has been drawn on the map." as="div" multiline className="text-[10px] text-slate-400" />
               </div>
-            ) : (
-              <div className="p-3 rounded-2xl bg-slate-800/60 border border-slate-700/60 text-slate-400 text-xs">
-                💡 <EditableText contentKey="cleanupMap.searchHint" defaultValue="Use the search bar above the map to find any school, hospital, province or landmark." as="span" multiline />
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Cleanup Campaign Spots List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">

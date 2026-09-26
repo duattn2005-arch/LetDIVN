@@ -231,7 +231,6 @@ collections:
           - { label: "Mobile Tab Map", name: "mobileTabMap", widget: string, required: false }
           - { label: "Mobile Tab List", name: "mobileTabList", widget: string, required: false }
           - { label: "Location Label", name: "locationLabel", widget: string, required: false }
-          - { label: "Search Hint", name: "searchHint", widget: text, required: false }
           - { label: "Featured Spots Label", name: "featuredSpotsLabel", widget: string, required: false }
           - { label: "Tap To Zoom Hint", name: "tapToZoomHint", widget: string, required: false }
           - { label: "Layer Streets", name: "layerStreets", widget: string, required: false }
