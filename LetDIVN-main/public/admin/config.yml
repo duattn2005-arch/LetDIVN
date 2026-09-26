@@ -70,11 +70,9 @@ collections:
             name: "slide1"
             widget: object
             collapsed: true
-            summary: "{{fields.title}}"
+            summary: "{{fields.est}}"
             fields:
-              - { label: "Ảnh nền", name: "bgImage", widget: image, required: false, choose_url: true }
-              - { label: "Tiêu đề", name: "title", widget: string, required: false }
-              - { label: "Mô tả", name: "desc", widget: text, required: false }
+              - { label: "Ảnh banner", name: "bgImage", widget: image, required: false, choose_url: true }
               - { label: "Dòng \"EST.\"", name: "est", widget: string, required: false }
       - label: "Trang chủ · Ô liên kết & Tin tức"
         name: "home"
