@@ -539,6 +539,7 @@ router.put('/wp/volunteers/:id', (req, res) => {
     const n = parseInt(body.participants, 10);
     updates.participants = Number.isFinite(n) && n > 0 ? Math.min(n, 100000) : 1;
   }
+  if ((updates.joinAs ?? existing.joinAs ?? 'individual') === 'individual') updates.participants = 1;
   if (typeof updates.preferredRole === 'string') updates.skills = updates.preferredRole ? [updates.preferredRole] : [];
   if (!updates.eventId) delete updates.eventId; // event_id is NOT NULL
   const saved = volunteers.update(existing.id, updates as any)!;

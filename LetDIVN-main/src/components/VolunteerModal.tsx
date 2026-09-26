@@ -45,10 +45,10 @@ const Icon: React.FC<{ name: IconName; color: string; className?: string }> = ({
   </svg>
 );
 
-const JOIN_OPTIONS: { value: JoinAs; title: string; desc: string; icon: IconName }[] = [
-  { value: 'individual', title: 'Individual', desc: 'I will join by myself', icon: 'person' },
-  { value: 'group', title: 'Group', desc: 'I will join with a group', icon: 'groups' },
-  { value: 'organization', title: 'Organization', desc: 'I represent a company or organization', icon: 'apartment' },
+const JOIN_OPTIONS: { value: JoinAs; title: string; icon: IconName }[] = [
+  { value: 'individual', title: 'Individual', icon: 'person' },
+  { value: 'group', title: 'Group', icon: 'groups' },
+  { value: 'organization', title: 'Organization', icon: 'apartment' },
 ];
 
 const ROLES: { value: string; icon: IconName }[] = [
@@ -83,13 +83,10 @@ const LeafArt: React.FC<{ className?: string; style?: React.CSSProperties }> = (
   </svg>
 );
 
-const SectionTitle: React.FC<{ icon: IconName; children: React.ReactNode; note?: string }> = ({ icon, children, note }) => (
+const SectionTitle: React.FC<{ icon: IconName; children: React.ReactNode }> = ({ icon, children }) => (
   <h4 className="flex items-center gap-3 mb-3 lg:mb-2.5 text-lg sm:text-[22px] lg:text-xl lg:[@media(max-height:820px)]:text-lg font-bold" style={{ color: NAVY }}>
     <Icon name={icon} color={NAVY} className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
-    <span>
-      {children}
-      {note && <span className="ml-2 text-xs sm:text-sm font-normal text-slate-600">{note}</span>}
-    </span>
+    <span>{children}</span>
   </h4>
 );
 
@@ -188,8 +185,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   /**
    * Saves the sign-up to the site's database and, in the background (not
    * awaited, so CORS never blocks the form), to the Google Sheet. The sheet
-   * keeps its columns: a group/organization shows in "age" (Nhóm / Tổ chức)
-   * and its name and head count in "skills".
+   * keeps its columns: a group/organization's name and head count go in
+   * "skills". Every field is required.
    */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,9 +196,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       setPhoneError('Phone number must be exactly 10 digits');
       return;
     }
-    const entered = parseInt(participants, 10);
-    const people = Number.isFinite(entered) && entered > 0 ? entered : isTeam ? NaN : 1;
-    if (isTeam && !(people >= 1)) {
+    const people = isTeam ? parseInt(participants, 10) : 1;
+    if (!(people >= 1)) {
       alert('⚠ Please enter the number of participants.');
       return;
     }
@@ -218,7 +214,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       city: address.trim(),
       eventId,
       eventName: eventTitle,
-      ageGroup: isTeam ? '' : birthYear,
+      ageGroup: birthYear,
       tshirtSize: 'L',
       emergencyContact: cleanPhone,
       skills: [role],
@@ -236,7 +232,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
         phone: cleanPhone,
         email: email.trim(),
         city: address.trim(),
-        age: isTeam ? teamLabel : birthYear,
+        age: birthYear,
         project: eventTitle,
         skills: sheetSkills,
       },
@@ -349,23 +345,20 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
             <section>
               <SectionTitle icon="groups">Join as</SectionTitle>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5" role="radiogroup" aria-label="Join as">
-                {JOIN_OPTIONS.map(({ value, title, desc, icon }) => {
+                {JOIN_OPTIONS.map(({ value, title, icon }) => {
                   const checked = joinAs === value;
                   return (
                     <label
                       key={value}
-                      className="relative flex items-center lg:flex-col lg:items-start gap-4 lg:gap-1.5 p-4 lg:p-3 min-h-[88px] lg:min-h-0 rounded-xl border cursor-pointer transition-colors"
+                      className="relative flex items-center lg:flex-col lg:items-start gap-3 lg:gap-1 px-4 py-3 lg:p-3 rounded-xl border cursor-pointer transition-colors"
                       style={{ borderColor: checked ? '#f28ab9' : '#dde3ee', backgroundColor: checked ? '#fff0f6' : '#fff', boxShadow: '0 2px 6px rgba(15,31,75,0.05)' }}
                     >
                       <input type="radio" name="joinAs" value={value} checked={checked} onChange={() => setJoinAs(value)} className="sr-only" />
-                      <Icon name={icon} color={checked ? PINK : NAVY} className="w-12 h-12 lg:w-9 lg:h-9 lg:[@media(max-height:820px)]:w-8 lg:[@media(max-height:820px)]:h-8 shrink-0" />
-                      <span className="flex-1 pr-6 lg:pr-0">
-                        <span className="block font-bold text-[16px] sm:text-[17px]" style={{ color: NAVY }}>
-                          {title}
-                        </span>
-                        <span className="block text-sm lg:text-[13px] text-slate-500 leading-snug">{desc}</span>
+                      <Icon name={icon} color={checked ? PINK : NAVY} className="w-9 h-9 lg:[@media(max-height:820px)]:w-8 lg:[@media(max-height:820px)]:h-8 shrink-0" />
+                      <span className="flex-1 pr-6 lg:pr-0 font-bold text-[16px] sm:text-[17px]" style={{ color: NAVY }}>
+                        {title}
                       </span>
-                      <span className="absolute top-4 right-4 lg:top-3 lg:right-3">
+                      <span className="absolute top-1/2 -translate-y-1/2 right-4 lg:translate-y-0 lg:top-3 lg:right-3">
                         <RadioMark checked={checked} />
                       </span>
                     </label>
@@ -481,8 +474,32 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                     <input id="vm-email" type="email" required autoComplete="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldClass} />
                   </IconField>
                 </div>
-                {/* A group or organization has no birth year: its name goes here instead. */}
-                {isTeam ? (
+                <div>
+                  <FieldLabel htmlFor="vm-birth" required>
+                    Year of birth
+                  </FieldLabel>
+                  <IconField icon="calendar" chevron>
+                    <select
+                      id="vm-birth"
+                      required
+                      value={birthYear}
+                      onChange={(e) => setBirthYear(e.target.value)}
+                      className={`${fieldClass} appearance-none cursor-pointer pr-12 ${birthYear ? '' : 'text-slate-400'}`}
+                      style={birthYear ? { color: NAVY } : undefined}
+                    >
+                      <option value="" disabled>
+                        Select your year of birth
+                      </option>
+                      {years.map((y) => (
+                        <option key={y} value={y} style={{ color: NAVY }}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </IconField>
+                </div>
+                {/* A group or organization also gives its name, next to the address. */}
+                {isTeam && (
                   <div>
                     <FieldLabel htmlFor="vm-org" required>
                       {teamWord} name
@@ -499,33 +516,8 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                       />
                     </IconField>
                   </div>
-                ) : (
-                  <div>
-                    <FieldLabel htmlFor="vm-birth" required>
-                      Year of birth
-                    </FieldLabel>
-                    <IconField icon="calendar" chevron>
-                      <select
-                        id="vm-birth"
-                        required
-                        value={birthYear}
-                        onChange={(e) => setBirthYear(e.target.value)}
-                        className={`${fieldClass} appearance-none cursor-pointer pr-12 ${birthYear ? '' : 'text-slate-400'}`}
-                        style={birthYear ? { color: NAVY } : undefined}
-                      >
-                        <option value="" disabled>
-                          Select your year of birth
-                        </option>
-                        {years.map((y) => (
-                          <option key={y} value={y} style={{ color: NAVY }}>
-                            {y}
-                          </option>
-                        ))}
-                      </select>
-                    </IconField>
-                  </div>
                 )}
-                <div className="sm:col-span-2">
+                <div className={isTeam ? '' : 'sm:col-span-2'}>
                   <FieldLabel htmlFor="vm-address" required>
                     Address
                   </FieldLabel>
@@ -536,21 +528,20 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
               </div>
             </section>
 
-            {/* Number of participants */}
+            {/* Number of participants: always 1 for an individual */}
             <section>
-              <SectionTitle icon="groups" note="(Only required for Group or Organization)">
-                Number of participants
-              </SectionTitle>
+              <SectionTitle icon="groups">Number of participants</SectionTitle>
               <IconField icon="groups">
                 <input
                   type="number"
                   min={1}
-                  required={isTeam}
+                  required
+                  readOnly={!isTeam}
                   inputMode="numeric"
                   placeholder="Enter number of participants"
-                  value={participants}
+                  value={isTeam ? participants : '1'}
                   onChange={(e) => setParticipants(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  className={fieldClass}
+                  className={`${fieldClass} ${isTeam ? '' : '!bg-slate-100 text-slate-500 cursor-not-allowed focus:!border-[#cfd6e4] focus:!ring-0'}`}
                   aria-label="Number of participants"
                 />
               </IconField>

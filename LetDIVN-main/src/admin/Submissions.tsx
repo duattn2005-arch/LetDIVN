@@ -14,7 +14,6 @@ const COLUMNS = {
   volunteers: [
     { key: 'fullName', label: 'Họ tên' },
     { key: 'joinAs', label: 'Hình thức' },
-    { key: 'organizationName', label: 'Nhóm / tổ chức' },
     { key: 'participants', label: 'Số người' },
     { key: 'email', label: 'Email' },
     { key: 'phone', label: 'Điện thoại' },
@@ -89,7 +88,11 @@ export function Submissions({ kind }: { kind: 'volunteers' | 'contacts' }) {
   const text = (r: any, key: string) => {
     const v = r[key];
     if (DATE_KEYS.includes(key)) return formatDateTime(v);
-    if (key === 'joinAs') return JOIN_AS[v as string] ?? 'Cá nhân';
+    // One column: "Cá nhân", or "Nhóm: <name>" / "Tổ chức: <name>".
+    if (key === 'joinAs') {
+      const label = JOIN_AS[v as string] ?? 'Cá nhân';
+      return v !== 'individual' && r.organizationName ? `${label}: ${r.organizationName}` : label;
+    }
     if (key === 'preferredRole' && !v) return Array.isArray(r.skills) ? r.skills.join(', ') : '';
     if (Array.isArray(v)) return v.join(', ');
     return v == null ? '' : String(v);
@@ -361,7 +364,14 @@ function VolunteerEditRow({
               </select>
             </div>
             {isTeam && input('organizationName', data.joinAs === 'organization' ? 'Tên tổ chức' : 'Tên nhóm')}
-            {isTeam && input('participants', 'Số người', 'number')}
+            {isTeam ? (
+              input('participants', 'Số người', 'number')
+            ) : (
+              <div>
+                <label className={label}>Số người</label>
+                <input className="wp-input !bg-[#f0f0f1] text-[var(--wp-muted)]" value="1" readOnly title="Cá nhân luôn là 1 người" />
+              </div>
+            )}
             {input('ageGroup', 'Năm sinh')}
           </div>
           <div className="space-y-2.5">
