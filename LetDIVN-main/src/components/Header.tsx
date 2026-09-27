@@ -116,16 +116,16 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Desktop Nav Items: Centered and well-spaced across the available width */}
-          <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-2 xl:gap-3.5 2xl:gap-5 text-[14px] xl:text-[15px] 2xl:text-[16px] font-semibold overflow-visible no-scrollbar mx-2 2xl:mx-4">
+          <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-1 2xl:gap-3.5 text-[15px] 2xl:text-[17px] font-medium overflow-visible no-scrollbar mx-2 2xl:mx-4">
 
             {/* 1. Who We Are */}
             <button
               id="nav-who-we-are"
               onClick={() => onNavigate('who-we-are')}
-              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'who-we-are' 
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
-                  : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
+                  ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs' 
+                  : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
               }`}
             >
               {t.navWhoWeAre}
@@ -135,10 +135,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-what-we-do"
               onClick={() => onNavigate('what-we-do')}
-              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'what-we-do' 
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
-                  : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
+                  ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs' 
+                  : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
               }`}
             >
               {t.navWhatWeDo}
@@ -148,10 +148,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-team"
               onClick={() => onNavigate('our-team')}
-              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'our-team' 
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
-                  : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
+                  ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs' 
+                  : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
               }`}
             >
               {t.navOurTeam}
@@ -161,10 +161,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-our-partners"
               onClick={() => onNavigate('our-partners')}
-              className={`shrink-0 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'our-partners' 
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
-                  : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
+                  ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs' 
+                  : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
               }`}
             >
               {t.navOurPartners}
@@ -175,10 +175,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-other-dropdown-btn"
                 onClick={() => setOtherDropdownOpen(!otherDropdownOpen)}
-                className={`shrink-0 flex items-center gap-1.5 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                className={`shrink-0 flex items-center gap-1.5 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                   currentView === 'media-on-us' || currentView === 'news' || currentView === 'gallery' || currentView === 'videos'
-                    ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs'
-                    : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
+                    ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs'
+                    : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
                 }`}
               >
                 <span>{t.navOther}</span>
@@ -236,10 +236,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 id="nav-projects-dropdown-btn"
                 onClick={() => setProjectsDropdownOpen(!projectsDropdownOpen)}
-                className={`shrink-0 flex items-center gap-1.5 px-3.5 2xl:px-4.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                className={`shrink-0 flex items-center gap-1.5 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                   currentView === 'project-detail'
-                    ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200/60 shadow-xs' 
-                    : 'text-slate-700 hover:text-[#E81A7F] hover:bg-slate-100/80 font-semibold'
+                    ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs' 
+                    : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
                 }`}
               >
                 <span>{t.navProject}</span>
@@ -273,10 +273,10 @@ export const Header: React.FC<HeaderProps> = ({
               id="nav-cleanup-map"
               onClick={() => onNavigate('map')}
               title={t.navMap}
-              className={`shrink-0 flex items-center gap-1.5 px-3 2xl:px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+              className={`shrink-0 flex items-center gap-1.5 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'map' 
-                  ? 'text-[#E81A7F] font-bold bg-pink-50 border border-pink-200 shadow-xs' 
-                  : 'text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/50 font-semibold'
+                  ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200 shadow-xs' 
+                  : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-pink-50/50'
               }`}
             >
               <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
@@ -286,22 +286,24 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Right Action Controls: Volunteer sign-up + Contact Us */}
-          <div className="hidden xl:flex items-center space-x-2.5 2xl:space-x-4 shrink-0">
+          {/* Sized like the "Contact us" button on letsdoitvietnam.org: Poppins 16px,
+              11px 30px 16px padding, pill-shaped, solid #F1138D. */}
+          <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3 shrink-0">
 
             {/* Volunteer registration button */}
             <button
               id="header-volunteer-btn"
               onClick={onOpenVolunteer}
-              className="flex items-center gap-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-3 2xl:px-4 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
+              className="bg-white border border-[#F1138D] text-[#F1138D] hover:bg-pink-50 text-[15px] 2xl:text-[16px] leading-none px-5 2xl:px-[29px] pt-[10px] pb-[15px] rounded-full transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
             >
-              <span>{t.joinVolunteer}</span>
+              {t.joinVolunteer}
             </button>
 
             {/* Contact Us button */}
             <button
               id="header-contact-btn"
               onClick={() => onNavigate('contact')}
-              className="bg-white border border-[#E81A7F] text-[#E81A7F] hover:bg-pink-50 font-bold text-xs px-3 2xl:px-4 py-1.5 rounded-full shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
+              className="bg-[#F1138D] hover:bg-[#D01370] text-white text-[15px] 2xl:text-[16px] leading-none px-5 2xl:px-[30px] pt-[11px] pb-[16px] rounded-full transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
             >
               {t.navContactUs}
             </button>
