@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CircleDot, PersonStanding } from 'lucide-react';
 import { dbService } from '../services/dbService';
 import { ProjectStaticContent as ProjectPage } from '../types';
+import { RichText } from './RichText';
 
 const BRAND_PINK = '#F1138D';
 const BRAND_AMBER = '#FEAC13';
@@ -120,7 +121,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                           {col.paragraphs.map((p, pi) => (
                             <li key={pi} className="ref-text flex gap-2">
                               <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
-                              <span className="whitespace-pre-line">{p}</span>
+                              <RichText text={p} />
                             </li>
                           ))}
                         </ul>
@@ -166,15 +167,13 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                   {section.paragraphs.map((p, i) => (
                     <li key={i} className="ref-text flex gap-2">
                       <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
-                      <span className="whitespace-pre-line">{p}</span>
+                      <RichText text={p} />
                     </li>
                   ))}
                 </ul>
               ) : (
                 section.paragraphs.map((p, i) => (
-                  <p key={i} className="whitespace-pre-line ref-text" style={paragraphStyle}>
-                    {p}
-                  </p>
+                  <RichText key={i} as="p" text={p} className="ref-text" style={paragraphStyle} />
                 ))
               )}
 
@@ -183,7 +182,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                   {section.subBlocks.map((block, bi) => (
                     <div key={bi} className="space-y-2">
                       {block.title && <p className="whitespace-pre-line ref-body text-sm sm:text-base font-bold text-slate-700">{block.title}</p>}
-                      {block.text && <p className="whitespace-pre-line ref-text">{block.text}</p>}
+                      {block.text && <RichText as="p" text={block.text} className="ref-text" />}
                       {block.gallery && block.gallery.length > 0 && (
                         <Gallery images={block.gallery} alt={block.title} aspect={block.galleryAspect} className="pt-2" />
                       )}
@@ -195,7 +194,7 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
               {((section.closingParagraphs?.length ?? 0) > 0 || (section.closingBullets?.length ?? 0) > 0) && (
                 <div className="text-left space-y-3 pt-2">
                   {section.closingParagraphs?.[0] && (
-                    <p className="whitespace-pre-line ref-text">{section.closingParagraphs[0]}</p>
+                    <RichText as="p" text={section.closingParagraphs[0]} className="ref-text" />
                   )}
                   {section.closingBullets && section.closingBullets.length > 0 && (
                     <>
@@ -206,16 +205,14 @@ export const ProjectStaticContent: React.FC<{ category: string }> = ({ category 
                         {section.closingBullets.map((p, i) => (
                           <li key={i} className="ref-text flex gap-2">
                             <CircleDot className="w-4 h-4 shrink-0 mt-0.5" style={{ color: BULLET_BLUE }} />
-                            <span className="whitespace-pre-line">{p}</span>
+                            <RichText text={p} />
                           </li>
                         ))}
                       </ul>
                     </>
                   )}
                   {section.closingParagraphs?.slice(1).map((p, i) => (
-                    <p key={i} className="whitespace-pre-line ref-text">
-                      {p}
-                    </p>
+                    <RichText key={i} as="p" text={p} className="ref-text" />
                   ))}
                 </div>
               )}

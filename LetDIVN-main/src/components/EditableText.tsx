@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dbService } from '../services/dbService';
+import { RichText } from './RichText';
 
 interface EditableTextProps {
   /** Key this piece of text is stored under in "Nội dung các trang" (e.g. 'whoWeAre.heroTitle') */
@@ -47,6 +48,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
   return render ? (
     <Tag className={className}>{render(resolvedValue)}</Tag>
   ) : (
-    <Tag className={`whitespace-pre-line ${className}`}>{resolvedValue}</Tag>
+    <RichText as={Tag} className={className} text={resolvedValue} />
   );
 };

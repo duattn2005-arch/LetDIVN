@@ -4,6 +4,7 @@ import { dbService } from '../services/dbService';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { RichText } from './RichText';
 
 interface EventLogisticsSectionProps {
   event: CleanupEvent;
@@ -112,9 +113,7 @@ export const EventLogisticsSection: React.FC<EventLogisticsSectionProps> = ({ ev
           <div className="flex items-center justify-between mb-3">
             <h3 className="ref-heading text-xl sm:text-2xl text-slate-900">Description &amp; Campaign Goals</h3>
           </div>
-          <p className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed" style={{ textAlign: descriptionAlign }}>
-            {event.description}
-          </p>
+          <RichText as="p" text={event.description} className="ref-body text-sm sm:text-base text-slate-600 leading-relaxed" style={{ textAlign: descriptionAlign }} />
         </div>
 
         {/* Detailed Schedule */}

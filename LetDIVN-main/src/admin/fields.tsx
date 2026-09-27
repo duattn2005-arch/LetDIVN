@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, FileText, ImagePlus, Plus, Trash2, X } from 'lucide-react';
 import { api, type Entry, type Field } from './api';
 import { MediaLibrary } from './MediaLibrary';
 import { defaultsFor, isImageUrl, optionList, renderTemplate } from './util';
+
+const RichTextField = React.lazy(() => import('./RichTextField'));
 
 // Form controls for the Decap widgets used in config.yml: string, text,
 // number, boolean, select, datetime, image, file, hidden, object, list
@@ -32,7 +34,12 @@ export function FieldRow({ field, value, onChange }: { field: Field; value: any;
 export function FieldInput({ field, value, onChange }: { field: Field; value: any; onChange: OnChange }) {
   switch (field.widget) {
     case 'text':
-      return <AutoTextarea value={value ?? ''} onChange={onChange} />;
+      // The TinyMCE toolbar loads lazily; until then the plain textarea stands in.
+      return (
+        <Suspense fallback={<AutoTextarea value={value ?? ''} onChange={onChange} />}>
+          <RichTextField value={value ?? ''} onChange={onChange} />
+        </Suspense>
+      );
     case 'number':
       return (
         <input

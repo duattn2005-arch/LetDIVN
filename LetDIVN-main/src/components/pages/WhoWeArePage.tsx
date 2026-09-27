@@ -4,6 +4,7 @@ import { dbService } from '../../services/dbService';
 import { WhoWeAreItem } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
+import { RichText } from '../RichText';
 
 const BRAND_PINK = '#F1138D';
 const TEXT_GREY = '#7A7A7A';
@@ -201,7 +202,7 @@ export const WhoWeArePage: React.FC<{ onJoin: () => void }> = () => {
                   {item.title}
                 </h2>
                 <div className="ref-text !leading-[1.32] max-w-[550px]">
-                  <p className="whitespace-pre-line">{item.desc}</p>
+                  <RichText as="p" text={item.desc} />
                 </div>
               </div>
             </div>

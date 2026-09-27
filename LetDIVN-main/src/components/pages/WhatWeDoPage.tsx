@@ -4,6 +4,7 @@ import { WhatWeDoItem } from '../../types';
 import { EditableText } from '../EditableText';
 import { EditableImage } from '../EditableImage';
 import { TakeActionStrip } from '../TakeActionStrip';
+import { RichText } from '../RichText';
 
 const BRAND_PINK = '#F1138D';
 
@@ -87,7 +88,7 @@ export const WhatWeDoPage: React.FC = () => {
                     {item.title}
                   </h2>
                   <div className="ref-text max-w-[550px]">
-                    <p className="whitespace-pre-line">{item.desc}</p>
+                    <RichText as="p" text={item.desc} />
                   </div>
                 </div>
               </div>
