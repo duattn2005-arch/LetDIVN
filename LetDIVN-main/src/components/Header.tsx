@@ -176,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
                 id="nav-other-dropdown-btn"
                 onClick={() => setOtherDropdownOpen(!otherDropdownOpen)}
                 className={`shrink-0 flex items-center gap-1.5 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-                  currentView === 'media-on-us' || currentView === 'news' || currentView === 'gallery' || currentView === 'videos'
+                  currentView === 'media-on-us' || currentView === 'news'
                     ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs'
                     : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
                 }`}
@@ -206,26 +206,6 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <span>{t.navNews}</span>
                     <EditableText contentKey="header.otherNewsLabel" defaultValue="News →" as="span" className="text-[10px] text-pink-500 font-bold" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      onNavigate('videos');
-                      setOtherDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:text-[#E81A7F] hover:bg-pink-50/60 font-medium transition-colors cursor-pointer flex items-center justify-between"
-                  >
-                    <span>{t.navVideos}</span>
-                    <EditableText contentKey="header.otherVideosLabel" defaultValue="Video →" as="span" className="text-[10px] text-pink-500 font-bold" />
-                  </button>
-                  <div className="border-t border-slate-100 my-1"></div>
-                  <button
-                    onClick={() => {
-                      onNavigate('gallery');
-                      setOtherDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-xs text-slate-600 hover:text-[#E81A7F] hover:bg-pink-50/60 transition-colors cursor-pointer"
-                  >
-                    <EditableText contentKey="header.otherPhotoGallery" defaultValue="Photo Gallery" as="span" />
                   </button>
                 </div>
               )}
@@ -371,12 +351,6 @@ export const Header: React.FC<HeaderProps> = ({
                 className="w-full text-left px-5 py-1.5 text-xs text-slate-700 hover:text-[#E81A7F]"
               >
                 • {t.navNews}
-              </button>
-              <button
-                onClick={() => { onNavigate('videos'); setMobileMenuOpen(false); }}
-                className="w-full text-left px-5 py-1.5 text-xs text-slate-700 hover:text-[#E81A7F]"
-              >
-                • {t.navVideos}
               </button>
             </div>
 
