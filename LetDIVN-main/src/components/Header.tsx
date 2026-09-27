@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Menu, X, Sparkles, MapPin } from 'lucide-react';
+import { ChevronDown, Menu, X, MapPin } from 'lucide-react';
 import { ActiveView } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { EditableText } from './EditableText';
@@ -294,7 +294,6 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenVolunteer}
               className="flex items-center gap-1.5 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs px-3 2xl:px-4 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
             >
-              <Sparkles className="w-3.5 h-3.5" />
               <span>{t.joinVolunteer}</span>
             </button>
 
@@ -416,7 +415,6 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => { onOpenVolunteer(); setMobileMenuOpen(false); }}
                 className="py-2.5 px-3 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 border border-emerald-200"
               >
-                <Sparkles className="w-4 h-4 text-emerald-600" />
                 <span>{t.joinVolunteer}</span>
               </button>
             </div>
