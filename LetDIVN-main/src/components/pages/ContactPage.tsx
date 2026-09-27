@@ -10,16 +10,8 @@ export const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sent, setSent] = useState(false);
-
-  const subjectOptions = [
-    t.contactSubjectOpt1,
-    t.contactSubjectOpt2,
-    t.contactSubjectOpt3,
-    t.contactSubjectOpt4
-  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +25,7 @@ export const ContactPage: React.FC = () => {
       name: name.trim(),
       email: email.trim(),
       phone: cleanPhone,
-      subject: subject || subjectOptions[0],
+      subject: 'Contact form',
       message: message.trim()
     });
 
@@ -47,7 +39,6 @@ export const ContactPage: React.FC = () => {
     setName('');
     setEmail('');
     setPhone('');
-    setSubject('');
     setMessage('');
     setSent(false);
   };
@@ -240,43 +231,21 @@ export const ContactPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-700">
-                        <EditableText contentKey="contactPage.phoneFieldLabel" defaultValue={t.contactPagePhoneFieldLabel} as="span" />
-                      </label>
-                      <span className={`text-[10px] font-mono font-bold ${phone.replace(/\D/g, '').length === 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
-                        {phone.replace(/\D/g, '').length}/10
-                      </span>
-                    </div>
-                    <input
-                      type="tel"
-                      inputMode="numeric"
-                      pattern="[0-9]{10}"
-                      maxLength={10}
-                      minLength={10}
-                      placeholder="0987 654 321"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                      className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs font-mono focus:outline-hidden focus:border-[#E81A7F]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      <EditableText contentKey="contactPage.subjectLabel" defaultValue={t.contactPageSubjectLabel} as="span" />
-                    </label>
-                    <select
-                      value={subject || subjectOptions[0]}
-                      onChange={(e) => setSubject(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs focus:outline-hidden focus:border-[#E81A7F] bg-white"
-                    >
-                      {subjectOptions.map((opt, idx) => (
-                        <option key={idx} value={opt}>{opt}</option>
-                      ))}
-                    </select>
-                  </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <EditableText contentKey="contactPage.phoneFieldLabel" defaultValue={t.contactPagePhoneFieldLabel} as="span" />
+                  </label>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    minLength={10}
+                    placeholder="0987 654 321"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs font-mono focus:outline-hidden focus:border-[#E81A7F]"
+                  />
                 </div>
 
                 <div>
