@@ -21,7 +21,6 @@ import { CampaignDetailPage } from './components/pages/CampaignDetailPage';
 import { NewsPage } from './components/pages/NewsPage';
 import { MediaOnUsPage } from './components/pages/MediaOnUsPage';
 import { HomeQuickLinksSection } from './components/HomeQuickLinksSection';
-import { FullGalleryPage } from './components/pages/FullGalleryPage';
 import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { CleanupMapPage } from './components/pages/CleanupMapPage';
@@ -41,7 +40,6 @@ const VIEW_PATHS: Record<string, string> = {
   map: '/cleanup-map/',
   news: '/news/',
   'media-on-us': '/media-on-us/',
-  gallery: '/gallery/',
   videos: '/videos/',
   contact: '/contact/',
 };
@@ -262,7 +260,7 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'gallery', 'videos', 'contact'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'videos', 'contact'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
@@ -332,10 +330,6 @@ export function AppContent() {
 
         {activeView === 'media-on-us' && (
           <MediaOnUsPage />
-        )}
-
-        {activeView === 'gallery' && (
-          <FullGalleryPage />
         )}
 
         {activeView === 'videos' && (

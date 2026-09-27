@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getNews, getPartners, getGallery, getTeam, getVideos, getWhatWeDo, getWhoWeAre, getMediaCoverage, getEvents, getProjectPages } from '../cmsContent.js';
+import { getNews, getPartners, getTeam, getVideos, getWhatWeDo, getWhoWeAre, getMediaCoverage, getEvents, getProjectPages } from '../cmsContent.js';
 import { events, volunteers, contacts } from '../db/collections.js';
 import type { VolunteerRegistration } from '../../src/types.js';
 
@@ -31,12 +31,11 @@ router.post('/volunteers', (req, res) => {
 });
 
 // --- Content managed in Decap CMS (/admin) ---
-// News, partners, gallery, team, videos, What We Do, Who We Are sections and
+// News, partners, team, videos, What We Do, Who We Are sections and
 // Media on Us entries are JSON files in the repo (see server/cmsContent.ts).
 // They are read-only here: all editing happens in Decap.
 router.get('/news', async (req, res) => res.json(await getNews()));
 router.get('/partners', async (req, res) => res.json(await getPartners()));
-router.get('/gallery', async (req, res) => res.json(await getGallery()));
 router.get('/team', async (req, res) => res.json(await getTeam()));
 router.get('/videos', async (req, res) => res.json(await getVideos()));
 router.get('/what-we-do', async (req, res) => res.json(await getWhatWeDo()));

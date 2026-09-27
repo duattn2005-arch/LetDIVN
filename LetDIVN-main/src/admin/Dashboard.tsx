@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CalendarDays, FileText, HeartHandshake, Image as ImageIcon, Mail, PenLine, Pin } from 'lucide-react';
+import { CalendarDays, FileText, HeartHandshake, Mail, PenLine, Pin } from 'lucide-react';
 import { api, type Entry } from './api';
 import { useAdmin } from './AdminApp';
 import { MetaBox, PageTitle } from './Layout';
@@ -80,7 +80,7 @@ export function Dashboard() {
   const glance: { key: string; icon: React.ElementType; href: string; label: string }[] = [
     ...folders.map((c) => ({
       key: c.name,
-      icon: c.name === 'news' ? Pin : c.name === 'events' ? CalendarDays : c.name === 'gallery' ? ImageIcon : FileText,
+      icon: c.name === 'news' ? Pin : c.name === 'events' ? CalendarDays : FileText,
       href: `#/c/${c.name}`,
       label: labelsFor(c).menu,
     })),

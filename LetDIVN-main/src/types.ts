@@ -91,20 +91,6 @@ export interface Partner {
   scale?: number; // Zoom / Scale percentage (e.g. 100, 120, 80)
 }
 
-export interface GalleryItem {
-  id: string;
-  /** File name of the entry in Decap CMS (content/<collection>/<slug>.json). */
-  slug?: string;
-  title: string;
-  eventName: string;
-  year: number;
-  city: string;
-  imageUrl: string;
-  caption: string;
-  category: string;
-  likes?: number;
-}
-
 export interface ContactMessage {
   id: string;
   name: string;
@@ -149,7 +135,6 @@ export type ActiveView =
   | 'map'
   | 'news'
   | 'media-on-us'
-  | 'gallery'
   | 'videos'
   | 'contact'
   | 'project-detail';

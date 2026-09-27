@@ -2,7 +2,6 @@ import {
   CleanupEvent,
   NewsArticle,
   Partner,
-  GalleryItem,
   TeamMember,
   VolunteerRegistration,
   ContactMessage,
@@ -108,11 +107,6 @@ class DatabaseService {
   // --- PARTNERS ---
   public getPartners(): Promise<Partner[]> {
     return this.get('/partners');
-  }
-
-  // --- GALLERY ---
-  public getGallery(): Promise<GalleryItem[]> {
-    return this.get('/gallery');
   }
 
   // --- TEAM ---

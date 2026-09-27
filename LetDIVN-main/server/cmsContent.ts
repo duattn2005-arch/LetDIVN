@@ -9,7 +9,6 @@ import type {
   MediaVideo,
   Partner,
   TeamMember,
-  GalleryItem,
   WhatWeDoItem,
   WhoWeAreItem,
   MediaCoverageEntry,
@@ -270,17 +269,6 @@ export const getTeam = () =>
     email: str(doc.email) || undefined,
   }));
 
-export const getGallery = () =>
-  getList<GalleryItem>('gallery', 'gal', (doc) => ({
-    title: str(doc.title),
-    eventName: str(doc.eventName),
-    year: num(doc.year, new Date().getFullYear()),
-    city: str(doc.city),
-    imageUrl: str(doc.imageUrl),
-    caption: str(doc.caption),
-    category: str(doc.category),
-  }));
-
 export const getWhatWeDo = () =>
   getList<WhatWeDoItem>('what-we-do', 'wwd', (doc) => ({
     badge: str(doc.badge) || undefined,
@@ -390,7 +378,7 @@ export async function getProjectPages(): Promise<Record<string, ProjectStaticCon
 // --- Page text and images ------------------------------------------------------
 
 /**
- * Every EditableText / EditableImage / EditableGalleryGrid value, as
+ * Every EditableText / EditableImage value, as
  * { contentKey: value }. content/page-content/<prefix>.json holds the fields of
  * one page nested by the rest of the key, e.g. project.wildlife-nature.json ->
  * { section1: { p0 } } is "project.wildlife-nature.section1.p0". Image lists

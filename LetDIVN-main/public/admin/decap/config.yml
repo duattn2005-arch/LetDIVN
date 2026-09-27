@@ -1,5 +1,5 @@
 # Decap CMS (/admin/decap/) — the text and images of every page, Cleanup Map
-# events, News, Videos, Partners, Team, Gallery, What We Do, Who We Are
+# events, News, Videos, Partners, Team, What We Do, Who We Are
 # sections and Media on Us. The site itself has no login.
 # This file also describes the collections and fields of the WordPress-style
 # editor at /admin/ (server/routes/wpAdmin.ts reads it), which commits to the
@@ -63,8 +63,6 @@ collections:
           - { label: "Top Tagline", name: "topTagline", widget: text, required: false }
           - { label: "Other Media Label", name: "otherMediaLabel", widget: string, required: false }
           - { label: "Other News Label", name: "otherNewsLabel", widget: string, required: false }
-          - { label: "Other Videos Label", name: "otherVideosLabel", widget: string, required: false }
-          - { label: "Other Photo Gallery", name: "otherPhotoGallery", widget: string, required: false }
       - label: "Trang chủ · Banner"
         name: "hero"
         file: LetDIVN-main/content/page-content/hero.json
@@ -134,12 +132,6 @@ collections:
               - { label: "Con số", name: "number", widget: string, required: false }
               - { label: "Tiêu đề", name: "title", widget: string, required: false }
               - { label: "Dòng phụ", name: "sub", widget: string, required: false }
-      - label: "Trang chủ · Thư viện ảnh"
-        name: "gallery"
-        file: LetDIVN-main/content/page-content/gallery.json
-        fields:
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
       - label: "Trang chủ · Tham gia"
         name: "getInvolved"
         file: LetDIVN-main/content/page-content/getInvolved.json
@@ -281,14 +273,6 @@ collections:
           - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
           - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
           - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
-      - label: "Trang Photo Gallery"
-        name: "fullGallery"
-        file: LetDIVN-main/content/page-content/fullGallery.json
-        fields:
-          - { label: "Tiêu đề", name: "title", widget: string, required: false }
-          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
-          - { label: "All Years Label", name: "allYearsLabel", widget: string, required: false }
-          - { label: "Year Prefix", name: "yearPrefix", widget: string, required: false }
       - label: "Trang Videos"
         name: "videosPage"
         file: LetDIVN-main/content/page-content/videosPage.json
@@ -702,30 +686,6 @@ collections:
       - { label: Facebook, name: facebook, widget: string, required: false }
       - { label: Email, name: email, widget: string, required: false }
       - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
-
-  - name: gallery
-    label: Thư viện ảnh
-    label_singular: ảnh
-    description: Ảnh ở trang Gallery.
-    folder: LetDIVN-main/content/gallery
-    format: json
-    extension: json
-    create: true
-    delete: true
-    slug: '{{title}}'
-    identifier_field: title
-    summary: '{{year}} · {{title}}'
-    sortable_fields: [order, year, title]
-    fields:
-      - { label: ID, name: id, widget: hidden, required: false }
-      - { label: Tiêu đề, name: title, widget: string }
-      - { label: Ảnh, name: imageUrl, widget: image }
-      - { label: Năm, name: year, widget: number, value_type: int }
-      - { label: Tỉnh / thành phố, name: city, widget: string, required: false }
-      - { label: Sự kiện, name: eventName, widget: string, required: false }
-      - { label: Chủ đề, name: category, widget: string, required: false }
-      - { label: Chú thích, name: caption, widget: text, required: false }
-      - { label: Thứ tự, name: order, widget: number, default: 0, value_type: int, hint: 'Số nhỏ hiện trước. Để 0 để ảnh mới lên đầu.' }
 
   - name: what-we-do
     label: What We Do
