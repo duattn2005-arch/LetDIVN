@@ -8,7 +8,7 @@
   "formTitle": "Send a Message to Our Team",
   "nameLabel": "Full Name *",
   "emailFieldLabel": "Email Address *",
-  "phoneFieldLabel": "Phone Number (10 digits)",
+  "phoneFieldLabel": "Phone Number",
   "subjectLabel": "Subject",
   "messageLabel": "Message *",
   "submitBtn": "Send Message",

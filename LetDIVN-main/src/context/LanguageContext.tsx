@@ -205,7 +205,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "Gửi tin nhắn khác",
     "contactPageNameLabel": "Họ và Tên *",
     "contactPageEmailFieldLabel": "Địa chỉ Email *",
-    "contactPagePhoneFieldLabel": "Số điện thoại (Đúng 10 số)",
+    "contactPagePhoneFieldLabel": "Số điện thoại",
     "contactPageSubjectLabel": "Chủ đề",
     "contactPageMessageLabel": "Nội dung tin nhắn *",
     "contactPageSubmitBtn": "Gửi Tin Nhắn Ngay"
@@ -394,7 +394,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "Send Another Message",
     "contactPageNameLabel": "Full Name *",
     "contactPageEmailFieldLabel": "Email Address *",
-    "contactPagePhoneFieldLabel": "Phone Number (10 digits)",
+    "contactPagePhoneFieldLabel": "Phone Number",
     "contactPageSubjectLabel": "Subject",
     "contactPageMessageLabel": "Message *",
     "contactPageSubmitBtn": "Send Message"
@@ -583,7 +583,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "Envoyer un autre message",
     "contactPageNameLabel": "Nom complet *",
     "contactPageEmailFieldLabel": "Adresse email *",
-    "contactPagePhoneFieldLabel": "Numéro de téléphone (10 chiffres)",
+    "contactPagePhoneFieldLabel": "Numéro de téléphone",
     "contactPageSubjectLabel": "Sujet",
     "contactPageMessageLabel": "Message *",
     "contactPageSubmitBtn": "Envoyer le message"
@@ -772,7 +772,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "別のメッセージを送る",
     "contactPageNameLabel": "お名前 *",
     "contactPageEmailFieldLabel": "メールアドレス *",
-    "contactPagePhoneFieldLabel": "電話番号（10桁）",
+    "contactPagePhoneFieldLabel": "電話番号",
     "contactPageSubjectLabel": "件名",
     "contactPageMessageLabel": "メッセージ内容 *",
     "contactPageSubmitBtn": "メッセージを送信"
@@ -961,7 +961,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "다른 메시지 보내기",
     "contactPageNameLabel": "성명 *",
     "contactPageEmailFieldLabel": "이메일 주소 *",
-    "contactPagePhoneFieldLabel": "전화번호 (숫자 10자리)",
+    "contactPagePhoneFieldLabel": "전화번호",
     "contactPageSubjectLabel": "제목",
     "contactPageMessageLabel": "메시지 내용 *",
     "contactPageSubmitBtn": "메시지 보내기"
@@ -1150,7 +1150,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "发送另一条留言",
     "contactPageNameLabel": "姓名 *",
     "contactPageEmailFieldLabel": "电子邮箱 *",
-    "contactPagePhoneFieldLabel": "电话号码（10位数字）",
+    "contactPagePhoneFieldLabel": "电话号码",
     "contactPageSubjectLabel": "主题",
     "contactPageMessageLabel": "留言内容 *",
     "contactPageSubmitBtn": "立即发送留言"
@@ -1339,7 +1339,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "Weitere Nachricht senden",
     "contactPageNameLabel": "Vollständiger Name *",
     "contactPageEmailFieldLabel": "E-Mail-Adresse *",
-    "contactPagePhoneFieldLabel": "Telefonnummer (10 Ziffern)",
+    "contactPagePhoneFieldLabel": "Telefonnummer",
     "contactPageSubjectLabel": "Betreff",
     "contactPageMessageLabel": "Nachricht *",
     "contactPageSubmitBtn": "Nachricht jetzt senden"
@@ -1528,7 +1528,7 @@ export const translations = {
     "contactPageSendAnotherBtn": "Enviar Otro Mensaje",
     "contactPageNameLabel": "Nombre Completo *",
     "contactPageEmailFieldLabel": "Correo Electrónico *",
-    "contactPagePhoneFieldLabel": "Número de Teléfono (10 dígitos)",
+    "contactPagePhoneFieldLabel": "Número de Teléfono",
     "contactPageSubjectLabel": "Asunto",
     "contactPageMessageLabel": "Mensaje *",
     "contactPageSubmitBtn": "Enviar Mensaje Ahora"

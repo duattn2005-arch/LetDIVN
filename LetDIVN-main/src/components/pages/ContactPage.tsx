@@ -241,7 +241,6 @@ export const ContactPage: React.FC = () => {
                     pattern="[0-9]{10}"
                     maxLength={10}
                     minLength={10}
-                    placeholder="0987 654 321"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                     className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs font-mono focus:outline-hidden focus:border-[#E81A7F]"
