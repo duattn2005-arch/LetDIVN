@@ -287,14 +287,14 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Right Action Controls: Volunteer sign-up + Contact Us */}
           {/* Sized like the "Contact us" button on letsdoitvietnam.org: Poppins 16px,
-              11px 30px 16px padding, pill-shaped, solid #F1138D. */}
+              ~44px tall, 30px side padding, pill-shaped, solid #F1138D. */}
           <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3 shrink-0">
 
             {/* Volunteer registration button */}
             <button
               id="header-volunteer-btn"
               onClick={onOpenVolunteer}
-              className="bg-white border border-[#F1138D] text-[#F1138D] hover:bg-pink-50 text-[15px] 2xl:text-[16px] leading-none px-5 2xl:px-[29px] pt-[10px] pb-[15px] rounded-full transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center justify-center h-[42px] 2xl:h-[44px] bg-white border-2 border-[#F1138D] text-[#F1138D] hover:bg-pink-50 text-[15px] 2xl:text-[16px] font-semibold leading-none px-5 2xl:px-[28px] rounded-full transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
             >
               {t.joinVolunteer}
             </button>
@@ -303,7 +303,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-contact-btn"
               onClick={() => onNavigate('contact')}
-              className="bg-[#F1138D] hover:bg-[#D01370] text-white text-[15px] 2xl:text-[16px] leading-none px-5 2xl:px-[30px] pt-[11px] pb-[16px] rounded-full transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center justify-center h-[42px] 2xl:h-[44px] bg-[#F1138D] hover:bg-[#D01370] border-2 border-[#F1138D] hover:border-[#D01370] text-white text-[15px] 2xl:text-[16px] font-semibold leading-none px-5 2xl:px-[28px] rounded-full shadow-md shadow-pink-500/25 transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
             >
               {t.navContactUs}
             </button>
