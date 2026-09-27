@@ -40,7 +40,11 @@ class DatabaseService {
   }
 
   private async request<T>(path: string, options?: RequestInit): Promise<T> {
+    // cache: 'no-cache' always asks the server (a 304 still skips the body).
+    // Without it, a browser that once got a looping 301 for this URL from the
+    // old nginx port-80 block keeps replaying it and the request never leaves.
     const res = await fetch(`/api${path}`, {
+      cache: 'no-cache',
       credentials: 'include',
       headers: options?.body ? { 'Content-Type': 'application/json' } : undefined,
       ...options,

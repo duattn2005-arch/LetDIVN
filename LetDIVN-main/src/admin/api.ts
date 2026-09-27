@@ -78,6 +78,10 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
   const send = () =>
     fetch(`/api/wp${url}`, {
       method,
+      // Always ask the server: a browser that once got a looping 301 for a URL
+      // (old nginx port-80 block) replays it from cache and the request fails
+      // with "Không kết nối được" before reaching us. A 304 still skips the body.
+      cache: 'no-cache',
       credentials: 'same-origin',
       headers: {
         'X-Requested-With': 'wp-admin',

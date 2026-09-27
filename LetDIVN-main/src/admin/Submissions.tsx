@@ -61,7 +61,7 @@ export function Submissions({ kind }: { kind: 'volunteers' | 'contacts' }) {
     setEditing(null);
     (isVolunteers ? api.volunteers() : api.contacts()).then(setRows, (err) => setError(err.message));
     if (isVolunteers) {
-      fetch('/api/events')
+      fetch('/api/events', { cache: 'no-cache' })
         .then((r) => r.json())
         .then((list: EventOption[]) => setEventList(Array.isArray(list) ? list.map((e) => ({ id: e.id, title: e.title })) : []))
         .catch(() => {});
