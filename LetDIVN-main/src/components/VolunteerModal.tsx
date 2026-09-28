@@ -16,6 +16,10 @@ type JoinAs = 'individual' | 'group' | 'organization';
 const NAVY = '#0f1f4b';
 const PINK = '#e8197c';
 
+// The date-of-birth calendar's range.
+const BIRTH_MIN_YEAR = 1900;
+const BIRTH_MAX_YEAR = 2050;
+
 // Solid icons like the design's (paths from Google's Material Icons, Apache-2.0).
 const ICON_PATHS = {
   person: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
@@ -110,7 +114,6 @@ const IconField: React.FC<{ icon: IconName; children: React.ReactNode; chevron?:
 
 export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose, selectedEventId }) => {
   const [events, setEvents] = useState<CleanupEvent[]>([]);
-  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     dbService.getEvents().then(setEvents);
@@ -121,7 +124,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [birthYear, setBirthYear] = useState('');
+  const [birthDate, setBirthDate] = useState(''); // yyyy-mm-dd from the date picker
   const [organizationName, setOrganizationName] = useState('');
   const [address, setAddress] = useState('');
   const [role, setRole] = useState('Clean-up');
@@ -138,7 +141,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
     setFullName('');
     setPhone('');
     setEmail('');
-    setBirthYear('');
+    setBirthDate('');
     setOrganizationName('');
     setAddress('');
     setRole('Clean-up');
@@ -171,24 +174,26 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
 
   if (!isOpen) return null;
 
-  const years = Array.from({ length: currentYear - 6 - 1920 + 1 }, (_, i) => currentYear - 6 - i);
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
     setPhone(digits);
     setPhoneError(digits.length > 0 && digits.length < 10 ? `Phone number must be exactly 10 digits (${digits.length}/10)` : null);
   };
 
-  const birthYearProblem = (value: string) => {
-    const year = Number(value);
-    return /^\d{4}$/.test(value) && year >= 1900 && year <= currentYear ? null : `Please enter a 4-digit year between 1900 and ${currentYear}`;
+  const birthDateProblem = (value: string) => {
+    const year = Number(value.slice(0, 4));
+    return /^\d{4}-\d{2}-\d{2}$/.test(value) && year >= BIRTH_MIN_YEAR && year <= BIRTH_MAX_YEAR
+      ? null
+      : `Please pick a date of birth between ${BIRTH_MIN_YEAR} and ${BIRTH_MAX_YEAR}`;
   };
 
-  const handleBirthYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
-    setBirthYear(digits);
-    setBirthError(digits.length === 4 ? birthYearProblem(digits) : null);
+  const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBirthDate(e.target.value);
+    setBirthError(e.target.value ? birthDateProblem(e.target.value) : null);
   };
+
+  // Saved as dd/mm/yyyy, the way it reads in the sheet and the admin.
+  const birthDateText = birthDate.split('-').reverse().join('/');
 
   const handleCloseModal = () => {
     resetFormState();
@@ -198,7 +203,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   /**
    * Saves the sign-up to the site's database and, in the background (not
    * awaited, so CORS never blocks the form), to the Google Sheet. The sheet
-   * keeps its columns: a group/organization (which has no year of birth)
+   * keeps its columns: a group/organization (which has no date of birth)
    * shows in "age" (Nhóm / Tổ chức), its name and head count in "skills".
    * Every field shown is required.
    */
@@ -210,7 +215,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       setPhoneError('Phone number must be exactly 10 digits');
       return;
     }
-    const birthProblem = isTeam ? null : birthYearProblem(birthYear);
+    const birthProblem = isTeam ? null : birthDateProblem(birthDate);
     if (birthProblem) {
       setBirthError(birthProblem);
       return;
@@ -233,7 +238,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       city: address.trim(),
       eventId,
       eventName: eventTitle,
-      ageGroup: isTeam ? '' : birthYear,
+      ageGroup: isTeam ? '' : birthDateText,
       tshirtSize: 'L',
       emergencyContact: cleanPhone,
       skills: [role],
@@ -251,7 +256,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
         phone: cleanPhone,
         email: email.trim(),
         city: address.trim(),
-        age: isTeam ? teamLabel : birthYear,
+        age: isTeam ? teamLabel : birthDateText,
         project: eventTitle,
         skills: sheetSkills,
       },
@@ -496,7 +501,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                     <input id="vm-email" type="email" required autoComplete="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldClass} />
                   </IconField>
                 </div>
-                {/* A group or organization has no year of birth: its name goes here instead. */}
+                {/* A group or organization has no date of birth: its name goes here instead. */}
                 {isTeam ? (
                   <div>
                     <FieldLabel htmlFor="vm-org" required>
@@ -517,27 +522,29 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                 ) : (
                   <div>
                     <FieldLabel htmlFor="vm-birth" required>
-                      Year of birth
+                      Date of birth
                     </FieldLabel>
-                    {/* Typed in, or picked from the suggested years. */}
+                    {/* The browser's calendar (day grid, month/year jump); a click anywhere on the field opens it. */}
                     <IconField icon="calendar">
                       <input
                         id="vm-birth"
+                        type="date"
                         required
-                        inputMode="numeric"
-                        autoComplete="bday-year"
-                        maxLength={4}
-                        list="vm-birth-years"
-                        placeholder="Enter your year of birth"
-                        value={birthYear}
-                        onChange={handleBirthYearChange}
-                        className={`${fieldClass} ${birthError ? '!border-red-400 !bg-red-50/40' : ''}`}
+                        autoComplete="bday"
+                        min={`${BIRTH_MIN_YEAR}-01-01`}
+                        max={`${BIRTH_MAX_YEAR}-12-31`}
+                        value={birthDate}
+                        onChange={handleBirthDateChange}
+                        onClick={(e) => {
+                          try {
+                            e.currentTarget.showPicker?.();
+                          } catch {
+                            /* not allowed here: the field still takes typing */
+                          }
+                        }}
+                        className={`${fieldClass} cursor-pointer ${birthDate ? '' : 'text-slate-400'} ${birthError ? '!border-red-400 !bg-red-50/40' : ''}`}
+                        style={birthDate ? { color: NAVY } : undefined}
                       />
-                      <datalist id="vm-birth-years">
-                        {years.map((y) => (
-                          <option key={y} value={y} />
-                        ))}
-                      </datalist>
                     </IconField>
                     {birthError && (
                       <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">

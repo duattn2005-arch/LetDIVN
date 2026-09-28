@@ -20,7 +20,7 @@ const COLUMNS = {
     { key: 'city', label: 'Địa chỉ' },
     { key: 'eventName', label: 'Sự kiện' },
     { key: 'preferredRole', label: 'Vai trò' },
-    { key: 'ageGroup', label: 'Năm sinh' },
+    { key: 'ageGroup', label: 'Ngày sinh' },
     { key: 'notes', label: 'Ghi chú' },
     { key: 'registeredAt', label: 'Ngày đăng ký' },
   ],
@@ -325,7 +325,7 @@ function VolunteerEditRow({
         eventName,
         organizationName: isTeam ? data.organizationName : '',
         participants: isTeam ? data.participants : '1',
-        // A group or organization has no year of birth.
+        // A group or organization has no date of birth.
         ageGroup: isTeam ? '' : data.ageGroup,
       });
       onSaved(saved);
@@ -374,7 +374,8 @@ function VolunteerEditRow({
                 <input className="wp-input !bg-[#f0f0f1] text-[var(--wp-muted)]" value="1" readOnly title="Cá nhân luôn là 1 người" />
               </div>
             )}
-            {!isTeam && input('ageGroup', 'Năm sinh')}
+            {/* Free text: older sign-ups hold only a year, newer ones dd/mm/yyyy. */}
+            {!isTeam && input('ageGroup', 'Ngày sinh')}
           </div>
           <div className="space-y-2.5">
             <div>
