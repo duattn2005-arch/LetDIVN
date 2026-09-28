@@ -1005,11 +1005,11 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 >
                   <MapPin className="w-4 h-4 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="#0f172a" />
                   <span className="truncate">{p.name}</span>
-                  {/* A campaign on here: a pulsing dot, like the pin's ripple. */}
+                  {/* A campaign on here: a pulsing green dot. */}
                   {campaignOfProvince.has(p.name) && (
                     <span className="relative ml-auto flex w-2.5 h-2.5 shrink-0" title="Campaign on">
-                      <span className="absolute inline-flex w-full h-full rounded-full bg-[#E81A7F] opacity-75 animate-ping" />
-                      <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-[#E81A7F]" />
+                      <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                      <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500" />
                     </span>
                   )}
                 </button>
