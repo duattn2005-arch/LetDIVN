@@ -20,8 +20,9 @@ type MapLayer = 'streets' | 'satellite' | 'carto';
 // scrolls horizontally instead of overflowing the header.
 const YEAR_OPTIONS = Array.from({ length: 37 }, (_, i) => 2024 + i); // 2024..2060
 
-// The provinces where Let's Do It Vietnam is active: always pinned on the map,
-// each in its legend color. Listed column by column, as the legend shows them.
+// The 9 provinces and cities where Let's Do It Vietnam has local teams: always
+// pinned on the map, each in its legend color. Listed column by column, as the
+// legend shows them.
 const PROVINCE_PINS = [
   { name: 'Hà Nội', color: '#e0197d', lat: 21.0285, lng: 105.8542 },
   { name: 'Quảng Trị', color: '#fbc70f', lat: 16.8163, lng: 107.1003 },
@@ -31,6 +32,7 @@ const PROVINCE_PINS = [
   { name: 'TP. Hồ Chí Minh', color: '#12a150', lat: 10.7769, lng: 106.7009 },
   { name: 'Đà Nẵng', color: '#b5d334', lat: 16.0544, lng: 108.2022 },
   { name: 'Cần Thơ', color: '#1170c2', lat: 10.0452, lng: 105.7469 },
+  { name: 'Quy Nhơn', color: '#7c3aed', lat: 13.7765, lng: 109.2237 },
 ];
 
 const provincePinIcon = (color: string) =>
