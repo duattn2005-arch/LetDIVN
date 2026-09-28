@@ -19,6 +19,8 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const currentView = propCurrentView || propActiveView || 'home';
   const { t } = useLanguage();
+  // The WordPress build leaves out Cleanup Map and Volunteer; they're added there by hand.
+  const isWordPress = import.meta.env.VITE_WORDPRESS === '1';
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
@@ -249,19 +251,21 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* 7. Real Cleanup Map (Pin Icon Badge) */}
+            {!isWordPress && (
             <button
               id="nav-cleanup-map"
               onClick={() => onNavigate('map')}
               title={t.navMap}
               className={`shrink-0 flex items-center gap-1.5 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-                currentView === 'map' 
-                  ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200 shadow-xs' 
+                currentView === 'map'
+                  ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200 shadow-xs'
                   : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-pink-50/50'
               }`}
             >
               <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
               <span>{t.navMap}</span>
             </button>
+            )}
 
           </nav>
 
@@ -271,6 +275,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3 shrink-0">
 
             {/* Volunteer registration button */}
+            {!isWordPress && (
             <button
               id="header-volunteer-btn"
               onClick={onOpenVolunteer}
@@ -278,6 +283,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               {t.joinVolunteer}
             </button>
+            )}
 
             {/* Contact Us button */}
             <button
@@ -369,6 +375,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* Map in Mobile */}
+            {!isWordPress && (
             <button
               onClick={() => { onNavigate('map'); setMobileMenuOpen(false); }}
               className="text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-[#E81A7F] flex items-center gap-2 font-bold text-[#E81A7F] pt-2 border-t border-slate-100"
@@ -376,6 +383,7 @@ export const Header: React.FC<HeaderProps> = ({
               <MapPin className="w-4 h-4" />
               <span>{t.navMap}</span>
             </button>
+            )}
 
             {/* Contact Us in Mobile */}
             <button
@@ -386,6 +394,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Action Buttons in Mobile */}
+            {!isWordPress && (
             <div className="grid grid-cols-1 gap-2 pt-2 border-t border-slate-100">
               <button
                 onClick={() => { onOpenVolunteer(); setMobileMenuOpen(false); }}
@@ -394,6 +403,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>{t.joinVolunteer}</span>
               </button>
             </div>
+            )}
 
           </div>
         </div>

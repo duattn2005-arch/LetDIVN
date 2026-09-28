@@ -57,6 +57,11 @@ function publicAssetPaths(): Plugin {
 export default defineConfig({
   base: BASE,
   plugins: [publicAssetPaths(), react(), tailwindcss()],
+  // Lets the code tell it's the WordPress build (e.g. the header leaves out
+  // Cleanup Map / Volunteer, which the site adds itself there).
+  define: {
+    'import.meta.env.VITE_WORDPRESS': JSON.stringify('1'),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
