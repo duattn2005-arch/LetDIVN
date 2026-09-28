@@ -20,17 +20,6 @@ function ldivn_text(string $s): string
     return html_entity_decode($s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 }
 
-/** Same as src/utils/slug.ts. */
-function ldivn_slugify(string $s): string
-{
-    $s = class_exists('Normalizer') ? Normalizer::normalize($s, Normalizer::FORM_D) : remove_accents($s);
-    $s = preg_replace('/\p{Mn}+/u', '', $s);
-    $s = str_ireplace('đ', 'd', $s);
-    $s = strtolower($s);
-    $s = preg_replace('/[^a-z0-9]+/', '-', $s);
-    return trim($s, '-');
-}
-
 function ldivn_youtube_id(string $url): string
 {
     $url = trim($url);
@@ -144,54 +133,6 @@ function ldivn_get_media_coverage(): array
         'pdfUrl' => ldivn_str($doc['pdfUrl'] ?? ''),
         'order' => (int) $doc['order'],
     ]);
-}
-
-/** Events, with the sign-up count: the count carried over from the old site plus sign-ups made here. */
-function ldivn_get_events(): array
-{
-    $signups = [];
-    foreach (get_posts([
-        'post_type' => 'ldivn_volunteer',
-        'post_status' => 'any',
-        'numberposts' => -1,
-        'fields' => 'ids',
-        'meta_query' => [['key' => '_ldivn_migrated', 'compare' => 'NOT EXISTS']],
-    ]) as $id) {
-        $event = get_post_meta($id, 'event_id', true);
-        $signups[$event] = ($signups[$event] ?? 0) + 1;
-    }
-
-    return ldivn_list('events', function ($doc) use ($signups) {
-        $lat = $doc['coordinates']['lat'] ?? null;
-        $lng = $doc['coordinates']['lng'] ?? null;
-        $hasCoords = is_numeric($lat) && is_numeric($lng) && ((float) $lat || (float) $lng);
-        $id = ldivn_str($doc['id']);
-        $schedule = array_values(array_filter(
-            array_map(fn($s) => ['time' => ldivn_str($s['time'] ?? ''), 'activity' => ldivn_str($s['activity'] ?? '')], $doc['schedule'] ?? []),
-            fn($s) => $s['time'] !== '' || $s['activity'] !== ''
-        ));
-        return [
-            'title' => ldivn_str($doc['title']),
-            'category' => ldivn_str($doc['category'] ?? '') ?: 'World Cleanup Day',
-            'date' => ldivn_str($doc['date'] ?? ''),
-            'time' => ldivn_str($doc['time'] ?? ''),
-            'location' => ldivn_str($doc['location'] ?? ''),
-            'city' => ldivn_str($doc['city'] ?? ''),
-            'coordinates' => $hasCoords ? ['lat' => (float) $lat, 'lng' => (float) $lng] : null,
-            'image' => ldivn_str($doc['image'] ?? ''),
-            'bannerImage' => ldivn_str($doc['bannerImage'] ?? '') ?: null,
-            'description' => ldivn_str($doc['description'] ?? ''),
-            'targetVolunteers' => ldivn_num($doc['targetVolunteers'] ?? null, 100),
-            'registeredCount' => (int) get_post_meta($doc['_post']->ID, '_ldivn_registered_base', true) + ($signups[$id] ?? 0),
-            'trashCollectedKg' => ldivn_num($doc['trashCollectedKg'] ?? null),
-            'status' => in_array($doc['status'] ?? '', ['Ongoing', 'Completed'], true) ? $doc['status'] : 'Upcoming',
-            'leader' => ldivn_str($doc['leader'] ?? ''),
-            'meetingPoint' => ldivn_str($doc['meetingPoint'] ?? ''),
-            'googleMapsUrl' => ldivn_str($doc['googleMapsUrl'] ?? '') ?: null,
-            'sheetUrl' => ldivn_str($doc['sheetUrl'] ?? '') ?: null,
-            'schedule' => isset($doc['schedule']) ? $schedule : null,
-        ];
-    });
 }
 
 // --- News ---------------------------------------------------------------------------------
@@ -422,18 +363,17 @@ function ldivn_get_page_content(): array
 
 function ldivn_get_stats(): array
 {
-    $events = ldivn_get_events();
     $partners = count(ldivn_get_partners());
     $volunteers = (int) wp_count_posts('ldivn_volunteer')->private;
-    $trashKg = array_sum(array_map(fn($e) => (float) ($e['trashCollectedKg'] ?? 0), $events)) ?: 5200;
+    $trashKg = 5200;
     return [
         'totalTrashKg' => $trashKg,
         'totalTrashTons' => round($trashKg / 1000, 1),
         'totalVolunteers' => $volunteers + 5400,
-        'totalEvents' => count($events) + 100,
+        'totalEvents' => 100,
         'totalProvinces' => 63,
         'totalPartners' => $partners > 0 ? $partners : 24,
         'totalNews' => count(ldivn_get_news()),
-        'upcomingEventsCount' => count(array_filter($events, fn($e) => $e['status'] === 'Upcoming')),
+        'upcomingEventsCount' => 0,
     ];
 }

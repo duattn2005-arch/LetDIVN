@@ -398,13 +398,6 @@ class LDIVN_Importer
 
     private function liveData(): void
     {
-        // Sign-up counts of the events (volunteers who signed up on the old site).
-        foreach ((array) $this->liveJson('/api/events') as $event) {
-            $found = get_posts(['post_type' => 'ldivn_event', 'post_status' => 'any', 'meta_key' => '_ldivn_id', 'meta_value' => $event['id'] ?? '', 'fields' => 'ids', 'numberposts' => 1]);
-            if ($found) {
-                update_post_meta($found[0], '_ldivn_registered_base', (int) ($event['registeredCount'] ?? 0));
-            }
-        }
         // Image crop positions set with the old on-page editor.
         $legacy = [];
         foreach ((array) $this->liveJson('/api/content') as $key => $value) {

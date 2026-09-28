@@ -16,10 +16,10 @@ define('LDIVN_DIR', __DIR__);
 /**
  * Decap collections (see schema.json, generated from public/admin/decap/config.yml)
  * that are lists of entries, and the post type each one is stored as. News is
- * WordPress's own "post".
+ * WordPress's own "post". Events (Cleanup Map) aren't kept here: the site
+ * adds its own cleanup map.
  */
 const LDIVN_TYPES = [
-    'events' => 'ldivn_event',
     'videos' => 'ldivn_video',
     'partners' => 'ldivn_partner',
     'team' => 'ldivn_team',
@@ -30,7 +30,6 @@ const LDIVN_TYPES = [
 
 /** Id prefix of entries created in WordPress (migrated ones keep their own id). */
 const LDIVN_ID_PREFIX = [
-    'events' => 'evt',
     'videos' => 'vid',
     'partners' => 'part',
     'team' => 'tm',

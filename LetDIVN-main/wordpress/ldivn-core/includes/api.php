@@ -9,7 +9,8 @@ add_action('rest_api_init', function () {
     $ns = 'ldivn/v1';
     $read = [
         '/content' => fn() => (object) ldivn_cached('content', 'ldivn_get_page_content'),
-        '/events' => fn() => ldivn_cached('events', 'ldivn_get_events'),
+        // No events here (see LDIVN_TYPES); the app still asks for them.
+        '/events' => fn() => [],
         '/news' => fn() => ldivn_cached('news', 'ldivn_get_news'),
         '/partners' => fn() => ldivn_cached('partners', 'ldivn_get_partners'),
         '/team' => fn() => ldivn_cached('team', 'ldivn_get_team'),

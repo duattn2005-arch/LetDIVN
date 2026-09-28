@@ -28,14 +28,13 @@ export const ProjectDetailPage: React.FC<ProjectDetailPageProps> = ({
     events.find((e) => e.id === projectId) ||
     events.find((e) => e.category === projectId) ||
     events.find((e) => slugify(e.category) === projectId) ||
-    events.find((e) => slugify(e.city) === projectId) ||
-    events[0];
-
-  if (!event) return null;
+    events.find((e) => slugify(e.city) === projectId);
+  // No event for it (the WordPress site has none): projectId is the category.
+  const category = event?.category ?? projectId;
 
   return (
     <div className="bg-white">
-      <ProjectStaticContent category={event.category} />
+      <ProjectStaticContent category={category} />
       {/* The reference site ends every project page with the four coloured tiles. */}
       <TakeActionStrip contentKeyPrefix="projectPages" photos={false} />
     </div>

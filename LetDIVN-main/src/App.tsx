@@ -92,6 +92,10 @@ export function AppContent() {
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>('evt-wcd-2026');
   const [selectedNewsArticleId, setSelectedNewsArticleId] = useState<string | undefined>(undefined);
   const [events, setEvents] = useState<CleanupEvent[]>([]);
+  const [eventsLoaded, setEventsLoaded] = useState(false);
+  // Categories that have a project page, so /<category-slug>/ opens it even
+  // when no event has that category (the WordPress site has no events).
+  const [projectCategories, setProjectCategories] = useState<string[] | null>(null);
 
   // Modals state
   const [isVolunteerModalOpen, setIsVolunteerModalOpen] = useState(false);
@@ -110,16 +114,24 @@ export function AppContent() {
   // are fetched here (not just in ProjectDetailPage) so a direct visit to
   // /<slug> and browser back/forward can both resolve which project it is.
   useEffect(() => {
-    const refresh = () => { dbService.getEvents().then(setEvents); };
+    const refresh = () => { dbService.getEvents().then((list) => { setEvents(list); setEventsLoaded(true); }); };
     refresh();
     const unsubscribe = dbService.subscribe(refresh);
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    dbService.getProjectPages().then((pages) => setProjectCategories(Object.keys(pages)), () => setProjectCategories([]));
   }, []);
 
   const resolveSlugToEvent = (path: string, list: CleanupEvent[]) =>
     list.find((e) => e.id === path) ||
     list.find((e) => slugify(e.category) === path) ||
     list.find((e) => slugify(e.city) === path);
+
+  /** Project id for /<path>/: an event's id, or else a project page's category. */
+  const resolveProject = (path: string) =>
+    resolveSlugToEvent(path, events)?.id ?? projectCategories?.find((c) => slugify(c) === path);
 
   const resolveCampaignSlug = (slug: string, list: CleanupEvent[]) =>
     list.find((e) => e.id === slug) || list.find((e) => slugify(e.city) === slug);
@@ -150,9 +162,9 @@ export function AppContent() {
     }
     const path = pathname.replace(/^\/+|\/+$/g, '');
     if (path) {
-      const match = resolveSlugToEvent(path, events);
-      if (match) {
-        setSelectedProjectId(match.id);
+      const projectId = resolveProject(path);
+      if (projectId) {
+        setSelectedProjectId(projectId);
         setActiveView('project-detail');
         return;
       }
@@ -179,7 +191,7 @@ export function AppContent() {
   // /<project-slug> resolves once events have loaded (skipped for static pages).
   const triedInitialUrlRef = React.useRef(false);
   useEffect(() => {
-    if (triedInitialUrlRef.current || events.length === 0) return;
+    if (triedInitialUrlRef.current || !eventsLoaded || !projectCategories) return;
     const campaignSlug = campaignSlugFromPath(window.location.pathname);
     if (campaignSlug) {
       const match = resolveCampaignSlug(campaignSlug, events);
@@ -192,14 +204,14 @@ export function AppContent() {
     }
     const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
     if (path && !viewForPath(window.location.pathname) && !newsSlugFromPath(window.location.pathname)) {
-      const match = resolveSlugToEvent(path, events);
-      if (match) {
-        setSelectedProjectId(match.id);
+      const projectId = resolveProject(path);
+      if (projectId) {
+        setSelectedProjectId(projectId);
         setActiveView('project-detail');
       }
     }
     triedInitialUrlRef.current = true;
-  }, [events]);
+  }, [events, eventsLoaded, projectCategories]);
 
   // Browser back/forward button support.
   useEffect(() => {
@@ -207,7 +219,7 @@ export function AppContent() {
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [events]);
+  }, [events, projectCategories]);
 
   const goToProject = (projectId: string) => {
     setSelectedProjectId(projectId);

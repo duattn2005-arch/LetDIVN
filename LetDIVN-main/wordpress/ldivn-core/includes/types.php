@@ -1,12 +1,11 @@
 <?php
-// Post types for the site's lists (events, partners, team, ...), the options
+// Post types for the site's lists (partners, team, ...), the options
 // page for site-wide text, and admin tweaks that keep the editing screens to
 // what the site actually shows.
 
 defined('ABSPATH') || exit;
 
 const LDIVN_TYPE_ICONS = [
-    'events' => 'dashicons-location-alt',
     'videos' => 'dashicons-video-alt3',
     'partners' => 'dashicons-groups',
     'team' => 'dashicons-id',
