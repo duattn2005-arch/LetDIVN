@@ -129,7 +129,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ initialCategory = 'All', ini
       meta.name = 'description';
       document.head.appendChild(meta);
     }
-    document.title = `${selectedArticle.seoTitle || selectedArticle.title} – Let's do it! Vietnam`;
+    document.title = `${selectedArticle.seoTitle || selectedArticle.title} – Lets Do It Vietnam`;
     meta.content = selectedArticle.seoDescription || selectedArticle.summary || '';
     return () => {
       document.title = previousTitle;

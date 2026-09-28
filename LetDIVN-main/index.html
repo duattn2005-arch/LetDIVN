@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
   <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SC9H766FBB"></script>
@@ -13,7 +13,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lets Do It Vietnam – People for Clean Planet</title>
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/favicon-96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script>
       // Shim to ensure window.fetch can be assigned without throwing getter-only TypeError in sandboxed environments
       (function() {
@@ -31,11 +34,38 @@
         }
       })();
     </script>
-    <meta name="description" content="Nền tảng chính thức của Let's do it! Vietnam - Ngày Hội Dọn Rác Thế Giới, kết nối tình nguyện viên, đối tác và hệ sinh thái quản lý dữ liệu môi trường." />
+    <meta name="description" content="Let's Do It Vietnam is the World Cleanup Day movement in Vietnam, bringing volunteers, partners and communities together for a clean planet." />
+    <meta property="og:site_name" content="Lets Do It Vietnam" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content="Lets Do It Vietnam – People for Clean Planet" />
-    <meta property="og:description" content="Nền tảng chính thức của Let's do it! Vietnam - Ngày Hội Dọn Rác Thế Giới, kết nối tình nguyện viên, đối tác và hệ sinh thái quản lý dữ liệu môi trường." />
+    <meta property="og:description" content="Let's Do It Vietnam is the World Cleanup Day movement in Vietnam, bringing volunteers, partners and communities together for a clean planet." />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://letsdoitvietnam.online/logo.png" />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Site name and logo Google shows in search results -->
+    <script type="application/ld+json">
+      [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Lets Do It Vietnam",
+          "alternateName": ["Let's Do It! Vietnam", "letsdoitvietnam.online"],
+          "url": "https://letsdoitvietnam.online/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Lets Do It Vietnam",
+          "url": "https://letsdoitvietnam.online/",
+          "logo": "https://letsdoitvietnam.online/favicon-192.png",
+          "sameAs": [
+            "https://www.facebook.com/LetsDoItVietNam",
+            "https://www.instagram.com/letsdoitvietnam/",
+            "https://letsdoitvietnam.org/"
+          ]
+        }
+      ]
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chau+Philomene+One&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;600;700&family=Roboto+Slab:wght@400;500&display=swap" rel="stylesheet">
@@ -57,7 +87,7 @@
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
         js = d.createElement(s); js.id = id;
-        js.src = 'https://connect.facebook.net/vi_VN/sdk.js';
+        js.src = 'https://connect.facebook.net/en_US/sdk.js';
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
     </script>

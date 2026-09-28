@@ -64,7 +64,7 @@ app.use(async (req, res) => {
 const escapeAttr = (v: string) => v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 function withArticleMeta(html: string, a: { slug: string; title: string; summary: string; image: string; seoTitle?: string; seoDescription?: string }, origin: string) {
-  const title = `${a.seoTitle || a.title} – Let's do it! Vietnam`;
+  const title = `${a.seoTitle || a.title} – Lets Do It Vietnam`;
   const description = (a.seoDescription || a.summary || '').replace(/\s+/g, ' ').trim().slice(0, 300);
   const url = `${origin}/news/${a.slug}/`;
   const image = a.image ? new URL(a.image, origin).href : '';
