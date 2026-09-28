@@ -34,9 +34,10 @@ const PROVINCE_PINS = [
   { name: 'Quy Nhơn', lat: 13.7765, lng: 109.2237 },
 ];
 
-// The map's popups sit inside the map, beneath the search card over its top
-// edge, so an opening popup pans the map until it is clear of that card.
-const POPUP_OPTIONS: L.PopupOptions = { autoPanPaddingTopLeft: [16, 84] };
+// The map's popups open in a pane of their own, lifted out of the map so they
+// sit over the search card and the other overlays (see the map's setup).
+const TOP_POPUP_PANE = 'topPopupPane';
+const POPUP_OPTIONS: L.PopupOptions = { pane: TOP_POPUP_PANE };
 
 // The same pink pin as the events'.
 const provincePinIcon = L.divIcon({
@@ -650,6 +651,18 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       tileLayerRef.current = tileLayer;
       mapInstanceRef.current = map;
 
+      // Inside the map, popups can't rise above the overlays drawn over it
+      // (the map is one layer to the page). So their pane sits beside the map
+      // in the same box, above the overlays, and shifts with the map's own
+      // pane whenever the map moves.
+      const popupPane = map.createPane(TOP_POPUP_PANE, mapContainerRef.current.parentElement!);
+      const mapPane = map.getPane('mapPane')!;
+      const followMap = () => {
+        popupPane.style.transform = mapPane.style.transform;
+      };
+      followMap();
+      map.on('move zoom viewreset resize', followMap);
+
       // Handle map click to pin new location
       map.on('click', async (e: L.LeafletMouseEvent) => {
         const { lat, lng } = e.latlng;
@@ -1084,7 +1097,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         </div>
 
         {/* Right Interactive Leaflet Map Area */}
-        <div className={`flex-1 relative w-full h-full min-h-[420px] ${mobileTab === 'list' ? 'hidden lg:block' : 'block'}`}>
+        {/* overflow-hidden: popups (outside the map itself) are cut at the map's edges, as inside it. */}
+        <div className={`flex-1 relative w-full h-full min-h-[420px] overflow-hidden ${mobileTab === 'list' ? 'hidden lg:block' : 'block'}`}>
           
           <div ref={mapContainerRef} className="w-full h-full z-10" />
 
