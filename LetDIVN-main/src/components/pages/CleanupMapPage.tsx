@@ -28,11 +28,40 @@ const PROVINCE_PINS = [
   { name: 'Quảng Ngãi', lat: 15.1205, lng: 108.7923 },
   { name: 'Hải Phòng', lat: 20.8449, lng: 106.6881 },
   { name: 'Bình Thuận', lat: 10.9289, lng: 108.1021 },
-  { name: 'TP. Hồ Chí Minh', lat: 10.7769, lng: 106.7009 },
+  { name: 'TP. Hồ Chí Minh', lat: 10.7769, lng: 106.7009, aliases: ['HCMC', 'Sài Gòn'] },
   { name: 'Đà Nẵng', lat: 16.0544, lng: 108.2022 },
   { name: 'Cần Thơ', lat: 10.0452, lng: 105.7469 },
   { name: 'Quy Nhơn', lat: 13.7765, lng: 109.2237 },
 ];
+type ProvincePin = (typeof PROVINCE_PINS)[number];
+
+/** A place name boiled down for matching: no accents, case, spaces, "TP." or "City". */
+const placeKey = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/gi, 'd')
+    .toLowerCase()
+    .replace(/^(tp\.?|thanh pho)\s*/, '')
+    .replace(/\s*city\b/, '')
+    .replace(/[^a-z]/g, '');
+
+/** The local team a campaign belongs to: by its city ("Hanoi", "Ha Noi"...), else by being within 25 km of the pin. */
+const provinceOf = (evt: CleanupEvent): ProvincePin | undefined => {
+  const city = placeKey(evt.city || '');
+  const byName = PROVINCE_PINS.find((p) => city && [p.name, ...(p.aliases ?? [])].some((n) => city.includes(placeKey(n))));
+  const at = evt.coordinates;
+  return byName ?? (at ? PROVINCE_PINS.find((p) => L.latLng(p.lat, p.lng).distanceTo([at.lat, at.lng]) < 25000) : undefined);
+};
+
+/** Where a campaign is pinned (a few migrated events carry fixed spots). */
+const FIXED_EVENT_SPOTS: Record<string, { lat: number; lng: number }> = {
+  'evt-green-ocean-danang': { lat: 16.1083, lng: 108.2778 }, // Bán đảo Sơn Trà Đà Nẵng
+  'evt-env-day-hcm': { lat: 10.7769, lng: 106.6924 },
+  'evt-wildlife-catba': { lat: 20.8, lng: 106.9961 },
+  'evt-wcd-2026': { lat: 21.0245, lng: 105.8576 },
+};
+const eventSpot = (evt: CleanupEvent) => FIXED_EVENT_SPOTS[evt.id] || evt.coordinates || { lat: 21.0285, lng: 105.8542 };
 
 // The map's popups open in a pane of their own, lifted out of the map so they
 // sit over the search card and the other overlays (see the map's setup).
@@ -47,6 +76,63 @@ const provincePinIcon = L.divIcon({
   iconAnchor: [12, 42],
   tooltipAnchor: [0, -36],
 });
+
+// A place with a campaign on: the pin bounces, over a pink ripple at its foot.
+const campaignPinIcon = (pending: boolean) =>
+  L.divIcon({
+    className: 'campaign-pin',
+    html: `
+      <div class="relative w-6 h-[42px]">
+        <span class="absolute left-1/2 -bottom-1.5 -ml-3 w-6 h-3 rounded-[50%] bg-[#E81A7F]/60 animate-ping"></span>
+        <img src="/images/map-pin.png" class="relative w-6 h-[42px] drop-shadow-lg animate-bounce" alt="" />
+        ${pending ? '<div class="absolute -top-2 -right-2 bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 rounded-full border border-white shadow whitespace-nowrap">Pending review</div>' : ''}
+      </div>`,
+    iconSize: [24, 42],
+    iconAnchor: [12, 42],
+    popupAnchor: [0, -38],
+    tooltipAnchor: [0, -36],
+  });
+
+const eventPopupHtml = (evt: CleanupEvent) => {
+  const isPending = evt.status === 'Pending';
+  return `
+        <div class="p-2 font-sans max-w-xs text-slate-900">
+          <div class="relative aspect-16/9 rounded-xl overflow-hidden mb-2 bg-slate-100">
+            <img src="${evt.image}" alt="${evt.title}" class="w-full h-full object-cover" />
+            ${isPending ? `
+              <div class="absolute top-2 right-2 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
+                Pending review
+              </div>
+            ` : ''}
+          </div>
+
+          <h4 class="font-extrabold text-sm text-slate-900 line-clamp-1 mb-1">
+            ${evt.title}
+          </h4>
+
+          <div class="space-y-1 text-xs text-slate-600 mb-3">
+            <div class="flex items-center gap-1.5">
+              <span>📍</span> <span class="truncate">${evt.location} (${evt.city})</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span>📅</span> <span>${evt.date} • ${evt.time}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-emerald-600 font-bold">
+              <span>👥</span> <span>${evt.registeredCount || 0} people registered</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="window.__selectCampaign('${evt.id}')" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
+              Details
+            </button>
+            <button onclick="window.__registerVolunteer('${evt.id}')" class="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
+              Register
+            </button>
+          </div>
+        </div>
+      `;
+};
 
 interface SearchSuggestion {
   placeId: string;
@@ -65,7 +151,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const [events, setEvents] = useState<CleanupEvent[]>([]);
-  const [activeEvent, setActiveEvent] = useState<CleanupEvent | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(2026);
   const [currentLayer, setCurrentLayer] = useState<MapLayer>('streets');
 
@@ -81,7 +166,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<{ [id: string]: L.Marker }>({});
+  const provinceMarkersRef = useRef<Map<string, L.Marker>>(new Map());
   const newPinMarkerRef = useRef<L.Marker | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const boundaryLayerRef = useRef<L.Layer | null>(null);
@@ -701,26 +786,65 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     };
   }, []);
 
-  // The provinces' pins, a click flies to the province. On top of the event
-  // pins: the taller event pin's head still shows above a province pin.
+  // The campaigns of the chosen year, soonest first, split between the local
+  // teams' provinces (the soonest one per province) and places outside them.
+  const yearCampaigns = [...events]
+    .filter((evt) => new Date(evt.date).getFullYear() === selectedYear)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const campaignOfProvince = new Map<string, CleanupEvent>();
+  const campaignsElsewhere: CleanupEvent[] = [];
+  yearCampaigns.forEach((evt) => {
+    const p = provinceOf(evt);
+    if (!p) campaignsElsewhere.push(evt);
+    else if (!campaignOfProvince.has(p.name)) campaignOfProvince.set(p.name, evt);
+  });
+
+  // The pins. A province with a campaign on gets the bouncing pin and opens
+  // that campaign when clicked; a quiet one just flies there. A campaign
+  // outside the provinces gets a bouncing pin of its own.
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
-    const pins = L.layerGroup(
-      PROVINCE_PINS.map((p) =>
-        L.marker([p.lat, p.lng], { icon: provincePinIcon, zIndexOffset: 1000 })
-          .bindTooltip(p.name, { direction: 'top' })
-          .on('click', () => flyToProvince(p))
-      )
-    ).addTo(map);
+    const pins = L.layerGroup().addTo(map);
+    provinceMarkersRef.current = new Map();
+
+    PROVINCE_PINS.forEach((p) => {
+      const evt = campaignOfProvince.get(p.name);
+      const marker = L.marker([p.lat, p.lng], {
+        icon: evt ? campaignPinIcon(evt.status === 'Pending') : provincePinIcon,
+        zIndexOffset: evt ? 2000 : 1000,
+      })
+        .bindTooltip(p.name, { direction: 'top' })
+        .addTo(pins);
+      if (evt) marker.bindPopup(eventPopupHtml(evt), { ...POPUP_OPTIONS, maxWidth: 300 });
+      else marker.on('click', () => flyToProvince(p));
+      provinceMarkersRef.current.set(p.name, marker);
+    });
+
+    campaignsElsewhere.forEach((evt) => {
+      const { lat, lng } = eventSpot(evt);
+      L.marker([lat, lng], { icon: campaignPinIcon(evt.status === 'Pending'), zIndexOffset: 2000 })
+        .bindPopup(eventPopupHtml(evt), { ...POPUP_OPTIONS, maxWidth: 300 })
+        .addTo(pins);
+    });
+
     return () => {
       pins.remove();
     };
-  }, []);
+  }, [events, selectedYear]);
 
-  const flyToProvince = (p: (typeof PROVINCE_PINS)[number]) => {
-    mapInstanceRef.current?.flyTo([p.lat, p.lng], 10, { duration: 1.2 });
+  // Flies to a province; one with a campaign on opens it on arrival. (The
+  // short wait lets the map show again first when coming from the mobile list.)
+  const flyToProvince = (p: ProvincePin) => {
     setMobileTab('map');
+    setTimeout(() => {
+      const map = mapInstanceRef.current;
+      if (!map) return;
+      map.invalidateSize();
+      map.flyTo([p.lat, p.lng], 10, { duration: 1.2 });
+      const marker = provinceMarkersRef.current.get(p.name);
+      if (marker?.getPopup()) map.once('moveend', () => marker.openPopup());
+    }, 50);
   };
 
   // Update Tile Layer when layer switch changes
@@ -733,95 +857,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     tileLayerRef.current = newTile;
     mapInstanceRef.current.invalidateSize();
   }, [currentLayer]);
-
-  // Update Markers on Map
-  useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map) return;
-
-    Object.values(markersRef.current).forEach(marker => map.removeLayer(marker));
-    markersRef.current = {};
-
-    events.filter(evt => new Date(evt.date).getFullYear() === selectedYear).forEach(evt => {
-      let coords = evt.coordinates || { lat: 21.0285, lng: 105.8542 };
-      if (evt.id === 'evt-green-ocean-danang') {
-        coords = { lat: 16.1083, lng: 108.2778 }; // Bán đảo Sơn Trà Đà Nẵng
-      } else if (evt.id === 'evt-env-day-hcm') {
-        coords = { lat: 10.7769, lng: 106.6924 };
-      } else if (evt.id === 'evt-wildlife-catba') {
-        coords = { lat: 20.8000, lng: 106.9961 };
-      } else if (evt.id === 'evt-wcd-2026') {
-        coords = { lat: 21.0245, lng: 105.8576 };
-      }
-
-      const isSelected = activeEvent?.id === evt.id;
-      const isPending = evt.status === 'Pending';
-
-      const customIcon = L.divIcon({
-        className: 'custom-map-marker',
-        html: `
-          <div class="relative flex items-center justify-center cursor-pointer transform hover:scale-110 transition-transform ${isSelected ? 'scale-125 z-50' : ''}">
-            <img src="/images/map-pin.png" class="w-6 h-[42px] drop-shadow-lg" />
-            ${isPending ? `
-              <div class="absolute -top-2 -right-2 bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 py-0.2 rounded-full border border-white shadow">
-                Pending review
-              </div>
-            ` : ''}
-          </div>
-        `,
-        iconSize: [24, 42],
-        iconAnchor: [12, 42],
-        popupAnchor: [0, -38]
-      });
-
-      const marker = L.marker([coords.lat, coords.lng], { icon: customIcon }).addTo(map);
-      markersRef.current[evt.id] = marker;
-
-      const popupContent = `
-        <div class="p-2 font-sans max-w-xs text-slate-900">
-          <div class="relative aspect-16/9 rounded-xl overflow-hidden mb-2 bg-slate-100">
-            <img src="${evt.image}" alt="${evt.title}" class="w-full h-full object-cover" />
-            ${isPending ? `
-              <div class="absolute top-2 right-2 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
-                Pending review
-              </div>
-            ` : ''}
-          </div>
-
-          <h4 class="font-extrabold text-sm text-slate-900 line-clamp-1 mb-1">
-            ${evt.title}
-          </h4>
-
-          <div class="space-y-1 text-xs text-slate-600 mb-3">
-            <div class="flex items-center gap-1.5">
-              <span>📍</span> <span class="truncate">${evt.location} (${evt.city})</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span>📅</span> <span>${evt.date} • ${evt.time}</span>
-            </div>
-            <div class="flex items-center gap-1.5 text-emerald-600 font-bold">
-              <span>👥</span> <span>${evt.registeredCount || 0} people registered</span>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="window.__selectCampaign('${evt.id}')" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
-              Details
-            </button>
-            <button onclick="window.__registerVolunteer('${evt.id}')" class="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center">
-              Register
-            </button>
-          </div>
-        </div>
-      `;
-
-      marker.bindPopup(popupContent, { ...POPUP_OPTIONS, maxWidth: 300 });
-
-      marker.on('click', () => {
-        setActiveEvent(evt);
-      });
-    });
-  }, [events, activeEvent, selectedYear]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -841,7 +876,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
   const handleResetView = () => {
     mapInstanceRef.current?.flyTo([16.0544, 108.0], 6, { duration: 1.2 });
-    setActiveEvent(null);
     setSearchedPlaceName(null);
     if (boundaryLayerRef.current && mapInstanceRef.current) {
       mapInstanceRef.current.removeLayer(boundaryLayerRef.current);
@@ -961,6 +995,13 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 >
                   <MapPin className="w-4 h-4 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="#0f172a" />
                   <span className="truncate">{p.name}</span>
+                  {/* A campaign on here: a pulsing dot, like the pin's ripple. */}
+                  {campaignOfProvince.has(p.name) && (
+                    <span className="relative ml-auto flex w-2.5 h-2.5 shrink-0" title="Campaign on">
+                      <span className="absolute inline-flex w-full h-full rounded-full bg-[#E81A7F] opacity-75 animate-ping" />
+                      <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-[#E81A7F]" />
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
