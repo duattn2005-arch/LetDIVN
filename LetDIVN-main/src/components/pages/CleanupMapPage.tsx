@@ -20,6 +20,28 @@ type MapLayer = 'streets' | 'satellite' | 'carto';
 // scrolls horizontally instead of overflowing the header.
 const YEAR_OPTIONS = Array.from({ length: 37 }, (_, i) => 2024 + i); // 2024..2060
 
+// The provinces where Let's Do It Vietnam is active: always pinned on the map,
+// each in its legend color. Listed column by column, as the legend shows them.
+const PROVINCE_PINS = [
+  { name: 'Hà Nội', color: '#e0197d', lat: 21.0285, lng: 105.8542 },
+  { name: 'Quảng Trị', color: '#fbc70f', lat: 16.8163, lng: 107.1003 },
+  { name: 'Quảng Ngãi', color: '#e8552a', lat: 15.1205, lng: 108.7923 },
+  { name: 'Hải Phòng', color: '#4a90e2', lat: 20.8449, lng: 106.6881 },
+  { name: 'Bình Thuận', color: '#e98b16', lat: 10.9289, lng: 108.1021 },
+  { name: 'TP. Hồ Chí Minh', color: '#12a150', lat: 10.7769, lng: 106.7009 },
+  { name: 'Đà Nẵng', color: '#b5d334', lat: 16.0544, lng: 108.2022 },
+  { name: 'Cần Thơ', color: '#1170c2', lat: 10.0452, lng: 105.7469 },
+];
+
+const provincePinIcon = (color: string) =>
+  L.divIcon({
+    className: 'province-pin',
+    html: `<svg viewBox="0 0 24 24" width="30" height="30" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,.35))"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="${color}" stroke="#fff" stroke-width="1.3"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 28],
+    tooltipAnchor: [0, -24],
+  });
+
 interface PinnedNewLocation {
   lat: number;
   lng: number;
@@ -700,6 +722,27 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     };
   }, []);
 
+  // The provinces' pins, beneath the event pins; a click flies to the province.
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    const pins = L.layerGroup(
+      PROVINCE_PINS.map((p) =>
+        L.marker([p.lat, p.lng], { icon: provincePinIcon(p.color), zIndexOffset: -1000 })
+          .bindTooltip(p.name, { direction: 'top' })
+          .on('click', () => flyToProvince(p))
+      )
+    ).addTo(map);
+    return () => {
+      pins.remove();
+    };
+  }, []);
+
+  const flyToProvince = (p: (typeof PROVINCE_PINS)[number]) => {
+    mapInstanceRef.current?.flyTo([p.lat, p.lng], 10, { duration: 1.2 });
+    setMobileTab('map');
+  };
+
   // Update Tile Layer when layer switch changes
   useEffect(() => {
     if (!mapInstanceRef.current || !tileLayerRef.current) return;
@@ -1187,6 +1230,23 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               </button>
             </div>
 
+          </div>
+
+          {/* Legend of the provinces' pins (bottom-left); steps aside for the event card where they'd overlap. */}
+          <div className={`absolute bottom-6 left-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-2 ${activeEvent ? 'hidden xl:block' : ''}`}>
+            <div className="grid grid-flow-col grid-rows-5 gap-x-3">
+              {PROVINCE_PINS.map((p) => (
+                <button
+                  key={p.name}
+                  type="button"
+                  onClick={() => flyToProvince(p)}
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg text-xs font-semibold text-slate-800 whitespace-nowrap hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                  {p.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Floating Pinned Location Action Card */}
