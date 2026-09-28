@@ -48,14 +48,6 @@ const provincePinIcon = L.divIcon({
   tooltipAnchor: [0, -36],
 });
 
-interface PinnedNewLocation {
-  lat: number;
-  lng: number;
-  placeName: string;
-  address: string;
-  city: string;
-}
-
 interface SearchSuggestion {
   placeId: string;
   name: string;
@@ -84,10 +76,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchedPlaceName, setSearchedPlaceName] = useState<string | null>(null);
   const [mobileTab, setMobileTab] = useState<'map' | 'list'>('map');
-
-  // Pinned location by user click
-  const [pinnedLocation, setPinnedLocation] = useState<PinnedNewLocation | null>(null);
-  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
 
   // Modal create/edit state
 
@@ -496,14 +484,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         </div>
       </div>
     `, POPUP_OPTIONS).openPopup();
-
-    setPinnedLocation({
-      lat,
-      lng,
-      placeName: displayName,
-      address: fullAddress,
-      city: 'Vietnam'
-    });
   };
 
   // The live-as-you-type autocomplete never retries Nominatim (that would slow
@@ -624,14 +604,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         </div>
       </div>
     `, POPUP_OPTIONS).openPopup();
-
-    setPinnedLocation({
-      lat: sug.lat,
-      lng: sug.lng,
-      placeName: sug.name,
-      address: sug.subAddress,
-      city: 'Vietnam'
-    });
   };
 
   // Initialize Map
@@ -666,19 +638,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       // Handle map click to pin new location
       map.on('click', async (e: L.LeafletMouseEvent) => {
         const { lat, lng } = e.latlng;
-        setIsLoadingAddress(true);
-
         const geo = await fetchAddressFromCoords(lat, lng);
-        setIsLoadingAddress(false);
-
-        const pinData: PinnedNewLocation = {
-          lat,
-          lng,
-          placeName: geo.placeName,
-          address: geo.address,
-          city: geo.city
-        };
-        setPinnedLocation(pinData);
 
         if (newPinMarkerRef.current) {
           map.removeLayer(newPinMarkerRef.current);
@@ -1033,6 +993,26 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
           {/* Cleanup Campaign Spots List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {/* The provinces' pins: a click flies there. */}
+            <div className="pb-4 mb-1 border-b border-slate-800 space-y-3">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <EditableText contentKey="cleanupMap.localTeamsLabel" defaultValue="Our Local Teams" as="span" /> ({PROVINCE_PINS.length})
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {PROVINCE_PINS.map((p) => (
+                  <button
+                    key={p.name}
+                    type="button"
+                    onClick={() => flyToProvince(p)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-800 bg-slate-800/60 text-xs font-bold text-white text-left hover:border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    <MapPin className="w-4 h-4 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="#0f172a" />
+                    <span className="truncate">{p.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
               <span><EditableText contentKey="cleanupMap.featuredSpotsLabel" defaultValue="Featured Cleanup Spots" as="span" /> ({events.length})</span>
               <EditableText contentKey="cleanupMap.tapToZoomHint" defaultValue="Tap to zoom in" as="span" className="text-[10px] text-[#E81A7F] font-semibold" />
@@ -1250,51 +1230,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             </div>
 
           </div>
-
-          {/* Legend of the provinces' pins (bottom-left). */}
-          <div className="absolute bottom-6 left-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-2">
-            <div className="grid grid-flow-col grid-rows-5 gap-x-3">
-              {PROVINCE_PINS.map((p) => (
-                <button
-                  key={p.name}
-                  type="button"
-                  onClick={() => flyToProvince(p)}
-                  className="flex items-center gap-2 px-2 py-1 rounded-lg text-xs font-semibold text-slate-800 whitespace-nowrap hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  <MapPin className="w-3.5 h-3.5 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="white" />
-                  {p.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Floating Pinned Location Action Card */}
-          {pinnedLocation && (
-            <div className="absolute top-20 left-4 right-4 sm:left-4 sm:right-auto sm:max-w-sm z-20 bg-slate-900/95 backdrop-blur-md p-4 rounded-3xl border border-emerald-500 shadow-2xl animate-in slide-in-from-top-3 duration-200">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex items-center gap-1.5 text-emerald-400 font-extrabold text-xs">
-                  <span className="p-1 rounded-lg bg-emerald-500/20">📍</span>
-                  <EditableText contentKey="cleanupMap.pinnedLabel" defaultValue="LOCATION PINNED" as="span" />
-                </div>
-                <button
-                  onClick={() => setPinnedLocation(null)}
-                  className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="text-sm font-extrabold text-white mb-1 leading-snug">
-                {pinnedLocation.placeName}
-              </div>
-              <div className="text-xs text-slate-300 mb-1 leading-relaxed">
-                {pinnedLocation.address}
-              </div>
-              <div className="text-[10px] text-slate-400">
-                Coordinates: {pinnedLocation.lat.toFixed(5)}, {pinnedLocation.lng.toFixed(5)} • {pinnedLocation.city}
-              </div>
-            </div>
-          )}
 
         </div>
 
