@@ -1,0 +1,3326 @@
+{
+  "collections": [
+    {
+      "name": "pages",
+      "label": "Nội dung các trang",
+      "label_singular": "trang",
+      "description": "Chữ và ảnh trên từng trang của website. Bấm vào một trang, sửa rồi bấm Publish.",
+      "files": [
+        {
+          "name": "header",
+          "label": "Đầu trang (dòng chữ chạy & menu Other)",
+          "fields": [
+            {
+              "name": "topAnnouncement",
+              "label": "Top Announcement",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "topTagline",
+              "label": "Top Tagline",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "otherMediaLabel",
+              "label": "Other Media Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "otherNewsLabel",
+              "label": "Other News Label",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "hero",
+          "label": "Trang chủ · Banner",
+          "fields": [
+            {
+              "name": "slide1",
+              "label": "Slide 1",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "bgImage",
+                  "label": "Ảnh banner",
+                  "widget": "image",
+                  "required": false
+                },
+                {
+                  "name": "est",
+                  "label": "Dòng \"EST.\"",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "title",
+                  "label": "title",
+                  "widget": "string"
+                },
+                {
+                  "name": "desc",
+                  "label": "desc",
+                  "widget": "text"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "home",
+          "label": "Trang chủ · Ô liên kết & Tin tức",
+          "fields": [
+            {
+              "name": "quickLinks",
+              "label": "Ô liên kết",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "title",
+                  "label": "Tiêu đề",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "whoWeAreImage",
+                  "label": "Who We Are Image",
+                  "widget": "image",
+                  "required": false
+                },
+                {
+                  "name": "whoWeAreLabel",
+                  "label": "Who We Are Label",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "whatWeDoImage",
+                  "label": "What We Do Image",
+                  "widget": "image",
+                  "required": false
+                },
+                {
+                  "name": "whatWeDoLabel",
+                  "label": "What We Do Label",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "ourPartnersImage",
+                  "label": "Our Partners Image",
+                  "widget": "image",
+                  "required": false
+                },
+                {
+                  "name": "ourPartnersLabel",
+                  "label": "Our Partners Label",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "mediaOnUsImage",
+                  "label": "Media On Us Image",
+                  "widget": "image",
+                  "required": false
+                },
+                {
+                  "name": "mediaOnUsLabel",
+                  "label": "Media On Us Label",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "newsTitle",
+                  "label": "News Title",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "selectedNews",
+                  "label": "Tin hiển thị ở trang chủ",
+                  "widget": "relation",
+                  "required": false,
+                  "hint": "Chọn các bài muốn hiện ở trang chủ, theo thứ tự. Để trống = tự động lấy các bài mới nhất.",
+                  "multiple": true,
+                  "collection": "news"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "about",
+          "label": "Trang chủ · Giới thiệu phong trào",
+          "fields": [
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "p1",
+              "label": "Đoạn 2",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "p2",
+              "label": "Đoạn 3",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "stat2",
+              "label": "Số liệu 2",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "img",
+                  "label": "Ảnh",
+                  "widget": "image",
+                  "required": false
+                },
+                {
+                  "name": "number",
+                  "label": "Con số",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "title",
+                  "label": "Tiêu đề",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "sub",
+                  "label": "Dòng phụ",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "stat3",
+              "label": "Số liệu 3",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "img",
+                  "label": "Ảnh",
+                  "widget": "image",
+                  "required": false
+                },
+                {
+                  "name": "number",
+                  "label": "Con số",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "title",
+                  "label": "Tiêu đề",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "sub",
+                  "label": "Dòng phụ",
+                  "widget": "string",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "getInvolved",
+          "label": "Trang chủ · Tham gia",
+          "fields": [
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subtitle",
+              "label": "Tiêu đề phụ",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "whoWeAre",
+          "label": "Trang Who We Are",
+          "fields": [
+            {
+              "name": "heroImage",
+              "label": "Hero Image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "intro",
+              "label": "Giới thiệu",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "value1Title",
+              "label": "Value1 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "value1Desc",
+              "label": "Value1 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "value2Title",
+              "label": "Value2 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "value2Desc",
+              "label": "Value2 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "value3Title",
+              "label": "Value3 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "value3Desc",
+              "label": "Value3 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "stripImage1",
+              "label": "Strip Image1",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "stripImage2",
+              "label": "Strip Image2",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "sustainabilityTitle",
+              "label": "Sustainability Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "sustainabilityDesc",
+              "label": "Sustainability Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "sustainabilityImage",
+              "label": "Sustainability Image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "beganTitle",
+              "label": "Began Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "beganDesc",
+              "label": "Began Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "todayTitle",
+              "label": "Today Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "todayDesc",
+              "label": "Today Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "todayImage",
+              "label": "Today Image",
+              "widget": "image",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "whatWeDo",
+          "label": "Trang What We Do",
+          "fields": [
+            {
+              "name": "heroImage",
+              "label": "Hero Image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "missionSubtitle",
+              "label": "Mission Subtitle",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "differenceSubtitle",
+              "label": "Difference Subtitle",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "stripImage1",
+              "label": "Strip Image1",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "stripImage2",
+              "label": "Strip Image2",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "card1Title",
+              "label": "Card1 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card1Desc",
+              "label": "Card1 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card2Title",
+              "label": "Card2 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card2Desc",
+              "label": "Card2 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card3Title",
+              "label": "Card3 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card3Desc",
+              "label": "Card3 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card4Title",
+              "label": "Card4 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card4Desc",
+              "label": "Card4 Desc",
+              "widget": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "ourTeam",
+          "label": "Trang Our Team",
+          "fields": [
+            {
+              "name": "heroImage",
+              "label": "Hero Image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subtitle",
+              "label": "Tiêu đề phụ",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "stripImage1",
+              "label": "Strip Image1",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "stripImage2",
+              "label": "Strip Image2",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "card1Title",
+              "label": "Card1 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card1Desc",
+              "label": "Card1 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card2Title",
+              "label": "Card2 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card2Desc",
+              "label": "Card2 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card3Title",
+              "label": "Card3 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card3Desc",
+              "label": "Card3 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card4Title",
+              "label": "Card4 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card4Desc",
+              "label": "Card4 Desc",
+              "widget": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "ourPartners",
+          "label": "Trang Our Partners",
+          "fields": [
+            {
+              "name": "heroImage",
+              "label": "Hero Image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subtitle",
+              "label": "Tiêu đề phụ",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "desc",
+              "label": "Mô tả",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "stripImage1",
+              "label": "Strip Image1",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "stripImage2",
+              "label": "Strip Image2",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "card1Title",
+              "label": "Card1 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card1Desc",
+              "label": "Card1 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card2Title",
+              "label": "Card2 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card2Desc",
+              "label": "Card2 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card3Title",
+              "label": "Card3 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card3Desc",
+              "label": "Card3 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card4Title",
+              "label": "Card4 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card4Desc",
+              "label": "Card4 Desc",
+              "widget": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "cleanupMap",
+          "label": "Trang Cleanup Map",
+          "fields": [
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subtitle",
+              "label": "Tiêu đề phụ",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "mobileTabMap",
+              "label": "Mobile Tab Map",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "mobileTabList",
+              "label": "Mobile Tab List",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "locationLabel",
+              "label": "Location Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "featuredSpotsLabel",
+              "label": "Featured Spots Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "tapToZoomHint",
+              "label": "Tap To Zoom Hint",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "layerStreets",
+              "label": "Layer Streets",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "layerSatellite",
+              "label": "Layer Satellite",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "layerTerrain",
+              "label": "Layer Terrain",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "clearBoundaryBtn",
+              "label": "Clear Boundary Btn",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "locatingLabel",
+              "label": "Locating Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "boundaryDrawnHint",
+              "label": "Boundary Drawn Hint",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "suggestionsHeader",
+              "label": "Suggestions Header",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "pinnedLabel",
+              "label": "Pinned Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "viewProjectBtn",
+              "label": "View Project Btn",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "registerBtn",
+              "label": "Register Btn",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "newsPage",
+          "label": "Trang News",
+          "fields": [
+            {
+              "name": "heroImage",
+              "label": "Hero Image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "titleDefault",
+              "label": "Title Default",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "stripImage1",
+              "label": "Strip Image1",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "stripImage2",
+              "label": "Strip Image2",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "card1Title",
+              "label": "Card1 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card1Desc",
+              "label": "Card1 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card2Title",
+              "label": "Card2 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card2Desc",
+              "label": "Card2 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card3Title",
+              "label": "Card3 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card3Desc",
+              "label": "Card3 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card4Title",
+              "label": "Card4 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card4Desc",
+              "label": "Card4 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "readMoreBtn",
+              "label": "Read More Btn",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "backToListBtn",
+              "label": "Back To List Btn",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "sourceOriginalLabel",
+              "label": "Source Original Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "defaultSourceLabel",
+              "label": "Default Source Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "titleMedia",
+              "label": "Title Media",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "mediaOnUsPage",
+          "label": "Trang Media on Us",
+          "fields": [
+            {
+              "name": "heroImage",
+              "label": "Hero Image",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subtitle",
+              "label": "Tiêu đề phụ",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "stripImage1",
+              "label": "Strip Image1",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "stripImage2",
+              "label": "Strip Image2",
+              "widget": "image",
+              "required": false
+            },
+            {
+              "name": "card1Title",
+              "label": "Card1 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card1Desc",
+              "label": "Card1 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card2Title",
+              "label": "Card2 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card2Desc",
+              "label": "Card2 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card3Title",
+              "label": "Card3 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card3Desc",
+              "label": "Card3 Desc",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "card4Title",
+              "label": "Card4 Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "card4Desc",
+              "label": "Card4 Desc",
+              "widget": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "videosPage",
+          "label": "Trang Videos",
+          "fields": [
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subtitle",
+              "label": "Tiêu đề phụ",
+              "widget": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "contactPage",
+          "label": "Trang Contact",
+          "fields": [
+            {
+              "name": "title",
+              "label": "Tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subtitle",
+              "label": "Tiêu đề phụ",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "findUsTitle",
+              "label": "Find Us Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "emailLabel",
+              "label": "Email Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "phoneLabel1",
+              "label": "Phone Label1",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "phoneLabel2",
+              "label": "Phone Label2",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "formTitle",
+              "label": "Form Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "nameLabel",
+              "label": "Name Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "emailFieldLabel",
+              "label": "Email Field Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "phoneFieldLabel",
+              "label": "Phone Field Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "subjectLabel",
+              "label": "Subject Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "messageLabel",
+              "label": "Message Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "submitBtn",
+              "label": "Submit Btn",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "thankYouTitle",
+              "label": "Thank You Title",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "thankYouMsgPrefix",
+              "label": "Thank You Msg Prefix",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "thankYouMsgSuffix",
+              "label": "Thank You Msg Suffix",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "sendAnotherBtn",
+              "label": "Send Another Btn",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "contact",
+          "label": "Thông tin liên hệ (chân trang & trang Contact)",
+          "fields": [
+            {
+              "name": "phone1",
+              "label": "Phone1",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "phone2",
+              "label": "Phone2",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "email",
+              "label": "Email",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "contactBubble",
+          "label": "Nút liên hệ nổi (góc phải)",
+          "fields": [
+            {
+              "name": "fbLabel",
+              "label": "Fb Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "fbHandle",
+              "label": "Fb Handle",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "igLabel",
+              "label": "Ig Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "igHandle",
+              "label": "Ig Handle",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "hotline1Label",
+              "label": "Hotline1 Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "hotline1Number",
+              "label": "Hotline1 Number",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "hotline2Label",
+              "label": "Hotline2 Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "hotline2Number",
+              "label": "Hotline2 Number",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "emailLabel",
+              "label": "Email Label",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "emailAddress",
+              "label": "Email Address",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "footer",
+          "label": "Chân trang",
+          "fields": [
+            {
+              "name": "desc",
+              "label": "Mô tả",
+              "widget": "text",
+              "required": false
+            },
+            {
+              "name": "address",
+              "label": "Address",
+              "widget": "string",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "projects",
+      "label": "Dự án",
+      "label_singular": "dự án",
+      "description": "Chữ và ảnh của các trang dự án (World Cleanup Day, YCSW, Green Ocean...). Sự kiện theo ngày nằm ở mục \"Sự kiện (Cleanup Map)\".",
+      "files": [
+        {
+          "name": "world-cleanup-day",
+          "label": "Dự án · World Cleanup Day",
+          "fields": [
+            {
+              "name": "category",
+              "label": "Dự án",
+              "widget": "hidden"
+            },
+            {
+              "name": "hero",
+              "label": "Ảnh bìa",
+              "widget": "image"
+            },
+            {
+              "name": "heroPosition",
+              "label": "Vị trí cắt ảnh bìa",
+              "widget": "string",
+              "required": false,
+              "hint": "Ví dụ \"50% 30%\" (ngang, dọc). Để trống = giữa ảnh."
+            },
+            {
+              "name": "kicker",
+              "label": "Dòng chữ nhỏ trên tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề trang",
+              "widget": "string"
+            },
+            {
+              "name": "titleColor",
+              "label": "Màu tiêu đề",
+              "widget": "string",
+              "required": false,
+              "hint": "Mã màu, ví dụ #F1138D. Để trống = hồng."
+            },
+            {
+              "name": "sections",
+              "label": "Các phần",
+              "widget": "list",
+              "label_singular": "phần",
+              "hint": "Mỗi phần là một dải trên trang. Bấm \"Add phần\" để thêm, bấm vào một phần để sửa, kéo để đổi thứ tự.",
+              "fields": [
+                {
+                  "name": "heading",
+                  "label": "Tiêu đề phần",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "headingAsTitle",
+                  "label": "Tiêu đề to ở giữa (kiểu tiêu đề trang)",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "paragraphs",
+                  "label": "Đoạn văn",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "bulletList",
+                  "label": "Hiện đoạn văn dạng gạch đầu dòng",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "textAlign",
+                  "label": "Căn lề đoạn văn",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "Trái",
+                      "value": "left"
+                    },
+                    {
+                      "label": "Giữa",
+                      "value": "center"
+                    },
+                    {
+                      "label": "Đều hai bên",
+                      "value": "justify"
+                    }
+                  ]
+                },
+                {
+                  "name": "image",
+                  "label": "Ảnh bên cạnh chữ",
+                  "widget": "image",
+                  "required": false,
+                  "hint": "Có ảnh thì phần hiện ảnh + chữ cạnh nhau (trái/phải xen kẽ)."
+                },
+                {
+                  "name": "gallery",
+                  "label": "Bộ ảnh bên dưới",
+                  "widget": "list",
+                  "label_singular": "ảnh",
+                  "required": false,
+                  "field": {
+                    "name": "image",
+                    "label": "Ảnh",
+                    "widget": "image"
+                  }
+                },
+                {
+                  "name": "galleryAspect",
+                  "label": "Tỉ lệ ảnh trong bộ ảnh",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "3:2 (mặc định)",
+                      "value": "3/2"
+                    },
+                    {
+                      "label": "4:3",
+                      "value": "4/3"
+                    },
+                    {
+                      "label": "Vuông",
+                      "value": "square"
+                    },
+                    {
+                      "label": "Ảnh ngang dài (7:2)",
+                      "value": "7/2"
+                    }
+                  ]
+                },
+                {
+                  "name": "columns",
+                  "label": "Hai cột cạnh nhau",
+                  "widget": "list",
+                  "label_singular": "cột",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "heading",
+                      "label": "Tiêu đề cột",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "paragraphs",
+                      "label": "Các dòng",
+                      "widget": "list",
+                      "label_singular": "dòng",
+                      "field": {
+                        "name": "paragraph",
+                        "label": "Dòng",
+                        "widget": "text"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "subBlocks",
+                  "label": "Khối con (tiêu đề đậm + đoạn văn + ảnh)",
+                  "widget": "list",
+                  "label_singular": "khối",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "title",
+                      "label": "Tiêu đề đậm",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "text",
+                      "label": "Đoạn văn",
+                      "widget": "text",
+                      "required": false
+                    },
+                    {
+                      "name": "gallery",
+                      "label": "Bộ ảnh",
+                      "widget": "list",
+                      "label_singular": "ảnh",
+                      "required": false,
+                      "field": {
+                        "name": "image",
+                        "label": "Ảnh",
+                        "widget": "image"
+                      }
+                    },
+                    {
+                      "name": "galleryAspect",
+                      "label": "Tỉ lệ ảnh trong bộ ảnh",
+                      "widget": "select",
+                      "required": false,
+                      "options": [
+                        {
+                          "label": "3:2 (mặc định)",
+                          "value": "3/2"
+                        },
+                        {
+                          "label": "4:3",
+                          "value": "4/3"
+                        },
+                        {
+                          "label": "Vuông",
+                          "value": "square"
+                        },
+                        {
+                          "label": "Ảnh ngang dài (7:2)",
+                          "value": "7/2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "closingParagraphs",
+                  "label": "Đoạn kết",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "hint": "Đoạn đầu hiện trước danh sách gạch đầu dòng bên dưới, các đoạn sau hiện sau nó.",
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "closingBulletsLabel",
+                  "label": "Dòng giới thiệu danh sách kết",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "closingBullets",
+                  "label": "Danh sách gạch đầu dòng kết",
+                  "widget": "list",
+                  "label_singular": "dòng",
+                  "required": false,
+                  "field": {
+                    "name": "bullet",
+                    "label": "Dòng",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "personListItem",
+                  "label": "Chỉ một dòng tên (có biểu tượng người)",
+                  "widget": "string",
+                  "required": false,
+                  "hint": "Dùng cho danh sách đơn vị tham gia. Điền ô này thì phần chỉ hiện đúng một dòng."
+                },
+                {
+                  "name": "band",
+                  "label": "Nền",
+                  "widget": "select",
+                  "required": false,
+                  "hint": "Để trống = tự xen kẽ xám/trắng.",
+                  "options": [
+                    {
+                      "label": "Xám",
+                      "value": "gray"
+                    },
+                    {
+                      "label": "Trắng",
+                      "value": "white"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "environmental-day",
+          "label": "Dự án · Environmental Day",
+          "fields": [
+            {
+              "name": "category",
+              "label": "Dự án",
+              "widget": "hidden"
+            },
+            {
+              "name": "hero",
+              "label": "Ảnh bìa",
+              "widget": "image"
+            },
+            {
+              "name": "heroPosition",
+              "label": "Vị trí cắt ảnh bìa",
+              "widget": "string",
+              "required": false,
+              "hint": "Ví dụ \"50% 30%\" (ngang, dọc). Để trống = giữa ảnh."
+            },
+            {
+              "name": "kicker",
+              "label": "Dòng chữ nhỏ trên tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề trang",
+              "widget": "string"
+            },
+            {
+              "name": "titleColor",
+              "label": "Màu tiêu đề",
+              "widget": "string",
+              "required": false,
+              "hint": "Mã màu, ví dụ #F1138D. Để trống = hồng."
+            },
+            {
+              "name": "sections",
+              "label": "Các phần",
+              "widget": "list",
+              "label_singular": "phần",
+              "hint": "Mỗi phần là một dải trên trang. Bấm \"Add phần\" để thêm, bấm vào một phần để sửa, kéo để đổi thứ tự.",
+              "fields": [
+                {
+                  "name": "heading",
+                  "label": "Tiêu đề phần",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "headingAsTitle",
+                  "label": "Tiêu đề to ở giữa (kiểu tiêu đề trang)",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "paragraphs",
+                  "label": "Đoạn văn",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "bulletList",
+                  "label": "Hiện đoạn văn dạng gạch đầu dòng",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "textAlign",
+                  "label": "Căn lề đoạn văn",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "Trái",
+                      "value": "left"
+                    },
+                    {
+                      "label": "Giữa",
+                      "value": "center"
+                    },
+                    {
+                      "label": "Đều hai bên",
+                      "value": "justify"
+                    }
+                  ]
+                },
+                {
+                  "name": "image",
+                  "label": "Ảnh bên cạnh chữ",
+                  "widget": "image",
+                  "required": false,
+                  "hint": "Có ảnh thì phần hiện ảnh + chữ cạnh nhau (trái/phải xen kẽ)."
+                },
+                {
+                  "name": "gallery",
+                  "label": "Bộ ảnh bên dưới",
+                  "widget": "list",
+                  "label_singular": "ảnh",
+                  "required": false,
+                  "field": {
+                    "name": "image",
+                    "label": "Ảnh",
+                    "widget": "image"
+                  }
+                },
+                {
+                  "name": "galleryAspect",
+                  "label": "Tỉ lệ ảnh trong bộ ảnh",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "3:2 (mặc định)",
+                      "value": "3/2"
+                    },
+                    {
+                      "label": "4:3",
+                      "value": "4/3"
+                    },
+                    {
+                      "label": "Vuông",
+                      "value": "square"
+                    },
+                    {
+                      "label": "Ảnh ngang dài (7:2)",
+                      "value": "7/2"
+                    }
+                  ]
+                },
+                {
+                  "name": "columns",
+                  "label": "Hai cột cạnh nhau",
+                  "widget": "list",
+                  "label_singular": "cột",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "heading",
+                      "label": "Tiêu đề cột",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "paragraphs",
+                      "label": "Các dòng",
+                      "widget": "list",
+                      "label_singular": "dòng",
+                      "field": {
+                        "name": "paragraph",
+                        "label": "Dòng",
+                        "widget": "text"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "subBlocks",
+                  "label": "Khối con (tiêu đề đậm + đoạn văn + ảnh)",
+                  "widget": "list",
+                  "label_singular": "khối",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "title",
+                      "label": "Tiêu đề đậm",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "text",
+                      "label": "Đoạn văn",
+                      "widget": "text",
+                      "required": false
+                    },
+                    {
+                      "name": "gallery",
+                      "label": "Bộ ảnh",
+                      "widget": "list",
+                      "label_singular": "ảnh",
+                      "required": false,
+                      "field": {
+                        "name": "image",
+                        "label": "Ảnh",
+                        "widget": "image"
+                      }
+                    },
+                    {
+                      "name": "galleryAspect",
+                      "label": "Tỉ lệ ảnh trong bộ ảnh",
+                      "widget": "select",
+                      "required": false,
+                      "options": [
+                        {
+                          "label": "3:2 (mặc định)",
+                          "value": "3/2"
+                        },
+                        {
+                          "label": "4:3",
+                          "value": "4/3"
+                        },
+                        {
+                          "label": "Vuông",
+                          "value": "square"
+                        },
+                        {
+                          "label": "Ảnh ngang dài (7:2)",
+                          "value": "7/2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "closingParagraphs",
+                  "label": "Đoạn kết",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "hint": "Đoạn đầu hiện trước danh sách gạch đầu dòng bên dưới, các đoạn sau hiện sau nó.",
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "closingBulletsLabel",
+                  "label": "Dòng giới thiệu danh sách kết",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "closingBullets",
+                  "label": "Danh sách gạch đầu dòng kết",
+                  "widget": "list",
+                  "label_singular": "dòng",
+                  "required": false,
+                  "field": {
+                    "name": "bullet",
+                    "label": "Dòng",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "personListItem",
+                  "label": "Chỉ một dòng tên (có biểu tượng người)",
+                  "widget": "string",
+                  "required": false,
+                  "hint": "Dùng cho danh sách đơn vị tham gia. Điền ô này thì phần chỉ hiện đúng một dòng."
+                },
+                {
+                  "name": "band",
+                  "label": "Nền",
+                  "widget": "select",
+                  "required": false,
+                  "hint": "Để trống = tự xen kẽ xám/trắng.",
+                  "options": [
+                    {
+                      "label": "Xám",
+                      "value": "gray"
+                    },
+                    {
+                      "label": "Trắng",
+                      "value": "white"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "green-ocean-campaign",
+          "label": "Dự án · Green Ocean Campaign",
+          "fields": [
+            {
+              "name": "category",
+              "label": "Dự án",
+              "widget": "hidden"
+            },
+            {
+              "name": "hero",
+              "label": "Ảnh bìa",
+              "widget": "image"
+            },
+            {
+              "name": "heroPosition",
+              "label": "Vị trí cắt ảnh bìa",
+              "widget": "string",
+              "required": false,
+              "hint": "Ví dụ \"50% 30%\" (ngang, dọc). Để trống = giữa ảnh."
+            },
+            {
+              "name": "kicker",
+              "label": "Dòng chữ nhỏ trên tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề trang",
+              "widget": "string"
+            },
+            {
+              "name": "titleColor",
+              "label": "Màu tiêu đề",
+              "widget": "string",
+              "required": false,
+              "hint": "Mã màu, ví dụ #F1138D. Để trống = hồng."
+            },
+            {
+              "name": "sections",
+              "label": "Các phần",
+              "widget": "list",
+              "label_singular": "phần",
+              "hint": "Mỗi phần là một dải trên trang. Bấm \"Add phần\" để thêm, bấm vào một phần để sửa, kéo để đổi thứ tự.",
+              "fields": [
+                {
+                  "name": "heading",
+                  "label": "Tiêu đề phần",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "headingAsTitle",
+                  "label": "Tiêu đề to ở giữa (kiểu tiêu đề trang)",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "paragraphs",
+                  "label": "Đoạn văn",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "bulletList",
+                  "label": "Hiện đoạn văn dạng gạch đầu dòng",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "textAlign",
+                  "label": "Căn lề đoạn văn",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "Trái",
+                      "value": "left"
+                    },
+                    {
+                      "label": "Giữa",
+                      "value": "center"
+                    },
+                    {
+                      "label": "Đều hai bên",
+                      "value": "justify"
+                    }
+                  ]
+                },
+                {
+                  "name": "image",
+                  "label": "Ảnh bên cạnh chữ",
+                  "widget": "image",
+                  "required": false,
+                  "hint": "Có ảnh thì phần hiện ảnh + chữ cạnh nhau (trái/phải xen kẽ)."
+                },
+                {
+                  "name": "gallery",
+                  "label": "Bộ ảnh bên dưới",
+                  "widget": "list",
+                  "label_singular": "ảnh",
+                  "required": false,
+                  "field": {
+                    "name": "image",
+                    "label": "Ảnh",
+                    "widget": "image"
+                  }
+                },
+                {
+                  "name": "galleryAspect",
+                  "label": "Tỉ lệ ảnh trong bộ ảnh",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "3:2 (mặc định)",
+                      "value": "3/2"
+                    },
+                    {
+                      "label": "4:3",
+                      "value": "4/3"
+                    },
+                    {
+                      "label": "Vuông",
+                      "value": "square"
+                    },
+                    {
+                      "label": "Ảnh ngang dài (7:2)",
+                      "value": "7/2"
+                    }
+                  ]
+                },
+                {
+                  "name": "columns",
+                  "label": "Hai cột cạnh nhau",
+                  "widget": "list",
+                  "label_singular": "cột",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "heading",
+                      "label": "Tiêu đề cột",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "paragraphs",
+                      "label": "Các dòng",
+                      "widget": "list",
+                      "label_singular": "dòng",
+                      "field": {
+                        "name": "paragraph",
+                        "label": "Dòng",
+                        "widget": "text"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "subBlocks",
+                  "label": "Khối con (tiêu đề đậm + đoạn văn + ảnh)",
+                  "widget": "list",
+                  "label_singular": "khối",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "title",
+                      "label": "Tiêu đề đậm",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "text",
+                      "label": "Đoạn văn",
+                      "widget": "text",
+                      "required": false
+                    },
+                    {
+                      "name": "gallery",
+                      "label": "Bộ ảnh",
+                      "widget": "list",
+                      "label_singular": "ảnh",
+                      "required": false,
+                      "field": {
+                        "name": "image",
+                        "label": "Ảnh",
+                        "widget": "image"
+                      }
+                    },
+                    {
+                      "name": "galleryAspect",
+                      "label": "Tỉ lệ ảnh trong bộ ảnh",
+                      "widget": "select",
+                      "required": false,
+                      "options": [
+                        {
+                          "label": "3:2 (mặc định)",
+                          "value": "3/2"
+                        },
+                        {
+                          "label": "4:3",
+                          "value": "4/3"
+                        },
+                        {
+                          "label": "Vuông",
+                          "value": "square"
+                        },
+                        {
+                          "label": "Ảnh ngang dài (7:2)",
+                          "value": "7/2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "closingParagraphs",
+                  "label": "Đoạn kết",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "hint": "Đoạn đầu hiện trước danh sách gạch đầu dòng bên dưới, các đoạn sau hiện sau nó.",
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "closingBulletsLabel",
+                  "label": "Dòng giới thiệu danh sách kết",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "closingBullets",
+                  "label": "Danh sách gạch đầu dòng kết",
+                  "widget": "list",
+                  "label_singular": "dòng",
+                  "required": false,
+                  "field": {
+                    "name": "bullet",
+                    "label": "Dòng",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "personListItem",
+                  "label": "Chỉ một dòng tên (có biểu tượng người)",
+                  "widget": "string",
+                  "required": false,
+                  "hint": "Dùng cho danh sách đơn vị tham gia. Điền ô này thì phần chỉ hiện đúng một dòng."
+                },
+                {
+                  "name": "band",
+                  "label": "Nền",
+                  "widget": "select",
+                  "required": false,
+                  "hint": "Để trống = tự xen kẽ xám/trắng.",
+                  "options": [
+                    {
+                      "label": "Xám",
+                      "value": "gray"
+                    },
+                    {
+                      "label": "Trắng",
+                      "value": "white"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wildlife-nature",
+          "label": "Dự án · Young Conservationists Save The Wildlife",
+          "fields": [
+            {
+              "name": "category",
+              "label": "Dự án",
+              "widget": "hidden"
+            },
+            {
+              "name": "hero",
+              "label": "Ảnh bìa",
+              "widget": "image"
+            },
+            {
+              "name": "heroPosition",
+              "label": "Vị trí cắt ảnh bìa",
+              "widget": "string",
+              "required": false,
+              "hint": "Ví dụ \"50% 30%\" (ngang, dọc). Để trống = giữa ảnh."
+            },
+            {
+              "name": "kicker",
+              "label": "Dòng chữ nhỏ trên tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề trang",
+              "widget": "string"
+            },
+            {
+              "name": "titleColor",
+              "label": "Màu tiêu đề",
+              "widget": "string",
+              "required": false,
+              "hint": "Mã màu, ví dụ #F1138D. Để trống = hồng."
+            },
+            {
+              "name": "sections",
+              "label": "Các phần",
+              "widget": "list",
+              "label_singular": "phần",
+              "hint": "Mỗi phần là một dải trên trang. Bấm \"Add phần\" để thêm, bấm vào một phần để sửa, kéo để đổi thứ tự.",
+              "fields": [
+                {
+                  "name": "heading",
+                  "label": "Tiêu đề phần",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "headingAsTitle",
+                  "label": "Tiêu đề to ở giữa (kiểu tiêu đề trang)",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "paragraphs",
+                  "label": "Đoạn văn",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "bulletList",
+                  "label": "Hiện đoạn văn dạng gạch đầu dòng",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "textAlign",
+                  "label": "Căn lề đoạn văn",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "Trái",
+                      "value": "left"
+                    },
+                    {
+                      "label": "Giữa",
+                      "value": "center"
+                    },
+                    {
+                      "label": "Đều hai bên",
+                      "value": "justify"
+                    }
+                  ]
+                },
+                {
+                  "name": "image",
+                  "label": "Ảnh bên cạnh chữ",
+                  "widget": "image",
+                  "required": false,
+                  "hint": "Có ảnh thì phần hiện ảnh + chữ cạnh nhau (trái/phải xen kẽ)."
+                },
+                {
+                  "name": "gallery",
+                  "label": "Bộ ảnh bên dưới",
+                  "widget": "list",
+                  "label_singular": "ảnh",
+                  "required": false,
+                  "field": {
+                    "name": "image",
+                    "label": "Ảnh",
+                    "widget": "image"
+                  }
+                },
+                {
+                  "name": "galleryAspect",
+                  "label": "Tỉ lệ ảnh trong bộ ảnh",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "3:2 (mặc định)",
+                      "value": "3/2"
+                    },
+                    {
+                      "label": "4:3",
+                      "value": "4/3"
+                    },
+                    {
+                      "label": "Vuông",
+                      "value": "square"
+                    },
+                    {
+                      "label": "Ảnh ngang dài (7:2)",
+                      "value": "7/2"
+                    }
+                  ]
+                },
+                {
+                  "name": "columns",
+                  "label": "Hai cột cạnh nhau",
+                  "widget": "list",
+                  "label_singular": "cột",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "heading",
+                      "label": "Tiêu đề cột",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "paragraphs",
+                      "label": "Các dòng",
+                      "widget": "list",
+                      "label_singular": "dòng",
+                      "field": {
+                        "name": "paragraph",
+                        "label": "Dòng",
+                        "widget": "text"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "subBlocks",
+                  "label": "Khối con (tiêu đề đậm + đoạn văn + ảnh)",
+                  "widget": "list",
+                  "label_singular": "khối",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "title",
+                      "label": "Tiêu đề đậm",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "text",
+                      "label": "Đoạn văn",
+                      "widget": "text",
+                      "required": false
+                    },
+                    {
+                      "name": "gallery",
+                      "label": "Bộ ảnh",
+                      "widget": "list",
+                      "label_singular": "ảnh",
+                      "required": false,
+                      "field": {
+                        "name": "image",
+                        "label": "Ảnh",
+                        "widget": "image"
+                      }
+                    },
+                    {
+                      "name": "galleryAspect",
+                      "label": "Tỉ lệ ảnh trong bộ ảnh",
+                      "widget": "select",
+                      "required": false,
+                      "options": [
+                        {
+                          "label": "3:2 (mặc định)",
+                          "value": "3/2"
+                        },
+                        {
+                          "label": "4:3",
+                          "value": "4/3"
+                        },
+                        {
+                          "label": "Vuông",
+                          "value": "square"
+                        },
+                        {
+                          "label": "Ảnh ngang dài (7:2)",
+                          "value": "7/2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "closingParagraphs",
+                  "label": "Đoạn kết",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "hint": "Đoạn đầu hiện trước danh sách gạch đầu dòng bên dưới, các đoạn sau hiện sau nó.",
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "closingBulletsLabel",
+                  "label": "Dòng giới thiệu danh sách kết",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "closingBullets",
+                  "label": "Danh sách gạch đầu dòng kết",
+                  "widget": "list",
+                  "label_singular": "dòng",
+                  "required": false,
+                  "field": {
+                    "name": "bullet",
+                    "label": "Dòng",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "personListItem",
+                  "label": "Chỉ một dòng tên (có biểu tượng người)",
+                  "widget": "string",
+                  "required": false,
+                  "hint": "Dùng cho danh sách đơn vị tham gia. Điền ô này thì phần chỉ hiện đúng một dòng."
+                },
+                {
+                  "name": "band",
+                  "label": "Nền",
+                  "widget": "select",
+                  "required": false,
+                  "hint": "Để trống = tự xen kẽ xám/trắng.",
+                  "options": [
+                    {
+                      "label": "Xám",
+                      "value": "gray"
+                    },
+                    {
+                      "label": "Trắng",
+                      "value": "white"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "workshop-education",
+          "label": "Dự án · Community Workshop",
+          "fields": [
+            {
+              "name": "category",
+              "label": "Dự án",
+              "widget": "hidden"
+            },
+            {
+              "name": "hero",
+              "label": "Ảnh bìa",
+              "widget": "image"
+            },
+            {
+              "name": "heroPosition",
+              "label": "Vị trí cắt ảnh bìa",
+              "widget": "string",
+              "required": false,
+              "hint": "Ví dụ \"50% 30%\" (ngang, dọc). Để trống = giữa ảnh."
+            },
+            {
+              "name": "kicker",
+              "label": "Dòng chữ nhỏ trên tiêu đề",
+              "widget": "string",
+              "required": false
+            },
+            {
+              "name": "title",
+              "label": "Tiêu đề trang",
+              "widget": "string"
+            },
+            {
+              "name": "titleColor",
+              "label": "Màu tiêu đề",
+              "widget": "string",
+              "required": false,
+              "hint": "Mã màu, ví dụ #F1138D. Để trống = hồng."
+            },
+            {
+              "name": "sections",
+              "label": "Các phần",
+              "widget": "list",
+              "label_singular": "phần",
+              "hint": "Mỗi phần là một dải trên trang. Bấm \"Add phần\" để thêm, bấm vào một phần để sửa, kéo để đổi thứ tự.",
+              "fields": [
+                {
+                  "name": "heading",
+                  "label": "Tiêu đề phần",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "headingAsTitle",
+                  "label": "Tiêu đề to ở giữa (kiểu tiêu đề trang)",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "paragraphs",
+                  "label": "Đoạn văn",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "bulletList",
+                  "label": "Hiện đoạn văn dạng gạch đầu dòng",
+                  "widget": "boolean",
+                  "required": false,
+                  "default": false
+                },
+                {
+                  "name": "textAlign",
+                  "label": "Căn lề đoạn văn",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "Trái",
+                      "value": "left"
+                    },
+                    {
+                      "label": "Giữa",
+                      "value": "center"
+                    },
+                    {
+                      "label": "Đều hai bên",
+                      "value": "justify"
+                    }
+                  ]
+                },
+                {
+                  "name": "image",
+                  "label": "Ảnh bên cạnh chữ",
+                  "widget": "image",
+                  "required": false,
+                  "hint": "Có ảnh thì phần hiện ảnh + chữ cạnh nhau (trái/phải xen kẽ)."
+                },
+                {
+                  "name": "gallery",
+                  "label": "Bộ ảnh bên dưới",
+                  "widget": "list",
+                  "label_singular": "ảnh",
+                  "required": false,
+                  "field": {
+                    "name": "image",
+                    "label": "Ảnh",
+                    "widget": "image"
+                  }
+                },
+                {
+                  "name": "galleryAspect",
+                  "label": "Tỉ lệ ảnh trong bộ ảnh",
+                  "widget": "select",
+                  "required": false,
+                  "options": [
+                    {
+                      "label": "3:2 (mặc định)",
+                      "value": "3/2"
+                    },
+                    {
+                      "label": "4:3",
+                      "value": "4/3"
+                    },
+                    {
+                      "label": "Vuông",
+                      "value": "square"
+                    },
+                    {
+                      "label": "Ảnh ngang dài (7:2)",
+                      "value": "7/2"
+                    }
+                  ]
+                },
+                {
+                  "name": "columns",
+                  "label": "Hai cột cạnh nhau",
+                  "widget": "list",
+                  "label_singular": "cột",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "heading",
+                      "label": "Tiêu đề cột",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "paragraphs",
+                      "label": "Các dòng",
+                      "widget": "list",
+                      "label_singular": "dòng",
+                      "field": {
+                        "name": "paragraph",
+                        "label": "Dòng",
+                        "widget": "text"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "subBlocks",
+                  "label": "Khối con (tiêu đề đậm + đoạn văn + ảnh)",
+                  "widget": "list",
+                  "label_singular": "khối",
+                  "required": false,
+                  "fields": [
+                    {
+                      "name": "title",
+                      "label": "Tiêu đề đậm",
+                      "widget": "string",
+                      "required": false
+                    },
+                    {
+                      "name": "text",
+                      "label": "Đoạn văn",
+                      "widget": "text",
+                      "required": false
+                    },
+                    {
+                      "name": "gallery",
+                      "label": "Bộ ảnh",
+                      "widget": "list",
+                      "label_singular": "ảnh",
+                      "required": false,
+                      "field": {
+                        "name": "image",
+                        "label": "Ảnh",
+                        "widget": "image"
+                      }
+                    },
+                    {
+                      "name": "galleryAspect",
+                      "label": "Tỉ lệ ảnh trong bộ ảnh",
+                      "widget": "select",
+                      "required": false,
+                      "options": [
+                        {
+                          "label": "3:2 (mặc định)",
+                          "value": "3/2"
+                        },
+                        {
+                          "label": "4:3",
+                          "value": "4/3"
+                        },
+                        {
+                          "label": "Vuông",
+                          "value": "square"
+                        },
+                        {
+                          "label": "Ảnh ngang dài (7:2)",
+                          "value": "7/2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "closingParagraphs",
+                  "label": "Đoạn kết",
+                  "widget": "list",
+                  "label_singular": "đoạn",
+                  "required": false,
+                  "hint": "Đoạn đầu hiện trước danh sách gạch đầu dòng bên dưới, các đoạn sau hiện sau nó.",
+                  "field": {
+                    "name": "paragraph",
+                    "label": "Đoạn văn",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "closingBulletsLabel",
+                  "label": "Dòng giới thiệu danh sách kết",
+                  "widget": "string",
+                  "required": false
+                },
+                {
+                  "name": "closingBullets",
+                  "label": "Danh sách gạch đầu dòng kết",
+                  "widget": "list",
+                  "label_singular": "dòng",
+                  "required": false,
+                  "field": {
+                    "name": "bullet",
+                    "label": "Dòng",
+                    "widget": "text"
+                  }
+                },
+                {
+                  "name": "personListItem",
+                  "label": "Chỉ một dòng tên (có biểu tượng người)",
+                  "widget": "string",
+                  "required": false,
+                  "hint": "Dùng cho danh sách đơn vị tham gia. Điền ô này thì phần chỉ hiện đúng một dòng."
+                },
+                {
+                  "name": "band",
+                  "label": "Nền",
+                  "widget": "select",
+                  "required": false,
+                  "hint": "Để trống = tự xen kẽ xám/trắng.",
+                  "options": [
+                    {
+                      "label": "Xám",
+                      "value": "gray"
+                    },
+                    {
+                      "label": "Trắng",
+                      "value": "white"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "news",
+      "label": "Tin tức",
+      "label_singular": "bài viết",
+      "description": "Các bài viết hiển thị ở trang News của website.",
+      "folder": "news",
+      "identifier_field": "title",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "title",
+          "label": "Tiêu đề",
+          "widget": "string"
+        },
+        {
+          "name": "category",
+          "label": "Chuyên mục",
+          "widget": "select",
+          "default": "News",
+          "options": [
+            {
+              "label": "Tin tức (News)",
+              "value": "News"
+            },
+            {
+              "label": "Báo chí viết về chúng tôi (Media On Us)",
+              "value": "Media On Us"
+            },
+            {
+              "label": "Thông cáo báo chí (Press Release)",
+              "value": "Press Release"
+            },
+            {
+              "label": "Câu chuyện tác động (Impact Story)",
+              "value": "Impact Story"
+            }
+          ]
+        },
+        {
+          "name": "date",
+          "label": "Ngày đăng",
+          "widget": "datetime"
+        },
+        {
+          "name": "author",
+          "label": "Tác giả",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "image",
+          "label": "Ảnh đại diện",
+          "widget": "image",
+          "hint": "Ảnh hiển thị trên thẻ bài viết."
+        },
+        {
+          "name": "summary",
+          "label": "Tóm tắt",
+          "widget": "text",
+          "hint": "Vài câu ngắn hiển thị dưới tiêu đề trong danh sách bài viết."
+        },
+        {
+          "name": "contentBlocks",
+          "label": "Nội dung",
+          "widget": "list",
+          "label_singular": "khối",
+          "hint": "Thêm đoạn văn và ảnh theo đúng thứ tự muốn hiển thị. Kéo để sắp xếp lại.",
+          "types": [
+            {
+              "name": "text",
+              "label": "Đoạn văn",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "value",
+                  "label": "Đoạn văn",
+                  "widget": "text"
+                }
+              ]
+            },
+            {
+              "name": "html",
+              "label": "Đoạn văn có định dạng (HTML)",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "value",
+                  "label": "HTML",
+                  "widget": "text"
+                }
+              ]
+            },
+            {
+              "name": "image",
+              "label": "Ảnh",
+              "widget": "object",
+              "fields": [
+                {
+                  "name": "value",
+                  "label": "Ảnh",
+                  "widget": "image"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "source",
+          "label": "Nguồn (tên báo)",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "sourceUrl",
+          "label": "Link bài gốc",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "featured",
+          "label": "Nổi bật",
+          "widget": "boolean",
+          "required": false,
+          "default": false
+        },
+        {
+          "name": "status",
+          "label": "Trạng thái",
+          "widget": "select",
+          "default": "Published",
+          "options": [
+            {
+              "label": "Đã đăng",
+              "value": "Published"
+            },
+            {
+              "label": "Chờ duyệt (chỉ admin thấy)",
+              "value": "Pending"
+            }
+          ]
+        },
+        {
+          "name": "tags",
+          "label": "Thẻ",
+          "widget": "list",
+          "required": false,
+          "hint": "Các thẻ, phân cách bằng dấu phẩy."
+        },
+        {
+          "name": "seoKeyphrase",
+          "label": "Cụm từ khóa chính (SEO)",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "seoTitle",
+          "label": "Tiêu đề SEO",
+          "widget": "string",
+          "required": false,
+          "hint": "Để trống = dùng tiêu đề bài viết."
+        },
+        {
+          "name": "seoDescription",
+          "label": "Mô tả meta (SEO)",
+          "widget": "text",
+          "required": false,
+          "hint": "Để trống = dùng phần tóm tắt."
+        }
+      ]
+    },
+    {
+      "name": "events",
+      "label": "Sự kiện (Cleanup Map)",
+      "label_singular": "sự kiện",
+      "description": "Các sự kiện / điểm dọn rác hiện trên Cleanup Map, trang Projects và nút đăng ký tình nguyện viên.",
+      "folder": "events",
+      "identifier_field": "title",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "title",
+          "label": "Tên sự kiện",
+          "widget": "string"
+        },
+        {
+          "name": "category",
+          "label": "Dự án",
+          "widget": "select",
+          "default": "World Cleanup Day",
+          "options": [
+            "World Cleanup Day",
+            "Environmental Day",
+            "Green Ocean Campaign",
+            {
+              "label": "Young Conservationists Save The Wildlife",
+              "value": "Wildlife & Nature"
+            },
+            {
+              "label": "Community Workshop",
+              "value": "Workshop & Education"
+            }
+          ]
+        },
+        {
+          "name": "status",
+          "label": "Trạng thái",
+          "widget": "select",
+          "default": "Upcoming",
+          "options": [
+            {
+              "label": "Sắp diễn ra",
+              "value": "Upcoming"
+            },
+            {
+              "label": "Đang diễn ra",
+              "value": "Ongoing"
+            },
+            {
+              "label": "Đã kết thúc",
+              "value": "Completed"
+            }
+          ]
+        },
+        {
+          "name": "date",
+          "label": "Ngày",
+          "widget": "datetime"
+        },
+        {
+          "name": "time",
+          "label": "Giờ",
+          "widget": "string",
+          "required": false,
+          "hint": "Ví dụ: 07:00 - 11:30"
+        },
+        {
+          "name": "location",
+          "label": "Địa điểm",
+          "widget": "string"
+        },
+        {
+          "name": "city",
+          "label": "Tỉnh / thành phố",
+          "widget": "string",
+          "hint": "Dùng để tạo link trang chiến dịch, ví dụ \"Da Nang\" -> /explore-campaigns/da-nang/"
+        },
+        {
+          "name": "coordinates",
+          "label": "Tọa độ trên bản đồ",
+          "widget": "object",
+          "required": false,
+          "hint": "Mở Google Maps, chuột phải vào điểm rồi bấm vào dòng số đầu tiên để copy (vĩ độ, kinh độ).",
+          "fields": [
+            {
+              "name": "lat",
+              "label": "Vĩ độ (lat)",
+              "widget": "number",
+              "required": false,
+              "value_type": "float"
+            },
+            {
+              "name": "lng",
+              "label": "Kinh độ (lng)",
+              "widget": "number",
+              "required": false,
+              "value_type": "float"
+            }
+          ]
+        },
+        {
+          "name": "googleMapsUrl",
+          "label": "Link Google Maps",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "image",
+          "label": "Ảnh",
+          "widget": "image"
+        },
+        {
+          "name": "bannerImage",
+          "label": "Ảnh banner",
+          "widget": "image",
+          "required": false
+        },
+        {
+          "name": "description",
+          "label": "Mô tả",
+          "widget": "text"
+        },
+        {
+          "name": "targetVolunteers",
+          "label": "Số tình nguyện viên cần",
+          "widget": "number",
+          "default": 100,
+          "value_type": "int"
+        },
+        {
+          "name": "trashCollectedKg",
+          "label": "Rác thu gom (kg)",
+          "widget": "number",
+          "required": false,
+          "default": 0,
+          "value_type": "int"
+        },
+        {
+          "name": "leader",
+          "label": "Trưởng nhóm",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "meetingPoint",
+          "label": "Điểm tập trung",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "sheetUrl",
+          "label": "Link Google Sheet riêng",
+          "widget": "string",
+          "required": false,
+          "hint": "Để trống để dùng Google Sheet chung."
+        },
+        {
+          "name": "schedule",
+          "label": "Lịch trình",
+          "widget": "list",
+          "label_singular": "mốc",
+          "required": false,
+          "fields": [
+            {
+              "name": "time",
+              "label": "Giờ",
+              "widget": "string"
+            },
+            {
+              "name": "activity",
+              "label": "Hoạt động",
+              "widget": "string"
+            }
+          ]
+        },
+        {
+          "name": "order",
+          "label": "Thứ tự",
+          "widget": "number",
+          "default": 99,
+          "hint": "Số nhỏ hiện trước.",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "name": "videos",
+      "label": "Videos",
+      "label_singular": "video",
+      "description": "Video YouTube ở mục \"Capturing Change, One Frame at a Time\".",
+      "folder": "videos",
+      "identifier_field": "title",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "title",
+          "label": "Tiêu đề",
+          "widget": "string"
+        },
+        {
+          "name": "youtube",
+          "label": "Link YouTube",
+          "widget": "string",
+          "hint": "Dán link dạng https://www.youtube.com/watch?v=... hoặc https://youtu.be/..."
+        },
+        {
+          "name": "order",
+          "label": "Thứ tự",
+          "widget": "number",
+          "default": 0,
+          "hint": "Số nhỏ hiện trước. Để 0 để video mới lên đầu.",
+          "value_type": "int"
+        },
+        {
+          "name": "addedAt",
+          "label": "Ngày thêm",
+          "widget": "hidden",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "partners",
+      "label": "Đối tác",
+      "label_singular": "đối tác",
+      "description": "Logo đối tác ở trang Our Partners.",
+      "folder": "partners",
+      "identifier_field": "name",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "name",
+          "label": "Tên",
+          "widget": "string"
+        },
+        {
+          "name": "logo",
+          "label": "Logo",
+          "widget": "image"
+        },
+        {
+          "name": "website",
+          "label": "Website",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "tier",
+          "label": "Hạng",
+          "widget": "select",
+          "default": "Community",
+          "options": [
+            "Diamond",
+            "Gold",
+            "Silver",
+            "Community",
+            "Media"
+          ]
+        },
+        {
+          "name": "type",
+          "label": "Loại hình",
+          "widget": "string",
+          "required": false,
+          "hint": "Ví dụ: Corporate, NGO, University"
+        },
+        {
+          "name": "description",
+          "label": "Mô tả",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "joinedYear",
+          "label": "Năm bắt đầu hợp tác",
+          "widget": "number",
+          "required": false,
+          "value_type": "int"
+        },
+        {
+          "name": "scale",
+          "label": "Tỉ lệ logo (%)",
+          "widget": "number",
+          "required": false,
+          "default": 100,
+          "hint": "Phóng to/thu nhỏ logo. 100 = kích thước chuẩn.",
+          "value_type": "int",
+          "min": 50,
+          "max": 180
+        },
+        {
+          "name": "order",
+          "label": "Thứ tự",
+          "widget": "number",
+          "default": 0,
+          "hint": "Số nhỏ hiện trước.",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "name": "team",
+      "label": "Đội ngũ",
+      "label_singular": "thành viên",
+      "description": "Thành viên ở trang Our Team.",
+      "folder": "team",
+      "identifier_field": "name",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "name",
+          "label": "Họ tên",
+          "widget": "string"
+        },
+        {
+          "name": "role",
+          "label": "Chức vụ",
+          "widget": "string"
+        },
+        {
+          "name": "avatar",
+          "label": "Ảnh",
+          "widget": "image"
+        },
+        {
+          "name": "department",
+          "label": "Bộ phận",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "bio",
+          "label": "Giới thiệu",
+          "widget": "text",
+          "required": false
+        },
+        {
+          "name": "linkedin",
+          "label": "LinkedIn",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "facebook",
+          "label": "Facebook",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "email",
+          "label": "Email",
+          "widget": "string",
+          "required": false
+        },
+        {
+          "name": "order",
+          "label": "Thứ tự",
+          "widget": "number",
+          "default": 99,
+          "hint": "Số nhỏ hiện trước.",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "name": "what-we-do",
+      "label": "What We Do",
+      "label_singular": "hoạt động",
+      "description": "Các khối ảnh + chữ ở trang What We Do.",
+      "folder": "what-we-do",
+      "identifier_field": "title",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "title",
+          "label": "Tiêu đề",
+          "widget": "string"
+        },
+        {
+          "name": "desc",
+          "label": "Nội dung",
+          "widget": "text"
+        },
+        {
+          "name": "image",
+          "label": "Ảnh",
+          "widget": "image"
+        },
+        {
+          "name": "layout",
+          "label": "Vị trí ảnh",
+          "widget": "select",
+          "default": "image-left",
+          "options": [
+            {
+              "label": "Ảnh bên trái",
+              "value": "image-left"
+            },
+            {
+              "label": "Ảnh bên phải",
+              "value": "image-right"
+            }
+          ]
+        },
+        {
+          "name": "order",
+          "label": "Thứ tự",
+          "widget": "number",
+          "default": 99,
+          "hint": "Số nhỏ hiện trước.",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "name": "who-we-are",
+      "label": "Who We Are",
+      "label_singular": "mục",
+      "description": "Các khối ảnh + chữ bổ sung ở cuối trang Who We Are.",
+      "folder": "who-we-are",
+      "identifier_field": "title",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "title",
+          "label": "Tiêu đề",
+          "widget": "string"
+        },
+        {
+          "name": "desc",
+          "label": "Nội dung",
+          "widget": "text"
+        },
+        {
+          "name": "image",
+          "label": "Ảnh",
+          "widget": "image"
+        },
+        {
+          "name": "layout",
+          "label": "Vị trí ảnh",
+          "widget": "select",
+          "default": "image-left",
+          "options": [
+            {
+              "label": "Ảnh bên trái",
+              "value": "image-left"
+            },
+            {
+              "label": "Ảnh bên phải",
+              "value": "image-right"
+            }
+          ]
+        },
+        {
+          "name": "order",
+          "label": "Thứ tự",
+          "widget": "number",
+          "default": 99,
+          "hint": "Số nhỏ hiện trước.",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "name": "media-coverage",
+      "label": "Media on Us",
+      "label_singular": "mục báo chí",
+      "description": "Các năm báo chí đưa tin ở trang Media on Us.",
+      "folder": "media-coverage",
+      "identifier_field": "title",
+      "fields": [
+        {
+          "name": "id",
+          "label": "ID",
+          "widget": "hidden",
+          "required": false
+        },
+        {
+          "name": "title",
+          "label": "Tiêu đề (chữ trên nút)",
+          "widget": "string"
+        },
+        {
+          "name": "image",
+          "label": "Ảnh",
+          "widget": "image"
+        },
+        {
+          "name": "articleCount",
+          "label": "Số bài báo",
+          "widget": "number",
+          "default": 0,
+          "value_type": "int"
+        },
+        {
+          "name": "segmentCount",
+          "label": "Số phóng sự",
+          "widget": "number",
+          "default": 0,
+          "value_type": "int"
+        },
+        {
+          "name": "pdfUrl",
+          "label": "File PDF / link tổng hợp",
+          "widget": "file",
+          "hint": "Tải file PDF lên hoặc dán link."
+        },
+        {
+          "name": "order",
+          "label": "Thứ tự",
+          "widget": "number",
+          "default": 99,
+          "hint": "Số nhỏ hiện trước.",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

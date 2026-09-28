@@ -10,7 +10,8 @@
     "start": "tsx server.ts",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "build:swap": "sh scripts/build-swap.sh"
+    "build:swap": "sh scripts/build-swap.sh",
+    "build:wp": "node wordpress/tools/decap-schema.mjs && vite build -c vite.wp.config.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
