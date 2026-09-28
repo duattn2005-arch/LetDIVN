@@ -1,0 +1,10 @@
+.ldm-admin h4 { margin: 20px 0 6px; font-size: 14px; }
+.ldm-admin label { display: block; margin-bottom: 4px; font-weight: 600; }
+.ldm-admin .description { display: block; margin-top: 4px; }
+.ldm-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0 16px; }
+.ldm-admin-grid p { margin: 8px 0; }
+.ldm-admin-grid .ldm-wide { grid-column: 1 / -1; }
+.ldm-admin-search { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+.ldm-admin-status { color: #646970; }
+.ldm-admin-map { height: 360px; border: 1px solid #c3c4c7; border-radius: 4px; cursor: crosshair; }
+.ldm-admin-map .leaflet-marker-draggable { cursor: move; }
