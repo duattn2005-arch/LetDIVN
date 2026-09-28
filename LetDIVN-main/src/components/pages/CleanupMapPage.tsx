@@ -914,7 +914,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       <div className="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
         
         {/* Left Interactive Sidebar */}
-        <div className={`w-full lg:w-96 bg-slate-900 border-r border-slate-800 flex-col z-20 shadow-2xl ${
+        <div className={`w-full lg:w-56 bg-slate-900 border-r border-slate-800 flex-col z-20 shadow-2xl ${
           mobileTab === 'map' ? 'hidden lg:flex' : 'flex flex-1 max-h-full lg:max-h-[calc(100vh-140px)]'
         }`}>
           
