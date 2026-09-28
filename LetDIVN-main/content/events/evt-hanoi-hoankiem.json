@@ -1,0 +1,35 @@
+{
+  "id": "evt-hanoi-hoankiem",
+  "title": "Hoan Kiem Lake Cleanup - Hanoi",
+  "category": "World Cleanup Day",
+  "status": "Upcoming",
+  "date": "2026-10-18",
+  "time": "07:00 - 10:30",
+  "location": "Hoan Kiem Lake, Hoan Kiem, Ha Noi",
+  "city": "Ha Noi",
+  "coordinates": {
+    "lat": 21.0287,
+    "lng": 105.8524
+  },
+  "image": "/images/world-cleanup-day/banner.jpg",
+  "description": "A Sunday-morning cleanup around Hoan Kiem Lake and the Old Quarter streets nearby: picking up litter, sorting it for recycling, and talking with passers-by about cutting single-use plastic.",
+  "targetVolunteers": 100,
+  "trashCollectedKg": 0,
+  "leader": "Let's Do It! Hanoi",
+  "meetingPoint": "Ly Thai To Monument, Hoan Kiem Lake, Ha Noi",
+  "schedule": [
+    {
+      "time": "07:00",
+      "activity": "Check-in, gloves and bags"
+    },
+    {
+      "time": "07:30 - 09:45",
+      "activity": "Cleanup around the lake and nearby streets"
+    },
+    {
+      "time": "09:45 - 10:30",
+      "activity": "Sorting the waste and group photo"
+    }
+  ],
+  "order": 7
+}
