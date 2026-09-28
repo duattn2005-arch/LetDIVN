@@ -26,15 +26,15 @@ const YEAR_OPTIONS = Array.from({ length: 37 }, (_, i) => 2024 + i); // 2024..20
 // The 9 provinces and cities where Let's Do It Vietnam has local teams: always
 // pinned on the map.
 const PROVINCE_PINS = [
-  { name: 'Hà Nội', lat: 21.0285, lng: 105.8542 },
-  { name: 'Quảng Trị', lat: 16.8163, lng: 107.1003 },
-  { name: 'Quảng Ngãi', lat: 15.1205, lng: 108.7923 },
-  { name: 'Hải Phòng', lat: 20.8449, lng: 106.6881 },
-  { name: 'Bình Thuận', lat: 10.9289, lng: 108.1021 },
-  { name: 'TP. Hồ Chí Minh', lat: 10.7769, lng: 106.7009, aliases: ['HCMC', 'Sài Gòn'] },
-  { name: 'Đà Nẵng', lat: 16.0544, lng: 108.2022 },
-  { name: 'Cần Thơ', lat: 10.0452, lng: 105.7469 },
-  { name: 'Quy Nhơn', lat: 13.7765, lng: 109.2237 },
+  { name: 'Hanoi', lat: 21.0285, lng: 105.8542 },
+  { name: 'Quang Tri', lat: 16.8163, lng: 107.1003 },
+  { name: 'Quang Ngai', lat: 15.1205, lng: 108.7923 },
+  { name: 'Hai Phong', lat: 20.8449, lng: 106.6881 },
+  { name: 'Binh Thuan', lat: 10.9289, lng: 108.1021 },
+  { name: 'Ho Chi Minh City', lat: 10.7769, lng: 106.7009, aliases: ['HCMC', 'Saigon'] },
+  { name: 'Da Nang', lat: 16.0544, lng: 108.2022 },
+  { name: 'Can Tho', lat: 10.0452, lng: 105.7469 },
+  { name: 'Quy Nhon', lat: 13.7765, lng: 109.2237 },
 ];
 type ProvincePin = (typeof PROVINCE_PINS)[number];
 
@@ -242,8 +242,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     const timer = setTimeout(async () => {
       setIsSearchingSuggestions(true);
 
-      // Expand common Vietnamese abbreviations (place names themselves stay
-      // Vietnamese — only the site's own UI text needs to be English).
+      // Expand the Vietnamese abbreviations people type; the geocoders
+      // answer in English either way.
       const normalizedQuery = searchQuery
         .replace(/\bthpt\b/gi, 'Trường THPT')
         .replace(/\bthcs\b/gi, 'Trường THCS')
