@@ -4,12 +4,19 @@
 
 defined('ABSPATH') || exit;
 
-add_action('wp_enqueue_scripts', function () {
+// Registered early: block themes render the page (and so the shortcode, which
+// adds the map's data to its script) before "wp_enqueue_scripts" runs.
+add_action('init', function () {
+    if (is_admin()) {
+        return;
+    }
     wp_register_style('ldm-leaflet', LDM_URL . 'assets/vendor/leaflet/leaflet.css', [], '1.9.4');
     wp_register_script('ldm-leaflet', LDM_URL . 'assets/vendor/leaflet/leaflet.js', [], '1.9.4', true);
     wp_register_style('ldm-map', LDM_URL . 'assets/css/map.css', ['ldm-leaflet'], LDM_VERSION);
     wp_register_script('ldm-map', LDM_URL . 'assets/js/map.js', ['ldm-leaflet'], LDM_VERSION, true);
+});
 
+add_action('wp_enqueue_scripts', function () {
     // In the <head> when the page is known to hold the map (no flash of an unstyled box).
     $post = get_post();
     if (is_singular() && $post && has_shortcode((string) $post->post_content, 'ldivn_cleanup_map')) {

@@ -24,17 +24,23 @@
   overflow: hidden;
   background: var(--ldm-950);
   color: #fff;
+  /* The site's font (Tailwind's font-sans), whatever the theme uses. */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-size: 14px;
   line-height: 1.4;
   text-align: left;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-user-select: none;
   user-select: none;
 }
-.ldm--full {
+/* Out of the content column to the screen's edges (block themes center their
+   children with "margin: auto !important"). */
+.ldm.ldm--full {
   width: 100vw;
-  max-width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
 }
 .ldm *, .ldm *::before, .ldm *::after { box-sizing: border-box; }
 .ldm [hidden] { display: none !important; }
@@ -58,6 +64,7 @@
   height: auto;
   cursor: pointer;
 }
+.ldm button:focus, .ldm select:focus { outline: none; }
 .ldm button:focus-visible, .ldm select:focus-visible { outline: 2px solid var(--ldm-pink); outline-offset: 2px; }
 .ldm input { -webkit-user-select: text; user-select: text; }
 .ldm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

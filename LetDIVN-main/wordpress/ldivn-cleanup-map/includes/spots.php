@@ -77,7 +77,7 @@ function ldm_spot_box(WP_Post $post): void
             $field('date', 'Ngày diễn ra *', 'type="date" required');
             $field('time', 'Giờ', 'type="text" placeholder="07:00 - 10:30"');
             ?>
-            <p class="ldm-wide"><label for="ldm-location">Địa điểm</label><input id="ldm-location" name="ldm[location]" value="<?php echo esc_attr($v['location']); ?>" class="widefat" placeholder="Hoan Kiem Lake, Hoan Kiem, Ha Noi"></p>
+            <p class="ldm-wide"><label for="ldm-location">Địa điểm</label><input type="text" id="ldm-location" name="ldm[location]" value="<?php echo esc_attr($v['location']); ?>" class="widefat" placeholder="Hoan Kiem Lake, Hoan Kiem, Ha Noi"></p>
             <?php $field('city', 'Tỉnh / Thành phố', 'type="text" placeholder="Ha Noi"', 'Dùng để gắn sự kiện vào tỉnh ở cột bên trái bản đồ.'); ?>
             <p>
                 <label for="ldm-status">Trạng thái</label>
