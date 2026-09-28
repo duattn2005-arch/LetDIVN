@@ -152,7 +152,6 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   const [address, setAddress] = useState('');
   const [role, setRole] = useState('Clean-up');
   const [participants, setParticipants] = useState('');
-  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [birthError, setBirthError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -169,7 +168,6 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
     setAddress('');
     setRole('Clean-up');
     setParticipants('');
-    setPhoneError(null);
     setBirthError(null);
   };
 
@@ -197,10 +195,9 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
 
   if (!isOpen) return null;
 
+  // Optional, any length: digits, with a leading + for foreign numbers.
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
-    setPhone(digits);
-    setPhoneError(digits.length > 0 && digits.length < 10 ? `Phone number must be exactly 10 digits (${digits.length}/10)` : null);
+    setPhone(e.target.value.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '').slice(0, 16));
   };
 
   const birthDateProblem = (text: string) =>
@@ -228,16 +225,12 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
    * awaited, so CORS never blocks the form), to the Google Sheet. The sheet
    * keeps its columns: a group/organization (which has no date of birth)
    * shows in "age" (Nhóm / Tổ chức), its name and head count in "skills".
-   * Every field shown is required.
+   * Every field shown is required except the phone number.
    */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length !== 10) {
-      setPhoneError('Phone number must be exactly 10 digits');
-      return;
-    }
+    const cleanPhone = phone.trim();
     const birthProblem = isTeam ? null : birthDateProblem(birthDate);
     if (birthProblem) {
       setBirthError(birthProblem);
@@ -492,29 +485,19 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                   </IconField>
                 </div>
                 <div>
-                  <FieldLabel htmlFor="vm-phone" required>
-                    Phone number
-                  </FieldLabel>
+                  <FieldLabel htmlFor="vm-phone">Phone number</FieldLabel>
                   <IconField icon="phone">
                     <input
                       id="vm-phone"
                       type="tel"
-                      inputMode="numeric"
+                      inputMode="tel"
                       autoComplete="tel"
-                      required
-                      maxLength={10}
-                      placeholder="Enter your phone number"
+                      placeholder="Enter your phone number (optional)"
                       value={phone}
                       onChange={handlePhoneChange}
-                      className={`${fieldClass} ${phoneError ? '!border-red-400 !bg-red-50/40' : ''}`}
+                      className={fieldClass}
                     />
                   </IconField>
-                  {phoneError && (
-                    <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                      {phoneError}
-                    </p>
-                  )}
                 </div>
                 <div>
                   <FieldLabel htmlFor="vm-email" required>
