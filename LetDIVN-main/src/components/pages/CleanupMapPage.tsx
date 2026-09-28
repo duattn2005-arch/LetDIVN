@@ -34,6 +34,10 @@ const PROVINCE_PINS = [
   { name: 'Quy Nhơn', lat: 13.7765, lng: 109.2237 },
 ];
 
+// The map's popups sit inside the map, beneath the search card over its top
+// edge, so an opening popup pans the map until it is clear of that card.
+const POPUP_OPTIONS: L.PopupOptions = { autoPanPaddingTopLeft: [16, 84] };
+
 // The same pink pin as the events'.
 const provincePinIcon = L.divIcon({
   className: 'province-pin',
@@ -490,7 +494,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}
         </div>
       </div>
-    `).openPopup();
+    `, POPUP_OPTIONS).openPopup();
 
     setPinnedLocation({
       lat,
@@ -618,7 +622,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           Coordinates: ${sug.lat.toFixed(5)}, ${sug.lng.toFixed(5)}
         </div>
       </div>
-    `).openPopup();
+    `, POPUP_OPTIONS).openPopup();
 
     setPinnedLocation({
       lat: sug.lat,
@@ -706,7 +710,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
           </div>
         `;
 
-        newMarker.bindPopup(popupContent, { maxWidth: 320 }).openPopup();
+        newMarker.bindPopup(popupContent, { ...POPUP_OPTIONS, maxWidth: 320 }).openPopup();
       });
 
       setTimeout(() => {
@@ -838,7 +842,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
         </div>
       `;
 
-      marker.bindPopup(popupContent, { maxWidth: 300 });
+      marker.bindPopup(popupContent, { ...POPUP_OPTIONS, maxWidth: 300 });
 
       marker.on('click', () => {
         setActiveEvent(evt);
@@ -1233,8 +1237,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
 
           </div>
 
-          {/* Legend of the provinces' pins (bottom-left); steps aside for the event card where they'd overlap. */}
-          <div className={`absolute bottom-6 left-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-2 ${activeEvent ? 'hidden xl:block' : ''}`}>
+          {/* Legend of the provinces' pins (bottom-left). */}
+          <div className="absolute bottom-6 left-4 z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-2">
             <div className="grid grid-flow-col grid-rows-5 gap-x-3">
               {PROVINCE_PINS.map((p) => (
                 <button
@@ -1274,63 +1278,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
               </div>
               <div className="text-[10px] text-slate-400">
                 Coordinates: {pinnedLocation.lat.toFixed(5)}, {pinnedLocation.lng.toFixed(5)} • {pinnedLocation.city}
-              </div>
-            </div>
-          )}
-
-          {/* Active Event Card at Bottom Overlay */}
-          {activeEvent && (
-            <div className="absolute bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-20 bg-slate-900/95 backdrop-blur-md p-4 rounded-3xl border border-slate-700 shadow-2xl animate-in slide-in-from-bottom-3 duration-200">
-              <div className="flex items-start gap-3.5">
-                <img
-                  src={activeEvent.image}
-                  alt={activeEvent.title}
-                  className="w-20 h-20 rounded-2xl object-cover shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-[10px] text-slate-400 font-bold">
-                      📍 {activeEvent.city}
-                    </span>
-                  </div>
-
-                  <h3 className="font-extrabold text-sm text-white truncate">
-                    {activeEvent.title}
-                  </h3>
-                  <p className="text-xs text-slate-400 truncate mt-0.5">
-                    {activeEvent.location}
-                  </p>
-
-                  <div className="flex items-center gap-2 mt-3">
-                    <a
-                      href={`#campaign-${activeEvent.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onSelectCampaign(activeEvent.id);
-                      }}
-                      className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center inline-block"
-                    >
-                      <EditableText contentKey="cleanupMap.viewProjectBtn" defaultValue="Details" as="span" />
-                    </a>
-                    <a
-                      href={`#register-${activeEvent.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onRegisterVolunteer(activeEvent.id);
-                      }}
-                      className="flex-1 py-2 bg-[#E81A7F] hover:bg-[#D01370] text-white font-bold text-xs rounded-xl transition-colors cursor-pointer text-center inline-block"
-                    >
-                      <EditableText contentKey="cleanupMap.registerBtn" defaultValue="Register to Join" as="span" />
-                    </a>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setActiveEvent(null)}
-                  className="text-slate-400 hover:text-white p-1 cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
               </div>
             </div>
           )}
