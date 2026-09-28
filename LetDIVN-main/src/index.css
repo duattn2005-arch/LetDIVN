@@ -326,22 +326,6 @@ button[class*="bg-pink-"]:hover {
   animation: ambient-float 18s ease-in-out infinite;
 }
 
-@keyframes float-gentle {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-5px) rotate(1.2deg);
-  }
-}
-
-.animate-float,
-.badge-float,
-[class*="bg-pink-50"] > svg,
-[class*="bg-white\/20"] > svg {
-  animation: float-gentle 3.5s ease-in-out infinite;
-}
-
 /* =========================================================================
    6. SEAMLESS COMPACT LAYOUT & EQUAL HEIGHT CARDS
    ========================================================================= */
