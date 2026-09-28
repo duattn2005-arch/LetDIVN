@@ -16,9 +16,32 @@ type JoinAs = 'individual' | 'group' | 'organization';
 const NAVY = '#0f1f4b';
 const PINK = '#e8197c';
 
-// The date-of-birth calendar's range.
+// The date of birth's range.
 const BIRTH_MIN_YEAR = 1900;
 const BIRTH_MAX_YEAR = 2050;
+
+/** "dd/mm/yyyy" → "yyyy-mm-dd" when it is a real date in range, else ''. */
+const birthIso = (text: string) => {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text);
+  if (!m) return '';
+  const [d, mo, y] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const date = new Date(y, mo - 1, d);
+  const real = date.getFullYear() === y && date.getMonth() === mo - 1 && date.getDate() === d;
+  return real && y >= BIRTH_MIN_YEAR && y <= BIRTH_MAX_YEAR ? `${m[3]}-${m[2]}-${m[1]}` : '';
+};
+
+/**
+ * Shapes what is typed into dd/mm/yyyy: the slashes come by themselves, and a
+ * day or month typed with its own slash ("1/5/1990") gets its leading zero.
+ */
+const formatBirthInput = (raw: string) => {
+  const parts = raw.split(/\D+/);
+  const digits = parts
+    .map((p, i) => (i < 2 && i < parts.length - 1 && p.length === 1 ? `0${p}` : p))
+    .join('')
+    .slice(0, 8);
+  return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)].filter(Boolean).join('/');
+};
 
 // Solid icons like the design's (paths from Google's Material Icons, Apache-2.0).
 const ICON_PATHS = {
@@ -124,7 +147,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [birthDate, setBirthDate] = useState(''); // yyyy-mm-dd from the date picker
+  const [birthDate, setBirthDate] = useState(''); // dd/mm/yyyy, typed or picked
   const [organizationName, setOrganizationName] = useState('');
   const [address, setAddress] = useState('');
   const [role, setRole] = useState('Clean-up');
@@ -180,20 +203,20 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
     setPhoneError(digits.length > 0 && digits.length < 10 ? `Phone number must be exactly 10 digits (${digits.length}/10)` : null);
   };
 
-  const birthDateProblem = (value: string) => {
-    const year = Number(value.slice(0, 4));
-    return /^\d{4}-\d{2}-\d{2}$/.test(value) && year >= BIRTH_MIN_YEAR && year <= BIRTH_MAX_YEAR
-      ? null
-      : `Please pick a date of birth between ${BIRTH_MIN_YEAR} and ${BIRTH_MAX_YEAR}`;
-  };
+  const birthDateProblem = (text: string) =>
+    birthIso(text) ? null : `Please enter a valid date of birth (dd/mm/yyyy) between ${BIRTH_MIN_YEAR} and ${BIRTH_MAX_YEAR}`;
 
   const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBirthDate(e.target.value);
-    setBirthError(e.target.value ? birthDateProblem(e.target.value) : null);
+    const text = formatBirthInput(e.target.value);
+    setBirthDate(text);
+    setBirthError(text.length === 10 ? birthDateProblem(text) : null);
   };
 
-  // Saved as dd/mm/yyyy, the way it reads in the sheet and the admin.
-  const birthDateText = birthDate.split('-').reverse().join('/');
+  // From the calendar: yyyy-mm-dd → dd/mm/yyyy.
+  const handleBirthPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBirthDate(e.target.value.split('-').reverse().join('/'));
+    setBirthError(null);
+  };
 
   const handleCloseModal = () => {
     resetFormState();
@@ -238,7 +261,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
       city: address.trim(),
       eventId,
       eventName: eventTitle,
-      ageGroup: isTeam ? '' : birthDateText,
+      ageGroup: isTeam ? '' : birthDate,
       tshirtSize: 'L',
       emergencyContact: cleanPhone,
       skills: [role],
@@ -256,7 +279,7 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
         phone: cleanPhone,
         email: email.trim(),
         city: address.trim(),
-        age: isTeam ? teamLabel : birthDateText,
+        age: isTeam ? teamLabel : birthDate,
         project: eventTitle,
         skills: sheetSkills,
       },
@@ -524,27 +547,41 @@ export const VolunteerModal: React.FC<VolunteerModalProps> = ({ isOpen, onClose,
                     <FieldLabel htmlFor="vm-birth" required>
                       Date of birth
                     </FieldLabel>
-                    {/* The browser's calendar (day grid, month/year jump); a click anywhere on the field opens it. */}
+                    {/* Typed in, or picked from the calendar behind the button on the right. */}
                     <IconField icon="calendar">
                       <input
                         id="vm-birth"
-                        type="date"
                         required
+                        inputMode="numeric"
                         autoComplete="bday"
-                        min={`${BIRTH_MIN_YEAR}-01-01`}
-                        max={`${BIRTH_MAX_YEAR}-12-31`}
+                        maxLength={10}
+                        placeholder="dd/mm/yyyy"
                         value={birthDate}
                         onChange={handleBirthDateChange}
-                        onClick={(e) => {
-                          try {
-                            e.currentTarget.showPicker?.();
-                          } catch {
-                            /* not allowed here: the field still takes typing */
-                          }
-                        }}
-                        className={`${fieldClass} cursor-pointer ${birthDate ? '' : 'text-slate-400'} ${birthError ? '!border-red-400 !bg-red-50/40' : ''}`}
-                        style={birthDate ? { color: NAVY } : undefined}
+                        onBlur={() => birthDate && setBirthError(birthDateProblem(birthDate))}
+                        className={`${fieldClass} pr-12 ${birthError ? '!border-red-400 !bg-red-50/40' : ''}`}
                       />
+                      {/* The browser's calendar (day grid, month/year jump), on an invisible date input over the button. */}
+                      <span className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-md overflow-hidden flex items-center justify-center hover:bg-slate-100" title="Pick from the calendar">
+                        <ChevronDown className="w-5 h-5 pointer-events-none" style={{ color: NAVY }} />
+                        <input
+                          type="date"
+                          tabIndex={-1}
+                          aria-label="Pick your date of birth from the calendar"
+                          min={`${BIRTH_MIN_YEAR}-01-01`}
+                          max={`${BIRTH_MAX_YEAR}-12-31`}
+                          value={birthIso(birthDate)}
+                          onChange={handleBirthPick}
+                          onClick={(e) => {
+                            try {
+                              e.currentTarget.showPicker?.();
+                            } catch {
+                              /* not allowed here: the date can still be typed */
+                            }
+                          }}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </span>
                     </IconField>
                     {birthError && (
                       <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1 font-medium">
