@@ -6,7 +6,10 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
-import { VIETNAM_PROVINCES_DATA } from '../../data/vietnamAdministrativeData';
+import { OLD_PROVINCES, NEW_PROVINCES, newProvinceOf, byProvinceName } from '../../data/vietnamProvinces';
+
+const OLD_PROVINCES_SORTED = [...OLD_PROVINCES].sort(byProvinceName);
+const NEW_PROVINCES_SORTED = [...NEW_PROVINCES].sort(byProvinceName);
 
 interface CleanupMapPageProps {
   onSelectProject: (id: string) => void;
@@ -161,6 +164,8 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchedPlaceName, setSearchedPlaceName] = useState<string | null>(null);
   const [mobileTab, setMobileTab] = useState<'map' | 'list'>('map');
+  // The sidebar's province list: the 63 of before 1/7/2025, or the 34 since.
+  const [provinceScheme, setProvinceScheme] = useState<'old' | 'new'>('new');
 
   // Modal create/edit state
 
@@ -833,18 +838,23 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     };
   }, [events, selectedYear]);
 
-  // Flies to a province; one with a campaign on opens it on arrival. (The
-  // short wait lets the map show again first when coming from the mobile list.)
-  const flyToProvince = (p: ProvincePin) => {
+  // Flies the map somewhere, then runs `onArrival`. (The short wait lets the
+  // map show again first when coming from the mobile list.)
+  const flyMapTo = (lat: number, lng: number, zoom: number, onArrival?: () => void) => {
     setMobileTab('map');
     setTimeout(() => {
       const map = mapInstanceRef.current;
       if (!map) return;
       map.invalidateSize();
-      map.flyTo([p.lat, p.lng], 10, { duration: 1.2 });
-      const marker = provinceMarkersRef.current.get(p.name);
-      if (marker?.getPopup()) map.once('moveend', () => marker.openPopup());
+      map.flyTo([lat, lng], zoom, { duration: 1.2 });
+      if (onArrival) map.once('moveend', onArrival);
     }, 50);
+  };
+
+  // A local team's province; one with a campaign on opens it on arrival.
+  const flyToProvince = (p: ProvincePin) => {
+    const marker = provinceMarkersRef.current.get(p.name);
+    flyMapTo(p.lat, p.lng, 10, marker?.getPopup() ? () => marker.openPopup() : undefined);
   };
 
   // Update Tile Layer when layer switch changes
@@ -1004,6 +1014,53 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                   )}
                 </button>
               ))}
+            </div>
+
+            {/* Every province, by the old map (63) or the new one (34); a click flies there.
+                A new province names the old ones merged into it, an old one the new one it joined. */}
+            <div className="pt-4 mt-1 border-t border-slate-800 space-y-3">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <EditableText contentKey="cleanupMap.provincesLabel" defaultValue="Provinces & Cities" as="span" />
+              </div>
+              <div className="flex p-1 rounded-xl bg-slate-800/80 border border-slate-700/80" role="tablist">
+                {(['old', 'new'] as const).map((scheme) => (
+                  <button
+                    key={scheme}
+                    type="button"
+                    role="tab"
+                    aria-selected={provinceScheme === scheme}
+                    onClick={() => setProvinceScheme(scheme)}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      provinceScheme === scheme ? 'bg-[#E81A7F] text-white shadow' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {scheme === 'old' ? (
+                      <><EditableText contentKey="cleanupMap.provincesOld" defaultValue="Old" as="span" /> ({OLD_PROVINCES.length})</>
+                    ) : (
+                      <><EditableText contentKey="cleanupMap.provincesNew" defaultValue="New" as="span" /> ({NEW_PROVINCES.length})</>
+                    )}
+                  </button>
+                ))}
+              </div>
+              <div className="space-y-0.5">
+                {(provinceScheme === 'old' ? OLD_PROVINCES_SORTED : NEW_PROVINCES_SORTED).map((p) => {
+                  const note =
+                    provinceScheme === 'new'
+                      ? p.from?.join(' + ')
+                      : newProvinceOf(p.name) !== p.name && `→ ${newProvinceOf(p.name)}`;
+                  return (
+                    <button
+                      key={p.name}
+                      type="button"
+                      onClick={() => flyMapTo(p.lat, p.lng, 9)}
+                      className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      <div className="text-[13px] font-semibold text-slate-200 truncate">{p.name}</div>
+                      {note && <div className="text-[10px] text-slate-500 leading-snug">{note}</div>}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
