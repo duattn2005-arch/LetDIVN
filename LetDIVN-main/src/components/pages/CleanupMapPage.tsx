@@ -823,51 +823,6 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     });
   }, [events, activeEvent, selectedYear]);
 
-  const handleFlyToEvent = (evt: CleanupEvent) => {
-    setActiveEvent(evt);
-    let coords = evt.coordinates || { lat: 21.0285, lng: 105.8542 };
-    if (evt.id === 'evt-green-ocean-danang') {
-      coords = { lat: 16.1083, lng: 108.2778 }; // Bán đảo Sơn Trà Đà Nẵng
-    } else if (evt.id === 'evt-env-day-hcm') {
-      coords = { lat: 10.7769, lng: 106.6924 };
-    } else if (evt.id === 'evt-wildlife-catba') {
-      coords = { lat: 20.8000, lng: 106.9961 };
-    }
-
-    mapInstanceRef.current?.flyTo([coords.lat, coords.lng], 15, { duration: 1.2 });
-    setMobileTab('map');
-    setTimeout(() => {
-      mapInstanceRef.current?.invalidateSize();
-    }, 200);
-    
-    // Draw boundary around the area
-    if (boundaryLayerRef.current && mapInstanceRef.current) {
-      mapInstanceRef.current.removeLayer(boundaryLayerRef.current);
-      boundaryLayerRef.current = null;
-    }
-
-    const d = 0.03;
-    const polygonPoints: [number, number][] = [
-      [coords.lat + d, coords.lng - d * 1.1],
-      [coords.lat + d * 0.9, coords.lng + d * 0.8],
-      [coords.lat - d * 0.4, coords.lng + d * 1.2],
-      [coords.lat - d * 0.9, coords.lng + d * 0.3],
-      [coords.lat - d * 0.7, coords.lng - d * 1.0]
-    ];
-    const poly = L.polygon(polygonPoints, {
-      color: '#e53e3e',
-      weight: 3.5,
-      dashArray: '6, 6', // Red dashed line matching Screenshot 2
-      fillColor: '#e53e3e',
-      fillOpacity: 0.05
-    }).addTo(mapInstanceRef.current!);
-    boundaryLayerRef.current = poly;
-
-    setTimeout(() => {
-      markersRef.current[evt.id]?.openPopup();
-    }, 1300);
-  };
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setShowSuggestions(false);
@@ -948,7 +903,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 mobileTab === 'list' ? 'bg-[#E81A7F] text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
-              📋 <EditableText contentKey="cleanupMap.mobileTabList" defaultValue="Spot List" as="span" /> ({events.length})
+              📋 <EditableText contentKey="cleanupMap.mobileTabList" defaultValue="Spot List" as="span" /> ({PROVINCE_PINS.length})
             </button>
           </div>
 
@@ -991,88 +946,24 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             </div>
           )}
 
-          {/* Cleanup Campaign Spots List */}
+          {/* The provinces' pins, one per row: a click flies there. */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {/* The provinces' pins: a click flies there. */}
-            <div className="pb-4 mb-1 border-b border-slate-800 space-y-3">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <EditableText contentKey="cleanupMap.localTeamsLabel" defaultValue="Our Local Teams" as="span" /> ({PROVINCE_PINS.length})
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {PROVINCE_PINS.map((p) => (
-                  <button
-                    key={p.name}
-                    type="button"
-                    onClick={() => flyToProvince(p)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-800 bg-slate-800/60 text-xs font-bold text-white text-left hover:border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <MapPin className="w-4 h-4 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="#0f172a" />
-                    <span className="truncate">{p.name}</span>
-                  </button>
-                ))}
-              </div>
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <EditableText contentKey="cleanupMap.localTeamsLabel" defaultValue="Our Local Teams" as="span" /> ({PROVINCE_PINS.length})
             </div>
-
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              <span><EditableText contentKey="cleanupMap.featuredSpotsLabel" defaultValue="Featured Cleanup Spots" as="span" /> ({events.length})</span>
-              <EditableText contentKey="cleanupMap.tapToZoomHint" defaultValue="Tap to zoom in" as="span" className="text-[10px] text-[#E81A7F] font-semibold" />
-            </div>
-
-            {events.length === 0 && (
-              <EditableText contentKey="cleanupMap.noUpcomingSpots" defaultValue="No upcoming cleanups yet: new ones will show here." as="p" multiline className="text-xs text-slate-400 py-2" />
-            )}
-
-            {[...events]
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-              .map(evt => {
-              const isSelected = activeEvent?.id === evt.id;
-              const isPending = evt.status === 'Pending';
-
-              return (
-                <div
-                  key={evt.id}
-                  onClick={() => handleFlyToEvent(evt)}
-                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
-                    isPending
-                      ? 'bg-amber-950/40 border-amber-500 shadow-md ring-1 ring-amber-500'
-                      : isSelected 
-                        ? 'bg-pink-950/40 border-[#E81A7F] shadow-lg ring-1 ring-[#E81A7F]' 
-                        : 'bg-slate-800/60 border-slate-800 hover:border-slate-700 hover:bg-slate-800'
-                  }`}
+            <div className="space-y-2">
+              {PROVINCE_PINS.map((p) => (
+                <button
+                  key={p.name}
+                  type="button"
+                  onClick={() => flyToProvince(p)}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-800/60 text-sm font-bold text-white text-left hover:border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-start gap-3">
-                    <img
-                      src={evt.image}
-                      alt={evt.title}
-                      className="w-16 h-16 rounded-xl object-cover shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        {isPending && (
-                          <EditableText contentKey="cleanupMap.pendingBadge" defaultValue="Pending review" as="span" className="text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded-md" />
-                        )}
-                        <span className="text-[10px] text-slate-400 font-bold ml-auto">
-                          📍 {evt.city}
-                        </span>
-                      </div>
-
-                      <h4 className="font-extrabold text-xs text-white truncate">
-                        {evt.title}
-                      </h4>
-
-                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                        {evt.location}
-                      </p>
-
-                      <div className="mt-2 flex items-center justify-between text-[11px]">
-                        <span className="text-slate-400 font-medium">📅 {evt.date}</span>
-                        <span className="text-emerald-400 font-bold">👥 {evt.registeredCount || 0} registered</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                  <MapPin className="w-4 h-4 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="#0f172a" />
+                  <span className="truncate">{p.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
