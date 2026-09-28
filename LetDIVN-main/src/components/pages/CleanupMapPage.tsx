@@ -21,7 +21,7 @@ type MapLayer = 'streets' | 'satellite' | 'carto';
 const YEAR_OPTIONS = Array.from({ length: 37 }, (_, i) => 2024 + i); // 2024..2060
 
 // The 9 provinces and cities where Let's Do It Vietnam has local teams: always
-// pinned on the map. Listed column by column, as the legend shows them.
+// pinned on the map and listed in the sidebar.
 const PROVINCE_PINS = [
   { name: 'Hà Nội', lat: 21.0285, lng: 105.8542 },
   { name: 'Quảng Trị', lat: 16.8163, lng: 107.1003 },
