@@ -248,6 +248,18 @@ export function AppContent() {
     setIsVolunteerModalOpen(true);
   };
 
+  // A link with ?register=<event id> (the WordPress cleanup map's "Register"
+  // button) lands with the sign-up form open for that event.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('register')) return;
+    handleOpenVolunteerModal(params.get('register') || undefined);
+    params.delete('register');
+    const query = params.toString();
+    window.history.replaceState(null, '', window.location.pathname + (query ? `?${query}` : '') + window.location.hash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 text-slate-800 antialiased font-sans relative selection:bg-[#E81A7F] selection:text-white">
       {/* Global Header */}

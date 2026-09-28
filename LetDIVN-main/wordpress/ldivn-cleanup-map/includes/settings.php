@@ -44,8 +44,17 @@ function ldm_sanitize_settings($in): array
         'show_past' => empty($in['show_past']) ? 0 : 1,
         'click_pin' => empty($in['click_pin']) ? 0 : 1,
         'core_events' => empty($in['core_events']) ? 0 : 1,
+        'site_events' => empty($in['site_events']) ? 0 : 1,
+        'site_url' => untrailingslashit(esc_url_raw(trim((string) ($in['site_url'] ?? '')))) ?: $d['site_url'],
     ];
 }
+
+// New settings: fetch the website's events afresh.
+add_action('update_option_' . LDM_OPTION, function ($old, $new) {
+    foreach ([$old['site_url'] ?? '', $new['site_url'] ?? ''] as $site) {
+        delete_transient('ldm_site_events_' . md5((string) $site));
+    }
+}, 10, 2);
 
 function ldm_settings_page(): void
 {
@@ -70,6 +79,14 @@ function ldm_settings_page(): void
             <?php settings_fields('ldm_settings'); ?>
             <table class="form-table" role="presentation">
                 <tr>
+                    <th scope="row"><label for="ldm-site">Sự kiện từ website</label></th>
+                    <td>
+                        <label><input type="checkbox" name="<?php echo $name('site_events'); ?>" value="1" <?php checked($s['site_events'], 1); ?>> Hiện các sự kiện của website</label>
+                        <input id="ldm-site" name="<?php echo $name('site_url'); ?>" value="<?php echo esc_attr($s['site_url']); ?>" class="regular-text" style="margin-left:8px">
+                        <p class="description">Bản đồ hiện đúng các sự kiện đang có trên website này (cập nhật 10 phút/lần). Nút <strong>Details</strong> mở trang chiến dịch, nút <strong>Register</strong> mở form đăng ký của website.</p>
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row"><label for="ldm-title">Tiêu đề</label></th>
                     <td><input id="ldm-title" name="<?php echo $name('title'); ?>" value="<?php echo esc_attr($s['title']); ?>" class="regular-text"></td>
                 </tr>
@@ -88,7 +105,7 @@ function ldm_settings_page(): void
                     <th scope="row"><label for="ldm-register">Link nút "Register" mặc định</label></th>
                     <td>
                         <input id="ldm-register" name="<?php echo $name('register_url'); ?>" value="<?php echo esc_attr($s['register_url']); ?>" class="large-text" placeholder="https://letsdoitvietnam.org/volunteer/?event={id}">
-                        <p class="description">Dùng cho điểm không có link riêng. Có thể chèn <code>{id}</code>, <code>{slug}</code>, <code>{title}</code>. Để trống thì không hiện nút.</p>
+                        <p class="description">Cho các điểm thêm ở menu "Bản đồ dọn rác" mà không có link riêng. Có thể chèn <code>{id}</code>, <code>{slug}</code>, <code>{title}</code>. Để trống thì không hiện nút.</p>
                     </td>
                 </tr>
                 <tr>

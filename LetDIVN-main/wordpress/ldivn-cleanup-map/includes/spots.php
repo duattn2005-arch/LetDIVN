@@ -264,30 +264,78 @@ function ldm_events(): array
         ];
     }
 
+    // The same events as the site's own map, whose campaign pages the popups open.
     if ($s['core_events'] && function_exists('ldivn_get_events')) {
         foreach ((array) ldivn_get_events() as $e) {
-            if (empty($e['date'])) {
-                continue;
-            }
-            $id = (string) ($e['id'] ?? '');
-            $at = $e['coordinates'] ?? null;
-            $out[] = [
-                'id' => $id,
-                'title' => (string) ($e['title'] ?? ''),
-                'date' => (string) $e['date'],
-                'time' => (string) ($e['time'] ?? ''),
-                'location' => (string) ($e['location'] ?? ''),
-                'city' => (string) ($e['city'] ?? ''),
-                'lat' => is_array($at) ? (float) $at['lat'] : null,
-                'lng' => is_array($at) ? (float) $at['lng'] : null,
-                'image' => (string) ($e['image'] ?? ''),
-                'pending' => ($e['status'] ?? '') === 'Pending',
-                'registered' => (int) ($e['registeredCount'] ?? 0),
-                'detailsUrl' => ldm_link($s['details_url'], $id, (string) ($e['slug'] ?? $id), (string) ($e['title'] ?? '')),
-                'registerUrl' => ldm_link($s['register_url'], $id, (string) ($e['slug'] ?? $id), (string) ($e['title'] ?? '')),
-            ];
+            $out[] = ldm_site_event($e, untrailingslashit(home_url()));
+        }
+    } elseif ($s['site_events'] && $s['site_url'] !== '') {
+        foreach (ldm_fetch_site_events($s['site_url']) as $e) {
+            $out[] = ldm_site_event($e, $s['site_url']);
         }
     }
 
+    $seen = [];
+    $out = array_values(array_filter($out, function ($e) use (&$seen) {
+        if ($e === null || isset($seen[$e['id']])) {
+            return false;
+        }
+        return $seen[$e['id']] = true;
+    }));
+
     return apply_filters('ldivn_map_events', $out);
+}
+
+/**
+ * An event of the Let's Do It Vietnam website (its /api/events), for the map:
+ * "Details" opens its campaign page there, "Register" that page with the
+ * sign-up form open (?register=<id>).
+ */
+function ldm_site_event($e, string $site): ?array
+{
+    if (!is_array($e) || empty($e['date']) || empty($e['id'])) {
+        return null;
+    }
+    $id = (string) $e['id'];
+    $at = $e['coordinates'] ?? null;
+    $image = (string) ($e['image'] ?? '');
+    $page = $site . '/explore-campaigns/' . rawurlencode($id) . '/';
+    return [
+        'id' => $id,
+        'title' => (string) ($e['title'] ?? ''),
+        'date' => (string) $e['date'],
+        'time' => (string) ($e['time'] ?? ''),
+        'location' => (string) ($e['location'] ?? ''),
+        'city' => (string) ($e['city'] ?? ''),
+        'lat' => is_array($at) && is_numeric($at['lat'] ?? null) ? (float) $at['lat'] : null,
+        'lng' => is_array($at) && is_numeric($at['lng'] ?? null) ? (float) $at['lng'] : null,
+        'image' => strpos($image, '/') === 0 && strpos($image, '//') !== 0 ? $site . $image : $image,
+        'pending' => ($e['status'] ?? '') === 'Pending',
+        'registered' => (int) ($e['registeredCount'] ?? 0),
+        'detailsUrl' => esc_url_raw($page),
+        'registerUrl' => esc_url_raw($page . '?register=' . rawurlencode($id)),
+    ];
+}
+
+/** The website's events, fetched at most every 10 minutes; its last good answer while it can't be reached. */
+function ldm_fetch_site_events(string $site): array
+{
+    $key = 'ldm_site_events_' . md5($site);
+    $cached = get_transient($key);
+    if (is_array($cached)) {
+        return $cached;
+    }
+    $res = wp_remote_get($site . '/api/events', ['timeout' => 8, 'headers' => ['Accept' => 'application/json']]);
+    $data = !is_wp_error($res) && wp_remote_retrieve_response_code($res) === 200
+        ? json_decode(wp_remote_retrieve_body($res), true)
+        : null;
+    if (!is_array($data)) {
+        $last = get_option($key . '_last', []);
+        $last = is_array($last) ? $last : [];
+        set_transient($key, $last, 2 * MINUTE_IN_SECONDS); // try again soon
+        return $last;
+    }
+    set_transient($key, $data, 10 * MINUTE_IN_SECONDS);
+    update_option($key . '_last', $data, false);
+    return $data;
 }

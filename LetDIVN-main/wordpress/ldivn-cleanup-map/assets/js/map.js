@@ -110,11 +110,6 @@
 
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  function formatDate(iso) {
-    var d = new Date(iso + 'T00:00:00');
-    return isNaN(d) ? iso : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-
   function svg(inner, extra) {
     return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ' + (extra || '') + '>' + inner + '</svg>';
   }
@@ -231,8 +226,8 @@
       '<h4 class="ldm-pop-title">' + esc(e.title) + '</h4>' +
       '<div class="ldm-pop-meta">' +
         (where ? '<div><span>📍</span><span class="ldm-trunc">' + esc(where) + '</span></div>' : '') +
-        '<div><span>📅</span><span>' + esc(formatDate(e.date)) + (e.time ? ' • ' + esc(e.time) : '') + '</span></div>' +
-        (e.registered > 0 ? '<div class="ldm-pop-count"><span>👥</span><span>' + e.registered + ' people registered</span></div>' : '') +
+        '<div><span>📅</span><span>' + esc(e.date) + (e.time ? ' • ' + esc(e.time) : '') + '</span></div>' +
+        '<div class="ldm-pop-count"><span>👥</span><span>' + (Number(e.registered) || 0) + ' people registered</span></div>' +
       '</div>' +
       (buttons ? '<div class="ldm-pop-btns">' + buttons + '</div>' : '') +
     '</div>';
@@ -423,7 +418,8 @@
 
     // The pins of the chosen year. A local team's province with a campaign on
     // gets the bouncing pin, opening the soonest campaign there; a quiet one
-    // flies there when clicked. Every other campaign gets a bouncing pin of its own.
+    // flies there when clicked. A campaign outside the local teams' provinces
+    // gets a bouncing pin of its own.
     function renderPins() {
       if (pinsLayer) pinsLayer.remove();
       pinsLayer = L.layerGroup().addTo(map);
@@ -436,8 +432,8 @@
       var ofTeam = new Map();
       var elsewhere = [];
       yearEvents.forEach(function (e) {
-        if (e.team && !ofTeam.has(e.team)) ofTeam.set(e.team, e);
-        else elsewhere.push(e);
+        if (!e.team) elsewhere.push(e);
+        else if (!ofTeam.has(e.team)) ofTeam.set(e.team, e);
         if (!campaignOfOld.has(e.oldProvince)) campaignOfOld.set(e.oldProvince, e);
         if (e.newProvince && !campaignOfNew.has(e.newProvince)) campaignOfNew.set(e.newProvince, e);
       });

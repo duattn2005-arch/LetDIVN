@@ -3,7 +3,7 @@
  * Plugin Name: LDIVN Cleanup Map
  * Plugin URI: https://letsdoitvietnam.org
  * Description: Bản đồ điểm dọn rác toàn quốc (Nationwide Cleanup Spot Map) của Let's Do It Vietnam. Thêm điểm ở menu "Bản đồ dọn rác", chèn bản đồ vào trang bằng shortcode [ldivn_cleanup_map].
- * Version: 1.0.0
+ * Version: 1.1.0
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Author: Let's Do It Vietnam
@@ -13,7 +13,7 @@
 
 defined('ABSPATH') || exit;
 
-define('LDM_VERSION', '1.0.0');
+define('LDM_VERSION', '1.1.0');
 define('LDM_DIR', __DIR__);
 define('LDM_URL', plugin_dir_url(__FILE__));
 define('LDM_TYPE', 'ldivn_map_spot');
@@ -43,6 +43,9 @@ function ldm_defaults(): array
         'show_past' => 0,
         'click_pin' => 1,
         'core_events' => 1,
+        // The live site: its events are on the map, its pages open from the popups.
+        'site_events' => 1,
+        'site_url' => 'https://letsdoitvietnam.online',
     ];
 }
 
