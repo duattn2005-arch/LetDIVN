@@ -724,13 +724,14 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     };
   }, []);
 
-  // The provinces' pins, beneath the event pins; a click flies to the province.
+  // The provinces' pins, a click flies to the province. On top of the event
+  // pins: the taller event pin's head still shows above a province pin.
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
     const pins = L.layerGroup(
       PROVINCE_PINS.map((p) =>
-        L.marker([p.lat, p.lng], { icon: provincePinIcon(p.color), zIndexOffset: -1000 })
+        L.marker([p.lat, p.lng], { icon: provincePinIcon(p.color), zIndexOffset: 1000 })
           .bindTooltip(p.name, { direction: 'top' })
           .on('click', () => flyToProvince(p))
       )
