@@ -6,7 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { EditableText } from '../EditableText';
-import { OLD_PROVINCES, NEW_PROVINCES, newProvinceOf, byProvinceName } from '../../data/vietnamProvinces';
+import { OLD_PROVINCES, NEW_PROVINCES, newProvinceOf, byProvinceName, type ProvincePlace } from '../../data/vietnamProvinces';
 
 const OLD_PROVINCES_SORTED = [...OLD_PROVINCES].sort(byProvinceName);
 const NEW_PROVINCES_SORTED = [...NEW_PROVINCES].sort(byProvinceName);
@@ -24,7 +24,7 @@ type MapLayer = 'streets' | 'satellite' | 'carto';
 const YEAR_OPTIONS = Array.from({ length: 37 }, (_, i) => 2024 + i); // 2024..2060
 
 // The 9 provinces and cities where Let's Do It Vietnam has local teams: always
-// pinned on the map and listed in the sidebar.
+// pinned on the map.
 const PROVINCE_PINS = [
   { name: 'Hà Nội', lat: 21.0285, lng: 105.8542 },
   { name: 'Quảng Trị', lat: 16.8163, lng: 107.1003 },
@@ -65,6 +65,15 @@ const FIXED_EVENT_SPOTS: Record<string, { lat: number; lng: number }> = {
   'evt-wcd-2026': { lat: 21.0245, lng: 105.8576 },
 };
 const eventSpot = (evt: CleanupEvent) => FIXED_EVENT_SPOTS[evt.id] || evt.coordinates || { lat: 21.0285, lng: 105.8542 };
+
+/** The old province a campaign is in: by its city's name, else the one whose centre is nearest its spot. */
+const oldProvinceOf = (evt: CleanupEvent): ProvincePlace => {
+  const city = placeKey(evt.city || '');
+  const byName = city ? OLD_PROVINCES.find((p) => city.includes(placeKey(p.name))) : undefined;
+  if (byName) return byName;
+  const spot = L.latLng(eventSpot(evt));
+  return OLD_PROVINCES.reduce((best, p) => (spot.distanceTo([p.lat, p.lng]) < spot.distanceTo([best.lat, best.lng]) ? p : best));
+};
 
 // The map's popups open in a pane of their own, lifted out of the map so they
 // sit over the search card and the other overlays (see the map's setup).
@@ -172,6 +181,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const provinceMarkersRef = useRef<Map<string, L.Marker>>(new Map());
+  const campaignMarkersRef = useRef<Map<string, L.Marker>>(new Map()); // event id -> the pin that opens it
   const newPinMarkerRef = useRef<L.Marker | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const boundaryLayerRef = useRef<L.Layer | null>(null);
@@ -804,6 +814,17 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     else if (!campaignOfProvince.has(p.name)) campaignOfProvince.set(p.name, evt);
   });
 
+  // The same campaigns by province, on the old map and the new one: for the
+  // sidebar's cards (green dot, and a click opens the campaign).
+  const campaignOfOldProvince = new Map<string, CleanupEvent>();
+  const campaignOfNewProvince = new Map<string, CleanupEvent>();
+  yearCampaigns.forEach((evt) => {
+    const oldName = oldProvinceOf(evt).name;
+    const newName = newProvinceOf(oldName);
+    if (!campaignOfOldProvince.has(oldName)) campaignOfOldProvince.set(oldName, evt);
+    if (newName && !campaignOfNewProvince.has(newName)) campaignOfNewProvince.set(newName, evt);
+  });
+
   // The pins. A province with a campaign on gets the bouncing pin and opens
   // that campaign when clicked; a quiet one just flies there. A campaign
   // outside the provinces gets a bouncing pin of its own.
@@ -812,6 +833,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
     if (!map) return;
     const pins = L.layerGroup().addTo(map);
     provinceMarkersRef.current = new Map();
+    campaignMarkersRef.current = new Map();
 
     PROVINCE_PINS.forEach((p) => {
       const evt = campaignOfProvince.get(p.name);
@@ -821,16 +843,19 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
       })
         .bindTooltip(p.name, { direction: 'top' })
         .addTo(pins);
-      if (evt) marker.bindPopup(eventPopupHtml(evt), { ...POPUP_OPTIONS, maxWidth: 300 });
-      else marker.on('click', () => flyToProvince(p));
+      if (evt) {
+        marker.bindPopup(eventPopupHtml(evt), { ...POPUP_OPTIONS, maxWidth: 300 });
+        campaignMarkersRef.current.set(evt.id, marker);
+      } else marker.on('click', () => flyToProvince(p));
       provinceMarkersRef.current.set(p.name, marker);
     });
 
     campaignsElsewhere.forEach((evt) => {
       const { lat, lng } = eventSpot(evt);
-      L.marker([lat, lng], { icon: campaignPinIcon(evt.status === 'Pending'), zIndexOffset: 2000 })
+      const marker = L.marker([lat, lng], { icon: campaignPinIcon(evt.status === 'Pending'), zIndexOffset: 2000 })
         .bindPopup(eventPopupHtml(evt), { ...POPUP_OPTIONS, maxWidth: 300 })
         .addTo(pins);
+      campaignMarkersRef.current.set(evt.id, marker);
     });
 
     return () => {
@@ -855,6 +880,15 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
   const flyToProvince = (p: ProvincePin) => {
     const marker = provinceMarkersRef.current.get(p.name);
     flyMapTo(p.lat, p.lng, 10, marker?.getPopup() ? () => marker.openPopup() : undefined);
+  };
+
+  // A province card: to its campaign's pin, opening it, if one is on there; else to the province.
+  const openProvince = (p: ProvincePlace, campaign?: CleanupEvent) => {
+    const marker = campaign && campaignMarkersRef.current.get(campaign.id);
+    if (marker) {
+      const at = marker.getLatLng();
+      flyMapTo(at.lat, at.lng, 10, () => marker.openPopup());
+    } else flyMapTo(p.lat, p.lng, 9);
   };
 
   // Update Tile Layer when layer switch changes
@@ -947,7 +981,7 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
                 mobileTab === 'list' ? 'bg-[#E81A7F] text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
-              📋 <EditableText contentKey="cleanupMap.mobileTabList" defaultValue="Spot List" as="span" /> ({PROVINCE_PINS.length})
+              📋 <EditableText contentKey="cleanupMap.mobileTabList" defaultValue="Spot List" as="span" /> ({(provinceScheme === 'old' ? OLD_PROVINCES : NEW_PROVINCES).length})
             </button>
           </div>
 
@@ -990,77 +1024,58 @@ export const CleanupMapPage: React.FC<CleanupMapPageProps> = ({
             </div>
           )}
 
-          {/* The provinces' pins, one per row: a click flies there. */}
+          {/* Every province, by the old map (63) or the new one (34, since 1/7/2025),
+              one card per row: a click flies there, or opens the campaign on there
+              (green dot). Hovering a card tells how it maps between old and new. */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              <EditableText contentKey="cleanupMap.localTeamsLabel" defaultValue="Our Local Teams" as="span" /> ({PROVINCE_PINS.length})
-            </div>
-            <div className="space-y-2">
-              {PROVINCE_PINS.map((p) => (
+            <div className="flex p-1 rounded-xl bg-slate-800/80 border border-slate-700/80" role="tablist">
+              {(['old', 'new'] as const).map((scheme) => (
                 <button
-                  key={p.name}
+                  key={scheme}
                   type="button"
-                  onClick={() => flyToProvince(p)}
-                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-800/60 text-sm font-bold text-white text-left hover:border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer"
+                  role="tab"
+                  aria-selected={provinceScheme === scheme}
+                  onClick={() => setProvinceScheme(scheme)}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    provinceScheme === scheme ? 'bg-[#E81A7F] text-white shadow' : 'text-slate-400 hover:text-white'
+                  }`}
                 >
-                  <MapPin className="w-4 h-4 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="#0f172a" />
-                  <span className="truncate">{p.name}</span>
-                  {/* A campaign on here: a pulsing green dot. */}
-                  {campaignOfProvince.has(p.name) && (
-                    <span className="relative ml-auto flex w-2.5 h-2.5 shrink-0" title="Campaign on">
-                      <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-                      <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                    </span>
+                  {scheme === 'old' ? (
+                    <><EditableText contentKey="cleanupMap.provincesOld" defaultValue="Old" as="span" /> ({OLD_PROVINCES.length})</>
+                  ) : (
+                    <><EditableText contentKey="cleanupMap.provincesNew" defaultValue="New" as="span" /> ({NEW_PROVINCES.length})</>
                   )}
                 </button>
               ))}
             </div>
-
-            {/* Every province, by the old map (63) or the new one (34); a click flies there.
-                A new province names the old ones merged into it, an old one the new one it joined. */}
-            <div className="pt-4 mt-1 border-t border-slate-800 space-y-3">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <EditableText contentKey="cleanupMap.provincesLabel" defaultValue="Provinces & Cities" as="span" />
-              </div>
-              <div className="flex p-1 rounded-xl bg-slate-800/80 border border-slate-700/80" role="tablist">
-                {(['old', 'new'] as const).map((scheme) => (
+            <div className="space-y-2">
+              {(provinceScheme === 'old' ? OLD_PROVINCES_SORTED : NEW_PROVINCES_SORTED).map((p) => {
+                const campaign = (provinceScheme === 'old' ? campaignOfOldProvince : campaignOfNewProvince).get(p.name);
+                const now = newProvinceOf(p.name);
+                const mapping =
+                  provinceScheme === 'new'
+                    ? p.from && p.from.join(' + ')
+                    : now && now !== p.name ? `→ ${now}` : undefined;
+                return (
                   <button
-                    key={scheme}
+                    key={p.name}
                     type="button"
-                    role="tab"
-                    aria-selected={provinceScheme === scheme}
-                    onClick={() => setProvinceScheme(scheme)}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      provinceScheme === scheme ? 'bg-[#E81A7F] text-white shadow' : 'text-slate-400 hover:text-white'
-                    }`}
+                    title={mapping}
+                    onClick={() => openProvince(p, campaign)}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-800/60 text-sm font-bold text-white text-left hover:border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer"
                   >
-                    {scheme === 'old' ? (
-                      <><EditableText contentKey="cleanupMap.provincesOld" defaultValue="Old" as="span" /> ({OLD_PROVINCES.length})</>
-                    ) : (
-                      <><EditableText contentKey="cleanupMap.provincesNew" defaultValue="New" as="span" /> ({NEW_PROVINCES.length})</>
+                    <MapPin className="w-4 h-4 shrink-0 text-[#E81A7F]" fill="currentColor" stroke="#0f172a" />
+                    <span className="truncate">{p.name}</span>
+                    {/* A campaign on here: a pulsing green dot. */}
+                    {campaign && (
+                      <span className="relative ml-auto flex w-2.5 h-2.5 shrink-0" title="Campaign on">
+                        <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                        <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      </span>
                     )}
                   </button>
-                ))}
-              </div>
-              <div className="space-y-0.5">
-                {(provinceScheme === 'old' ? OLD_PROVINCES_SORTED : NEW_PROVINCES_SORTED).map((p) => {
-                  const note =
-                    provinceScheme === 'new'
-                      ? p.from?.join(' + ')
-                      : newProvinceOf(p.name) !== p.name && `→ ${newProvinceOf(p.name)}`;
-                  return (
-                    <button
-                      key={p.name}
-                      type="button"
-                      onClick={() => flyMapTo(p.lat, p.lng, 9)}
-                      className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-                    >
-                      <div className="text-[13px] font-semibold text-slate-200 truncate">{p.name}</div>
-                      {note && <div className="text-[10px] text-slate-500 leading-snug">{note}</div>}
-                    </button>
-                  );
-                })}
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
