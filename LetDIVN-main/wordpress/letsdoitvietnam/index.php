@@ -2,7 +2,10 @@
 // Every address renders the same page: the app reads the address and shows
 // the right view. WordPress still sends the right status (404 for unknown
 // addresses) and Yoast writes the title/description of the page asked for.
+// A page with content of its own (e.g. a plugin's shortcode) prints it in
+// #ldivn-page-content, which the app shows between its header and footer.
 defined('ABSPATH') || exit;
+$ldivn_page = is_page() ? get_queried_object() : null;
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
   <head>
@@ -25,6 +28,9 @@ defined('ABSPATH') || exit;
   <body class="bg-white text-slate-900 antialiased font-sans selection:bg-pink-500 selection:text-white">
     <?php wp_body_open(); ?>
     <div id="root"></div>
+    <?php if ($ldivn_page && trim($ldivn_page->post_content) !== '') : ?>
+    <div id="ldivn-page-content"><?php echo apply_filters('the_content', $ldivn_page->post_content); ?></div>
+    <?php endif; ?>
     <?php wp_footer(); ?>
   </body>
 </html>

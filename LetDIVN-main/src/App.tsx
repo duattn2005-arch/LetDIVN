@@ -25,6 +25,7 @@ import { MediaVideosPage } from './components/pages/MediaVideosPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { CleanupMapPage } from './components/pages/CleanupMapPage';
 import { ContactBubble } from './components/ContactBubble';
+import { WordPressPageContent } from './components/WordPressPageContent';
 import { dbService } from './services/dbService';
 import { CleanupEvent } from './types';
 import { slugify } from './utils/slug';
@@ -86,8 +87,13 @@ const newsSlugFromPath = (pathname: string): string | undefined => {
   return normalized.slice(VIEW_PATHS.news.length).replace(/\/+$/, '') || undefined;
 };
 
+// WordPress: a page with content of its own (the theme's #ldivn-page-content)
+// is shown at its address instead of the app's view for it.
+const wpPageContent = typeof document !== 'undefined' ? document.getElementById('ldivn-page-content') : null;
+const wpPagePath = wpPageContent ? normalizePath(window.location.pathname) : undefined;
+
 export function AppContent() {
-  const [activeView, setActiveView] = useState<string>('home');
+  const [activeView, setActiveView] = useState<string>(wpPageContent ? 'wp-page' : 'home');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('evt-wcd-2026');
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>('evt-wcd-2026');
   const [selectedNewsArticleId, setSelectedNewsArticleId] = useState<string | undefined>(undefined);
@@ -139,6 +145,10 @@ export function AppContent() {
   // Resolve the current pathname to a campaign, a static view, or a project,
   // used both on initial load and on browser back/forward.
   const applyPath = (pathname: string) => {
+    if (wpPagePath && normalizePath(pathname) === wpPagePath) {
+      setActiveView('wp-page');
+      return;
+    }
     const newsSlug = newsSlugFromPath(pathname);
     if (newsSlug) {
       setSelectedNewsArticleId(newsSlug);
@@ -175,7 +185,7 @@ export function AppContent() {
   // Deep-link support: landing directly on a static page's URL (e.g.
   // /who-we-are/) opens that page immediately — doesn't need event data.
   useEffect(() => {
-    if (campaignSlugFromPath(window.location.pathname)) return;
+    if (wpPageContent || campaignSlugFromPath(window.location.pathname)) return;
     const newsSlug = newsSlugFromPath(window.location.pathname);
     if (newsSlug) {
       setSelectedNewsArticleId(newsSlug);
@@ -191,7 +201,7 @@ export function AppContent() {
   // /<project-slug> resolves once events have loaded (skipped for static pages).
   const triedInitialUrlRef = React.useRef(false);
   useEffect(() => {
-    if (triedInitialUrlRef.current || !eventsLoaded || !projectCategories) return;
+    if (triedInitialUrlRef.current || wpPageContent || !eventsLoaded || !projectCategories) return;
     const campaignSlug = campaignSlugFromPath(window.location.pathname);
     if (campaignSlug) {
       const match = resolveCampaignSlug(campaignSlug, events);
@@ -284,7 +294,7 @@ export function AppContent() {
       {/* Main View Router */}
       <main className="flex-grow">
         {/* Fallback to Home if unknown view or activeView === 'home' */}
-        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'videos', 'contact'].includes(activeView)) && (
+        {(!activeView || activeView === 'home' || !['who-we-are', 'what-we-do', 'our-team', 'our-partners', 'campaign-detail', 'map', 'project-detail', 'news', 'media-on-us', 'videos', 'contact', 'wp-page'].includes(activeView)) && (
           <>
             <HeroSection
               onJoinEvent={() => handleOpenVolunteerModal()}
@@ -339,6 +349,10 @@ export function AppContent() {
 
         {activeView === 'project-detail' && (
           <ProjectDetailPage projectId={selectedProjectId} />
+        )}
+
+        {activeView === 'wp-page' && wpPageContent && (
+          <WordPressPageContent node={wpPageContent} />
         )}
 
         {activeView === 'news' && (

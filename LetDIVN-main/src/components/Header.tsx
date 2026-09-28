@@ -4,6 +4,15 @@ import { ActiveView } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { EditableText } from './EditableText';
 
+/** Items of the WordPress menu "Menu trên header" (the theme prints them; none on the Node site). */
+const wpMenu: { title: string; url: string }[] =
+  (typeof window !== 'undefined' && (window as Window & { ldivnHeaderMenu?: { title: string; url: string }[] }).ldivnHeaderMenu) || [];
+
+const isCurrentPage = (url: string) => {
+  const target = new URL(url, window.location.href);
+  return !target.hash && target.origin === window.location.origin && target.pathname === window.location.pathname;
+};
+
 interface HeaderProps {
   currentView?: ActiveView | string;
   activeView?: ActiveView | string;
@@ -250,6 +259,21 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
+            {/* WordPress menu items (e.g. Cleanup Map, Volunteer) */}
+            {wpMenu.map((item) => (
+              <a
+                key={item.url + item.title}
+                href={item.url}
+                className={`shrink-0 px-2 py-2 rounded-xl transition-all whitespace-nowrap ${
+                  isCurrentPage(item.url)
+                    ? 'text-[#F1138D] font-semibold bg-pink-50 border border-pink-200/60 shadow-xs'
+                    : 'text-[#1C244B] hover:text-[#F1138D] hover:bg-slate-100/80'
+                }`}
+              >
+                {item.title}
+              </a>
+            ))}
+
             {/* 7. Real Cleanup Map (Pin Icon Badge) */}
             {!isWordPress && (
             <button
@@ -373,6 +397,18 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               ))}
             </div>
+
+            {/* WordPress menu items in Mobile */}
+            {wpMenu.map((item) => (
+              <a
+                key={item.url + item.title}
+                href={item.url}
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-[#E81A7F]"
+              >
+                {item.title}
+              </a>
+            ))}
 
             {/* Map in Mobile */}
             {!isWordPress && (

@@ -158,7 +158,8 @@ function ldivn_register_field_groups(): void
     $order = 0;
     foreach (ldivn_collection('pages')['files'] as $file) {
         $page = LDIVN_PAGE_FILES[$file['name']] ?? null;
-        if ($page && !ldivn_page_id($page)) {
+        // The Cleanup Map page shows its own content (see ldivn_managed_page_ids).
+        if ($page === 'cleanup-map' || ($page && !ldivn_page_id($page))) {
             continue;
         }
         acf_add_local_field_group([

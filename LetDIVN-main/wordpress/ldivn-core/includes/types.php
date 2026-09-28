@@ -113,10 +113,15 @@ add_action('acf/init', function () {
 
 // --- Pages -----------------------------------------------------------------------------
 
-/** Ids of the pages whose content is edited in the fields below the title. */
+/**
+ * Ids of the pages whose content is edited in the fields below the title.
+ * Cleanup Map is a normal page: the site puts its own map in it.
+ */
 function ldivn_managed_page_ids(): array
 {
-    return array_map('intval', array_values(get_option('ldivn_pages', [])));
+    $ids = get_option('ldivn_pages', []);
+    unset($ids['cleanup-map']);
+    return array_map('intval', array_values($ids));
 }
 
 // The site's pages are drawn by the theme from the fields, not from the page body.

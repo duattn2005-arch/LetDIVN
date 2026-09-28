@@ -8,6 +8,21 @@ defined('ABSPATH') || exit;
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
+    register_nav_menus(['header' => 'Menu trên header']);
+});
+
+// Giao diện → Menu: the items of the menu at "Menu trên header" are added to
+// the app's header (window.ldivnHeaderMenu = [{title, url}]).
+add_action('wp_head', function () {
+    $locations = get_nav_menu_locations();
+    $items = empty($locations['header']) ? [] : (wp_get_nav_menu_items($locations['header']) ?: []);
+    $menu = [];
+    foreach ($items as $item) {
+        if (!$item->menu_item_parent) {
+            $menu[] = ['title' => $item->title, 'url' => $item->url];
+        }
+    }
+    echo '<script>window.ldivnHeaderMenu = ' . wp_json_encode($menu) . ";</script>\n";
 });
 
 add_action('wp_enqueue_scripts', function () {
