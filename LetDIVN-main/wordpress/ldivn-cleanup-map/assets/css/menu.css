@@ -69,8 +69,8 @@
     --flex-grow: 1 !important;
   }
 
-  /* --- The items, as in that header: a pink pill for the page you're on, a
-     grey one under the mouse, a chevron on the ones with a dropdown. --- */
+  /* --- The items, as in that header: pink for the page you're on, a grey
+     pill under the mouse, a chevron on the ones with a dropdown. --- */
   .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) {
     --e-nav-menu-horizontal-menu-item-margin: 7px !important;
   }
@@ -85,12 +85,13 @@
     background: rgba(241, 245, 249, 0.8);
     color: #f1138d;
   }
+  /* The page you're on: just its name in pink, no frame. */
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .elementor-nav-menu > li:not(.ldivn-menu-volunteer) > .elementor-item.elementor-item-active {
-    background: #fdf2f8;
-    border-color: rgba(251, 207, 232, 0.6);
+    background: transparent;
+    border-color: transparent;
     color: #f1138d;
     font-weight: 600;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    box-shadow: none;
   }
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item .sub-arrow {
     display: inline-block !important;
