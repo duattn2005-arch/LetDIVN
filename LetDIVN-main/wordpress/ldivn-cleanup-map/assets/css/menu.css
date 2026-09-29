@@ -68,15 +68,99 @@
   .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-nav-menu {
     --flex-grow: 1 !important;
   }
-  /* Even gaps: no room kept for a submenu arrow when the menu shows none. */
-  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-arrow:has(> i[class=""]) {
-    display: none !important;
+
+  /* --- The items, as in that header: a pink pill for the page you're on, a
+     grey one under the mouse, a chevron on the ones with a dropdown. --- */
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) {
+    --e-nav-menu-horizontal-menu-item-margin: 7px !important;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .elementor-nav-menu > li:not(.ldivn-menu-volunteer) > .elementor-item {
+    padding: 8px !important;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: #1c244b;
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .elementor-nav-menu > li:not(.ldivn-menu-volunteer) > .elementor-item:is(:hover, :focus-visible, .highlighted, [aria-expanded="true"]) {
+    background: rgba(241, 245, 249, 0.8);
+    color: #f1138d;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .elementor-nav-menu > li:not(.ldivn-menu-volunteer) > .elementor-item.elementor-item-active {
+    background: #fdf2f8;
+    border-color: rgba(251, 207, 232, 0.6);
+    color: #f1138d;
+    font-weight: 600;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item .sub-arrow {
+    display: inline-block !important;
+    width: 16px;
+    height: 16px;
+    margin: 0 0 0 6px !important;
+    padding: 0 !important;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / 16px no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / 16px no-repeat;
+    transition: transform 0.2s;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item .sub-arrow > * { display: none !important; }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item:is(.highlighted, [aria-expanded="true"]) .sub-arrow { transform: rotate(180deg); }
+
+  /* --- The dropdowns: a white rounded card, its title on top (menu.js), each
+     item "• Name" with a pink arrow. --- */
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu {
+    width: 320px !important;
+    min-width: 0 !important;
+    margin-top: 6px !important;
+    padding: 8px 0 !important;
+    overflow: hidden;
+    border: 1px solid #f1f5f9 !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25) !important;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .ldivn-sub-head {
+    padding: 6px 16px;
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #334155 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    white-space: normal;
+    transition: color 0.15s, background-color 0.15s;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item::before {
+    content: "•";
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item::after {
+    content: "→";
+    margin-left: auto;
+    color: #ec4899;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item:is(:hover, :focus-visible, .elementor-item-active) {
+    background: rgba(253, 242, 248, 0.6) !important;
+    color: #e81a7f !important;
   }
 }
 /* Narrower computer screens: smaller items, as that header does below 1536px. */
 @media (min-width: 1025px) and (max-width: 1535px) {
   .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) {
-    --e-nav-menu-horizontal-menu-item-margin: 9px !important;
+    --e-nav-menu-horizontal-menu-item-margin: 2px !important;
   }
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item {
     font-size: 15px !important;
