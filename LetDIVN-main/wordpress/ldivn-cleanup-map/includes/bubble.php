@@ -1,8 +1,8 @@
 <?php
 // The contact bubble of the Let's Do It Vietnam website, bottom right of every
 // page: Facebook, Instagram, the hotlines, email and the contact page
-// (assets/css/bubble.css, assets/js/bubble.js). Its window opens by itself on
-// every page. Both turned off in Cài đặt.
+// (assets/css/bubble.css, assets/js/bubble.js). Its window opens by itself when
+// the site is loaded or reloaded. Both turned off in Cài đặt.
 
 defined('ABSPATH') || exit;
 

@@ -169,7 +169,7 @@ function ldm_settings_page(): void
                         <label><input type="checkbox" name="<?php echo $name('core_events'); ?>" value="1" <?php checked($s['core_events'], 1); ?>> Lấy thêm sự kiện từ plugin "Let's Do It Vietnam – Core"</label>
                         <span class="description">(<?php echo function_exists('ldivn_get_events') ? 'đang bật' : 'không cài trên web này — bỏ qua'; ?>)</span><br>
                         <label><input type="checkbox" name="<?php echo $name('bubble'); ?>" value="1" <?php checked($s['bubble'], 1); ?>> Hiện bong bóng liên hệ ở góc dưới bên phải mọi trang (Facebook, Instagram, hotline, email)</label><br>
-                        <label><input type="checkbox" name="<?php echo $name('bubble_open'); ?>" value="1" <?php checked($s['bubble_open'], 1); ?>> Khung liên hệ tự mở ra mỗi khi vào một trang</label>
+                        <label><input type="checkbox" name="<?php echo $name('bubble_open'); ?>" value="1" <?php checked($s['bubble_open'], 1); ?>> Khung liên hệ tự mở khi vào web hoặc tải lại trang (chuyển sang trang khác thì không tự mở)</label>
                     </td>
                 </tr>
                 <tr>
