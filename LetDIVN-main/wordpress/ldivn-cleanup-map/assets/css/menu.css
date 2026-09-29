@@ -15,9 +15,6 @@
 }
 
 /* "#volunteer": an outlined pink button, like the "Contact us" one but white. */
-.ldivn-menu-volunteer {
-  margin-left: 16px !important;
-}
 .ldivn-menu-volunteer > a {
   display: inline-flex !important;
   align-items: center;
@@ -63,6 +60,18 @@
     --flex-shrink: 1 !important;
     margin-left: 32px;
   }
+  /* The menu to the right, right before the "Contact us" button (Elementor lets
+     the button take the free space otherwise, leaving a gap before it). */
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-button {
+    --flex-grow: 0 !important;
+  }
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-nav-menu {
+    --flex-grow: 1 !important;
+  }
+  /* Even gaps: no room kept for a submenu arrow when the menu shows none. */
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-arrow:has(> i[class=""]) {
+    display: none !important;
+  }
 }
 /* Narrower computer screens: smaller items, as that header does below 1536px. */
 @media (min-width: 1025px) and (max-width: 1535px) {
@@ -76,15 +85,9 @@
     height: 42px;
     padding: 0 20px !important;
   }
-  .ldivn-menu-volunteer {
-    margin-left: 8px !important;
-  }
 }
 
 /* In the mobile dropdown it is an ordinary item, in pink. */
-.elementor-nav-menu--dropdown .ldivn-menu-volunteer {
-  margin-left: 0 !important;
-}
 .elementor-nav-menu--dropdown .ldivn-menu-volunteer > a {
   display: flex !important;
   height: auto;
