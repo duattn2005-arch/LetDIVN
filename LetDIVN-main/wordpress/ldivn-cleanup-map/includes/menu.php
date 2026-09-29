@@ -43,5 +43,4 @@ add_filter('nav_menu_link_attributes', function ($atts, $item) {
 
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ldm-menu', LDM_URL . 'assets/css/menu.css', [], LDM_VERSION);
-    wp_enqueue_script('ldm-menu', LDM_URL . 'assets/js/menu.js', [], LDM_VERSION, true);
 });

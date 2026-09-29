@@ -2,13 +2,17 @@
    Everything under .ldmv and set explicitly, so the theme's button and
    heading styles don't leak in. */
 
+/* As wide as the header's content (up to 1536px) whatever box it is put in:
+   it reaches out of a narrower column to both sides, centred on it. */
 .ldmv {
+  --ldmv-w: min(1536px, calc(100vw - 32px));
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   align-items: start;
-  max-width: 1280px;
-  margin: 0 auto;
+  width: var(--ldmv-w);
+  max-width: none;
+  margin: 0 0 0 calc(50% - var(--ldmv-w) / 2);
   color: #0f172a;
   /* The site's font (Poppins), as in its menu and buttons. */
   font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
@@ -16,7 +20,7 @@
 }
 .ldmv *, .ldmv *::before, .ldmv *::after { box-sizing: border-box; }
 @media (min-width: 1024px) {
-  .ldmv { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px; }
+  .ldmv { --ldmv-w: min(1536px, calc(100vw - 64px)); grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px; }
 }
 
 /* Frosted white cards */

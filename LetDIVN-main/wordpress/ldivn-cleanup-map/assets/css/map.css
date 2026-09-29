@@ -381,6 +381,26 @@
   background: rgba(232, 26, 127, 0.6);
   animation: ldm-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
+/* Several campaigns close together: the pin and their count bounce as one. */
+.ldm .ldm-pin--group img { animation: none; }
+.ldm-pin-group { position: relative; display: block; animation: ldm-bounce 1s infinite; }
+.ldm-pin-count {
+  position: absolute;
+  top: -8px;
+  left: 14px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--ldm-900);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
 .ldm-pending {
   position: absolute;
   top: -8px;
@@ -527,5 +547,5 @@
 @keyframes ldm-pop-in { from { opacity: 0.5; transform: scale(0.95); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .ldm-pin--live img, .ldm-ripple, .ldm-live i, .ldm-found-label i, .ldm-circle-bounce, .ldm-sugs { animation: none !important; }
+  .ldm-pin--live img, .ldm-pin-group, .ldm-ripple, .ldm-live i, .ldm-found-label i, .ldm-circle-bounce, .ldm-sugs { animation: none !important; }
 }

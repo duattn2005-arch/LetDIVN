@@ -51,6 +51,9 @@ function ldm_sanitize_settings($in): array
         'vol_forward' => empty($in['vol_forward']) ? 0 : 1,
         'vol_email' => implode(', ', array_filter(array_map('sanitize_email', explode(',', (string) ($in['vol_email'] ?? ''))))),
         'bubble' => empty($in['bubble']) ? 0 : 1,
+        'bubble_open' => empty($in['bubble_open']) ? 0 : 1,
+        'latest' => empty($in['latest']) ? 0 : 1,
+        'latest_label' => $text('latest_label') ?: $d['latest_label'],
     ];
 }
 
@@ -78,6 +81,7 @@ function ldm_settings_page(): void
             <p style="margin:0 0 8px"><code style="font-size:14px;padding:4px 8px">[ldivn_cleanup_map]</code></p>
             <p style="margin:0">Tuỳ chọn: <code>fullwidth="yes"</code> (tràn hết chiều ngang màn hình), <code>height="700px"</code>, <code>year="2026"</code>, <code>scheme="old"</code> (mở sẵn 63 tỉnh cũ), <code>title="..."</code>, <code>subtitle="..."</code>.<br>
                 Ví dụ: <code>[ldivn_cleanup_map fullwidth="yes" height="calc(100vh - 80px)"]</code></p>
+            <p style="margin:8px 0 0">Xem thử bản đồ khi một thành phố có nhiều điểm: mở trang bản đồ với <code>?ldm_demo=hanoi</code> ở cuối địa chỉ (vd. <code><?php echo esc_html(home_url('/cleanup-map/?ldm_demo=hanoi')); ?></code>) — thêm tạm 5 điểm ở Hà Nội, chỉ bạn thấy khi đang đăng nhập, không lưu gì.</p>
         </div>
 
         <?php
@@ -147,7 +151,7 @@ function ldm_settings_page(): void
                     <td>
                         <textarea id="ldm-teams" name="<?php echo $name('teams'); ?>" rows="10" class="large-text code"><?php echo esc_textarea($s['teams']); ?></textarea>
                         <p class="description">Các tỉnh/thành có nhóm Let's Do It luôn được ghim (hiện đang đọc được <?php echo (int) $teams_count; ?> ghim). Mỗi dòng: <code>Tên | vĩ độ | kinh độ | tên gọi khác</code>.<br>
-                            Sự kiện ở tỉnh có nhóm sẽ làm ghim đó nhảy lên; sự kiện ở nơi khác có ghim riêng.</p>
+                            Sự kiện đã ghim vị trí có ghim riêng ở đúng chỗ đó (nhiều điểm gần nhau gộp thành một ghim có số, bấm vào thì phóng to ra từng điểm); sự kiện chưa ghim vị trí ở tỉnh có nhóm thì làm ghim của nhóm nhảy lên.</p>
                     </td>
                 </tr>
                 <tr>
@@ -164,7 +168,16 @@ function ldm_settings_page(): void
                         <label><input type="checkbox" name="<?php echo $name('click_pin'); ?>" value="1" <?php checked($s['click_pin'], 1); ?>> Bấm lên bản đồ thì ghim điểm mới và hiện địa chỉ</label><br>
                         <label><input type="checkbox" name="<?php echo $name('core_events'); ?>" value="1" <?php checked($s['core_events'], 1); ?>> Lấy thêm sự kiện từ plugin "Let's Do It Vietnam – Core"</label>
                         <span class="description">(<?php echo function_exists('ldivn_get_events') ? 'đang bật' : 'không cài trên web này — bỏ qua'; ?>)</span><br>
-                        <label><input type="checkbox" name="<?php echo $name('bubble'); ?>" value="1" <?php checked($s['bubble'], 1); ?>> Hiện bong bóng liên hệ ở góc dưới bên phải mọi trang (Facebook, Instagram, hotline, email)</label>
+                        <label><input type="checkbox" name="<?php echo $name('bubble'); ?>" value="1" <?php checked($s['bubble'], 1); ?>> Hiện bong bóng liên hệ ở góc dưới bên phải mọi trang (Facebook, Instagram, hotline, email)</label><br>
+                        <label><input type="checkbox" name="<?php echo $name('bubble_open'); ?>" value="1" <?php checked($s['bubble_open'], 1); ?>> Khung liên hệ tự mở khi vào trang (khách bấm đóng thì không tự mở lại trong lần truy cập đó)</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="ldm-latest-label">Bài viết mới nhất</label></th>
+                    <td>
+                        <label><input type="checkbox" name="<?php echo $name('latest'); ?>" value="1" <?php checked($s['latest'], 1); ?>> Chạy chữ 5 bài viết (Posts) mới nhất trên đầu mọi trang, tự cập nhật khi đăng bài mới</label><br>
+                        <input id="ldm-latest-label" name="<?php echo $name('latest_label'); ?>" value="<?php echo esc_attr($s['latest_label']); ?>" class="regular-text" style="margin-top:6px">
+                        <p class="description">Chữ ở đầu thanh.</p>
                     </td>
                 </tr>
             </table>

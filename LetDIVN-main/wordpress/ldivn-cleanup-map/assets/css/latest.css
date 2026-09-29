@@ -1,0 +1,124 @@
+/* The newest posts along the top of every page (includes/latest.php), as the
+   Let's Do It Vietnam website's announcement bar. Everything under .ldlp and
+   set explicitly, so the theme's link styles don't leak in. */
+
+.ldlp {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: left;
+}
+.ldlp *, .ldlp *::before, .ldlp *::after { box-sizing: border-box; }
+
+.ldlp .ldlp-in {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 6px 12px;
+}
+@media (min-width: 640px) {
+  .ldlp .ldlp-in { gap: 16px; padding: 6px 16px; }
+}
+@media (min-width: 1025px) {
+  .ldlp .ldlp-in { padding: 6px 32px; } /* the header's sides */
+}
+
+.ldlp .ldlp-label {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #e81a7f;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ldlp .ldlp-live {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #fff;
+  animation: ldlp-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes ldlp-pulse { 50% { opacity: 0.4; } }
+
+/* The titles run from right to left, and stop under the mouse. */
+.ldlp .ldlp-view {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+.ldlp .ldlp-track {
+  display: flex;
+  width: max-content;
+  animation: ldlp-run var(--ldlp-time, 40s) linear infinite;
+  will-change: transform;
+}
+.ldlp:hover .ldlp-track,
+.ldlp:focus-within .ldlp-track { animation-play-state: paused; }
+@keyframes ldlp-run { to { transform: translate3d(-50%, 0, 0); } }
+
+.ldlp .ldlp-run {
+  display: flex;
+  flex-shrink: 0;
+  gap: 32px;
+  padding-right: 32px;
+}
+.ldlp .ldlp-item,
+.ldlp .ldlp-item:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: none;
+  transition: color 0.15s;
+}
+.ldlp .ldlp-item:nth-child(even),
+.ldlp .ldlp-item:nth-child(even):visited { color: #f9a8d4; }
+.ldlp .ldlp-item:hover,
+.ldlp .ldlp-item:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (min-width: 640px) {
+  .ldlp .ldlp-item { font-size: 12px; }
+}
+.ldlp .ldlp-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #34d399;
+  animation: ldlp-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.ldlp .ldlp-item:nth-child(even) .ldlp-dot { background: #e81a7f; }
+
+/* No running: the titles scroll sideways by hand, once. */
+@media (prefers-reduced-motion: reduce) {
+  .ldlp .ldlp-track, .ldlp .ldlp-live, .ldlp .ldlp-dot { animation: none; }
+  .ldlp .ldlp-view { overflow-x: auto; scrollbar-width: none; }
+  .ldlp .ldlp-run[aria-hidden] { display: none; }
+}

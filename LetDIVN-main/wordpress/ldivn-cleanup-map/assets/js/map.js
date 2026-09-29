@@ -178,6 +178,7 @@
       return Object.assign({}, e, {
         year: Number(e.date.slice(0, 4)),
         spot: spot,
+        ownSpot: !!hasSpot,
         team: team ? team.name : null,
         oldProvince: old.name,
         newProvince: newProvinceOf(old.name)
@@ -202,6 +203,16 @@
       html: '<span class="ldm-ripple"></span><img src="' + esc(CFG.pin) + '" alt="">' +
         (pending ? '<span class="ldm-pending">Pending review</span>' : ''),
       iconSize: [24, 42], iconAnchor: [12, 42], popupAnchor: [0, -38], tooltipAnchor: [0, -36]
+    });
+  }
+
+  // Several campaigns close together: one bouncing pin with their count.
+  function groupIcon(count) {
+    return L.divIcon({
+      className: 'ldm-pin ldm-pin--live ldm-pin--group',
+      html: '<span class="ldm-ripple"></span><span class="ldm-pin-group"><img src="' + esc(CFG.pin) + '" alt="">' +
+        '<span class="ldm-pin-count">' + count + '</span></span>',
+      iconSize: [24, 42], iconAnchor: [12, 42], tooltipAnchor: [0, -36]
     });
   }
 
@@ -404,12 +415,18 @@
     var POPUP = { pane: 'ldmTopPopup', maxWidth: 300 };
 
     var pinsLayer = null;
-    var teamMarkers = new Map();
-    var campaignMarkers = new Map(); // event id -> the pin that opens it
-    var campaignOfOld = new Map();
+    var pinsShown = '';               // which pins pinsLayer holds (drawPins)
+    var yearPins = [];                // the campaign pins of the year: { e, label }
+    var quietTeams = [];              // the local teams with no campaign this year
+    var campaignMarkers = new Map();  // event id -> the pin that opens it, or its group's
+    var campaignOfOld = new Map();    // province -> its campaigns this year
     var campaignOfNew = new Map();
     var boundary = null;
     var placeMarker = null;
+    // Pins closer on screen than GROUP_PX share one pin with their count, which
+    // zooms in on them, until the map is zoomed in to the streets.
+    var GROUP_PX = 34;
+    var GROUP_UNTIL = 13;
 
     function flyMapTo(lat, lng, zoom, onArrival) {
       setTab('map');
@@ -420,53 +437,108 @@
       }, 50);
     }
 
-    // The pins of the chosen year. A local team's province with a campaign on
-    // gets the bouncing pin, opening the soonest campaign there; a quiet one
-    // flies there when clicked. A campaign outside the local teams' provinces
-    // gets a bouncing pin of its own.
-    function renderPins() {
-      if (pinsLayer) pinsLayer.remove();
-      pinsLayer = L.layerGroup().addTo(map);
-      teamMarkers.clear();
-      campaignMarkers.clear();
-      campaignOfOld.clear();
-      campaignOfNew.clear();
-
-      var yearEvents = events.filter(function (e) { return e.year === state.year; });
-      var ofTeam = new Map();
-      var elsewhere = [];
-      yearEvents.forEach(function (e) {
-        if (!e.team) elsewhere.push(e);
-        else if (!ofTeam.has(e.team)) ofTeam.set(e.team, e);
-        if (!campaignOfOld.has(e.oldProvince)) campaignOfOld.set(e.oldProvince, e);
-        if (e.newProvince && !campaignOfNew.has(e.newProvince)) campaignOfNew.set(e.newProvince, e);
-      });
-
-      TEAMS.forEach(function (t) {
-        var e = ofTeam.get(t.name);
-        var m = L.marker([t.lat, t.lng], { icon: e ? campaignIcon(e.pending) : teamIcon(), zIndexOffset: e ? 2000 : 1000, riseOnHover: true })
-          .bindTooltip(esc(t.name), { direction: 'top' })
-          .addTo(pinsLayer);
-        if (e) {
-          m.bindPopup(eventPopup(e), POPUP);
-          campaignMarkers.set(e.id, m);
-        } else {
-          m.on('click', function () { flyMapTo(t.lat, t.lng, 10); });
-        }
-        teamMarkers.set(t.name, m);
-      });
-
-      elsewhere.forEach(function (e) {
-        var m = L.marker([e.spot.lat, e.spot.lng], { icon: campaignIcon(e.pending), zIndexOffset: 2000, riseOnHover: true })
-          .bindTooltip(esc(e.title), { direction: 'top' })
-          .bindPopup(eventPopup(e), POPUP)
-          .addTo(pinsLayer);
-        campaignMarkers.set(e.id, m);
-      });
+    // Close enough to see every one of these spots apart.
+    function flyMapToSpots(spots) {
+      setTab('map');
+      setTimeout(function () {
+        map.invalidateSize();
+        map.flyToBounds(L.latLngBounds(spots.map(function (s) { return [s.lat, s.lng]; })), { padding: [80, 80], maxZoom: GROUP_UNTIL + 1, duration: 1.2 });
+      }, 50);
     }
 
+    function addTo(lists, key, e) {
+      if (!lists.has(key)) lists.set(key, []);
+      lists.get(key).push(e);
+    }
+
+    // The pins of the chosen year. A campaign with a place of its own gets a
+    // bouncing pin there; one without goes to its local team's pin (which
+    // opens the soonest of them) or else to its province's centre. A local
+    // team with no campaign keeps a quiet pin that flies there when clicked.
+    function renderPins() {
+      campaignOfOld.clear();
+      campaignOfNew.clear();
+      yearPins = [];
+      var atTeam = new Map();
+      var busy = new Set();
+      events.forEach(function (e) {
+        if (e.year !== state.year) return;
+        addTo(campaignOfOld, e.oldProvince, e);
+        if (e.newProvince) addTo(campaignOfNew, e.newProvince, e);
+        if (e.team) busy.add(e.team);
+        if (e.ownSpot || !e.team) yearPins.push({ e: e, label: e.title });
+        else if (!atTeam.has(e.team)) atTeam.set(e.team, e); // events are soonest first
+      });
+      atTeam.forEach(function (e, team) { yearPins.push({ e: e, label: team }); });
+      quietTeams = TEAMS.filter(function (t) { return !busy.has(t.name); });
+      pinsShown = '';
+      drawPins();
+    }
+
+    function groupPins() {
+      var zoom = map.getZoom();
+      var groups = [];
+      yearPins.forEach(function (p) {
+        var at = map.project([p.e.spot.lat, p.e.spot.lng], zoom);
+        var near = zoom < GROUP_UNTIL && groups.find(function (g) { return g.at.distanceTo(at) < GROUP_PX; });
+        if (near) near.pins.push(p);
+        else groups.push({ at: at, pins: [p] });
+      });
+      return groups.map(function (g) { return g.pins; });
+    }
+
+    // "Hanoi · 5 cleanup spots": the province when they all are in the same one.
+    function groupLabel(pins) {
+      var key = state.scheme === 'old' ? 'oldProvince' : 'newProvince';
+      var province = pins[0].e[key];
+      var same = province && pins.every(function (p) { return p.e[key] === province; });
+      return (same ? province + ' · ' : '') + pins.length + ' cleanup spots';
+    }
+
+    // Redrawn when zooming groups or ungroups pins; the campaign open stays open.
+    function drawPins() {
+      var groups = groupPins();
+      var shown = state.year + ':' + groups.map(function (g) { return g.map(function (p) { return p.e.id; }).join(','); }).join('|');
+      if (shown === pinsShown) return;
+      pinsShown = shown;
+
+      var openId = null;
+      campaignMarkers.forEach(function (m, id) { if (m.isPopupOpen()) openId = id; });
+      if (pinsLayer) pinsLayer.remove();
+      pinsLayer = L.layerGroup().addTo(map);
+      campaignMarkers.clear();
+
+      quietTeams.forEach(function (t) {
+        L.marker([t.lat, t.lng], { icon: teamIcon(), zIndexOffset: 1000, riseOnHover: true })
+          .bindTooltip(esc(t.name), { direction: 'top' })
+          .on('click', function () { flyMapTo(t.lat, t.lng, 10); })
+          .addTo(pinsLayer);
+      });
+
+      groups.forEach(function (g) {
+        var m;
+        if (g.length === 1) {
+          m = L.marker([g[0].e.spot.lat, g[0].e.spot.lng], { icon: campaignIcon(g[0].e.pending), zIndexOffset: 2000, riseOnHover: true })
+            .bindTooltip(esc(g[0].label), { direction: 'top' })
+            .bindPopup(eventPopup(g[0].e), POPUP);
+        } else {
+          var spots = g.map(function (p) { return p.e.spot; });
+          m = L.marker(L.latLngBounds(spots.map(function (s) { return [s.lat, s.lng]; })).getCenter(), { icon: groupIcon(g.length), zIndexOffset: 3000, riseOnHover: true })
+            .bindTooltip(esc(groupLabel(g)), { direction: 'top' })
+            .on('click', function () { flyMapToSpots(spots); });
+        }
+        m.addTo(pinsLayer);
+        g.forEach(function (p) { campaignMarkers.set(p.e.id, m); });
+      });
+
+      var again = openId && campaignMarkers.get(openId);
+      if (again && again.getPopup()) again.openPopup();
+    }
+    map.on('zoomend', drawPins);
+
     // Every province, old (63) or new (34), one card per row: a click flies
-    // there, or opens the campaign on there (green dot).
+    // there; with campaigns on (green dot), to the one and opens it, or to
+    // all of them.
     function renderProvinces() {
       var list = state.scheme === 'old' ? OLD_SORTED : NEW_SORTED;
       var campaigns = state.scheme === 'old' ? campaignOfOld : campaignOfNew;
@@ -490,11 +562,16 @@
       var btn = ev.target.closest('.ldm-prov');
       if (!btn) return;
       var p = (state.scheme === 'old' ? OLD_SORTED : NEW_SORTED)[Number(btn.getAttribute('data-i'))];
-      var campaign = (state.scheme === 'old' ? campaignOfOld : campaignOfNew).get(p.name);
-      var marker = campaign && campaignMarkers.get(campaign.id);
-      if (marker) {
-        var at = marker.getLatLng();
-        flyMapTo(at.lat, at.lng, 10, function () { marker.openPopup(); });
+      var campaigns = (state.scheme === 'old' ? campaignOfOld : campaignOfNew).get(p.name) || [];
+      var spots = campaigns.map(function (e) { return e.spot; });
+      var many = spots.some(function (s) { return s.lat !== spots[0].lat || s.lng !== spots[0].lng; });
+      if (many) {
+        flyMapToSpots(spots);
+      } else if (campaigns.length) {
+        flyMapTo(spots[0].lat, spots[0].lng, 10, function () {
+          var marker = campaignMarkers.get(campaigns[0].id); // the pins are redrawn for the new zoom by now
+          if (marker && marker.getPopup()) marker.openPopup();
+        });
       } else {
         flyMapTo(p.lat, p.lng, 9);
       }

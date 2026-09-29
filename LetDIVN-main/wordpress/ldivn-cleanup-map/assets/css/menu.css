@@ -106,8 +106,7 @@
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item .sub-arrow > * { display: none !important; }
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item:is(.highlighted, [aria-expanded="true"]) .sub-arrow { transform: rotate(180deg); }
 
-  /* --- The dropdowns: a white rounded card, its title on top (menu.js), each
-     item "• Name" with a pink arrow. --- */
+  /* --- The dropdowns: a white rounded card, just the items' names in it. --- */
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu {
     width: 320px !important;
     min-width: 0 !important;
@@ -119,20 +118,10 @@
     background: #fff !important;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25) !important;
   }
-  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .ldivn-sub-head {
-    padding: 6px 16px;
-    color: #94a3b8;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    line-height: 1.5;
-    text-transform: uppercase;
-  }
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item {
     display: flex !important;
     align-items: center;
-    gap: 6px;
-    padding: 10px 16px !important;
+    padding: 10px 20px !important;
     border: 0 !important;
     background: transparent !important;
     color: #334155 !important;
@@ -142,15 +131,11 @@
     white-space: normal;
     transition: color 0.15s, background-color 0.15s;
   }
-  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item::before {
-    content: "•";
-  }
+  /* No bullet, no arrow: the items open nothing further. */
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item::before,
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item::after {
-    content: "→";
-    margin-left: auto;
-    color: #ec4899;
-    font-size: 10px;
-    font-weight: 700;
+    content: none !important;
+    display: none !important;
   }
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .sub-menu .elementor-sub-item:is(:hover, :focus-visible, .elementor-item-active) {
     background: rgba(253, 242, 248, 0.6) !important;

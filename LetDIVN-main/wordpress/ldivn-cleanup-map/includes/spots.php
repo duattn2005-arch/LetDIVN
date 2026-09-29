@@ -317,6 +317,44 @@ function ldm_site_event($e, string $site): ?array
     ];
 }
 
+/**
+ * "?ldm_demo=hanoi" after the map page's address, for someone logged in who
+ * can edit: 5 made-up campaigns around Hanoi, to see how the map shows several
+ * spots in one city. Nothing is saved, and visitors never see them.
+ */
+function ldm_demo_events(): array
+{
+    if (($_GET['ldm_demo'] ?? '') !== 'hanoi' || !current_user_can('edit_posts')) {
+        return [];
+    }
+    $spots = [
+        ['Hoan Kiem Lake Cleanup', 'Hoan Kiem Lake, Hoan Kiem', 21.0288, 105.8525, 48],
+        ['West Lake Shore Cleanup', 'Thanh Nien Road, Tay Ho', 21.0465, 105.8378, 35],
+        ['Red River Bank Cleanup', 'Long Bien Bridge, Long Bien', 21.0436, 105.8622, 62],
+        ['To Lich River Cleanup', 'Khuong Dinh, Thanh Xuan', 20.9935, 105.8148, 27],
+        ['Yen So Park Cleanup', 'Yen So Park, Hoang Mai', 20.9688, 105.8604, 40],
+    ];
+    $out = [];
+    foreach ($spots as $i => [$title, $location, $lat, $lng, $registered]) {
+        $out[] = [
+            'id' => 'demo-hanoi-' . ($i + 1),
+            'title' => '[Demo] ' . $title,
+            'date' => wp_date('Y-m-d', time() + ($i + 1) * 3 * DAY_IN_SECONDS),
+            'time' => '07:30 - 10:30',
+            'location' => $location,
+            'city' => 'Hanoi',
+            'lat' => $lat,
+            'lng' => $lng,
+            'image' => '',
+            'pending' => false,
+            'registered' => $registered,
+            'detailsUrl' => '',
+            'registerUrl' => '',
+        ];
+    }
+    return $out;
+}
+
 /** The website's events, fetched at most every 10 minutes; its last good answer while it can't be reached. */
 function ldm_fetch_site_events(string $site): array
 {
