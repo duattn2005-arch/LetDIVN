@@ -24,6 +24,28 @@ add_action('wp_enqueue_scripts', function () {
     }
 });
 
+/** Whether this page is just the full-width map (nothing else in it). */
+function ldm_is_map_page(): bool
+{
+    $post = get_post();
+    if (!is_singular() || !$post) {
+        return false;
+    }
+    $content = (string) $post->post_content;
+    if (!preg_match('/\[ldivn_cleanup_map\b[^\]]*\bfullwidth=["\']?(?:yes|1|true)\b/i', $content)) {
+        return false;
+    }
+    return trim(wp_strip_all_tags(preg_replace('/\[ldivn_cleanup_map\b[^\]]*\]/i', '', $content))) === '';
+}
+
+// Such a page shows the map right under the site's header (".ldm-map-page" in map.css).
+add_filter('body_class', function ($classes) {
+    if (ldm_is_map_page()) {
+        $classes[] = 'ldm-map-page';
+    }
+    return $classes;
+});
+
 add_shortcode('ldivn_cleanup_map', 'ldm_shortcode');
 
 function ldm_shortcode($atts): string

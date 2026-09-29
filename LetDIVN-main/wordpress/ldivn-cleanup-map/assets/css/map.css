@@ -35,13 +35,21 @@
   user-select: none;
 }
 /* Out of the content column to the screen's edges (block themes center their
-   children with "margin: auto !important"). */
+   children with "margin: auto !important"). 100vw counts the page's scrollbar
+   too: --ldm-sbw, its width set by map.js, is taken off. */
 .ldm.ldm--full {
-  width: 100vw;
-  max-width: 100vw !important;
-  margin-left: calc(50% - 50vw) !important;
-  margin-right: calc(50% - 50vw) !important;
+  width: calc(100vw - var(--ldm-sbw, 0px));
+  max-width: calc(100vw - var(--ldm-sbw, 0px)) !important;
+  margin-left: calc(50% - 50vw + var(--ldm-sbw, 0px) / 2) !important;
+  margin-right: calc(50% - 50vw + var(--ldm-sbw, 0px) / 2) !important;
 }
+/* A page that is just the full-width map (body class from shortcode.php): the
+   map right under the site's header, its own title bar instead of the page title. */
+.ldm-map-page .entry-title,
+.ldm-map-page .page-title,
+.ldm-map-page .wp-block-post-title { display: none !important; }
+.ldm-map-page #main-content .container { padding-top: 0 !important; } /* Divi */
+.ldm-map-page .entry-content > p:empty { display: none !important; }
 .ldm *, .ldm *::before, .ldm *::after { box-sizing: border-box; }
 .ldm [hidden] { display: none !important; }
 .ldm svg { display: block; flex-shrink: 0; }

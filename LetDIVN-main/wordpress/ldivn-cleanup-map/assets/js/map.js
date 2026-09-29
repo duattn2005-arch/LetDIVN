@@ -741,8 +741,15 @@
     if (window.ResizeObserver) new ResizeObserver(function () { map.invalidateSize(); }).observe(stage);
   }
 
+  // The page's scrollbar width, for the full-width map (100vw counts it; see map.css).
+  function setScrollbarWidth() {
+    document.documentElement.style.setProperty('--ldm-sbw', (window.innerWidth - document.documentElement.clientWidth) + 'px');
+  }
+
   function start() {
     if (!window.L) return;
+    setScrollbarWidth();
+    window.addEventListener('resize', setScrollbarWidth);
     document.querySelectorAll('.ldm[data-ldm]:not(.ldm--ready)').forEach(function (root) {
       try { init(root); } catch (err) { console.error('LDIVN Cleanup Map:', err); }
     });
