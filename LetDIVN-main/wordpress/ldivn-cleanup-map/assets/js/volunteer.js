@@ -41,13 +41,17 @@
   };
 
   // The texts as set in Tình nguyện viên → Sửa form đăng ký (includes/volunteer-form.php).
+  // There the form is drawn to be edited in place (CFG.edit, assets/js/volunteer-edit.js):
+  // each text is marked with its key, data-t (data-tp: an input's placeholder).
   var T = CFG.text || {};
+  var EDIT = !!CFG.edit;
   function t(key) { return esc(T[key] || ''); }
+  function tx(key) { return '<span data-t="' + key + '">' + t(key) + '</span>'; }
 
   var JOIN_OPTIONS = [
-    { value: 'individual', title: t('join_individual'), icon: 'person' },
-    { value: 'group', title: t('join_group'), icon: 'groups' },
-    { value: 'organization', title: t('join_organization'), icon: 'apartment' }
+    { value: 'individual', key: 'join_individual', icon: 'person' },
+    { value: 'group', key: 'join_group', icon: 'groups' },
+    { value: 'organization', key: 'join_organization', icon: 'apartment' }
   ];
   // The roles as set there, each with the icon its name calls for.
   var ROLES = (CFG.roles || []).map(function (name) {
@@ -143,8 +147,8 @@
     return '<span class="ldv-radio' + (small ? ' ldv-radio--sm' : '') + '" aria-hidden="true"><span></span></span>';
   }
 
-  function sectionTitle(name, text) {
-    return '<h4 class="ldv-h">' + icon(name, 'ldv-h-ic') + '<span>' + text + '</span></h4>';
+  function sectionTitle(name, key) {
+    return '<h4 class="ldv-h">' + icon(name, 'ldv-h-ic') + tx(key) + '</h4>';
   }
 
   function logo() {
@@ -168,7 +172,7 @@
       return '<label class="ldv-choice' + (i === 0 ? ' is-on' : '') + '">' +
         '<input type="radio" name="joinAs" value="' + o.value + '"' + (i === 0 ? ' checked' : '') + ' class="ldv-sr">' +
         icon(o.icon, 'ldv-choice-ic') +
-        '<span class="ldv-choice-title">' + o.title + '</span>' +
+        '<span class="ldv-choice-title" data-t="' + o.key + '">' + t(o.key) + '</span>' +
         '<span class="ldv-choice-mark">' + radioMark(false) + '</span>' +
       '</label>';
     }).join('');
@@ -176,7 +180,7 @@
       return '<label class="ldv-role' + (i === 0 ? ' is-on' : '') + '">' +
         '<input type="radio" name="role" value="' + esc(r.value) + '"' + (i === 0 ? ' checked' : '') + ' class="ldv-sr">' +
         icon(r.icon, 'ldv-role-ic') +
-        '<span class="ldv-role-title">' + esc(r.value) + '</span>' +
+        '<span class="ldv-role-title" data-role>' + esc(r.value) + '</span>' +
         '<span class="ldv-role-mark">' + radioMark(true) + '</span>' +
       '</label>';
     }).join('');
@@ -188,8 +192,8 @@
         '<svg viewBox="0 0 960 80" preserveAspectRatio="none" class="ldv-wave" aria-hidden="true"><path d="M0 80 L0 38 C 120 0, 300 8, 470 60 C 520 74, 560 80, 600 80 Z" fill="#fff"/><rect x="0" y="70" width="960" height="10" fill="#fff"/></svg>' +
         '<div class="ldv-head-row' + (modal ? ' ldv-head-row--close' : '') + '">' +
           '<div class="ldv-head-text">' + logo() +
-            '<div><h3 class="ldv-title" id="' + p + '-title">' + t('title') + '</h3>' +
-            '<p class="ldv-sub">' + t('subtitle') + '</p></div>' +
+            '<div><h3 class="ldv-title" id="' + p + '-title" data-t="title">' + t('title') + '</h3>' +
+            '<p class="ldv-sub" data-t="subtitle">' + t('subtitle') + '</p></div>' +
           '</div>' +
           '<div class="ldv-photo" aria-hidden="true">' +
             '<div class="ldv-photo-img">' + (CFG.photo ? '<img src="' + esc(CFG.photo) + '" alt="">' : '') + '</div>' +
@@ -203,36 +207,36 @@
       '<form class="ldv-form" novalidate>' +
         '<input type="text" name="website" tabindex="-1" autocomplete="off" class="ldv-hp" aria-hidden="true">' +
         '<div class="ldv-col">' +
-          '<section>' + sectionTitle('groups', t('join_title')) +
+          '<section>' + sectionTitle('groups', 'join_title') +
             '<div class="ldv-join" role="radiogroup" aria-label="' + t('join_title') + '">' + join + '</div>' +
           '</section>' +
-          '<section>' + sectionTitle('assignment', t('project_title')) +
+          '<section>' + sectionTitle('assignment', 'project_title') +
             '<div class="ldv-field">' + icon('calendar', 'ldv-field-ic') +
               '<select name="eventId" class="ldv-input ldv-select is-empty" aria-label="' + t('project_title') + '" required>' +
                 '<option value="" disabled selected>…</option>' +
               '</select>' + line('chevron', 'ldv-chevron') +
             '</div>' +
           '</section>' +
-          '<section>' + sectionTitle('work', t('role_title')) +
+          '<section>' + sectionTitle('work', 'role_title') +
             '<div class="ldv-roles" role="radiogroup" aria-label="' + t('role_title') + '">' + roles + '</div>' +
           '</section>' +
         '</div>' +
 
         '<div class="ldv-col">' +
           '<hr class="ldv-hr">' +
-          '<section>' + sectionTitle('person', t('info_title')) +
+          '<section>' + sectionTitle('person', 'info_title') +
             '<div class="ldv-grid">' +
-              '<div><label class="ldv-label" for="' + p + '-name"><span class="ldv-name-label">' + t('name_label') + '</span><span class="ldv-req"> *</span></label>' +
+              '<div><label class="ldv-label" for="' + p + '-name"><span class="ldv-name-label" data-t="name_label">' + t('name_label') + '</span><span class="ldv-req"> *</span></label>' +
                 '<div class="ldv-field">' + icon('person', 'ldv-field-ic') +
-                '<input id="' + p + '-name" name="fullName" class="ldv-input" required autocomplete="name" placeholder="' + t('name_placeholder') + '"></div></div>' +
-              '<div><label class="ldv-label" for="' + p + '-phone">' + t('phone_label') + '</label>' +
+                '<input id="' + p + '-name" name="fullName" class="ldv-input" required autocomplete="name" placeholder="' + t('name_placeholder') + '" data-tp="name_placeholder"></div></div>' +
+              '<div><label class="ldv-label" for="' + p + '-phone">' + tx('phone_label') + '</label>' +
                 '<div class="ldv-field">' + icon('phone', 'ldv-field-ic') +
-                '<input id="' + p + '-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" class="ldv-input" placeholder="' + t('phone_placeholder') + '"></div></div>' +
-              '<div><label class="ldv-label" for="' + p + '-email">' + t('email_label') + '<span class="ldv-req"> *</span></label>' +
+                '<input id="' + p + '-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" class="ldv-input" placeholder="' + t('phone_placeholder') + '" data-tp="phone_placeholder"></div></div>' +
+              '<div><label class="ldv-label" for="' + p + '-email">' + tx('email_label') + '<span class="ldv-req"> *</span></label>' +
                 '<div class="ldv-field">' + icon('mail', 'ldv-field-ic') +
-                '<input id="' + p + '-email" name="email" type="email" required autocomplete="email" class="ldv-input" placeholder="' + t('email_placeholder') + '"></div></div>' +
+                '<input id="' + p + '-email" name="email" type="' + (EDIT ? 'text' : 'email') + '" required autocomplete="email" class="ldv-input" placeholder="' + t('email_placeholder') + '" data-tp="email_placeholder"></div></div>' +
               // A group or organization has no date of birth: its name goes here instead.
-              '<div class="ldv-birth-box"><label class="ldv-label" for="' + p + '-birth">' + t('birth_label') + '<span class="ldv-req"> *</span></label>' +
+              '<div class="ldv-birth-box"><label class="ldv-label" for="' + p + '-birth">' + tx('birth_label') + '<span class="ldv-req"> *</span></label>' +
                 '<div class="ldv-field">' + icon('calendar', 'ldv-field-ic') +
                   '<input id="' + p + '-birth" name="birthDate" required inputmode="numeric" autocomplete="bday" maxlength="10" placeholder="dd/mm/yyyy" class="ldv-input ldv-input--picker">' +
                   // The browser's calendar, on an invisible date input over the button on the right.
@@ -242,16 +246,16 @@
                 '</div>' +
                 '<p class="ldv-err" hidden>' + line('alert', 'ldv-err-ic') + '<span></span></p>' +
               '</div>' +
-              '<div class="ldv-org-box" hidden><label class="ldv-label" for="' + p + '-org"><span class="ldv-org-label">' + t('group_label') + '</span><span class="ldv-req"> *</span></label>' +
+              '<div class="ldv-org-box" hidden><label class="ldv-label" for="' + p + '-org"><span class="ldv-org-label" data-t="group_label">' + t('group_label') + '</span><span class="ldv-req"> *</span></label>' +
                 '<div class="ldv-field"><span class="ldv-org-ic">' + icon('groups', 'ldv-field-ic') + '</span>' +
-                '<input id="' + p + '-org" name="organizationName" autocomplete="organization" class="ldv-input" placeholder="' + t('group_placeholder') + '"></div></div>' +
-              '<div class="ldv-wide"><label class="ldv-label" for="' + p + '-address">' + t('address_label') + '<span class="ldv-req"> *</span></label>' +
+                '<input id="' + p + '-org" name="organizationName" autocomplete="organization" class="ldv-input" placeholder="' + t('group_placeholder') + '" data-tp="group_placeholder"></div></div>' +
+              '<div class="ldv-wide"><label class="ldv-label" for="' + p + '-address">' + tx('address_label') + '<span class="ldv-req"> *</span></label>' +
                 '<div class="ldv-field">' + icon('place', 'ldv-field-ic') +
-                '<input id="' + p + '-address" name="address" required autocomplete="street-address" class="ldv-input" placeholder="' + t('address_placeholder') + '"></div></div>' +
+                '<input id="' + p + '-address" name="address" required autocomplete="street-address" class="ldv-input" placeholder="' + t('address_placeholder') + '" data-tp="address_placeholder"></div></div>' +
             '</div>' +
           '</section>' +
           // Number of participants: always 1 for an individual.
-          '<section>' + sectionTitle('groups', t('people_title')) +
+          '<section>' + sectionTitle('groups', 'people_title') +
             '<div class="ldv-field">' + icon('groups', 'ldv-field-ic') +
               '<input name="participants" type="number" min="1" required readonly inputmode="numeric" value="1" class="ldv-input is-locked" aria-label="' + t('people_title') + '">' +
             '</div>' +
@@ -260,7 +264,10 @@
 
         '<p class="ldv-formerr" hidden></p>' +
         '<div class="ldv-actions">' +
-          '<button type="submit" class="ldv-submit">' + line('userPlus', 'ldv-submit-ic') + '<span>' + t('button') + '</span></button>' +
+          // Being edited, a box: text can be typed in it, which a button doesn't allow.
+          (EDIT
+            ? '<div class="ldv-submit">' + line('userPlus', 'ldv-submit-ic') + tx('button') + '</div>'
+            : '<button type="submit" class="ldv-submit">' + line('userPlus', 'ldv-submit-ic') + '<span>' + t('button') + '</span></button>') +
         '</div>' +
       '</form>';
   }
@@ -342,15 +349,21 @@
       var join = joinAs();
       var team = join !== 'individual';
       var kind = join === 'organization' ? 'organization' : 'group';
+      // A text, with the key it now shows (for the in-place editor).
+      var show = function (el, key, placeholder) {
+        el.setAttribute(placeholder ? 'data-tp' : 'data-t', key);
+        if (placeholder) el.placeholder = T[key] || '';
+        else el.textContent = T[key] || '';
+      };
       syncCards('joinAs');
-      $('.ldv-name-label').textContent = T[team ? 'contact_label' : 'name_label'] || '';
-      nameInput.placeholder = T[team ? 'contact_placeholder' : 'name_placeholder'] || '';
+      show($('.ldv-name-label'), team ? 'contact_label' : 'name_label');
+      show(nameInput, team ? 'contact_placeholder' : 'name_placeholder', true);
       $('.ldv-birth-box').hidden = team;
       birth.required = !team;
       $('.ldv-org-box').hidden = !team;
       org.required = team;
-      $('.ldv-org-label').textContent = T[kind + '_label'] || '';
-      org.placeholder = T[kind + '_placeholder'] || '';
+      show($('.ldv-org-label'), kind + '_label');
+      show(org, kind + '_placeholder', true);
       $('.ldv-org-ic').innerHTML = icon(join === 'organization' ? 'apartment' : 'groups', 'ldv-field-ic');
       people.readOnly = !team;
       people.classList.toggle('is-locked', !team);
@@ -362,6 +375,12 @@
       if (e.target.name === 'joinAs') syncJoin();
       if (e.target.name === 'role') syncCards('role');
     });
+
+    // Being edited (CFG.edit): what is typed in the fields is their placeholder, as is.
+    if (EDIT) {
+      form.addEventListener('submit', function (e) { e.preventDefault(); });
+      return;
+    }
 
     // Optional, any length: digits, with a leading + for foreign numbers.
     phone.addEventListener('input', function () {

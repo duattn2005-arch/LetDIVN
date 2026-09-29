@@ -1,7 +1,8 @@
 <?php
 // Tình nguyện viên → Sửa form đăng ký: the texts, the photo and the role
 // choices of the "Register to Volunteer" form (assets/js/volunteer.js draws it
-// with them). What is left empty takes the website's own text.
+// with them), edited on the form itself (assets/js/volunteer-edit.js). What is
+// left empty takes the website's own text.
 
 defined('ABSPATH') || exit;
 
@@ -93,10 +94,38 @@ add_action('admin_init', function () {
     ]);
 });
 
-add_action('admin_enqueue_scripts', function ($hook) {
-    if (($_GET['page'] ?? '') === 'ldv-form') {
-        wp_enqueue_media();
+/** The texts not seen on the form as it opens: edited in fields under it. */
+const LDV_FORM_OTHER_TEXTS = ['project_placeholder', 'done_title', 'done_text', 'done_button', 'send_error'];
+
+// The page draws the form itself (assets/js/volunteer.js, edit mode) and edits it in place (volunteer-edit.js).
+add_action('admin_enqueue_scripts', function () {
+    if (($_GET['page'] ?? '') !== 'ldv-form') {
+        return;
     }
+    $form = ldv_form();
+    wp_enqueue_media();
+    wp_enqueue_style('ldv-edit-form', LDM_URL . 'assets/css/volunteer.css', [], LDM_VERSION);
+    wp_enqueue_script('ldv-edit-form', LDM_URL . 'assets/js/volunteer.js', [], LDM_VERSION, true);
+    wp_add_inline_script('ldv-edit-form', 'window.LDIVN_VOLUNTEER = ' . wp_json_encode([
+        'edit' => true,
+        'api' => add_query_arg('ldv_api', '1', home_url('/')),
+        'ajax' => admin_url('admin-ajax.php'),
+        'logo' => LDM_URL . 'assets/images/logo-icon-light.png',
+        'photo' => $form['photo'],
+        'text' => $form['text'],
+        'roles' => $form['roles'],
+    ]) . ';', 'before');
+    wp_enqueue_script('ldv-edit', LDM_URL . 'assets/js/volunteer-edit.js', ['ldv-edit-form'], LDM_VERSION, true);
+});
+
+add_action('admin_post_ldv_form_reset', function () {
+    if (!current_user_can('manage_options')) {
+        wp_die('Bạn không có quyền làm việc này.');
+    }
+    check_admin_referer('ldv_form_reset');
+    delete_option(LDV_FORM_OPTION);
+    wp_safe_redirect(admin_url('edit.php?post_type=' . LDV_TYPE . '&page=ldv-form&ldv_reset=1'));
+    exit;
 });
 
 function ldv_form_page(): void
@@ -105,71 +134,71 @@ function ldv_form_page(): void
         return;
     }
     $saved = (array) get_option(LDV_FORM_OPTION, []);
-    $form = ldv_form();
+    $texts = ldv_form_texts();
     $name = fn($key) => esc_attr(LDV_FORM_OPTION . '[text][' . $key . ']');
     ?>
     <div class="wrap">
         <h1>Sửa form đăng ký tình nguyện viên</h1>
-        <p>Chữ, ảnh và các vai trò của form "Register to Volunteer". Ô nào để trống thì dùng chữ mặc định (chữ mờ trong ô).
-            Danh sách <strong>dự án / chiến dịch</strong> trong form lấy từ các điểm ở menu <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . LDM_TYPE)); ?>">Bản đồ dọn rác</a> chưa diễn ra.
-            <a href="<?php echo esc_url(ldv_page_url()); ?>" target="_blank" rel="noopener">Xem form ↗</a></p>
+        <?php settings_errors(); ?>
+        <?php if (!empty($_GET['ldv_reset'])) : ?>
+            <div class="notice notice-success is-dismissible"><p>Form đã về như mặc định.</p></div>
+        <?php endif; ?>
+        <p style="max-width:1000px;font-size:14px">
+            <strong>Bấm vào chữ bất kỳ trên form để sửa ngay tại chỗ</strong>: tiêu đề, tên các mục, tên ô, chữ mờ trong ô, chữ trên nút.
+            Bấm vào <strong>ảnh tròn</strong> để đổi ảnh. Vai trò: rê chuột vào để thấy nút <strong>×</strong> xoá, nút <strong>+</strong> để thêm.
+            Chọn <em>Group</em> / <em>Organization</em> trên form (bấm vào biểu tượng) để sửa chữ khi đăng ký theo nhóm, tổ chức.
+            Xoá trắng một chữ thì dùng lại chữ mặc định. Sửa xong bấm <strong>Lưu form</strong> ở dưới.<br>
+            Danh sách <strong>dự án / chiến dịch</strong> lấy từ các điểm chưa diễn ra ở menu <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . LDM_TYPE)); ?>">Bản đồ dọn rác</a>.
+            <a href="<?php echo esc_url(ldv_page_url()); ?>" target="_blank" rel="noopener">Xem form trên web ↗</a>
+        </p>
 
-        <form method="post" action="options.php">
+        <div class="ldv-edit-box"><div data-ldv-form=""></div></div>
+
+        <form method="post" action="options.php" class="ldv-edit-save">
             <?php settings_fields('ldv_form'); ?>
+            <?php foreach ($texts as $key => $field) : ?>
+                <?php if (isset($field[1]) && !in_array($key, LDV_FORM_OTHER_TEXTS, true)) : ?>
+                    <input type="hidden" name="<?php echo $name($key); ?>" value="<?php echo esc_attr($saved['text'][$key] ?? ''); ?>">
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <textarea name="<?php echo esc_attr(LDV_FORM_OPTION . '[roles]'); ?>" hidden><?php echo esc_textarea($saved['roles'] ?? ''); ?></textarea>
+            <input type="hidden" name="<?php echo esc_attr(LDV_FORM_OPTION . '[photo]'); ?>" value="<?php echo esc_attr($saved['photo'] ?? ''); ?>">
+
+            <h2>Các chữ khác</h2>
             <table class="form-table" role="presentation">
-                <tr>
-                    <th scope="row">Ảnh tròn ở góc phải</th>
-                    <td>
-                        <img src="<?php echo esc_url($form['photo']); ?>" alt="" class="ldv-photo-preview" style="width:96px;height:96px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:12px">
-                        <input type="hidden" name="<?php echo esc_attr(LDV_FORM_OPTION . '[photo]'); ?>" value="<?php echo esc_attr($saved['photo'] ?? ''); ?>" class="ldv-photo-input">
-                        <button type="button" class="button ldv-photo-pick">Chọn ảnh</button>
-                        <button type="button" class="button-link ldv-photo-reset" style="margin-left:8px">Dùng ảnh mặc định</button>
-                    </td>
-                </tr>
-                <?php foreach (ldv_form_texts() as $key => $field) : ?>
-                    <?php if (!isset($field[1])) : ?>
-                        <tr><th colspan="2"><h2 style="margin:12px 0 0"><?php echo esc_html($field[0]); ?></h2></th></tr>
-                        <?php continue; ?>
-                    <?php endif; ?>
+                <?php foreach (LDV_FORM_OTHER_TEXTS as $key) : ?>
                     <tr>
-                        <th scope="row"><label for="ldv-t-<?php echo esc_attr($key); ?>"><?php echo esc_html($field[0]); ?></label></th>
-                        <td><input id="ldv-t-<?php echo esc_attr($key); ?>" name="<?php echo $name($key); ?>" value="<?php echo esc_attr($saved['text'][$key] ?? ''); ?>" placeholder="<?php echo esc_attr($field[1]); ?>" class="large-text"></td>
+                        <th scope="row"><label for="ldv-t-<?php echo esc_attr($key); ?>"><?php echo esc_html($texts[$key][0]); ?></label></th>
+                        <td><input id="ldv-t-<?php echo esc_attr($key); ?>" name="<?php echo $name($key); ?>" value="<?php echo esc_attr($saved['text'][$key] ?? ''); ?>" placeholder="<?php echo esc_attr($texts[$key][1]); ?>" class="large-text"></td>
                     </tr>
-                    <?php if ($key === 'role_title') : ?>
-                        <tr>
-                            <th scope="row"><label for="ldv-roles">· Các vai trò</label></th>
-                            <td>
-                                <textarea id="ldv-roles" name="<?php echo esc_attr(LDV_FORM_OPTION . '[roles]'); ?>" rows="5" class="regular-text" placeholder="<?php echo esc_attr(LDV_DEFAULT_ROLES); ?>"><?php echo esc_textarea($saved['roles'] ?? ''); ?></textarea>
-                                <p class="description">Mỗi dòng một vai trò (nên 2–6). Vai trò đầu tiên được chọn sẵn.</p>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
                 <?php endforeach; ?>
             </table>
             <?php submit_button('Lưu form'); ?>
         </form>
+
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('Đưa mọi chữ, ảnh và vai trò của form về như mặc định?');">
+            <input type="hidden" name="action" value="ldv_form_reset">
+            <?php wp_nonce_field('ldv_form_reset'); ?>
+            <?php submit_button('Khôi phục form mặc định', 'delete small', 'submit', false); ?>
+        </form>
     </div>
-    <script>
-    (function () {
-      var input = document.querySelector('.ldv-photo-input');
-      var img = document.querySelector('.ldv-photo-preview');
-      var fallback = <?php echo wp_json_encode(LDM_URL . 'assets/images/volunteer.jpg'); ?>;
-      var frame;
-      document.querySelector('.ldv-photo-pick').addEventListener('click', function () {
-        frame = frame || wp.media({ title: 'Chọn ảnh cho form', library: { type: 'image' }, multiple: false });
-        frame.off('select').on('select', function () {
-          var file = frame.state().get('selection').first().toJSON();
-          var url = (file.sizes && file.sizes.medium_large ? file.sizes.medium_large.url : file.url);
-          input.value = url;
-          img.src = url;
-        });
-        frame.open();
-      });
-      document.querySelector('.ldv-photo-reset').addEventListener('click', function () {
-        input.value = '';
-        img.src = fallback;
-      });
-    })();
-    </script>
+    <style>
+        .ldv-edit-box { max-width: 1000px; margin: 16px 0 8px; }
+        .ldv-edit-box [contenteditable] { border-radius: 4px; outline: 1px dashed transparent; outline-offset: 3px; cursor: text; transition: outline-color 0.15s; }
+        .ldv-edit-box [contenteditable]:hover { outline-color: rgba(232, 25, 124, 0.6); }
+        .ldv-edit-box [contenteditable]:focus { outline: 2px solid #e8197c; }
+        .ldv-edit-box .ldv-edit-ph { color: #9ca3af !important; }
+        .ldv-edit-box .ldv-edit-ph:focus { color: #0f1f4b !important; }
+        .ldv-edit-box .ldv-photo { pointer-events: auto; cursor: pointer; }
+        .ldv-edit-box .ldv-photo::after { content: "Đổi ảnh"; position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%); padding: 2px 10px; border-radius: 999px; background: #0f1f4b; color: #fff; font-size: 12px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; }
+        .ldv-edit-box .ldv-photo:hover::after { opacity: 1; }
+        .ldv-edit-box .ldv-role { position: relative; }
+        .ldv-edit-box .ldv-edit-del { display: none; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: #0f1f4b; color: #fff; font-size: 14px; line-height: 20px; cursor: pointer; }
+        .ldv-edit-box .ldv-role:hover .ldv-edit-del { display: block; }
+        .ldv-edit-box .ldv-edit-add { min-height: 64px; border: 2px dashed #cfd6e4; border-radius: 14px; background: transparent; color: #64748b; font-size: 24px; cursor: pointer; }
+        .ldv-edit-box .ldv-edit-add:hover { border-color: #e8197c; color: #e8197c; }
+        .ldv-edit-box .ldv-submit { cursor: default; }
+    </style>
     <?php
 }
+
