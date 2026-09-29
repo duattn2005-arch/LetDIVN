@@ -50,6 +50,7 @@ function ldm_sanitize_settings($in): array
         'vol_everywhere' => empty($in['vol_everywhere']) ? 0 : 1,
         'vol_forward' => empty($in['vol_forward']) ? 0 : 1,
         'vol_email' => implode(', ', array_filter(array_map('sanitize_email', explode(',', (string) ($in['vol_email'] ?? ''))))),
+        'bubble' => empty($in['bubble']) ? 0 : 1,
     ];
 }
 
@@ -162,7 +163,8 @@ function ldm_settings_page(): void
                         <label><input type="checkbox" name="<?php echo $name('show_past'); ?>" value="1" <?php checked($s['show_past'], 1); ?>> Vẫn hiện sự kiện đã qua (mặc định: qua ngày là tự ẩn)</label><br>
                         <label><input type="checkbox" name="<?php echo $name('click_pin'); ?>" value="1" <?php checked($s['click_pin'], 1); ?>> Bấm lên bản đồ thì ghim điểm mới và hiện địa chỉ</label><br>
                         <label><input type="checkbox" name="<?php echo $name('core_events'); ?>" value="1" <?php checked($s['core_events'], 1); ?>> Lấy thêm sự kiện từ plugin "Let's Do It Vietnam – Core"</label>
-                        <span class="description">(<?php echo function_exists('ldivn_get_events') ? 'đang bật' : 'không cài trên web này — bỏ qua'; ?>)</span>
+                        <span class="description">(<?php echo function_exists('ldivn_get_events') ? 'đang bật' : 'không cài trên web này — bỏ qua'; ?>)</span><br>
+                        <label><input type="checkbox" name="<?php echo $name('bubble'); ?>" value="1" <?php checked($s['bubble'], 1); ?>> Hiện bong bóng liên hệ ở góc dưới bên phải mọi trang (Facebook, Instagram, hotline, email)</label>
                     </td>
                 </tr>
             </table>

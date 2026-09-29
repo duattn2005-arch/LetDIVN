@@ -1,0 +1,268 @@
+/* The contact bubble (includes/bubble.php), as on the Let's Do It Vietnam
+   website. Everything under .ldcb and set explicitly, so the theme's link and
+   button styles don't leak in. */
+
+.ldcb {
+  position: fixed;
+  right: 16px;
+  bottom: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.4;
+  text-align: left;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.ldcb *, .ldcb *::before, .ldcb *::after { box-sizing: border-box; }
+.ldcb svg { display: block; flex-shrink: 0; }
+.ldcb [hidden] { display: none !important; }
+@media (min-width: 640px) {
+  .ldcb { right: 24px; bottom: 24px; }
+}
+
+/* --- The window ---------------------------------------------------------------------- */
+.ldcb .ldcb-panel {
+  width: min(340px, calc(100vw - 2rem));
+  margin-bottom: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  transform-origin: bottom right;
+  animation: ldcb-in 0.2s ease-out;
+}
+@keyframes ldcb-in {
+  from { opacity: 0.5; transform: translateY(16px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+
+.ldcb .ldcb-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(to right, #e81a7f, #ff4d9e);
+  color: #fff;
+}
+.ldcb .ldcb-top-l { display: flex; align-items: center; gap: 10px; }
+.ldcb .ldcb-top-ic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.ldcb .ldcb-top-ic svg { width: 16px; height: 16px; }
+.ldcb .ldcb-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.ldcb .ldcb-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #6ee7b7;
+  animation: ldcb-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes ldcb-pulse { 50% { opacity: 0.5; } }
+.ldcb .ldcb-sub { margin-top: 2px; color: #fce7f3; font-size: 11px; }
+
+.ldcb .ldcb-x,
+.ldcb .ldcb-x:hover,
+.ldcb .ldcb-x:focus {
+  -webkit-appearance: none;
+  appearance: none;
+  display: flex;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.ldcb .ldcb-x:hover { background: rgba(255, 255, 255, 0.2); }
+.ldcb .ldcb-x svg { width: 16px; height: 16px; }
+
+.ldcb .ldcb-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 70vh;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+/* --- A contact -------------------------------------------------------------------------- */
+.ldcb .ldcb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 16px;
+  background: #f8fafc;
+  color: #1e293b;
+  text-decoration: none;
+  box-shadow: none;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.ldcb .ldcb-row:hover, .ldcb .ldcb-row:focus { color: #1e293b; text-decoration: none; }
+.ldcb .ldcb-row-l { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ldcb .ldcb-ic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  color: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: transform 0.15s;
+}
+.ldcb .ldcb-row:hover .ldcb-ic { transform: scale(1.05); }
+.ldcb .ldcb-ic svg { width: 18px; height: 18px; }
+.ldcb .ldcb-text { display: block; min-width: 0; }
+.ldcb .ldcb-label {
+  display: block;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+.ldcb .ldcb-val {
+  display: block;
+  max-width: 190px;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ldcb .ldcb-chev {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  transition: color 0.15s, transform 0.15s;
+}
+.ldcb .ldcb-row:hover .ldcb-chev { transform: translateX(2px); }
+
+.ldcb .ldcb-row--fb { background: rgba(24, 119, 242, 0.05); border-color: rgba(24, 119, 242, 0.2); }
+.ldcb .ldcb-row--fb:hover { background: rgba(24, 119, 242, 0.1); }
+.ldcb .ldcb-row--fb .ldcb-ic { background: #1877f2; }
+.ldcb .ldcb-row--fb .ldcb-ic svg { fill: currentColor; }
+.ldcb .ldcb-row--fb:hover .ldcb-label,
+.ldcb .ldcb-row--fb:hover .ldcb-chev { color: #1877f2; }
+
+.ldcb .ldcb-row--ig { background: rgba(225, 48, 108, 0.05); border-color: rgba(225, 48, 108, 0.2); }
+.ldcb .ldcb-row--ig:hover { background: rgba(225, 48, 108, 0.1); }
+.ldcb .ldcb-row--ig .ldcb-ic { background: linear-gradient(to top right, #f58529, #dd2a7b, #8134af); }
+.ldcb .ldcb-row--ig:hover .ldcb-label,
+.ldcb .ldcb-row--ig:hover .ldcb-chev { color: #e1306c; }
+
+.ldcb .ldcb-row--phone:hover { background: #ecfdf5; }
+.ldcb .ldcb-row--phone .ldcb-ic { background: #10b981; }
+.ldcb .ldcb-row--phone .ldcb-val { color: #059669; font-size: 12px; font-weight: 600; }
+.ldcb .ldcb-row--phone:hover .ldcb-label,
+.ldcb .ldcb-row--phone:hover .ldcb-chev { color: #059669; }
+
+.ldcb .ldcb-row--mail:hover { background: #fdf2f8; }
+.ldcb .ldcb-row--mail .ldcb-ic { background: #ec4899; }
+.ldcb .ldcb-row--mail .ldcb-val { max-width: 150px; }
+.ldcb .ldcb-row--mail:hover .ldcb-label,
+.ldcb .ldcb-row--mail:hover .ldcb-chev { color: #e81a7f; }
+
+.ldcb .ldcb-open,
+.ldcb .ldcb-open:hover,
+.ldcb .ldcb-open:focus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #e81a7f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+.ldcb .ldcb-open:hover { background: #d01370; box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.25), 0 2px 4px -2px rgba(236, 72, 153, 0.25); }
+.ldcb .ldcb-open svg { width: 14px; height: 14px; }
+
+/* --- The round button ------------------------------------------------------------------- */
+.ldcb .ldcb-btn,
+.ldcb .ldcb-btn:hover,
+.ldcb .ldcb-btn:focus {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(to top right, #e81a7f, #ff2b8f, #ff4d9e);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.25), 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.ldcb .ldcb-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.25), 0 25px 50px -12px rgba(236, 72, 153, 0.5);
+}
+.ldcb .ldcb-btn:active { transform: scale(0.95); }
+.ldcb .ldcb-ping {
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  background: rgba(236, 72, 153, 0.4);
+  pointer-events: none;
+  animation: ldcb-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes ldcb-ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+.ldcb .ldcb-icon { position: relative; display: flex; align-items: center; justify-content: center; }
+.ldcb .ldcb-i-open { width: 28px; height: 28px; fill: rgba(255, 255, 255, 0.2); }
+.ldcb .ldcb-i-close { display: none; width: 24px; height: 24px; }
+.ldcb .ldcb-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+.ldcb.is-open .ldcb-ping, .ldcb.is-open .ldcb-i-open { display: none; }
+.ldcb.is-open .ldcb-i-close { display: block; }
