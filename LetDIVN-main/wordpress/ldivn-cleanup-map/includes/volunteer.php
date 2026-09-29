@@ -139,7 +139,8 @@ add_action('admin_head-edit.php', function () {
     if (($GLOBALS['typenow'] ?? '') !== LDV_TYPE) {
         return;
     }
-    $url = wp_nonce_url(admin_url('admin-post.php?action=ldv_export'), 'ldv_export');
+    // Not wp_nonce_url(): it HTML-escapes the "&", which a script's link keeps as is.
+    $url = add_query_arg(['action' => 'ldv_export', '_wpnonce' => wp_create_nonce('ldv_export')], admin_url('admin-post.php'));
     echo '<script>document.addEventListener("DOMContentLoaded",function(){var h=document.querySelector(".wp-heading-inline");if(h){var a=document.createElement("a");a.className="page-title-action";a.href=' . wp_json_encode($url) . ';a.textContent="Tải về Excel (CSV)";h.after(a);}});</script>';
 });
 
