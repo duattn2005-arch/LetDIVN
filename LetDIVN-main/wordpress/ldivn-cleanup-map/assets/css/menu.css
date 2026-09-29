@@ -1,0 +1,96 @@
+/* LDIVN Cleanup Map: the menu items for the map and the sign-up form (includes/menu.php). */
+
+/* The map's page: a pink pin before its name. */
+.ldivn-menu-map > a .ldm-menu-pin {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.15em;
+  height: 1.15em;
+  margin-right: 0.4em;
+  vertical-align: -0.2em;
+  color: #e81a7f;
+}
+.ldivn-menu-map > a {
+  align-items: center;
+}
+
+/* "#volunteer": an outlined pink button, like the "Contact us" one but white. */
+.ldivn-menu-volunteer {
+  margin-left: 16px !important;
+}
+.ldivn-menu-volunteer > a {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 28px !important;
+  border: 2px solid #f1138d !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #f1138d !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.ldivn-menu-volunteer > a:hover,
+.ldivn-menu-volunteer > a:focus {
+  background: #fdf2f8 !important;
+  color: #f1138d !important;
+  transform: translateY(-2px);
+}
+/* Without the menu's underline/frame hover effect (Elementor's "pointers"). */
+.ldivn-menu-volunteer > a::before,
+.ldivn-menu-volunteer > a::after {
+  display: none !important;
+}
+
+/* On computers, an Elementor header holding the Volunteer button is laid out
+   like the Let's Do It Vietnam one so the longer menu stays on one line: up to
+   1600px wide, the logo only as wide as it is, the menu taking the rest. */
+@media (min-width: 1025px) {
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-volunteer) {
+    --content-width: min(1600px, 100%) !important;
+    --padding-left: 32px !important;
+    --padding-right: 32px !important;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-volunteer) > .e-con-inner > .e-con:first-child {
+    --width: auto !important;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-volunteer) > .e-con-inner > .e-con:last-child {
+    --width: auto !important;
+    --flex-grow: 1 !important;
+    --flex-shrink: 1 !important;
+    margin-left: 32px;
+  }
+}
+/* Narrower computer screens: smaller items, as that header does below 1536px. */
+@media (min-width: 1025px) and (max-width: 1535px) {
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-volunteer) {
+    --e-nav-menu-horizontal-menu-item-margin: 9px !important;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-volunteer) .elementor-item {
+    font-size: 15px !important;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-volunteer) .ldivn-menu-volunteer > a {
+    height: 42px;
+    padding: 0 20px !important;
+  }
+  .ldivn-menu-volunteer {
+    margin-left: 8px !important;
+  }
+}
+
+/* In the mobile dropdown it is an ordinary item, in pink. */
+.elementor-nav-menu--dropdown .ldivn-menu-volunteer {
+  margin-left: 0 !important;
+}
+.elementor-nav-menu--dropdown .ldivn-menu-volunteer > a {
+  display: flex !important;
+  height: auto;
+  padding: 13px 20px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  transform: none;
+}
