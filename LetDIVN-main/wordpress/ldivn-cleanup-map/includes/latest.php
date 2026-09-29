@@ -18,7 +18,6 @@ add_action('wp_enqueue_scripts', function () {
 /** The bar's HTML, or '' with no posts. */
 function ldlp_bar(): string
 {
-    $s = ldm_settings();
     $posts = get_posts([
         'post_type' => 'post',
         'post_status' => 'publish',
@@ -41,9 +40,8 @@ function ldlp_bar(): string
         }
         return '<div class="ldlp-run"' . ($copy ? ' aria-hidden="true"' : '') . '>' . $out . '</div>';
     };
-    return '<div class="ldlp" role="region" aria-label="' . esc_attr($s['latest_label']) . '">'
+    return '<div class="ldlp" role="region" aria-label="Latest posts">'
         . '<div class="ldlp-in">'
-        . '<span class="ldlp-label"><span class="ldlp-live"></span>' . esc_html($s['latest_label']) . '</span>'
         . '<div class="ldlp-view"><div class="ldlp-track">' . $run(false) . $run(true) . '</div></div>'
         . '</div>'
         . '</div>';

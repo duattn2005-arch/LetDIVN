@@ -3,7 +3,7 @@
 // with the Hoan Kiem Lake one, Hanoi has 5. Ordinary spots in the list
 // ("Điểm mẫu" in its Ghim column), except that their popup says they are
 // samples, without a Register button, and the sign-up form doesn't offer them.
-// Added once when this version is installed; Cài đặt removes or re-adds them.
+// Added once after this version is installed; Cài đặt removes or re-adds them.
 
 defined('ABSPATH') || exit;
 
@@ -52,8 +52,9 @@ function ldm_add_samples(): void
     }
 }
 
-add_action('admin_init', function () {
-    if (get_option('ldm_samples') === false && current_user_can('manage_options')) {
+// On the first request after the update, whoever makes it: the map shows them at once.
+add_action('wp_loaded', function () {
+    if (get_option('ldm_samples') === false) {
         add_option('ldm_samples', 1, '', false);
         ldm_add_samples();
     }

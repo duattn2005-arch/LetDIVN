@@ -31,31 +31,10 @@
   .ldlp .ldlp-in { padding: 6px 32px; } /* the header's sides */
 }
 
-.ldlp .ldlp-label {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  gap: 6px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: #e81a7f;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.ldlp .ldlp-live {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: #fff;
-  animation: ldlp-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
 @keyframes ldlp-pulse { 50% { opacity: 0.4; } }
 
-/* The titles run from right to left, and stop under the mouse. */
+/* The titles run from right to left without stopping (only while a title
+   has the keyboard's focus). */
 .ldlp .ldlp-view {
   flex: 1 1 auto;
   min-width: 0;
@@ -69,8 +48,7 @@
   animation: ldlp-run var(--ldlp-time, 40s) linear infinite;
   will-change: transform;
 }
-.ldlp:hover .ldlp-track,
-.ldlp:focus-within .ldlp-track { animation-play-state: paused; }
+.ldlp:has(.ldlp-item:focus-visible) .ldlp-track { animation-play-state: paused; }
 @keyframes ldlp-run { to { transform: translate3d(-50%, 0, 0); } }
 
 .ldlp .ldlp-run {
@@ -118,7 +96,7 @@
 
 /* No running: the titles scroll sideways by hand, once. */
 @media (prefers-reduced-motion: reduce) {
-  .ldlp .ldlp-track, .ldlp .ldlp-live, .ldlp .ldlp-dot { animation: none; }
+  .ldlp .ldlp-track, .ldlp .ldlp-dot { animation: none; }
   .ldlp .ldlp-view { overflow-x: auto; scrollbar-width: none; }
   .ldlp .ldlp-run[aria-hidden] { display: none; }
 }

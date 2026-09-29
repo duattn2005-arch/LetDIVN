@@ -426,10 +426,11 @@
     var campaignOfNew = new Map();
     var boundary = null;
     var placeMarker = null;
-    // Pins closer on screen than GROUP_PX share one pin with their count, which
-    // zooms in on them, until the map is zoomed in to the streets.
+    // Seen from afar (the country, a region), pins closer on screen than
+    // GROUP_PX share one pin with their count, which zooms in on them. From a
+    // city's view on (GROUP_UNTIL), every spot has its own pin.
     var GROUP_PX = 34;
-    var GROUP_UNTIL = 13;
+    var GROUP_UNTIL = 10;
 
     function flyMapTo(lat, lng, zoom, onArrival) {
       setTab('map');
@@ -440,12 +441,16 @@
       }, 50);
     }
 
-    // Close enough to see every one of these spots apart.
-    function flyMapToSpots(spots) {
+    // All these spots in view. closer: at least one step in (a group's pin), so
+    // clicking it again always takes the spots further apart.
+    function flyMapToSpots(spots, closer) {
       setTab('map');
       setTimeout(function () {
         map.invalidateSize();
-        map.flyToBounds(L.latLngBounds(spots.map(function (s) { return [s.lat, s.lng]; })), { padding: [80, 80], maxZoom: GROUP_UNTIL + 1, duration: 1.2 });
+        var bounds = L.latLngBounds(spots.map(function (s) { return [s.lat, s.lng]; }));
+        var zoom = map.getBoundsZoom(bounds, false, L.point(160, 160));
+        if (closer) zoom = Math.max(zoom, map.getZoom() + 1);
+        map.flyTo(bounds.getCenter(), Math.min(zoom, 14), { duration: 1.2 });
       }, 50);
     }
 
@@ -528,7 +533,7 @@
           var spots = g.map(function (p) { return p.e.spot; });
           m = L.marker(L.latLngBounds(spots.map(function (s) { return [s.lat, s.lng]; })).getCenter(), { icon: groupIcon(g.length), zIndexOffset: 3000, riseOnHover: true })
             .bindTooltip(esc(groupLabel(g)), { direction: 'top' })
-            .on('click', function () { flyMapToSpots(spots); });
+            .on('click', function () { flyMapToSpots(spots, true); });
         }
         m.addTo(pinsLayer);
         g.forEach(function (p) { campaignMarkers.set(p.e.id, m); });

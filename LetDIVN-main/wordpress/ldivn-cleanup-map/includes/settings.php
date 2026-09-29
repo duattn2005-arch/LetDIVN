@@ -53,7 +53,6 @@ function ldm_sanitize_settings($in): array
         'bubble' => empty($in['bubble']) ? 0 : 1,
         'bubble_open' => empty($in['bubble_open']) ? 0 : 1,
         'latest' => empty($in['latest']) ? 0 : 1,
-        'latest_label' => $text('latest_label') ?: $d['latest_label'],
     ];
 }
 
@@ -174,11 +173,9 @@ function ldm_settings_page(): void
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="ldm-latest-label">Bài viết mới nhất</label></th>
+                    <th scope="row">Bài viết mới nhất</th>
                     <td>
-                        <label><input type="checkbox" name="<?php echo $name('latest'); ?>" value="1" <?php checked($s['latest'], 1); ?>> Chạy chữ 5 bài viết (Posts) mới nhất trên đầu mọi trang, tự cập nhật khi đăng bài mới</label><br>
-                        <input id="ldm-latest-label" name="<?php echo $name('latest_label'); ?>" value="<?php echo esc_attr($s['latest_label']); ?>" class="regular-text" style="margin-top:6px">
-                        <p class="description">Chữ ở đầu thanh.</p>
+                        <label><input type="checkbox" name="<?php echo $name('latest'); ?>" value="1" <?php checked($s['latest'], 1); ?>> Chạy chữ 5 bài viết (Posts) mới nhất trên đầu mọi trang, tự cập nhật khi đăng bài mới</label>
                     </td>
                 </tr>
             </table>
