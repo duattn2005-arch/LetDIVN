@@ -40,6 +40,9 @@ function ldm_shortcode($atts): string
 
     wp_enqueue_style('ldm-map');
     wp_enqueue_script('ldm-map');
+    if ($s['vol_on_map']) {
+        ldv_enqueue(); // the Register buttons open the sign-up form
+    }
 
     static $data_added = false;
     if (!$data_added) {

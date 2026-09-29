@@ -1,0 +1,332 @@
+/* LDIVN Cleanup Map – the "Register to Volunteer" form (assets/js/volunteer.js),
+   drawn like the website's. Scoped under .ldv; the properties themes like to
+   set on headings, inputs and buttons (Divi, Elementor kits...) are !important. */
+
+.ldv {
+  --ldv-navy: #0f1f4b;
+  --ldv-pink: #e8197c;
+  --ldv-line: #cfd6e4;
+  --ldv-card: #dde3ee;
+  position: relative;
+  width: 100%;
+  margin: auto;
+  overflow: hidden;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 30px 80px -20px rgba(15, 31, 75, 0.45);
+  color: var(--ldv-navy);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.ldv *, .ldv *::before, .ldv *::after { box-sizing: border-box; }
+.ldv [hidden] { display: none !important; }
+.ldv svg { display: block; flex-shrink: 0; }
+.ldv img { display: block; max-width: none !important; border: 0 !important; border-radius: 0; box-shadow: none !important; }
+.ldv h3, .ldv h4, .ldv p {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  font-family: inherit !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  text-align: inherit;
+}
+.ldv section { padding: 0; border: 0; }
+.ldv--form { max-width: 960px; }
+.ldv--done { max-width: 448px; padding: 36px 32px; text-align: center; }
+
+/* --- The window ------------------------------------------------------------------------ */
+
+.ldv-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12px;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.55);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  animation: ldv-fade 0.2s ease-out;
+}
+.ldv-overlay > .ldv { animation: ldv-zoom 0.2s ease-out; }
+@keyframes ldv-fade { from { opacity: 0; } }
+@keyframes ldv-zoom { from { opacity: 0; transform: scale(0.95); } }
+
+.ldv .ldv-close {
+  position: absolute !important;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  color: var(--ldv-navy) !important;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.ldv .ldv-close:hover { transform: scale(1.05); }
+.ldv-close-ic { width: 24px; height: 24px; stroke-width: 2.5; }
+
+/* --- Header: sky, greenery, logo, title, photo ------------------------------------------ */
+
+.ldv-head {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 20px 36px;
+  background: linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #fff 100%);
+}
+.ldv-blob { position: absolute; border-radius: 9999px; pointer-events: none; }
+.ldv-blob--1 { left: 8px; top: 16px; width: 160px; height: 64px; background: rgba(255, 255, 255, 0.8); filter: blur(24px); }
+.ldv-blob--2 { left: -48px; top: 112px; width: 192px; height: 160px; background: rgba(94, 158, 69, 0.4); filter: blur(40px); }
+.ldv-blob--3 { left: 80px; top: 144px; width: 176px; height: 128px; background: rgba(143, 194, 111, 0.35); filter: blur(40px); }
+.ldv-wave { position: absolute; left: 0; bottom: 0; width: 100%; height: 48px; pointer-events: none; }
+.ldv-head-row { position: relative; display: flex; align-items: center; gap: 24px; }
+.ldv-head-text { flex: 1; min-width: 0; text-align: center; }
+
+.ldv-logo { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 10px; color: var(--ldv-navy); }
+.ldv .ldv-logo img { width: 48px !important; height: 48px !important; object-fit: contain; }
+.ldv-logo-text { text-align: left; line-height: 1; }
+.ldv-logo-1 { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-weight: 900; font-size: 24px; letter-spacing: -0.025em; white-space: nowrap; }
+.ldv-logo-2 { margin: 4px 0 0 12px; font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 18px; }
+
+.ldv .ldv-title { margin-top: 16px !important; color: var(--ldv-navy) !important; font-size: 28px !important; font-weight: 800 !important; line-height: 1.25 !important; }
+.ldv .ldv-sub { margin-top: 4px !important; color: #34406b !important; font-size: 15px !important; font-weight: 400 !important; line-height: 1.5 !important; }
+
+.ldv-photo { display: none; position: relative; flex-shrink: 0; width: 132px; height: 132px; margin-right: 8px; pointer-events: none; }
+.ldv-photo-img { width: 100%; height: 100%; overflow: hidden; border: 4px solid #fff; border-radius: 50%; box-shadow: 0 10px 30px -8px rgba(15, 31, 75, 0.35); }
+.ldv .ldv-photo-img img { width: 100% !important; height: 100% !important; object-fit: cover; object-position: 60% 40%; }
+.ldv-ray { position: absolute; display: block; border-radius: 9999px; background: var(--ldv-pink); }
+.ldv-ray--1 { left: -6px; top: -4px; width: 6px; height: 24px; transform: rotate(-30deg); }
+.ldv-ray--2 { left: -20px; top: 16px; width: 6px; height: 24px; transform: rotate(-65deg); }
+.ldv-ray--3 { left: -30px; top: 44px; width: 24px; height: 6px; }
+.ldv-leaf { position: absolute; }
+.ldv-leaf--1 { left: -20px; bottom: -4px; width: 32px; height: 44px; }
+.ldv-leaf--2 { right: -8px; bottom: 8px; width: 24px; height: 32px; }
+
+/* --- The form ---------------------------------------------------------------------------- */
+
+.ldv-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px 48px; margin: 0; padding: 0 20px 32px; }
+.ldv .ldv-col > * { margin: 0 !important; }
+.ldv .ldv-col > * + * { margin-top: 24px !important; }
+.ldv .ldv-hp { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0; }
+.ldv-sr { position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 !important; opacity: 0; }
+.ldv .ldv-hr { display: block; height: 0; margin: 0 !important; border: 0 !important; border-top: 1px solid #e3e8f0 !important; background: none !important; }
+
+.ldv .ldv-h { display: flex; align-items: center; gap: 12px; margin-bottom: 12px !important; color: var(--ldv-navy) !important; font-size: 18px !important; font-weight: 700 !important; line-height: 1.4 !important; }
+.ldv-h-ic { width: 28px; height: 28px; color: var(--ldv-navy); }
+
+/* Radio cards: "Join as" and "Preferred role". */
+.ldv-join { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.ldv-roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.ldv .ldv-choice, .ldv .ldv-role {
+  position: relative;
+  margin: 0 !important;
+  border: 1px solid var(--ldv-card) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 6px rgba(15, 31, 75, 0.05);
+  color: var(--ldv-navy) !important;
+  font-size: inherit !important;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.ldv .ldv-choice.is-on, .ldv .ldv-role.is-on { border-color: #f28ab9 !important; background: #fff0f6 !important; }
+.ldv-choice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.ldv-choice-ic { width: 36px; height: 36px; color: var(--ldv-navy); }
+.ldv-choice-title { flex: 1; padding-right: 24px; font-weight: 700; font-size: 16px; line-height: 1.4; }
+.ldv-choice-mark { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); }
+.ldv-role { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 78px; padding: 0 4px; }
+.ldv-role-ic { width: 32px; height: 32px; color: var(--ldv-navy); }
+.ldv-role-title { font-weight: 700; font-size: 15px; line-height: 1.3; }
+.ldv-role-mark { position: absolute; top: 8px; right: 8px; }
+.is-on > .ldv-choice-ic, .is-on > .ldv-role-ic { color: var(--ldv-pink); }
+.ldv .ldv-choice input:focus-visible ~ .ldv-choice-title, .ldv .ldv-role input:focus-visible ~ .ldv-role-title { text-decoration: underline; }
+
+/* The round radio mark in a card's corner. */
+.ldv-radio { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 22px; height: 22px; border: 2px solid #8a93a8; border-radius: 50%; background: #fff; }
+.ldv-radio > span { display: none; width: 10px; height: 10px; border-radius: 50%; background: var(--ldv-pink); }
+.ldv-radio--sm { width: 18px; height: 18px; }
+.ldv-radio--sm > span { width: 8px; height: 8px; }
+.is-on .ldv-radio { border-color: var(--ldv-pink); }
+.is-on .ldv-radio > span { display: block; }
+
+/* Fields with their icon on the left. */
+.ldv-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px 24px; }
+.ldv .ldv-label { display: block !important; margin: 0 0 6px !important; padding: 0 !important; color: var(--ldv-navy) !important; font-size: 15px !important; font-weight: 500 !important; line-height: 1.4 !important; text-transform: none !important; letter-spacing: normal !important; }
+.ldv-req { color: var(--ldv-pink); }
+.ldv-field { position: relative; }
+.ldv .ldv-field-ic { position: absolute; left: 16px; top: 50%; z-index: 1; width: 20px; height: 20px; transform: translateY(-50%); color: #4b5570; pointer-events: none; }
+.ldv-org-ic { display: contents; }
+.ldv .ldv-chevron { position: absolute; right: 16px; top: 50%; width: 20px; height: 20px; transform: translateY(-50%); color: var(--ldv-navy); pointer-events: none; }
+
+.ldv .ldv-input {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 48px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 16px 0 48px !important;
+  border: 1px solid var(--ldv-line) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  color: var(--ldv-navy) !important;
+  font-family: inherit !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  letter-spacing: normal !important;
+  outline: none !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.ldv .ldv-input::placeholder { color: #94a3b8 !important; opacity: 1; }
+.ldv .ldv-input:focus { border-color: var(--ldv-pink) !important; box-shadow: 0 0 0 4px rgba(232, 25, 124, 0.1) !important; }
+.ldv .ldv-select { padding-right: 48px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.ldv .ldv-select.is-empty { color: #94a3b8 !important; }
+.ldv .ldv-select option { color: var(--ldv-navy); }
+.ldv .ldv-select:disabled { cursor: default; }
+.ldv .ldv-input--picker { padding-right: 48px !important; }
+.ldv .ldv-input.is-bad { border-color: #f87171 !important; background: rgba(254, 242, 242, 0.4) !important; }
+.ldv .ldv-input.is-locked { background: #f1f5f9 !important; color: #64748b !important; cursor: not-allowed; }
+.ldv .ldv-input.is-locked:focus { border-color: var(--ldv-line) !important; box-shadow: none !important; }
+.ldv .ldv-input[type="number"] { -moz-appearance: textfield; }
+.ldv .ldv-input[type="number"]::-webkit-inner-spin-button, .ldv .ldv-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Date of birth: the calendar button on the right, an invisible date input over it. */
+.ldv-picker { position: absolute; right: 6px; top: 50%; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; overflow: hidden; border-radius: 6px; transform: translateY(-50%); }
+.ldv-picker:hover { background: #f1f5f9; }
+.ldv-picker-ic { width: 20px; height: 20px; color: var(--ldv-navy); pointer-events: none; }
+.ldv .ldv-picker input { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; border: 0 !important; opacity: 0; cursor: pointer; }
+.ldv .ldv-err { display: flex; align-items: center; gap: 4px; margin-top: 6px !important; color: #ef4444 !important; font-size: 12px !important; font-weight: 500 !important; line-height: 1.4 !important; }
+.ldv-err-ic { width: 14px; height: 14px; }
+
+.ldv .ldv-formerr { grid-column: 1 / -1; color: #dc2626 !important; font-size: 14px !important; font-weight: 500 !important; text-align: center; }
+.ldv-actions { grid-column: 1 / -1; display: flex; justify-content: center; padding-top: 4px; }
+
+.ldv .ldv-submit, .ldv .ldv-done-btn, .ldv-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px !important;
+  margin: 0 !important;
+  padding: 0 28px !important;
+  border: 0 !important;
+  border-radius: 9999px !important;
+  background: #e8197c !important;
+  box-shadow: 0 10px 15px -3px rgba(232, 25, 124, 0.3), 0 4px 6px -4px rgba(232, 25, 124, 0.3) !important;
+  color: #fff !important;
+  font-family: inherit;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.ldv .ldv-submit:hover, .ldv .ldv-done-btn:hover, .ldv-button:hover { filter: brightness(1.1); }
+.ldv .ldv-submit { width: 100%; }
+.ldv .ldv-submit:disabled { opacity: 0.7; cursor: wait; }
+.ldv-submit-ic, .ldv-button svg { width: 20px; height: 20px; }
+.ldv-button { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+.ldv-button svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- Done -------------------------------------------------------------------------------- */
+
+.ldv-done-ic { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; margin: 24px auto 16px; border-radius: 50%; background: #fde7f1; color: var(--ldv-pink); }
+.ldv-done-ic svg { width: 36px; height: 36px; }
+.ldv .ldv-done-title { margin-bottom: 8px !important; color: var(--ldv-navy) !important; font-size: 24px !important; font-weight: 800 !important; line-height: 1.3 !important; }
+.ldv .ldv-done-text { margin-bottom: 24px !important; color: #475569 !important; font-size: 15px !important; line-height: 1.5 !important; }
+.ldv .ldv-done-btn { width: 100%; }
+
+/* --- On a page ([ldivn_volunteer_form]) --------------------------------------------------- */
+
+.ldv-inline { width: 100%; margin: 0 auto; }
+.ldv-inline > .ldv { box-shadow: 0 20px 60px -20px rgba(15, 31, 75, 0.3); }
+
+/* --- Wider screens ------------------------------------------------------------------------- */
+
+@media (min-width: 640px) {
+  .ldv-overlay { align-items: center; padding: 16px; }
+  .ldv-head { padding: 24px 40px 40px; }
+  .ldv-head-row--close { padding-right: 48px; }
+  .ldv .ldv-logo img { width: 60px !important; height: 60px !important; }
+  .ldv-logo-1 { font-size: 30px; }
+  .ldv-logo-2 { font-size: 20px; }
+  .ldv .ldv-title { font-size: 34px !important; }
+  .ldv .ldv-sub { font-size: 17px !important; }
+  .ldv-photo { display: block; }
+  .ldv-form { padding: 0 40px 32px; }
+  .ldv .ldv-h { font-size: 22px !important; }
+  .ldv-h-ic { width: 32px; height: 32px; }
+  .ldv-join { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .ldv-choice { flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px; }
+  .ldv-choice-title { padding-right: 0; font-size: 17px; }
+  .ldv-choice-mark { top: 12px; right: 12px; transform: none; }
+  .ldv-roles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+  .ldv-role-title { font-size: 16px; }
+  .ldv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ldv-wide { grid-column: 1 / -1; }
+  .ldv .ldv-label { font-size: 16px !important; }
+  .ldv .ldv-submit { width: 430px; font-size: 18px !important; }
+}
+
+@media (min-width: 1024px) {
+  .ldv-overlay { padding: 12px; }
+  .ldv--form { max-width: 1320px; }
+  .ldv-overlay > .ldv--form { max-height: calc(100vh - 24px); overflow-y: auto; }
+  .ldv-head { padding: 20px 48px 36px; }
+  .ldv-head-row { gap: 40px; }
+  .ldv-head-text { display: flex; align-items: center; justify-content: center; gap: 24px; text-align: left; }
+  .ldv .ldv-title { margin-top: 0 !important; font-size: 38px !important; }
+  .ldv-form { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px 48px; padding: 0 48px 24px; }
+  .ldv .ldv-col > * + * { margin-top: 20px !important; }
+  .ldv .ldv-hr { display: none; }
+  .ldv .ldv-col > .ldv-hr + * { margin-top: 0 !important; }
+  .ldv .ldv-h { margin-bottom: 10px !important; font-size: 20px !important; }
+  .ldv-role { height: 74px; }
+  .ldv-actions { padding-top: 0; }
+}
+
+@media (min-width: 1280px) {
+  .ldv-head-text { gap: 40px; }
+  .ldv-photo { width: 150px; height: 150px; }
+}
+
+/* Short desktop screens: tighter, so the whole form still fits. */
+@media (min-width: 1024px) and (max-height: 820px) {
+  .ldv-head { padding-top: 12px; padding-bottom: 32px; }
+  .ldv-photo { width: 112px; height: 112px; }
+  .ldv-form { gap: 16px 48px; padding-bottom: 16px; }
+  .ldv .ldv-col > * + * { margin-top: 16px !important; }
+  .ldv .ldv-col > .ldv-hr + * { margin-top: 0 !important; }
+  .ldv .ldv-h { font-size: 18px !important; }
+  .ldv-choice-ic, .ldv-role-ic { width: 28px; height: 28px; }
+  .ldv-role { height: 68px; }
+  .ldv-grid { row-gap: 10px; }
+  .ldv .ldv-label { margin-bottom: 4px !important; }
+  .ldv .ldv-input { height: 40px !important; }
+}

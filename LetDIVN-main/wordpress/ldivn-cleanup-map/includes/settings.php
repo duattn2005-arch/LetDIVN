@@ -46,6 +46,10 @@ function ldm_sanitize_settings($in): array
         'core_events' => empty($in['core_events']) ? 0 : 1,
         'site_events' => empty($in['site_events']) ? 0 : 1,
         'site_url' => untrailingslashit(esc_url_raw(trim((string) ($in['site_url'] ?? '')))) ?: $d['site_url'],
+        'vol_on_map' => empty($in['vol_on_map']) ? 0 : 1,
+        'vol_everywhere' => empty($in['vol_everywhere']) ? 0 : 1,
+        'vol_forward' => empty($in['vol_forward']) ? 0 : 1,
+        'vol_email' => implode(', ', array_filter(array_map('sanitize_email', explode(',', (string) ($in['vol_email'] ?? ''))))),
     ];
 }
 
@@ -75,6 +79,28 @@ function ldm_settings_page(): void
                 Ví dụ: <code>[ldivn_cleanup_map fullwidth="yes" height="calc(100vh - 80px)"]</code></p>
         </div>
 
+        <?php
+        $import = isset($_GET['ldm_import']) ? sanitize_key(wp_unslash($_GET['ldm_import'])) : '';
+        if ($import === 'done') {
+            $n = fn($k) => isset($_GET[$k]) ? absint($_GET[$k]) : 0;
+            printf(
+                '<div class="notice notice-success"><p>Đã chuyển xong: thêm %d điểm dọn rác%s%s. Bản đồ giờ chỉ dùng các điểm trên website này, đăng ký chỉ lưu ở đây.</p></div>',
+                $n('added'),
+                $n('kept') ? sprintf(', %d điểm đã có từ trước', $n('kept')) : '',
+                $n('no_photo') ? sprintf(', %d điểm không tải được ảnh (chọn lại ở "Ảnh sự kiện")', $n('no_photo')) : ''
+            );
+        } elseif ($import === 'error') {
+            printf('<div class="notice notice-error"><p>Không đọc được sự kiện của %s. Thử lại sau ít phút.</p></div>', esc_html($s['site_url']));
+        }
+        ?>
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="notice notice-warning inline" style="margin:16px 0;padding:12px 16px">
+            <input type="hidden" name="action" value="ldm_import_events">
+            <?php wp_nonce_field('ldm_import_events'); ?>
+            <p style="margin:0 0 8px"><strong>Chuyển sự kiện về website này</strong> (khi không dùng <?php echo esc_html($s['site_url']); ?> nữa)</p>
+            <p style="margin:0 0 10px">Chép các sự kiện của <?php echo esc_html($s['site_url']); ?> thành điểm dọn rác ở đây, kèm ảnh. Sau đó bản đồ chỉ dùng các điểm ở đây, đăng ký chỉ lưu ở đây (bỏ chọn "Hiện các sự kiện của website" và "Gửi về website"). Bấm lại lần nữa cũng không bị chép trùng.</p>
+            <?php submit_button('Chuyển sự kiện về đây', 'secondary', 'submit', false); ?>
+        </form>
+
         <form method="post" action="options.php">
             <?php settings_fields('ldm_settings'); ?>
             <table class="form-table" role="presentation">
@@ -83,7 +109,7 @@ function ldm_settings_page(): void
                     <td>
                         <label><input type="checkbox" name="<?php echo $name('site_events'); ?>" value="1" <?php checked($s['site_events'], 1); ?>> Hiện các sự kiện của website</label>
                         <input id="ldm-site" name="<?php echo $name('site_url'); ?>" value="<?php echo esc_attr($s['site_url']); ?>" class="regular-text" style="margin-left:8px">
-                        <p class="description">Bản đồ hiện đúng các sự kiện đang có trên website này (cập nhật 10 phút/lần). Nút <strong>Details</strong> mở trang chiến dịch, nút <strong>Register</strong> mở form đăng ký của website.</p>
+                        <p class="description">Bản đồ hiện đúng các sự kiện đang có trên website này (cập nhật 10 phút/lần). Nút <strong>Details</strong> mở trang chiến dịch trên website; nút <strong>Register</strong> xem mục "Đăng ký tình nguyện viên" ở dưới.</p>
                     </td>
                 </tr>
                 <tr>
@@ -137,6 +163,41 @@ function ldm_settings_page(): void
                         <label><input type="checkbox" name="<?php echo $name('click_pin'); ?>" value="1" <?php checked($s['click_pin'], 1); ?>> Bấm lên bản đồ thì ghim điểm mới và hiện địa chỉ</label><br>
                         <label><input type="checkbox" name="<?php echo $name('core_events'); ?>" value="1" <?php checked($s['core_events'], 1); ?>> Lấy thêm sự kiện từ plugin "Let's Do It Vietnam – Core"</label>
                         <span class="description">(<?php echo function_exists('ldivn_get_events') ? 'đang bật' : 'không cài trên web này — bỏ qua'; ?>)</span>
+                    </td>
+                </tr>
+            </table>
+
+            <h2>Đăng ký tình nguyện viên</h2>
+            <div class="notice notice-info inline" style="margin:16px 0;padding:12px 16px">
+                <p style="margin:0 0 8px"><strong>Mở form "Register to Volunteer":</strong></p>
+                <ul style="margin:0 0 0 18px;list-style:disc">
+                    <li>Nút <strong>Register</strong> trên bản đồ (bật ở dưới).</li>
+                    <li>Bất kỳ link nào tới <code>#volunteer</code>, ví dụ một mục menu: Giao diện → Menu → Liên kết tự tạo, URL <code>#volunteer</code>, tên "Volunteer".</li>
+                    <li>Nút: <code>[ldivn_volunteer_button]</code> (đổi chữ: <code>text="..."</code>).</li>
+                    <li>Form nằm luôn trên trang: <code>[ldivn_volunteer_form]</code>.</li>
+                </ul>
+                <p style="margin:8px 0 0">Các đăng ký xem ở menu <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . LDV_TYPE)); ?>"><strong>Tình nguyện viên</strong></a> (có nút tải về Excel).</p>
+            </div>
+            <table class="form-table" role="presentation">
+                <tr>
+                    <th scope="row">Mở form</th>
+                    <td>
+                        <label><input type="checkbox" name="<?php echo $name('vol_on_map'); ?>" value="1" <?php checked($s['vol_on_map'], 1); ?>> Nút Register trên bản đồ mở form ngay trên web này (bỏ chọn: mở form của website ở trên)</label><br>
+                        <label><input type="checkbox" name="<?php echo $name('vol_everywhere'); ?>" value="1" <?php checked($s['vol_everywhere'], 1); ?>> Link <code>#volunteer</code> mở form ở mọi trang (bỏ chọn: chỉ ở trang có bản đồ hoặc shortcode của form)</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Gửi về website</th>
+                    <td>
+                        <label><input type="checkbox" name="<?php echo $name('vol_forward'); ?>" value="1" <?php checked($s['vol_forward'], 1); ?>> Gửi mỗi đăng ký về website <code><?php echo esc_html($s['site_url']); ?></code></label>
+                        <p class="description">Như form trên website: đăng ký được cộng vào số người của sự kiện và ghi thêm một dòng vào Google Sheet đăng ký. Đăng ký vẫn luôn được lưu ở đây.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="ldm-vol-email">Email báo có đăng ký mới</label></th>
+                    <td>
+                        <input id="ldm-vol-email" name="<?php echo $name('vol_email'); ?>" value="<?php echo esc_attr($s['vol_email']); ?>" class="regular-text" placeholder="<?php echo esc_attr(get_option('admin_email')); ?>">
+                        <p class="description">Để trống thì không gửi. Nhiều email thì cách nhau bằng dấu phẩy.</p>
                     </td>
                 </tr>
             </table>

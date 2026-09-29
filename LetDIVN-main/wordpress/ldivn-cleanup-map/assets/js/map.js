@@ -215,8 +215,12 @@
   }
 
   function eventPopup(e) {
+    // With the sign-up form on this site (volunteer.js), Register opens it with the event chosen.
+    var here = window.LDIVN_VOLUNTEER && window.LDIVN_VOLUNTEER.onMap;
     var buttons = (e.detailsUrl ? '<a class="ldm-pop-btn ldm-pop-btn--dark" href="' + esc(e.detailsUrl) + '">Details</a>' : '') +
-      (e.registerUrl ? '<a class="ldm-pop-btn ldm-pop-btn--pink" href="' + esc(e.registerUrl) + '">Register</a>' : '');
+      (here
+        ? '<a class="ldm-pop-btn ldm-pop-btn--pink" href="#volunteer" data-ldv-event="' + esc(e.id) + '">Register</a>'
+        : e.registerUrl ? '<a class="ldm-pop-btn ldm-pop-btn--pink" href="' + esc(e.registerUrl) + '">Register</a>' : '');
     var where = [e.location, e.city ? '(' + e.city + ')' : ''].filter(Boolean).join(' ');
     return '<div class="ldm-pop">' +
       (e.image || e.pending
