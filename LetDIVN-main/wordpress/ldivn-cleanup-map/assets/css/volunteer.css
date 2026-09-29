@@ -7,15 +7,21 @@
   --ldv-pink: #e8197c;
   --ldv-line: #cfd6e4;
   --ldv-card: #dde3ee;
+  /* Set in Sửa form đăng ký (applyStyle in volunteer.js): the colours above, and these. */
+  --ldv-radius: 26px;
+  --ldv-r: calc(var(--ldv-radius) * 0.46);
+  --ldv-r-in: calc(var(--ldv-radius) * 0.3);
+  --ldv-head: linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #fff 100%);
+  --ldv-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   position: relative;
   width: 100%;
   margin: auto;
   overflow: hidden;
-  border-radius: 26px;
+  border-radius: var(--ldv-radius);
   background: #fff;
   box-shadow: 0 30px 80px -20px rgba(15, 31, 75, 0.45);
   color: var(--ldv-navy);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: var(--ldv-font);
   font-size: 15px;
   line-height: 1.5;
   text-align: left;
@@ -90,7 +96,7 @@
   position: relative;
   overflow: hidden;
   padding: 28px 20px 36px;
-  background: linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #fff 100%);
+  background: var(--ldv-head);
 }
 .ldv-blob { position: absolute; border-radius: 9999px; pointer-events: none; }
 .ldv-blob--1 { left: 8px; top: 16px; width: 160px; height: 64px; background: rgba(255, 255, 255, 0.8); filter: blur(24px); }
@@ -107,7 +113,7 @@
 .ldv-logo-2 { margin: 4px 0 0 12px; font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 18px; }
 
 .ldv .ldv-title { margin-top: 16px !important; color: var(--ldv-navy) !important; font-size: 28px !important; font-weight: 800 !important; line-height: 1.25 !important; }
-.ldv .ldv-sub { margin-top: 4px !important; color: #34406b !important; font-size: 15px !important; font-weight: 400 !important; line-height: 1.5 !important; }
+.ldv .ldv-sub { margin-top: 4px !important; color: #34406b !important; color: color-mix(in srgb, var(--ldv-navy) 85%, #fff) !important; font-size: 15px !important; font-weight: 400 !important; line-height: 1.5 !important; }
 
 .ldv-photo { display: none; position: relative; flex-shrink: 0; width: 132px; height: 132px; margin-right: 8px; pointer-events: none; }
 .ldv-photo-img { width: 100%; height: 100%; overflow: hidden; border: 4px solid #fff; border-radius: 50%; box-shadow: 0 10px 30px -8px rgba(15, 31, 75, 0.35); }
@@ -139,7 +145,7 @@
   position: relative;
   margin: 0 !important;
   border: 1px solid var(--ldv-card) !important;
-  border-radius: 12px !important;
+  border-radius: var(--ldv-r) !important;
   background: #fff !important;
   box-shadow: 0 2px 6px rgba(15, 31, 75, 0.05);
   color: var(--ldv-navy) !important;
@@ -147,7 +153,7 @@
   cursor: pointer;
   transition: border-color 0.15s, background-color 0.15s;
 }
-.ldv .ldv-choice.is-on, .ldv .ldv-role.is-on { border-color: #f28ab9 !important; background: #fff0f6 !important; }
+.ldv .ldv-choice.is-on, .ldv .ldv-role.is-on { border-color: color-mix(in srgb, var(--ldv-pink) 50%, #fff) !important; background: color-mix(in srgb, var(--ldv-pink) 6%, #fff) !important; }
 .ldv-choice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
 .ldv-choice-ic { width: 36px; height: 36px; color: var(--ldv-navy); }
 .ldv-choice-title { flex: 1; padding-right: 24px; font-weight: 700; font-size: 16px; line-height: 1.4; }
@@ -174,6 +180,10 @@
 .ldv-field { position: relative; }
 .ldv .ldv-field-ic { position: absolute; left: 16px; top: 50%; z-index: 1; width: 20px; height: 20px; transform: translateY(-50%); color: #4b5570; pointer-events: none; }
 .ldv-org-ic { display: contents; }
+/* A field of one's own: no icon; a ticked box with its text beside it. */
+.ldv .ldv-input.ldv-input--plain { padding-left: 16px !important; }
+.ldv .ldv-check { display: flex; align-items: flex-start; gap: 10px; margin: 0; color: var(--ldv-navy); font-size: 15px; font-weight: 500; line-height: 1.45; cursor: pointer; }
+.ldv .ldv-check input { flex-shrink: 0; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ldv-pink); cursor: pointer; }
 .ldv .ldv-chevron { position: absolute; right: 16px; top: 50%; width: 20px; height: 20px; transform: translateY(-50%); color: var(--ldv-navy); pointer-events: none; }
 
 .ldv .ldv-input {
@@ -185,7 +195,7 @@
   margin: 0 !important;
   padding: 0 16px 0 48px !important;
   border: 1px solid var(--ldv-line) !important;
-  border-radius: 8px !important;
+  border-radius: var(--ldv-r-in) !important;
   background: #fff !important;
   box-shadow: none !important;
   color: var(--ldv-navy) !important;
@@ -200,7 +210,7 @@
   appearance: none;
 }
 .ldv .ldv-input::placeholder { color: #94a3b8 !important; opacity: 1; }
-.ldv .ldv-input:focus { border-color: var(--ldv-pink) !important; box-shadow: 0 0 0 4px rgba(232, 25, 124, 0.1) !important; }
+.ldv .ldv-input:focus { border-color: var(--ldv-pink) !important; box-shadow: 0 0 0 4px color-mix(in srgb, var(--ldv-pink) 10%, transparent) !important; }
 .ldv .ldv-select { padding-right: 48px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
 .ldv .ldv-select.is-empty { color: #94a3b8 !important; }
 .ldv .ldv-select option { color: var(--ldv-navy); }
@@ -233,8 +243,8 @@
   padding: 0 28px !important;
   border: 0 !important;
   border-radius: 9999px !important;
-  background: #e8197c !important;
-  box-shadow: 0 10px 15px -3px rgba(232, 25, 124, 0.3), 0 4px 6px -4px rgba(232, 25, 124, 0.3) !important;
+  background: var(--ldv-pink, #e8197c) !important;
+  box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--ldv-pink, #e8197c) 30%, transparent), 0 4px 6px -4px color-mix(in srgb, var(--ldv-pink, #e8197c) 30%, transparent) !important;
   color: #fff !important;
   font-family: inherit;
   font-size: 16px !important;
@@ -256,7 +266,7 @@
 
 /* --- Done -------------------------------------------------------------------------------- */
 
-.ldv-done-ic { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; margin: 24px auto 16px; border-radius: 50%; background: #fde7f1; color: var(--ldv-pink); }
+.ldv-done-ic { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; margin: 24px auto 16px; border-radius: 50%; background: color-mix(in srgb, var(--ldv-pink) 12%, #fff); color: var(--ldv-pink); }
 .ldv-done-ic svg { width: 36px; height: 36px; }
 .ldv .ldv-done-title { margin-bottom: 8px !important; color: var(--ldv-navy) !important; font-size: 24px !important; font-weight: 800 !important; line-height: 1.3 !important; }
 .ldv .ldv-done-text { margin-bottom: 24px !important; color: #475569 !important; font-size: 15px !important; line-height: 1.5 !important; }

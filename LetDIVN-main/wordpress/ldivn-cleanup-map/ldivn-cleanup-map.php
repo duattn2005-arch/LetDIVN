@@ -3,7 +3,7 @@
  * Plugin Name: LDIVN Cleanup Map
  * Plugin URI: https://letsdoitvietnam.org
  * Description: Báº£n Ä‘á»“ Ä‘iá»ƒm dá»n rÃ¡c toÃ n quá»‘c (Nationwide Cleanup Spot Map) vÃ  form "Register to Volunteer" cá»§a Let's Do It Vietnam. ChÃ¨n báº£n Ä‘á»“ báº±ng shortcode [ldivn_cleanup_map]; form má»Ÿ tá»« nÃºt Register trÃªn báº£n Ä‘á»“, tá»« link "#volunteer" (vd. má»™t má»¥c menu) hoáº·c [ldivn_volunteer_form]. Xem Ä‘Äƒng kÃ½ á»Ÿ menu "TÃ¬nh nguyá»‡n viÃªn".
- * Version: 1.10.0
+ * Version: 1.11.0
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Author: Let's Do It Vietnam
@@ -13,7 +13,7 @@
 
 defined('ABSPATH') || exit;
 
-define('LDM_VERSION', '1.10.0');
+define('LDM_VERSION', '1.11.0');
 define('LDM_DIR', __DIR__);
 define('LDM_URL', plugin_dir_url(__FILE__));
 define('LDM_TYPE', 'ldivn_map_spot');

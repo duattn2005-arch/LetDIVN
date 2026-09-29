@@ -76,6 +76,25 @@ function ldv_data(int $id): array
     return is_array($data) ? $data : [];
 }
 
+/**
+ * The answers to the fields of one's own (Sửa form đăng ký): key => [label,
+ * value], the fields there now first, then those removed since.
+ */
+function ldv_custom_values(array $data): array
+{
+    $stored = is_array($data['custom'] ?? null) ? $data['custom'] : [];
+    $out = [];
+    foreach (ldv_custom_fields() as $key => $f) {
+        $out[$key] = ['label' => $f['label'], 'value' => (string) ($stored[$key]['value'] ?? '')];
+    }
+    foreach ($stored as $key => $answer) {
+        if (!isset($out[$key]) && is_array($answer)) {
+            $out[$key] = ['label' => (string) ($answer['label'] ?? $key), 'value' => (string) ($answer['value'] ?? '')];
+        }
+    }
+    return $out;
+}
+
 function ldv_value(array $data, string $key): string
 {
     $v = $data[$key] ?? '';
@@ -150,8 +169,11 @@ function ldv_edit_box(WP_Post $post): void
         'Tên nhóm / tổ chức' => '<input name="ldv[organizationName]" value="' . $v('organizationName') . '" class="regular-text">',
         'Số người' => '<input type="number" min="1" name="ldv[participants]" value="' . $v('participants') . '" class="small-text">',
         'Vai trò' => '<select name="ldv[preferredRole]">' . $options(array_combine($roles, $roles), (string) ($data['preferredRole'] ?? '')) . '</select>',
-        'Ghi chú' => '<textarea name="ldv[notes]" rows="3" class="large-text">' . esc_textarea((string) ($data['notes'] ?? '')) . '</textarea>',
     ];
+    foreach (ldv_custom_values($data) as $key => $answer) {
+        $rows[$answer['label'] . ' '] = '<input name="ldv[custom][' . esc_attr($key) . ']" value="' . esc_attr($answer['value']) . '" class="regular-text">';
+    }
+    $rows['Ghi chú'] = '<textarea name="ldv[notes]" rows="3" class="large-text">' . esc_textarea((string) ($data['notes'] ?? '')) . '</textarea>';
     wp_nonce_field('ldv_edit', 'ldv_edit_nonce');
     echo '<table class="form-table" role="presentation"><tbody>';
     foreach ($rows as $label => $field) {
@@ -193,6 +215,7 @@ function ldv_edited_fields(int $post_id): ?array
         'participants' => max(1, absint($get('participants'))),
         'preferredRole' => sanitize_text_field($get('preferredRole')),
         'notes' => sanitize_textarea_field($get('notes')),
+        'custom' => is_array($in['custom'] ?? null) ? array_map(fn($v) => sanitize_text_field((string) $v), $in['custom']) : [],
     ];
 }
 
@@ -224,6 +247,15 @@ add_action('save_post_' . LDV_TYPE, function (int $post_id) {
     if ($fields['fullName'] === '') {
         unset($fields['fullName']);
     }
+    // The answers to the fields of one's own, each with its label.
+    $answers = ldv_custom_values($data);
+    $custom = is_array($data['custom'] ?? null) ? $data['custom'] : [];
+    foreach ($fields['custom'] as $key => $value) {
+        if (isset($answers[$key])) {
+            $custom[$key] = ['label' => $answers[$key]['label'], 'value' => $value];
+        }
+    }
+    $fields['custom'] = $custom;
     update_post_meta($post_id, '_ldv_data', wp_slash(wp_json_encode(array_merge($data, $fields), JSON_UNESCAPED_UNICODE)));
 });
 
@@ -279,12 +311,17 @@ add_action('admin_post_ldv_export', function () {
     if (!current_user_can('edit_posts')) {
         wp_die('Không có quyền.');
     }
+    // Then a column for each field of one's own (Sửa form đăng ký).
+    $custom = ldv_custom_fields();
     $rows = [];
     foreach (get_posts(['post_type' => LDV_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'orderby' => 'date', 'order' => 'DESC']) as $p) {
         $data = ldv_data($p->ID);
-        $rows[] = array_map(fn($key) => ldv_export_value($data, $key), array_keys(LDV_EXPORT_COLUMNS));
+        $rows[] = array_merge(
+            array_map(fn($key) => ldv_export_value($data, $key), array_keys(LDV_EXPORT_COLUMNS)),
+            array_map(fn($key) => (string) ($data['custom'][$key]['value'] ?? ''), array_keys($custom))
+        );
     }
-    $file = ldv_xlsx('Tình nguyện viên', array_values(LDV_EXPORT_COLUMNS), $rows);
+    $file = ldv_xlsx('Tình nguyện viên', array_merge(array_values(LDV_EXPORT_COLUMNS), array_column($custom, 'label')), $rows);
 
     // Nothing printed before by other plugins may end up in the file.
     while (ob_get_level()) {
@@ -375,19 +412,26 @@ function ldv_ajax_submit(): void
         $fail('Too many registrations from this connection. Please try again in a few minutes.');
     }
 
-    $join = array_key_exists($get('joinAs'), LDV_JOIN_AS) ? $get('joinAs') : 'individual';
+    // The form as set in Sửa form đăng ký: the parts and fields it shows, those required.
+    $form = ldv_form();
+    $part_off = fn($part) => in_array($part, $form['layout']['off'], true);
+    $fields = array_column($form['fields'], null, 'key');
+    $shown = fn($key) => empty($fields[$key]['off']);
+    $required = fn($key) => $shown($key) && !empty($fields[$key]['required']);
+
+    $join = !$part_off('join') && array_key_exists($get('joinAs'), LDV_JOIN_AS) ? $get('joinAs') : 'individual';
     $team = $join !== 'individual';
-    $roles = ldv_form()['roles'];
-    $role = in_array($get('role'), $roles, true) ? $get('role') : $roles[0];
+    $roles = $form['roles'];
+    $role = !$part_off('role') && in_array($get('role'), $roles, true) ? $get('role') : $roles[0];
     $name = sanitize_text_field($get('fullName'));
     $email = sanitize_email($get('email'));
-    $phone = substr(preg_replace('/(?!^)\+/', '', preg_replace('/[^\d+]/', '', $get('phone'))), 0, 16);
-    $address = sanitize_text_field($get('address'));
+    $phone = $shown('phone') ? substr(preg_replace('/(?!^)\+/', '', preg_replace('/[^\d+]/', '', $get('phone'))), 0, 16) : '';
+    $address = $shown('address') ? sanitize_text_field($get('address')) : '';
     $org = $team ? sanitize_text_field($get('organizationName')) : '';
-    $birth = $team ? '' : $get('birthDate');
-    $people = $team ? absint($get('participants')) : 1;
+    $birth = !$team && $shown('birth') ? $get('birthDate') : '';
+    $people = $team && !$part_off('people') ? absint($get('participants')) : 1;
 
-    if ($name === '' || $address === '') {
+    if ($name === '' || ($address === '' && $required('address')) || ($phone === '' && $required('phone'))) {
         $fail('Please fill in every required field.');
     }
     if (!is_email($email)) {
@@ -396,19 +440,41 @@ function ldv_ajax_submit(): void
     if ($team && $org === '') {
         $fail('Please enter the ' . ($join === 'organization' ? 'organization' : 'group') . ' name.');
     }
-    if (!$team && !ldv_valid_birth($birth)) {
+    // A date of birth asked for, or given though optional: a real one.
+    if (!$team && ($required('birth') || $birth !== '') && !ldv_valid_birth($birth)) {
         $fail('Please enter a valid date of birth (dd/mm/yyyy) between 1900 and 2050');
     }
     if ($people < 1 || $people > 99999) {
         $fail('Please enter the number of participants.');
     }
 
+    // The fields of one's own: kept with their label as it was then.
+    $custom = [];
+    $given = isset($in['custom']) && is_array($in['custom']) ? $in['custom'] : [];
+    foreach (ldv_custom_fields() as $key => $f) {
+        if (!empty($f['off'])) {
+            continue;
+        }
+        $raw = isset($given[$key]) && is_scalar($given[$key]) ? trim((string) $given[$key]) : '';
+        if ($f['type'] === 'check') {
+            $value = $raw !== '' ? 'Yes' : '';
+        } elseif ($f['type'] === 'select') {
+            $value = in_array($raw, $f['options'], true) ? $raw : '';
+        } else {
+            $value = mb_substr(sanitize_text_field($raw), 0, 500);
+        }
+        if ($value === '' && !empty($f['required'])) {
+            $fail('Please fill in every required field.');
+        }
+        $custom[$key] = ['label' => $f['label'], 'value' => $value];
+    }
+
     $events = ldv_events()['all'];
-    $event_id = $get('eventId');
+    $event_id = $part_off('project') ? '' : $get('eventId');
     if ($event_id !== '' && !isset($events[$event_id])) {
         $fail('Please select a project or campaign.');
     }
-    if ($event_id === '' && $events) {
+    if ($event_id === '' && $events && !$part_off('project')) {
         $fail('Please select a project or campaign.');
     }
     $event_name = $event_id !== '' ? $events[$event_id]['title'] : 'World Cleanup Day ' . wp_date('Y');
@@ -425,6 +491,7 @@ function ldv_ajax_submit(): void
         'organizationName' => mb_substr($org, 0, 200),
         'participants' => $people,
         'preferredRole' => $role,
+        'custom' => $custom,
         'registeredAt' => wp_date('c'),
     ];
     $post_id = wp_insert_post([
@@ -555,6 +622,11 @@ function ldv_after_signup(int $post_id, array $data): void
                 $lines[] = $label . ': ' . $text;
             }
         }
+        foreach (ldv_custom_values($data) as $answer) {
+            if ($answer['value'] !== '') {
+                $lines[] = $answer['label'] . ': ' . $answer['value'];
+            }
+        }
         $lines[] = '';
         $lines[] = 'Danh sách: ' . admin_url('edit.php?post_type=' . LDV_TYPE);
         wp_mail($to, 'Đăng ký tình nguyện viên mới: ' . $data['fullName'], implode("\n", $lines), ['Reply-To: ' . $data['fullName'] . ' <' . $data['email'] . '>']);
@@ -614,16 +686,16 @@ function ldv_enqueue(): void
     }
     $done = true;
     $s = ldm_settings();
-    $form = ldv_form();
+    $form = ldv_form(); // Tình nguyện viên → Sửa form đăng ký
     wp_enqueue_style('ldv');
+    if ($form['style']['font'] !== '') {
+        wp_enqueue_style('ldv-font', ldv_font_url($form['style']['font']), [], null);
+    }
     wp_enqueue_script('ldv');
-    wp_add_inline_script('ldv', 'window.LDIVN_VOLUNTEER = ' . wp_json_encode([
+    wp_add_inline_script('ldv', 'window.LDIVN_VOLUNTEER = ' . wp_json_encode(ldv_form_js($form) + [
         'api' => add_query_arg('ldv_api', '1', home_url('/')),
         'ajax' => admin_url('admin-ajax.php'),
         'logo' => LDM_URL . 'assets/images/logo-icon-light.png',
-        'photo' => $form['photo'],
-        'text' => $form['text'], // Tình nguyện viên → Sửa form đăng ký
-        'roles' => $form['roles'],
         'onMap' => (bool) $s['vol_on_map'],
         // The form's own address: shown while it is open, and it opens the form.
         'page' => (string) wp_parse_url(ldv_page_url(), PHP_URL_PATH),
