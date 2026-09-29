@@ -171,8 +171,14 @@
 @media (min-width: 640px) {
   .ldmv .ldmv-player { padding: 12px; }
 }
+.ldmv .ldmv-list-in { display: flex; flex-direction: column; }
 @media (min-width: 1024px) {
-  .ldmv .ldmv-list { order: 1; }
+  /* Side by side, the list is as tall as the player (its items scroll inside):
+     its content is taken out of the flow so the player alone sets the height. */
+  .ldmv { align-items: stretch; }
+  .ldmv .ldmv-list { order: 1; position: relative; min-height: 320px; }
+  .ldmv .ldmv-list-in { position: absolute; inset: 16px; }
+  .ldmv .ldmv-items { flex: 1 1 auto; min-height: 0; max-height: none; }
   .ldmv .ldmv-player { order: 2; }
 }
 .ldmv .ldmv-frame {

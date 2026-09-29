@@ -185,10 +185,10 @@ function ldmv_render(array $videos): string
     $first = $videos[0];
 
     return '<div class="ldmv">'
-        . '<div class="ldmv-list ldmv-card">'
+        . '<div class="ldmv-list ldmv-card"><div class="ldmv-list-in">'
         . '<div class="ldmv-head"><span class="ldmv-count">' . $youtube . count($videos) . ' Videos</span><span class="ldmv-hd">HD 1080p</span></div>'
         . '<div class="ldmv-items">' . $items . '</div>'
-        . '</div>'
+        . '</div></div>'
         . '<div class="ldmv-player ldmv-card">'
         . '<div class="ldmv-frame"><iframe src="https://www.youtube.com/embed/' . esc_attr($first['id']) . '" title="' . esc_attr($first['title']) . '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
         . '<div class="ldmv-bar"><div class="ldmv-now-wrap"><span class="ldmv-dot"></span><h3 class="ldmv-now">' . esc_html($first['title']) . '</h3></div><span class="ldmv-badge">YouTube Player</span></div>'
