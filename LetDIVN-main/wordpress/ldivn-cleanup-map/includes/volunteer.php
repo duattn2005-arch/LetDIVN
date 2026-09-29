@@ -437,6 +437,40 @@ function ldv_after_signup(int $post_id, array $data): void
     }
 }
 
+// --- /volunteer/: the form's own address ------------------------------------------------------
+// The front page with the form open. Unless the site has a page of that name.
+
+/** The form's own address. */
+function ldv_page_url(): string
+{
+    return home_url('/volunteer/');
+}
+
+add_filter('query_vars', function ($vars) {
+    $vars[] = 'ldv_page';
+    return $vars;
+});
+
+add_filter('request', function ($vars) {
+    // The address asked for, whatever WordPress made of it (a page name, or a 404).
+    $path = trim((string) wp_parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/');
+    $base = trim((string) wp_parse_url(home_url('/'), PHP_URL_PATH), '/');
+    if ($base !== '' && strpos($path, $base . '/') === 0) {
+        $path = substr($path, strlen($base) + 1);
+    }
+    if ($path !== 'volunteer' || is_admin() || get_page_by_path('volunteer', OBJECT, ['page', 'post'])) {
+        return $vars;
+    }
+    $front = get_option('show_on_front') === 'page' ? (int) get_option('page_on_front') : 0;
+    return $front ? ['page_id' => $front, 'ldv_page' => 1] : ['ldv_page' => 1];
+});
+
+// WordPress would send the front page's other address to "/".
+add_filter('redirect_canonical', fn($url) => get_query_var('ldv_page') ? false : $url);
+
+// After SEO plugins and themes, which set the front page's own title.
+add_filter('pre_get_document_title', fn($title) => get_query_var('ldv_page') ? 'Register to Volunteer – ' . get_bloginfo('name') : $title, 99);
+
 // --- On the pages ------------------------------------------------------------------------------
 
 add_action('init', function () {
@@ -463,6 +497,10 @@ function ldv_enqueue(): void
         'logo' => LDM_URL . 'assets/images/logo-icon-light.png',
         'photo' => LDM_URL . 'assets/images/volunteer.jpg',
         'onMap' => (bool) $s['vol_on_map'],
+        // The form's own address: shown while it is open, and it opens the form.
+        'page' => (string) wp_parse_url(ldv_page_url(), PHP_URL_PATH),
+        'home' => home_url('/'),
+        'autoOpen' => (bool) get_query_var('ldv_page'),
     ]) . ';', 'before');
 }
 
@@ -472,6 +510,7 @@ add_action('wp_enqueue_scripts', function () {
     $content = is_singular() && $post ? (string) $post->post_content : '';
     if (
         $s['vol_everywhere']
+        || get_query_var('ldv_page')
         || has_shortcode($content, 'ldivn_volunteer_form')
         || has_shortcode($content, 'ldivn_volunteer_button')
         || ($s['vol_on_map'] && has_shortcode($content, 'ldivn_cleanup_map'))
@@ -494,7 +533,8 @@ add_shortcode('ldivn_volunteer_button', function ($atts) {
     $a = shortcode_atts(['text' => 'Register to Volunteer', 'event' => ''], $atts, 'ldivn_volunteer_button');
     ldv_enqueue();
     return sprintf(
-        '<a href="#volunteer" class="ldv-button" data-ldv-open data-ldv-event="%s"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span>%s</span></a>',
+        '<a href="%s" class="ldv-button" data-ldv-open data-ldv-event="%s"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span>%s</span></a>',
+        esc_url(ldv_page_url()),
         esc_attr($a['event']),
         esc_html($a['text'])
     );

@@ -439,13 +439,16 @@
 
   var overlay = null;
   var bodyOverflow = '';
+  // The address was changed to the form's own (/volunteer/) when it opened.
+  var pushed = false;
 
   function onKey(e) {
     if (e.key === 'Escape') close();
   }
 
-  function open(eventId) {
-    close();
+  /** The form in a window. push: false keeps the address (the page was opened with it). */
+  function open(eventId, push) {
+    teardown();
     overlay = document.createElement('div');
     overlay.className = 'ldv-overlay';
     overlay.id = 'ldv-modal';
@@ -462,22 +465,61 @@
     document.addEventListener('keydown', onKey);
     var first = card.querySelector('.ldv-close');
     if (first) first.focus({ preventScroll: true });
+    // While open, the address is the form's own, to share or reload.
+    if (push !== false && CFG.page && location.pathname !== CFG.page && window.history.pushState) {
+      // Without "#volunteer" left behind, which would open the form again on the way back.
+      if (location.hash === '#volunteer') history.replaceState(null, '', location.pathname + location.search);
+      history.pushState({ ldv: 1 }, '', CFG.page + (eventId ? '?register=' + encodeURIComponent(eventId) : ''));
+      pushed = true;
+    }
   }
 
-  function close() {
+  /** Takes the window away, the address untouched. */
+  function teardown() {
     if (!overlay) return;
     overlay.parentNode && overlay.parentNode.removeChild(overlay);
     overlay = null;
     document.body.style.overflow = bodyOverflow;
     document.removeEventListener('keydown', onKey);
+  }
+
+  function close() {
+    if (!overlay) return;
+    teardown();
     if (location.hash === '#volunteer' && window.history.replaceState) {
       history.replaceState(null, '', location.pathname + location.search);
     }
+    // Back to the address before the form opened (the home page when it was opened at /volunteer/).
+    if (CFG.page && location.pathname === CFG.page) {
+      if (pushed) {
+        pushed = false;
+        history.back();
+      } else if (window.history.replaceState) {
+        history.replaceState(null, '', CFG.home || '/');
+      }
+    }
   }
 
-  /** A link to "#volunteer" of this site, from whatever page: the form opens right here. */
+  // Back/forward: leaving /volunteer/ closes the form, coming back to it opens it.
+  window.addEventListener('popstate', function () {
+    if (!CFG.page) return;
+    if (location.pathname === CFG.page) {
+      if (!overlay) open(registerParam() || '', false);
+    } else if (overlay) {
+      pushed = false;
+      teardown();
+    }
+  });
+
+  function registerParam() {
+    var m = /[?&]register=([^&#]*)/.exec(location.search);
+    return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
+  }
+
+  /** A link to "#volunteer" or to /volunteer/ of this site, from whatever page: the form opens right here. */
   function isVolunteerLink(a) {
-    return a.tagName === 'A' && (a.hash === '#volunteer' || a.hash === '#ldivn-volunteer') && a.host === location.host;
+    if (a.tagName !== 'A' || a.host !== location.host) return false;
+    return a.hash === '#volunteer' || a.hash === '#ldivn-volunteer' || (!!CFG.page && a.pathname === CFG.page && !a.hash);
   }
 
   // Captured before the theme's own handlers (smooth scroll, menus) and the map's.
@@ -501,9 +543,10 @@
       build(card, { modal: false, event: box.getAttribute('data-ldv-form') || '' });
     });
 
-    // ?register=<event id> (the website's own link) or #volunteer opens the form.
-    var m = /[?&]register=([^&#]*)/.exec(location.search);
-    if (m) open(decodeURIComponent(m[1].replace(/\+/g, ' ')));
+    // ?register=<event id> (the website's own link), /volunteer/ or #volunteer opens the form.
+    var event = registerParam();
+    if (event !== null) open(event, false);
+    else if (CFG.autoOpen) open('', false);
     else if (location.hash === '#volunteer') open('');
   }
 
