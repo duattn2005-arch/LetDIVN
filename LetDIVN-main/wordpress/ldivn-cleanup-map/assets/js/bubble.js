@@ -2,23 +2,10 @@
  * The contact bubble (includes/bubble.php): the round button opens and closes
  * the window; Escape closes it, and so does a click outside it when it was
  * opened by the button. With data-ldcb-auto the window opens by itself on
- * every page, until the visitor closes it: then not again during that visit.
+ * every page.
  */
 (function () {
   'use strict';
-
-  var CLOSED = 'ldcb-closed';
-
-  function remember(closed) {
-    try {
-      if (closed) sessionStorage.setItem(CLOSED, '1');
-      else sessionStorage.removeItem(CLOSED);
-    } catch (err) { /* private mode: it just opens again on the next page */ }
-  }
-
-  function wasClosed() {
-    try { return sessionStorage.getItem(CLOSED) === '1'; } catch (err) { return false; }
-  }
 
   function init(root) {
     var panel = root.querySelector('.ldcb-panel');
@@ -31,29 +18,19 @@
       button.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
 
-    function close() {
-      set(false);
-      remember(true);
-    }
-
     button.addEventListener('click', function () {
-      if (panel.hidden) {
-        byButton = true;
-        set(true);
-        remember(false);
-      } else {
-        close();
-      }
+      byButton = panel.hidden;
+      set(panel.hidden);
     });
-    root.querySelector('[data-ldcb-close]').addEventListener('click', close);
+    root.querySelector('[data-ldcb-close]').addEventListener('click', function () { set(false); });
     document.addEventListener('mousedown', function (e) {
-      if (byButton && !panel.hidden && !root.contains(e.target)) close();
+      if (byButton && !panel.hidden && !root.contains(e.target)) set(false);
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !panel.hidden) close();
+      if (e.key === 'Escape' && !panel.hidden) set(false);
     });
 
-    if (root.hasAttribute('data-ldcb-auto') && !wasClosed()) {
+    if (root.hasAttribute('data-ldcb-auto')) {
       setTimeout(function () { if (panel.hidden) set(true); }, 800);
     }
   }

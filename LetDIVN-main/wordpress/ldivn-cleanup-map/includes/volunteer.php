@@ -9,7 +9,6 @@ defined('ABSPATH') || exit;
 
 const LDV_TYPE = 'ldm_volunteer';
 const LDV_JOIN_AS = ['individual' => 'Cá nhân', 'group' => 'Nhóm', 'organization' => 'Tổ chức'];
-const LDV_ROLES = ['Clean-up', 'Media', 'Leader', 'Logistics'];
 /** The website's sign-up sheet (the same default as its form). */
 const LDV_SHEET_ID = '1NhKYRQwjF3L2rVt9KgVLIjYZVFFUwvuts8uD-8EDVYw';
 
@@ -25,6 +24,7 @@ const LDV_COLUMNS = [
     'organizationName' => 'Tên nhóm / tổ chức',
     'participants' => 'Số người',
     'preferredRole' => 'Vai trò',
+    'notes' => 'Ghi chú',
     'registeredAt' => 'Thời gian đăng ký',
     'forwarded' => 'Gửi về website',
 ];
@@ -114,21 +114,117 @@ add_action('manage_' . LDV_TYPE . '_posts_custom_column', function ($col, $id) {
     }
 }, 10, 2);
 
-// One sign-up: every field, read-only.
+// One sign-up: every field, to correct or complete ("Lưu thay đổi").
 add_action('add_meta_boxes_' . LDV_TYPE, function (WP_Post $post) {
     remove_meta_box('submitdiv', LDV_TYPE, 'side');
-    add_meta_box('ldv-data', 'Thông tin đăng ký', function (WP_Post $post) {
-        $data = ldv_data($post->ID);
-        echo '<table class="widefat striped"><tbody>';
-        foreach (LDV_COLUMNS as $key => $label) {
-            $text = ldv_value($data, $key);
-            if ($text !== '') {
-                printf('<tr><th style="width:220px">%s</th><td>%s</td></tr>', esc_html($label), esc_html($text));
-            }
+    add_meta_box('ldv-data', 'Thông tin đăng ký', 'ldv_edit_box', LDV_TYPE, 'normal', 'high');
+});
+
+function ldv_edit_box(WP_Post $post): void
+{
+    $data = ldv_data($post->ID);
+    $v = fn($key) => esc_attr((string) ($data[$key] ?? ''));
+    $options = function (array $choices, string $current): string {
+        if ($current !== '' && !isset($choices[$current])) {
+            $choices = [$current => $current] + $choices;
         }
-        echo '</tbody></table>';
-        printf('<p><a class="button" href="%s">&larr; Danh sách</a> <a class="button button-link-delete" href="%s">Xoá</a></p>', esc_url(admin_url('edit.php?post_type=' . LDV_TYPE)), esc_url((string) get_delete_post_link($post->ID)));
-    }, LDV_TYPE, 'normal', 'high');
+        $out = '';
+        foreach ($choices as $value => $label) {
+            $out .= sprintf('<option value="%s"%s>%s</option>', esc_attr((string) $value), selected((string) $value, $current, false), esc_html($label));
+        }
+        return $out;
+    };
+    $events = array_map(fn($e) => $e['title'] . ' (' . $e['date'] . ')', ldv_events()['all']);
+    if (($data['eventId'] ?? '') !== '' && !isset($events[$data['eventId']])) {
+        $events = [$data['eventId'] => (string) ($data['eventName'] ?? $data['eventId'])] + $events;
+    }
+    $roles = ldv_form()['roles'];
+    $rows = [
+        'Họ tên / người liên hệ' => '<input name="ldv[fullName]" value="' . $v('fullName') . '" class="regular-text" required>',
+        'Điện thoại' => '<input name="ldv[phone]" value="' . $v('phone') . '" class="regular-text">',
+        'Email' => '<input type="email" name="ldv[email]" value="' . $v('email') . '" class="regular-text">',
+        'Ngày sinh' => '<input name="ldv[birthDate]" value="' . $v('birthDate') . '" class="regular-text" placeholder="dd/mm/yyyy">',
+        'Địa chỉ' => '<input name="ldv[city]" value="' . $v('city') . '" class="large-text">',
+        'Dự án / chiến dịch' => '<select name="ldv[eventId]"><option value="">' . esc_html(($data['eventId'] ?? '') === '' ? (string) ($data['eventName'] ?? '—') : '—') . '</option>' . $options($events, (string) ($data['eventId'] ?? '')) . '</select>',
+        'Tham gia với tư cách' => '<select name="ldv[joinAs]">' . $options(LDV_JOIN_AS, (string) ($data['joinAs'] ?? 'individual')) . '</select>',
+        'Tên nhóm / tổ chức' => '<input name="ldv[organizationName]" value="' . $v('organizationName') . '" class="regular-text">',
+        'Số người' => '<input type="number" min="1" name="ldv[participants]" value="' . $v('participants') . '" class="small-text">',
+        'Vai trò' => '<select name="ldv[preferredRole]">' . $options(array_combine($roles, $roles), (string) ($data['preferredRole'] ?? '')) . '</select>',
+        'Ghi chú' => '<textarea name="ldv[notes]" rows="3" class="large-text">' . esc_textarea((string) ($data['notes'] ?? '')) . '</textarea>',
+    ];
+    wp_nonce_field('ldv_edit', 'ldv_edit_nonce');
+    echo '<table class="form-table" role="presentation"><tbody>';
+    foreach ($rows as $label => $field) {
+        printf('<tr><th scope="row" style="width:200px">%s</th><td>%s</td></tr>', esc_html($label), $field);
+    }
+    foreach (['registeredAt', 'forwarded'] as $key) {
+        $text = ldv_value($data, $key);
+        if ($text !== '') {
+            printf('<tr><th scope="row">%s</th><td>%s</td></tr>', esc_html(LDV_COLUMNS[$key]), esc_html($text));
+        }
+    }
+    echo '</tbody></table>';
+    echo '<p>';
+    submit_button('Lưu thay đổi', 'primary', 'save', false);
+    printf(' <a class="button" href="%s">&larr; Danh sách</a> <a class="button button-link-delete" href="%s">Xoá</a></p>', esc_url(admin_url('edit.php?post_type=' . LDV_TYPE)), esc_url((string) get_delete_post_link($post->ID)));
+}
+
+/** The corrected fields of a sign-up from its edit screen, or null when it isn't that screen's saving. */
+function ldv_edited_fields(int $post_id): ?array
+{
+    if (
+        !isset($_POST['ldv_edit_nonce'], $_POST['ldv'])
+        || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['ldv_edit_nonce'])), 'ldv_edit')
+        || !current_user_can('edit_post', $post_id)
+    ) {
+        return null;
+    }
+    $in = (array) wp_unslash($_POST['ldv']);
+    $get = fn($k) => isset($in[$k]) && is_scalar($in[$k]) ? trim((string) $in[$k]) : '';
+    return [
+        'fullName' => mb_substr(sanitize_text_field($get('fullName')), 0, 200),
+        'phone' => substr(preg_replace('/(?!^)\+/', '', preg_replace('/[^\d+]/', '', $get('phone'))), 0, 16),
+        'email' => sanitize_email($get('email')),
+        'birthDate' => sanitize_text_field($get('birthDate')),
+        'city' => mb_substr(sanitize_text_field($get('city')), 0, 300),
+        'eventId' => sanitize_text_field($get('eventId')),
+        'joinAs' => array_key_exists($get('joinAs'), LDV_JOIN_AS) ? $get('joinAs') : 'individual',
+        'organizationName' => mb_substr(sanitize_text_field($get('organizationName')), 0, 200),
+        'participants' => max(1, absint($get('participants'))),
+        'preferredRole' => sanitize_text_field($get('preferredRole')),
+        'notes' => sanitize_textarea_field($get('notes')),
+    ];
+}
+
+// The list shows the name: the title follows the corrected one.
+add_filter('wp_insert_post_data', function ($post, $raw) {
+    if ($post['post_type'] === LDV_TYPE && !empty($raw['ID'])) {
+        $fields = ldv_edited_fields((int) $raw['ID']);
+        if ($fields && $fields['fullName'] !== '') {
+            $post['post_title'] = wp_slash($fields['fullName']);
+        }
+    }
+    return $post;
+}, 10, 2);
+
+add_action('save_post_' . LDV_TYPE, function (int $post_id) {
+    $fields = ldv_edited_fields($post_id);
+    if (!$fields) {
+        return;
+    }
+    $data = ldv_data($post_id);
+    $events = ldv_events()['all'];
+    if ($fields['eventId'] === '' || $fields['eventId'] === ($data['eventId'] ?? '')) {
+        unset($fields['eventId']); // unchanged
+    } elseif (isset($events[$fields['eventId']])) {
+        $fields['eventName'] = $events[$fields['eventId']]['title'];
+    } else {
+        unset($fields['eventId']);
+    }
+    if ($fields['fullName'] === '') {
+        unset($fields['fullName']);
+    }
+    update_post_meta($post_id, '_ldv_data', wp_slash(wp_json_encode(array_merge($data, $fields), JSON_UNESCAPED_UNICODE)));
 });
 
 add_filter('post_row_actions', function ($actions, $post) {
@@ -202,15 +298,42 @@ add_action('admin_post_ldv_export', function () {
     exit;
 });
 
-// --- The form's events and sign-ups (admin-ajax: works even where the REST API is closed) ----
+// --- The form's events and sign-ups ---------------------------------------------------------
+// Asked at the site's own address, "/?ldv_api=1": not under /wp-admin/, which
+// hosts guard (a check page instead of the answer) and which sends logged-in
+// people through the dashboard's own start-up. admin-ajax.php answers too:
+// the form falls back on it (works even where the REST API is closed).
 
-/** Projects the form offers: the map's events that haven't passed, soonest first. */
+add_action('wp_loaded', function () {
+    if (!isset($_GET['ldv_api']) || is_admin()) {
+        return;
+    }
+    // Never kept by a page cache.
+    if (!defined('DONOTCACHEPAGE')) {
+        define('DONOTCACHEPAGE', true);
+    }
+    do_action('litespeed_control_set_nocache', 'ldivn volunteer form');
+    nocache_headers();
+    header('X-LiteSpeed-Cache-Control: no-cache');
+
+    $action = isset($_REQUEST['action']) ? sanitize_key(wp_unslash($_REQUEST['action'])) : '';
+    if ($action === 'ldv_events') {
+        ldv_ajax_events();
+    } elseif ($action === 'ldv_submit' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+        ldv_ajax_submit();
+    }
+    wp_send_json(['ok' => false, 'error' => 'Unknown request.'], 400);
+});
+
+/** Projects the form offers: the map's events that haven't passed, soonest first (no sample spots). */
 function ldv_events(): array
 {
     $today = wp_date('Y-m-d');
     $all = [];
     foreach (ldm_events() as $e) {
-        $all[$e['id']] = ['id' => $e['id'], 'title' => $e['title'], 'date' => $e['date']];
+        if (empty($e['sample'])) {
+            $all[$e['id']] = ['id' => $e['id'], 'title' => $e['title'], 'date' => $e['date']];
+        }
     }
     $upcoming = array_filter($all, fn($e) => $e['date'] >= $today);
     usort($upcoming, fn($a, $b) => strcmp($a['date'], $b['date']));
@@ -254,7 +377,8 @@ function ldv_ajax_submit(): void
 
     $join = array_key_exists($get('joinAs'), LDV_JOIN_AS) ? $get('joinAs') : 'individual';
     $team = $join !== 'individual';
-    $role = in_array($get('role'), LDV_ROLES, true) ? $get('role') : 'Clean-up';
+    $roles = ldv_form()['roles'];
+    $role = in_array($get('role'), $roles, true) ? $get('role') : $roles[0];
     $name = sanitize_text_field($get('fullName'));
     $email = sanitize_email($get('email'));
     $phone = substr(preg_replace('/(?!^)\+/', '', preg_replace('/[^\d+]/', '', $get('phone'))), 0, 16);
@@ -490,12 +614,16 @@ function ldv_enqueue(): void
     }
     $done = true;
     $s = ldm_settings();
+    $form = ldv_form();
     wp_enqueue_style('ldv');
     wp_enqueue_script('ldv');
     wp_add_inline_script('ldv', 'window.LDIVN_VOLUNTEER = ' . wp_json_encode([
+        'api' => add_query_arg('ldv_api', '1', home_url('/')),
         'ajax' => admin_url('admin-ajax.php'),
         'logo' => LDM_URL . 'assets/images/logo-icon-light.png',
-        'photo' => LDM_URL . 'assets/images/volunteer.jpg',
+        'photo' => $form['photo'],
+        'text' => $form['text'], // Tình nguyện viên → Sửa form đăng ký
+        'roles' => $form['roles'],
         'onMap' => (bool) $s['vol_on_map'],
         // The form's own address: shown while it is open, and it opens the form.
         'page' => (string) wp_parse_url(ldv_page_url(), PHP_URL_PATH),

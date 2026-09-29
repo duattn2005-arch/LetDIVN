@@ -228,7 +228,8 @@
   function eventPopup(e) {
     // With the sign-up form on this site (volunteer.js), Register opens it with the event chosen.
     var here = window.LDIVN_VOLUNTEER && window.LDIVN_VOLUNTEER.onMap;
-    var buttons = (e.detailsUrl ? '<a class="ldm-pop-btn ldm-pop-btn--dark" href="' + esc(e.detailsUrl) + '">Details</a>' : '') +
+    // A sample spot (includes/samples.php) can't be signed up for.
+    var buttons = e.sample ? '' : (e.detailsUrl ? '<a class="ldm-pop-btn ldm-pop-btn--dark" href="' + esc(e.detailsUrl) + '">Details</a>' : '') +
       (here
         ? '<a class="ldm-pop-btn ldm-pop-btn--pink" href="#volunteer" data-ldv-event="' + esc(e.id) + '">Register</a>'
         : e.registerUrl ? '<a class="ldm-pop-btn ldm-pop-btn--pink" href="' + esc(e.registerUrl) + '">Register</a>' : '');
@@ -242,7 +243,9 @@
       '<div class="ldm-pop-meta">' +
         (where ? '<div><span>📍</span><span class="ldm-trunc">' + esc(where) + '</span></div>' : '') +
         '<div><span>📅</span><span>' + esc(e.date) + (e.time ? ' • ' + esc(e.time) : '') + '</span></div>' +
-        '<div class="ldm-pop-count"><span>👥</span><span>' + (Number(e.registered) || 0) + ' people registered</span></div>' +
+        (e.sample
+          ? '<div class="ldm-pop-sample">Sample spot, for preview</div>'
+          : '<div class="ldm-pop-count"><span>👥</span><span>' + (Number(e.registered) || 0) + ' people registered</span></div>') +
       '</div>' +
       (buttons ? '<div class="ldm-pop-btns">' + buttons + '</div>' : '') +
     '</div>';

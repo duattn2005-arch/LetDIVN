@@ -81,8 +81,9 @@ function ldm_settings_page(): void
             <p style="margin:0 0 8px"><code style="font-size:14px;padding:4px 8px">[ldivn_cleanup_map]</code></p>
             <p style="margin:0">Tuỳ chọn: <code>fullwidth="yes"</code> (tràn hết chiều ngang màn hình), <code>height="700px"</code>, <code>year="2026"</code>, <code>scheme="old"</code> (mở sẵn 63 tỉnh cũ), <code>title="..."</code>, <code>subtitle="..."</code>.<br>
                 Ví dụ: <code>[ldivn_cleanup_map fullwidth="yes" height="calc(100vh - 80px)"]</code></p>
-            <p style="margin:8px 0 0">Xem thử bản đồ khi một thành phố có nhiều điểm: mở trang bản đồ với <code>?ldm_demo=hanoi</code> ở cuối địa chỉ (vd. <code><?php echo esc_html(home_url('/cleanup-map/?ldm_demo=hanoi')); ?></code>) — thêm tạm 5 điểm ở Hà Nội, chỉ bạn thấy khi đang đăng nhập, không lưu gì.</p>
         </div>
+
+        <?php ldm_samples_box(); ?>
 
         <?php
         $import = isset($_GET['ldm_import']) ? sanitize_key(wp_unslash($_GET['ldm_import'])) : '';
@@ -169,7 +170,7 @@ function ldm_settings_page(): void
                         <label><input type="checkbox" name="<?php echo $name('core_events'); ?>" value="1" <?php checked($s['core_events'], 1); ?>> Lấy thêm sự kiện từ plugin "Let's Do It Vietnam – Core"</label>
                         <span class="description">(<?php echo function_exists('ldivn_get_events') ? 'đang bật' : 'không cài trên web này — bỏ qua'; ?>)</span><br>
                         <label><input type="checkbox" name="<?php echo $name('bubble'); ?>" value="1" <?php checked($s['bubble'], 1); ?>> Hiện bong bóng liên hệ ở góc dưới bên phải mọi trang (Facebook, Instagram, hotline, email)</label><br>
-                        <label><input type="checkbox" name="<?php echo $name('bubble_open'); ?>" value="1" <?php checked($s['bubble_open'], 1); ?>> Khung liên hệ tự mở khi vào trang (khách bấm đóng thì không tự mở lại trong lần truy cập đó)</label>
+                        <label><input type="checkbox" name="<?php echo $name('bubble_open'); ?>" value="1" <?php checked($s['bubble_open'], 1); ?>> Khung liên hệ tự mở ra mỗi khi vào một trang</label>
                     </td>
                 </tr>
                 <tr>

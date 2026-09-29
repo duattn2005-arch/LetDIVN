@@ -70,7 +70,7 @@ function ldm_shortcode($atts): string
     if (!$data_added) {
         $data_added = true;
         wp_add_inline_script('ldm-map', 'window.LDIVN_MAP = ' . wp_json_encode([
-            'events' => array_merge(ldm_events(), ldm_demo_events()),
+            'events' => ldm_events(),
             'teams' => ldm_teams(),
             'pin' => LDM_URL . 'assets/images/map-pin.png',
             'showPast' => (bool) $s['show_past'],
