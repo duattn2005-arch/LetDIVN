@@ -29,6 +29,21 @@ const LDV_COLUMNS = [
     'forwarded' => 'Gửi về website',
 ];
 
+/** Column => label of the Excel download: the same as the website's admin gave. */
+const LDV_EXPORT_COLUMNS = [
+    'fullName' => 'Họ tên',
+    'joinAs' => 'Hình thức',
+    'participants' => 'Số người',
+    'email' => 'Email',
+    'phone' => 'Điện thoại',
+    'city' => 'Địa chỉ',
+    'eventName' => 'Sự kiện',
+    'preferredRole' => 'Vai trò',
+    'birthDate' => 'Ngày sinh',
+    'notes' => 'Ghi chú',
+    'registeredAt' => 'Ngày đăng ký',
+];
+
 // --- Admin: the list of sign-ups ---------------------------------------------------------------
 
 add_action('init', function () {
@@ -134,32 +149,56 @@ add_action('admin_head-post.php', function () {
     }
 });
 
-// "Tải về Excel (CSV)" next to the list's title.
+// "Tải về Excel" next to the list's title.
 add_action('admin_head-edit.php', function () {
     if (($GLOBALS['typenow'] ?? '') !== LDV_TYPE) {
         return;
     }
     // Not wp_nonce_url(): it HTML-escapes the "&", which a script's link keeps as is.
     $url = add_query_arg(['action' => 'ldv_export', '_wpnonce' => wp_create_nonce('ldv_export')], admin_url('admin-post.php'));
-    echo '<script>document.addEventListener("DOMContentLoaded",function(){var h=document.querySelector(".wp-heading-inline");if(h){var a=document.createElement("a");a.className="page-title-action";a.href=' . wp_json_encode($url) . ';a.textContent="Tải về Excel (CSV)";h.after(a);}});</script>';
+    echo '<script>document.addEventListener("DOMContentLoaded",function(){var h=document.querySelector(".wp-heading-inline");if(h){var a=document.createElement("a");a.className="page-title-action";a.href=' . wp_json_encode($url) . ';a.textContent="Tải về Excel";h.after(a);}});</script>';
 });
+
+/** A cell of the Excel download (the number of people stays a number). */
+function ldv_export_value(array $data, string $key)
+{
+    if ($key === 'joinAs') {
+        // "Cá nhân", or "Nhóm: <name>" / "Tổ chức: <name>".
+        $join = (string) ($data['joinAs'] ?? '');
+        $label = LDV_JOIN_AS[$join] ?? 'Cá nhân';
+        return $join !== 'individual' && !empty($data['organizationName']) ? $label . ': ' . $data['organizationName'] : $label;
+    }
+    if ($key === 'participants') {
+        return is_numeric($data['participants'] ?? null) ? (int) $data['participants'] : '';
+    }
+    if ($key === 'registeredAt') {
+        $t = strtotime((string) ($data['registeredAt'] ?? ''));
+        return $t ? wp_date('H:i j/n/y', $t) : '';
+    }
+    return ldv_value($data, $key);
+}
 
 add_action('admin_post_ldv_export', function () {
     check_admin_referer('ldv_export');
     if (!current_user_can('edit_posts')) {
         wp_die('Không có quyền.');
     }
-    nocache_headers();
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="tinh-nguyen-vien-' . wp_date('Y-m-d') . '.csv"');
-    $out = fopen('php://output', 'w');
-    fwrite($out, "\xEF\xBB\xBF"); // so Excel reads Vietnamese correctly
-    fputcsv($out, array_values(LDV_COLUMNS));
+    $rows = [];
     foreach (get_posts(['post_type' => LDV_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'orderby' => 'date', 'order' => 'DESC']) as $p) {
         $data = ldv_data($p->ID);
-        fputcsv($out, array_map(fn($key) => ldv_value($data, $key), array_keys(LDV_COLUMNS)));
+        $rows[] = array_map(fn($key) => ldv_export_value($data, $key), array_keys(LDV_EXPORT_COLUMNS));
     }
-    fclose($out);
+    $file = ldv_xlsx('Tình nguyện viên', array_values(LDV_EXPORT_COLUMNS), $rows);
+
+    // Nothing printed before by other plugins may end up in the file.
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    nocache_headers();
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="tinh-nguyen-vien-' . wp_date('Y-m-d') . '.xlsx"');
+    header('Content-Length: ' . strlen($file));
+    echo $file;
     exit;
 });
 
