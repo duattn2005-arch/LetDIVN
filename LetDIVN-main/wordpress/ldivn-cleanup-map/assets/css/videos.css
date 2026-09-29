@@ -1,0 +1,240 @@
+/* [ldivn_videos]: the Let's Do It Vietnam video block (list + player).
+   Everything under .ldmv and set explicitly, so the theme's button and
+   heading styles don't leak in. */
+
+.ldmv {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  max-width: 1280px;
+  margin: 0 auto;
+  color: #0f172a;
+  /* The site's font (Poppins), as in its menu and buttons. */
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+  text-align: left;
+}
+.ldmv *, .ldmv *::before, .ldmv *::after { box-sizing: border-box; }
+@media (min-width: 1024px) {
+  .ldmv { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px; }
+}
+
+/* Frosted white cards */
+.ldmv .ldmv-card {
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+}
+
+/* --- The list ---------------------------------------------------------------------------- */
+.ldmv .ldmv-list {
+  order: 2;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+.ldmv .ldmv-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 10px;
+  padding: 0 4px 4px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.ldmv .ldmv-count { display: inline-flex; align-items: center; gap: 6px; }
+.ldmv .ldmv-count svg { width: 14px; height: 14px; color: #e81a7f; }
+.ldmv .ldmv-hd {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fdf2f8;
+  color: #db2777;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+}
+.ldmv .ldmv-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.ldmv .ldmv-item {
+  -webkit-appearance: none;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; /* the list scrolls instead of squeezing its items */
+  gap: 12px;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  color: inherit;
+  font: inherit;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.ldmv .ldmv-item:hover,
+.ldmv .ldmv-item:focus-visible {
+  background: #fff;
+  border-color: #fbcfe8;
+  color: inherit;
+  outline: none;
+}
+.ldmv .ldmv-item.is-active {
+  background: linear-gradient(to right, #fdf2f8, rgba(250, 245, 255, 0.4));
+  border-color: #f9a8d4;
+  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.4), 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.ldmv .ldmv-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 96px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f172a;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: transform 0.3s;
+}
+.ldmv .ldmv-item:hover .ldmv-thumb { transform: scale(1.05); }
+.ldmv .ldmv-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  object-fit: cover;
+}
+.ldmv .ldmv-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  transition: background-color 0.15s;
+}
+.ldmv .ldmv-item:hover .ldmv-play { background: rgba(0, 0, 0, 0.1); }
+.ldmv .ldmv-play svg {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+  filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+  transition: transform 0.15s;
+}
+.ldmv .ldmv-item:hover .ldmv-play svg { transform: scale(1.1); }
+.ldmv .ldmv-item-title {
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.375;
+  transition: color 0.15s;
+}
+.ldmv .ldmv-item:hover .ldmv-item-title { color: #e81a7f; }
+
+/* --- The player -------------------------------------------------------------------------- */
+.ldmv .ldmv-player {
+  order: 1;
+  padding: 8px;
+  border: 1px solid #fff;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+@media (min-width: 640px) {
+  .ldmv .ldmv-player { padding: 12px; }
+}
+@media (min-width: 1024px) {
+  .ldmv .ldmv-list { order: 1; }
+  .ldmv .ldmv-player { order: 2; }
+}
+.ldmv .ldmv-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+}
+.ldmv .ldmv-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+}
+.ldmv .ldmv-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+}
+.ldmv .ldmv-now-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ldmv .ldmv-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #e81a7f;
+  animation: ldmv-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes ldmv-ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+.ldmv .ldmv-now {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+@media (min-width: 640px) {
+  .ldmv .ldmv-now { font-size: 14px; }
+}
+.ldmv .ldmv-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+}
