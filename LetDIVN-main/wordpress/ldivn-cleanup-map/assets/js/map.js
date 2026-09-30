@@ -243,9 +243,7 @@
       '<div class="ldm-pop-meta">' +
         (where ? '<div><span>📍</span><span class="ldm-trunc">' + esc(where) + '</span></div>' : '') +
         '<div><span>📅</span><span>' + esc(e.date) + (e.time ? ' • ' + esc(e.time) : '') + '</span></div>' +
-        (e.sample
-          ? '<div class="ldm-pop-sample">Sample spot, for preview</div>'
-          : '<div class="ldm-pop-count"><span>👥</span><span>' + (Number(e.registered) || 0) + ' people registered</span></div>') +
+        '<div class="ldm-pop-count"><span>👥</span><span>' + (Number(e.registered) || 0) + ' people registered</span></div>' +
       '</div>' +
       (buttons ? '<div class="ldm-pop-btns">' + buttons + '</div>' : '') +
     '</div>';

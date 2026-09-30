@@ -1,8 +1,8 @@
 <?php
 // Sample spots around Hanoi, to see the map with several spots in one city:
 // with the Hoan Kiem Lake one, Hanoi has 5. Ordinary spots in the list
-// ("Điểm mẫu" in its Ghim column), except that their popup says they are
-// samples, without a Register button, and the sign-up form doesn't offer them.
+// ("Điểm mẫu" in its Ghim column), except that their popup has no Register
+// button and the sign-up form doesn't offer them.
 // Added once after this version is installed; Cài đặt removes or re-adds them.
 
 defined('ABSPATH') || exit;

@@ -486,9 +486,7 @@
 .ldm-pop-meta { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; color: #475569; font-size: 12px; }
 .ldm-pop-meta > div { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .ldm-trunc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ldm-pop-count { color: #059669; font-weight: 700; }
-.ldm-pop-sample { align-self: flex-start; padding: 2px 8px; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 700; }
-.ldm-pop-btns { display: flex; gap: 8px; }
+.ldm-pop-count { color: #059669; font-weight: 700; }.ldm-pop-btns { display: flex; gap: 8px; }
 .ldm .ldm-pop-btn {
   flex: 1;
   padding: 8px 0;
