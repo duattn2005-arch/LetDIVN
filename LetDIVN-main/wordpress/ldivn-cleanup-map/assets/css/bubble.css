@@ -187,7 +187,8 @@
 
 .ldcb .ldcb-row--mail:hover { background: #fdf2f8; }
 .ldcb .ldcb-row--mail .ldcb-ic { background: #ec4899; }
-.ldcb .ldcb-row--mail .ldcb-val { max-width: 150px; }
+/* The whole address, on two lines if it must. */
+.ldcb .ldcb-row--mail .ldcb-val { max-width: none; overflow: visible; white-space: normal; overflow-wrap: anywhere; }
 .ldcb .ldcb-row--mail:hover .ldcb-label,
 .ldcb .ldcb-row--mail:hover .ldcb-chev { color: #e81a7f; }
 
