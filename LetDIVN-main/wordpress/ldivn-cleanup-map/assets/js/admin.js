@@ -110,6 +110,67 @@
     if (e.key === 'Enter') { e.preventDefault(); runSearch(); }
   });
 
+  // --- A Google Maps link: the pin goes where it points ------------------------------------
+  // Coordinates read from the link itself; a short link (maps.app.goo.gl) is opened by
+  // the site first (includes/rest.php). A link to a place without them: a search of its name.
+  var gmaps = box.querySelector('[name="ldm[gmaps]"]');
+  var gmapsBtn = box.querySelector('.ldm-admin-gmaps button');
+  var gsay = function (text) { box.querySelector('.ldm-admin-gstatus').textContent = text || ''; };
+
+  function coordsIn(link) {
+    var text = link;
+    try { text = decodeURIComponent(link); } catch (e) { /* a stray %: as it is */ }
+    var n = '(-?\\d{1,3}(?:\\.\\d+)?)';
+    var patterns = [
+      new RegExp('!3d' + n + '!4d' + n),
+      new RegExp('[?&](?:q|query|ll|sll|destination|daddr|center)=(?:loc:)?' + n + ',\\s*\\+?' + n),
+      new RegExp('@' + n + ',' + n),
+      new RegExp('/(?:search|place|dir)/' + n + ',\\s*\\+?' + n)
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      var m = patterns[i].exec(text);
+      if (m && Math.abs(+m[1]) <= 90 && Math.abs(+m[2]) <= 180) return [+m[1], +m[2]];
+    }
+    return null;
+  }
+
+  function useLink() {
+    var link = gmaps.value.trim();
+    if (!link) return;
+    if (!/^https?:\/\/([a-z0-9-]+\.)*(goo\.gl|google\.[a-z.]+|g\.co)\//i.test(link)) {
+      gsay('Đây không phải link Google Maps.');
+      return;
+    }
+    var at = coordsIn(link);
+    if (at) {
+      gsay('Đã đặt ghim theo link.');
+      place(at[0], at[1], { fly: true, fill: true });
+      return;
+    }
+    gsay('Đang mở link…');
+    fetch(url(CFG.gmaps, { url: link }), { headers: { 'X-WP-Nonce': CFG.nonce || '' }, credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (d && d.lat !== null && d.lng !== null && d.lat !== undefined) {
+          gsay('Đã đặt ghim theo link.');
+          place(d.lat, d.lng, { fly: true, fill: true });
+        } else if (d && d.name) {
+          gsay('Link không có toạ độ: tìm theo tên "' + d.name + '".');
+          search.value = d.name;
+          runSearch();
+        } else {
+          gsay('Không đọc được vị trí trong link này. Mở link, bấm chuột phải lên chỗ đó trên Google Maps để chép toạ độ, dán vào ô Vĩ độ / Kinh độ.');
+        }
+      })
+      .catch(function () { gsay('Không mở được link lúc này, thử lại sau.'); });
+  }
+
+  gmapsBtn.addEventListener('click', useLink);
+  gmaps.addEventListener('change', useLink);
+  gmaps.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); useLink(); }
+  });
+
   // The box may start collapsed or be resized: keep the map's tiles in step.
   setTimeout(function () { map.invalidateSize(); }, 200);
   if (window.ResizeObserver) new ResizeObserver(function () { map.invalidateSize(); }).observe(el);

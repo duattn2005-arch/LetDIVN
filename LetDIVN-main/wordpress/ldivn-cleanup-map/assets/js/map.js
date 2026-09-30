@@ -234,6 +234,9 @@
         ? '<a class="ldm-pop-btn ldm-pop-btn--pink" href="#volunteer" data-ldv-event="' + esc(e.id) + '">Register</a>'
         : e.registerUrl ? '<a class="ldm-pop-btn ldm-pop-btn--pink" href="' + esc(e.registerUrl) + '">Register</a>' : '');
     var where = [e.location, e.city ? '(' + e.city + ')' : ''].filter(Boolean).join(' ');
+    // Google Maps, to find the way: the spot's own link, else its pin (not a city's centre).
+    var gmaps = /^https?:\/\//.test(e.mapsUrl || '') ? e.mapsUrl
+      : e.ownSpot ? 'https://www.google.com/maps/search/?api=1&query=' + e.spot.lat + ',' + e.spot.lng : '';
     return '<div class="ldm-pop">' +
       (e.image || e.pending
         ? '<div class="ldm-pop-img">' + (e.image ? '<img src="' + esc(e.image) + '" alt="">' : '') +
@@ -244,6 +247,7 @@
         (where ? '<div><span>📍</span><span class="ldm-trunc">' + esc(where) + '</span></div>' : '') +
         '<div><span>📅</span><span>' + esc(e.date) + (e.time ? ' • ' + esc(e.time) : '') + '</span></div>' +
         '<div class="ldm-pop-count"><span>👥</span><span>' + (Number(e.registered) || 0) + ' people registered</span></div>' +
+        (gmaps ? '<div><span>🧭</span><a class="ldm-pop-gmaps" href="' + esc(gmaps) + '" target="_blank" rel="noopener">Open in Google Maps ↗</a></div>' : '') +
       '</div>' +
       (buttons ? '<div class="ldm-pop-btns">' + buttons + '</div>' : '') +
     '</div>';

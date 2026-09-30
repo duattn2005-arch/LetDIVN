@@ -5,7 +5,7 @@
 defined('ABSPATH') || exit;
 
 /** Meta fields of a spot, stored as "_ldm_<name>". */
-const LDM_FIELDS = ['date', 'time', 'location', 'city', 'lat', 'lng', 'status', 'registered', 'details_url', 'register_url'];
+const LDM_FIELDS = ['date', 'time', 'location', 'city', 'lat', 'lng', 'gmaps', 'status', 'registered', 'details_url', 'register_url'];
 
 add_action('init', function () {
     register_post_type(LDM_TYPE, [
@@ -90,7 +90,16 @@ function ldm_spot_box(WP_Post $post): void
         </div>
 
         <h4>Vị trí trên bản đồ</h4>
-        <p class="description">Gõ tên địa điểm rồi bấm <strong>Tìm</strong>, hoặc bấm thẳng lên bản đồ để đặt ghim. Kéo ghim để chỉnh cho chính xác.</p>
+        <p class="description">Dán <strong>link Google Maps</strong> của địa điểm, hoặc gõ tên địa điểm rồi bấm <strong>Tìm</strong>, hoặc bấm thẳng lên bản đồ để đặt ghim. Kéo ghim để chỉnh cho chính xác.</p>
+        <div class="ldm-admin-gmaps">
+            <label for="ldm-gmaps">Link Google Maps</label>
+            <div class="ldm-admin-row">
+                <input type="url" id="ldm-gmaps" name="ldm[gmaps]" value="<?php echo esc_attr($v['gmaps']); ?>" class="large-text" placeholder="https://maps.app.goo.gl/... hoặc https://www.google.com/maps/place/...">
+                <button type="button" class="button">Lấy vị trí</button>
+                <span class="ldm-admin-gstatus" aria-live="polite"></span>
+            </div>
+            <span class="description">Ghim tự đặt vào chỗ trong link. Trên bản đồ, khung thông tin của điểm có thêm "Open in Google Maps" để khách xem đường đi (để trống thì dùng vị trí của ghim).</span>
+        </div>
         <div class="ldm-admin-search">
             <input type="search" class="regular-text" placeholder="Tìm địa điểm, trường học, bãi biển..." aria-label="Tìm địa điểm">
             <button type="button" class="button">Tìm</button>
@@ -139,6 +148,7 @@ add_action('save_post_' . LDM_TYPE, function (int $post_id) {
         'city' => sanitize_text_field($get('city')),
         'lat' => $coord($get('lat'), 90),
         'lng' => $coord($get('lng'), 180),
+        'gmaps' => esc_url_raw($get('gmaps'), ['http', 'https']),
         'status' => $get('status') === 'Pending' ? 'Pending' : 'Upcoming',
         'registered' => $get('registered') === '' ? '' : (string) absint($get('registered')),
         'details_url' => esc_url_raw($get('details_url')),
@@ -165,6 +175,8 @@ add_action('admin_enqueue_scripts', function ($hook) {
     wp_localize_script('ldm-admin', 'LDM_ADMIN', [
         'search' => rest_url('ldivn-map/v1/geocode/search'),
         'reverse' => rest_url('ldivn-map/v1/geocode/reverse'),
+        'gmaps' => rest_url('ldivn-map/v1/gmaps'),
+        'nonce' => wp_create_nonce('wp_rest'),
         'pin' => LDM_URL . 'assets/images/map-pin.png',
     ]);
 });
@@ -259,6 +271,7 @@ function ldm_events(): array
             'city' => ldm_meta($p->ID, 'city'),
             'lat' => $lat !== '' ? (float) $lat : null,
             'lng' => $lng !== '' ? (float) $lng : null,
+            'mapsUrl' => ldm_meta($p->ID, 'gmaps'), // its Google Maps link; '' = the pin's place
             'image' => (string) get_the_post_thumbnail_url($p, 'medium_large'),
             'pending' => ldm_meta($p->ID, 'status') === 'Pending',
             'sample' => ldm_meta($p->ID, 'sample') === '1', // includes/samples.php

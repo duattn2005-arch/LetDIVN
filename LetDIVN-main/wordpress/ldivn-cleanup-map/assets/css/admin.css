@@ -4,7 +4,9 @@
 .ldm-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0 16px; }
 .ldm-admin-grid p { margin: 8px 0; }
 .ldm-admin-grid .ldm-wide { grid-column: 1 / -1; }
-.ldm-admin-search { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
-.ldm-admin-status { color: #646970; }
+.ldm-admin-search, .ldm-admin-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+.ldm-admin-row input { flex: 1 1 360px; max-width: 640px; }
+.ldm-admin-gmaps { margin: 12px 0 16px; padding: 10px 12px; border-left: 3px solid #e81a7f; background: #fdf2f8; }
+.ldm-admin-status, .ldm-admin-gstatus { color: #646970; }
 .ldm-admin-map { height: 360px; border: 1px solid #c3c4c7; border-radius: 4px; cursor: crosshair; }
 .ldm-admin-map .leaflet-marker-draggable { cursor: move; }
