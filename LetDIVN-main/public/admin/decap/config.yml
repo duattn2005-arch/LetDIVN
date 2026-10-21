@@ -1,0 +1,764 @@
+# Decap CMS (/admin/decap/) — the text and images of every page, Cleanup Map
+# events, News, Videos, Partners, Team, What We Do, Who We Are
+# sections and Media on Us. The site itself has no login.
+# This file also describes the collections and fields of the WordPress-style
+# editor at /admin/ (server/routes/wpAdmin.ts reads it), which commits to the
+# same files — so both editors always show the same content.
+# Every save is a commit to the GitHub repo below; the live site reads the
+# content from GitHub (server/cmsContent.ts), so there is no rebuild step.
+#
+# Paths are relative to the REPO root, which contains this app in LetDIVN-main/.
+
+backend:
+  name: github
+  repo: duattn2005-arch/LetDIVN
+  branch: main
+  # GitHub login goes through our own server (server/routes/decapAuth.ts).
+  base_url: https://letsdoitvietnam.online
+  auth_endpoint: api/decap/auth
+  auth_scope: public_repo
+  commit_messages:
+    create: 'Thêm {{collection}}: {{slug}}'
+    update: 'Sửa {{collection}}: {{slug}}'
+    delete: 'Xóa {{collection}}: {{slug}}'
+    uploadMedia: 'Tải ảnh: {{path}}'
+    deleteMedia: 'Xóa ảnh: {{path}}'
+
+# On localhost only: edit the files on disk instead of GitHub.
+# Run `npx decap-server` from the repo root alongside `npm run dev`.
+local_backend: true
+
+locale: vi
+site_url: https://letsdoitvietnam.online
+display_url: https://letsdoitvietnam.online
+
+# Uploads go to public/images/cms/ (News keeps its own folder, see below).
+media_folder: LetDIVN-main/public/images/cms
+public_folder: /images/cms
+
+# Vietnamese titles -> plain ascii file names (e.g. "Ngày hội" -> "ngay-hoi").
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  # --- Text and images of every page. Each file is one page; the field names
+  # map to the contentKey of EditableText / EditableImage in the code
+  # (e.g. whoWeAre.json -> heroTitle = "whoWeAre.heroTitle").
+  # A field left empty shows the text built into the code.
+  - name: pages
+    label: Nội dung các trang
+    label_singular: trang
+    description: Chữ và ảnh trên từng trang của website. Bấm vào một trang, sửa rồi bấm Publish.
+    media_folder: /LetDIVN-main/public/images/cms
+    public_folder: /images/cms
+    editor:
+      preview: false
+    files:
+      - label: "Đầu trang (dòng chữ chạy & menu Other)"
+        name: "header"
+        file: LetDIVN-main/content/page-content/header.json
+        fields:
+          - { label: "Top Announcement", name: "topAnnouncement", widget: text, required: false }
+          - { label: "Top Tagline", name: "topTagline", widget: text, required: false }
+          - { label: "Other Media Label", name: "otherMediaLabel", widget: string, required: false }
+          - { label: "Other News Label", name: "otherNewsLabel", widget: string, required: false }
+      - label: "Trang chủ · Banner"
+        name: "hero"
+        file: LetDIVN-main/content/page-content/hero.json
+        fields:
+          - label: "Slide 1"
+            name: "slide1"
+            widget: object
+            collapsed: true
+            summary: "{{fields.est}}"
+            fields:
+              - { label: "Ảnh banner", name: "bgImage", widget: image, required: false, choose_url: true }
+              - { label: "Dòng \"EST.\"", name: "est", widget: string, required: false }
+      - label: "Trang chủ · Ô liên kết & Tin tức"
+        name: "home"
+        file: LetDIVN-main/content/page-content/home.json
+        fields:
+          - label: "Ô liên kết"
+            name: "quickLinks"
+            widget: object
+            collapsed: true
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Tiêu đề", name: "title", widget: string, required: false }
+              - { label: "Who We Are Image", name: "whoWeAreImage", widget: image, required: false, choose_url: true }
+              - { label: "Who We Are Label", name: "whoWeAreLabel", widget: string, required: false }
+              - { label: "What We Do Image", name: "whatWeDoImage", widget: image, required: false, choose_url: true }
+              - { label: "What We Do Label", name: "whatWeDoLabel", widget: string, required: false }
+              - { label: "Our Partners Image", name: "ourPartnersImage", widget: image, required: false, choose_url: true }
+              - { label: "Our Partners Label", name: "ourPartnersLabel", widget: string, required: false }
+              - { label: "Media On Us Image", name: "mediaOnUsImage", widget: image, required: false, choose_url: true }
+              - { label: "Media On Us Label", name: "mediaOnUsLabel", widget: string, required: false }
+              - { label: "News Title", name: "newsTitle", widget: string, required: false }
+              - label: "Tin hiển thị ở trang chủ"
+                name: "selectedNews"
+                widget: relation
+                collection: news
+                value_field: "{{slug}}"
+                search_fields: [title]
+                display_fields: [title]
+                multiple: true
+                required: false
+                hint: "Chọn các bài muốn hiện ở trang chủ, theo thứ tự. Để trống = tự động lấy các bài mới nhất."
+      - label: "Trang chủ · Giới thiệu phong trào"
+        name: "about"
+        file: LetDIVN-main/content/page-content/about.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Đoạn 2", name: "p1", widget: text, required: false }
+          - { label: "Đoạn 3", name: "p2", widget: text, required: false }
+          - label: "Số liệu 2"
+            name: "stat2"
+            widget: object
+            collapsed: true
+            summary: "{{fields.number}}"
+            fields:
+              - { label: "Ảnh", name: "img", widget: image, required: false, choose_url: true }
+              - { label: "Con số", name: "number", widget: string, required: false }
+              - { label: "Tiêu đề", name: "title", widget: string, required: false }
+              - { label: "Dòng phụ", name: "sub", widget: string, required: false }
+          - label: "Số liệu 3"
+            name: "stat3"
+            widget: object
+            collapsed: true
+            summary: "{{fields.number}}"
+            fields:
+              - { label: "Ảnh", name: "img", widget: image, required: false, choose_url: true }
+              - { label: "Con số", name: "number", widget: string, required: false }
+              - { label: "Tiêu đề", name: "title", widget: string, required: false }
+              - { label: "Dòng phụ", name: "sub", widget: string, required: false }
+      - label: "Trang chủ · Tham gia"
+        name: "getInvolved"
+        file: LetDIVN-main/content/page-content/getInvolved.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: string, required: false }
+      - label: "Trang Who We Are"
+        name: "whoWeAre"
+        file: LetDIVN-main/content/page-content/whoWeAre.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Giới thiệu", name: "intro", widget: text, required: false }
+          - { label: "Value1 Title", name: "value1Title", widget: string, required: false }
+          - { label: "Value1 Desc", name: "value1Desc", widget: text, required: false }
+          - { label: "Value2 Title", name: "value2Title", widget: string, required: false }
+          - { label: "Value2 Desc", name: "value2Desc", widget: text, required: false }
+          - { label: "Value3 Title", name: "value3Title", widget: string, required: false }
+          - { label: "Value3 Desc", name: "value3Desc", widget: text, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Sustainability Title", name: "sustainabilityTitle", widget: string, required: false }
+          - { label: "Sustainability Desc", name: "sustainabilityDesc", widget: text, required: false }
+          - { label: "Sustainability Image", name: "sustainabilityImage", widget: image, required: false, choose_url: true }
+          - { label: "Began Title", name: "beganTitle", widget: string, required: false }
+          - { label: "Began Desc", name: "beganDesc", widget: text, required: false }
+          - { label: "Today Title", name: "todayTitle", widget: string, required: false }
+          - { label: "Today Desc", name: "todayDesc", widget: text, required: false }
+          - { label: "Today Image", name: "todayImage", widget: image, required: false, choose_url: true }
+      - label: "Trang What We Do"
+        name: "whatWeDo"
+        file: LetDIVN-main/content/page-content/whatWeDo.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Mission Subtitle", name: "missionSubtitle", widget: text, required: false }
+          - { label: "Difference Subtitle", name: "differenceSubtitle", widget: string, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
+          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
+          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
+          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
+          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
+          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
+          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
+          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+      - label: "Trang Our Team"
+        name: "ourTeam"
+        file: LetDIVN-main/content/page-content/ourTeam.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
+          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
+          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
+          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
+          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
+          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
+          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
+          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+      - label: "Trang Our Partners"
+        name: "ourPartners"
+        file: LetDIVN-main/content/page-content/ourPartners.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: string, required: false }
+          - { label: "Mô tả", name: "desc", widget: text, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
+          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
+          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
+          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
+          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
+          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
+          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
+          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+      - label: "Trang Cleanup Map"
+        name: "cleanupMap"
+        file: LetDIVN-main/content/page-content/cleanupMap.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "Mobile Tab Map", name: "mobileTabMap", widget: string, required: false }
+          - { label: "Mobile Tab List", name: "mobileTabList", widget: string, required: false }
+          - { label: "Location Label", name: "locationLabel", widget: string, required: false }
+          - { label: "Featured Spots Label", name: "featuredSpotsLabel", widget: string, required: false }
+          - { label: "Tap To Zoom Hint", name: "tapToZoomHint", widget: string, required: false }
+          - { label: "Layer Streets", name: "layerStreets", widget: string, required: false }
+          - { label: "Layer Satellite", name: "layerSatellite", widget: string, required: false }
+          - { label: "Layer Terrain", name: "layerTerrain", widget: string, required: false }
+          - { label: "Clear Boundary Btn", name: "clearBoundaryBtn", widget: string, required: false }
+          - { label: "Locating Label", name: "locatingLabel", widget: string, required: false }
+          - { label: "Boundary Drawn Hint", name: "boundaryDrawnHint", widget: text, required: false }
+          - { label: "Suggestions Header", name: "suggestionsHeader", widget: string, required: false }
+          - { label: "Pinned Label", name: "pinnedLabel", widget: string, required: false }
+          - { label: "View Project Btn", name: "viewProjectBtn", widget: string, required: false }
+          - { label: "Register Btn", name: "registerBtn", widget: string, required: false }
+      - label: "Trang News"
+        name: "newsPage"
+        file: LetDIVN-main/content/page-content/newsPage.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Title Default", name: "titleDefault", widget: string, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
+          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
+          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
+          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
+          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
+          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
+          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
+          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+          - { label: "Read More Btn", name: "readMoreBtn", widget: string, required: false }
+          - { label: "Back To List Btn", name: "backToListBtn", widget: string, required: false }
+          - { label: "Source Original Label", name: "sourceOriginalLabel", widget: string, required: false }
+          - { label: "Default Source Label", name: "defaultSourceLabel", widget: string, required: false }
+          - { label: "Title Media", name: "titleMedia", widget: string, required: false }
+      - label: "Trang Media on Us"
+        name: "mediaOnUsPage"
+        file: LetDIVN-main/content/page-content/mediaOnUsPage.json
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: image, required: false, choose_url: true }
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "Strip Image1", name: "stripImage1", widget: image, required: false, choose_url: true }
+          - { label: "Strip Image2", name: "stripImage2", widget: image, required: false, choose_url: true }
+          - { label: "Card1 Title", name: "card1Title", widget: string, required: false }
+          - { label: "Card1 Desc", name: "card1Desc", widget: text, required: false }
+          - { label: "Card2 Title", name: "card2Title", widget: string, required: false }
+          - { label: "Card2 Desc", name: "card2Desc", widget: text, required: false }
+          - { label: "Card3 Title", name: "card3Title", widget: string, required: false }
+          - { label: "Card3 Desc", name: "card3Desc", widget: text, required: false }
+          - { label: "Card4 Title", name: "card4Title", widget: string, required: false }
+          - { label: "Card4 Desc", name: "card4Desc", widget: text, required: false }
+      - label: "Trang Videos"
+        name: "videosPage"
+        file: LetDIVN-main/content/page-content/videosPage.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+      - label: "Trang Contact"
+        name: "contactPage"
+        file: LetDIVN-main/content/page-content/contactPage.json
+        fields:
+          - { label: "Tiêu đề", name: "title", widget: string, required: false }
+          - { label: "Tiêu đề phụ", name: "subtitle", widget: text, required: false }
+          - { label: "Find Us Title", name: "findUsTitle", widget: string, required: false }
+          - { label: "Email Label", name: "emailLabel", widget: string, required: false }
+          - { label: "Phone Label1", name: "phoneLabel1", widget: string, required: false }
+          - { label: "Phone Label2", name: "phoneLabel2", widget: string, required: false }
+          - { label: "Form Title", name: "formTitle", widget: string, required: false }
+          - { label: "Name Label", name: "nameLabel", widget: string, required: false }
+          - { label: "Email Field Label", name: "emailFieldLabel", widget: string, required: false }
+          - { label: "Phone Field Label", name: "phoneFieldLabel", widget: string, required: false }
+          - { label: "Subject Label", name: "subjectLabel", widget: string, required: false }
+          - { label: "Message Label", name: "messageLabel", widget: string, required: false }
+          - { label: "Submit Btn", name: "submitBtn", widget: string, required: false }
+          - { label: "Thank You Title", name: "thankYouTitle", widget: string, required: false }
+          - { label: "Thank You Msg Prefix", name: "thankYouMsgPrefix", widget: string, required: false }
+          - { label: "Thank You Msg Suffix", name: "thankYouMsgSuffix", widget: string, required: false }
+          - { label: "Send Another Btn", name: "sendAnotherBtn", widget: string, required: false }
+      - label: "Thông tin liên hệ (chân trang & trang Contact)"
+        name: "contact"
+        file: LetDIVN-main/content/page-content/contact.json
+        fields:
+          - { label: "Phone1", name: "phone1", widget: string, required: false }
+          - { label: "Phone2", name: "phone2", widget: string, required: false }
+          - { label: "Email", name: "email", widget: string, required: false }
+      - label: "Nút liên hệ nổi (góc phải)"
+        name: "contactBubble"
+        file: LetDIVN-main/content/page-content/contactBubble.json
+        fields:
+          - { label: "Fb Label", name: "fbLabel", widget: string, required: false }
+          - { label: "Fb Handle", name: "fbHandle", widget: string, required: false }
+          - { label: "Ig Label", name: "igLabel", widget: string, required: false }
+          - { label: "Ig Handle", name: "igHandle", widget: string, required: false }
+          - { label: "Hotline1 Label", name: "hotline1Label", widget: string, required: false }
+          - { label: "Hotline1 Number", name: "hotline1Number", widget: string, required: false }
+          - { label: "Hotline2 Label", name: "hotline2Label", widget: string, required: false }
+          - { label: "Hotline2 Number", name: "hotline2Number", widget: string, required: false }
+          - { label: "Email Label", name: "emailLabel", widget: string, required: false }
+          - { label: "Email Address", name: "emailAddress", widget: string, required: false }
+      - label: "Chân trang"
+        name: "footer"
+        file: LetDIVN-main/content/page-content/footer.json
+        fields:
+          - { label: "Mô tả", name: "desc", widget: text, required: false }
+          - { label: "Address", name: "address", widget: string, required: false }
+
+
+  # --- The five project story pages (/world-cleanup-day/, /wildlife-nature/,
+  # ...) in content/project-pages/, whose sections, paragraphs and photos can
+  # be added, removed and reordered.
+  - name: projects
+    label: Dự án
+    label_singular: dự án
+    description: Chữ và ảnh của các trang dự án (World Cleanup Day, YCSW, Green Ocean...). Sự kiện theo ngày nằm ở mục "Sự kiện (Cleanup Map)".
+    media_folder: /LetDIVN-main/public/images/cms
+    public_folder: /images/cms
+    editor:
+      preview: false
+    files:
+      - label: "Dự án · World Cleanup Day"
+        name: "world-cleanup-day"
+        file: LetDIVN-main/content/project-pages/world-cleanup-day.json
+        fields: &projectPageFields
+          # Which events use this page (CleanupEvent.category); not editable.
+          - { label: Dự án, name: category, widget: hidden }
+          - { label: Ảnh bìa, name: hero, widget: image, choose_url: true }
+          - { label: Vị trí cắt ảnh bìa, name: heroPosition, widget: string, required: false, hint: 'Ví dụ "50% 30%" (ngang, dọc). Để trống = giữa ảnh.' }
+          - { label: Dòng chữ nhỏ trên tiêu đề, name: kicker, widget: string, required: false }
+          - { label: Tiêu đề trang, name: title, widget: string }
+          - { label: Màu tiêu đề, name: titleColor, widget: string, required: false, hint: 'Mã màu, ví dụ #F1138D. Để trống = hồng.' }
+          - label: Các phần
+            name: sections
+            widget: list
+            label_singular: phần
+            summary: '{{fields.heading}}{{fields.personListItem}} {{fields.paragraphs | truncate(90)}}'
+            hint: 'Mỗi phần là một dải trên trang. Bấm "Add phần" để thêm, bấm vào một phần để sửa, kéo để đổi thứ tự.'
+            fields:
+              - { label: Tiêu đề phần, name: heading, widget: string, required: false }
+              - { label: Tiêu đề to ở giữa (kiểu tiêu đề trang), name: headingAsTitle, widget: boolean, default: false, required: false }
+              - label: Đoạn văn
+                name: paragraphs
+                widget: list
+                label_singular: đoạn
+                required: false
+                field: { label: Đoạn văn, name: paragraph, widget: text }
+              - { label: Hiện đoạn văn dạng gạch đầu dòng, name: bulletList, widget: boolean, default: false, required: false }
+              - label: Căn lề đoạn văn
+                name: textAlign
+                widget: select
+                required: false
+                options:
+                  - { label: 'Trái', value: left }
+                  - { label: 'Giữa', value: center }
+                  - { label: 'Đều hai bên', value: justify }
+              - { label: Ảnh bên cạnh chữ, name: image, widget: image, choose_url: true, required: false, hint: 'Có ảnh thì phần hiện ảnh + chữ cạnh nhau (trái/phải xen kẽ).' }
+              - label: Bộ ảnh bên dưới
+                name: gallery
+                widget: list
+                label_singular: ảnh
+                required: false
+                field: { label: Ảnh, name: image, widget: image, choose_url: true }
+              - &galleryAspect
+                label: Tỉ lệ ảnh trong bộ ảnh
+                name: galleryAspect
+                widget: select
+                required: false
+                options:
+                  - { label: '3:2 (mặc định)', value: '3/2' }
+                  - { label: '4:3', value: '4/3' }
+                  - { label: 'Vuông', value: square }
+                  - { label: 'Ảnh ngang dài (7:2)', value: '7/2' }
+              - label: Hai cột cạnh nhau
+                name: columns
+                widget: list
+                label_singular: cột
+                required: false
+                summary: '{{fields.heading}}'
+                fields:
+                  - { label: Tiêu đề cột, name: heading, widget: string, required: false }
+                  - label: Các dòng
+                    name: paragraphs
+                    widget: list
+                    label_singular: dòng
+                    field: { label: Dòng, name: paragraph, widget: text }
+              - label: Khối con (tiêu đề đậm + đoạn văn + ảnh)
+                name: subBlocks
+                widget: list
+                label_singular: khối
+                required: false
+                summary: '{{fields.title}}'
+                fields:
+                  - { label: Tiêu đề đậm, name: title, widget: string, required: false }
+                  - { label: Đoạn văn, name: text, widget: text, required: false }
+                  - label: Bộ ảnh
+                    name: gallery
+                    widget: list
+                    label_singular: ảnh
+                    required: false
+                    field: { label: Ảnh, name: image, widget: image, choose_url: true }
+                  - *galleryAspect
+              - label: Đoạn kết
+                name: closingParagraphs
+                widget: list
+                label_singular: đoạn
+                required: false
+                hint: 'Đoạn đầu hiện trước danh sách gạch đầu dòng bên dưới, các đoạn sau hiện sau nó.'
+                field: { label: Đoạn văn, name: paragraph, widget: text }
+              - { label: Dòng giới thiệu danh sách kết, name: closingBulletsLabel, widget: string, required: false }
+              - label: Danh sách gạch đầu dòng kết
+                name: closingBullets
+                widget: list
+                label_singular: dòng
+                required: false
+                field: { label: Dòng, name: bullet, widget: text }
+              - { label: Chỉ một dòng tên (có biểu tượng người), name: personListItem, widget: string, required: false, hint: 'Dùng cho danh sách đơn vị tham gia. Điền ô này thì phần chỉ hiện đúng một dòng.' }
+              - label: Nền
+                name: band
+                widget: select
+                required: false
+                hint: 'Để trống = tự xen kẽ xám/trắng.'
+                options:
+                  - { label: 'Xám', value: gray }
+                  - { label: 'Trắng', value: white }
+      - label: "Dự án · Environmental Day"
+        name: "environmental-day"
+        file: LetDIVN-main/content/project-pages/environmental-day.json
+        fields: *projectPageFields
+      - label: "Dự án · Green Ocean Campaign"
+        name: "green-ocean-campaign"
+        file: LetDIVN-main/content/project-pages/green-ocean-campaign.json
+        fields: *projectPageFields
+      - label: "Dự án · Young Conservationists Save The Wildlife"
+        name: "wildlife-nature"
+        file: LetDIVN-main/content/project-pages/wildlife-nature.json
+        fields: *projectPageFields
+      - label: "Dự án · Community Workshop"
+        name: "workshop-education"
+        file: LetDIVN-main/content/project-pages/workshop-education.json
+        fields: *projectPageFields
+
+  - name: news
+    label: Tin tức
+    label_singular: bài viết
+    description: Các bài viết hiển thị ở trang News của website.
+    folder: LetDIVN-main/content/news
+    media_folder: /LetDIVN-main/public/images/news
+    public_folder: /images/news
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: title
+    summary: '{{date}} · {{title}}'
+    sortable_fields: [date, title]
+    fields:
+      # Original database id of migrated articles (homepage picker stores ids).
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - label: Chuyên mục
+        name: category
+        widget: select
+        default: News
+        options:
+          - { label: 'Tin tức (News)', value: 'News' }
+          - { label: 'Báo chí viết về chúng tôi (Media On Us)', value: 'Media On Us' }
+          - { label: 'Thông cáo báo chí (Press Release)', value: 'Press Release' }
+          - { label: 'Câu chuyện tác động (Impact Story)', value: 'Impact Story' }
+      - label: Ngày đăng
+        name: date
+        widget: datetime
+        format: 'YYYY-MM-DD'
+        date_format: 'DD/MM/YYYY'
+        time_format: false
+      - { label: Tác giả, name: author, widget: string, required: false }
+      - { label: Ảnh đại diện, name: image, widget: image, hint: 'Ảnh hiển thị trên thẻ bài viết.' }
+      - { label: Tóm tắt, name: summary, widget: text, hint: 'Vài câu ngắn hiển thị dưới tiêu đề trong danh sách bài viết.' }
+      - label: Nội dung
+        name: contentBlocks
+        widget: list
+        label_singular: khối
+        hint: 'Thêm đoạn văn và ảnh theo đúng thứ tự muốn hiển thị. Kéo để sắp xếp lại.'
+        types:
+          - label: Đoạn văn
+            name: text
+            widget: object
+            summary: '{{fields.value}}'
+            fields:
+              - { label: Đoạn văn, name: value, widget: text }
+          # Paragraphs with bold/headings/lists, written in the WordPress-style editor at /admin/.
+          - label: Đoạn văn có định dạng (HTML)
+            name: html
+            widget: object
+            summary: '{{fields.value}}'
+            fields:
+              - { label: HTML, name: value, widget: text }
+          - label: Ảnh
+            name: image
+            widget: object
+            summary: '{{fields.value}}'
+            fields:
+              - { label: Ảnh, name: value, widget: image }
+      - { label: Nguồn (tên báo), name: source, widget: string, required: false }
+      - { label: Link bài gốc, name: sourceUrl, widget: string, required: false }
+      - { label: Nổi bật, name: featured, widget: boolean, default: false, required: false }
+      - label: Trạng thái
+        name: status
+        widget: select
+        default: Published
+        options:
+          - { label: 'Đã đăng', value: 'Published' }
+          - { label: 'Chờ duyệt (chỉ admin thấy)', value: 'Pending' }
+      - { label: Thẻ, name: tags, widget: list, required: false, hint: 'Các thẻ, phân cách bằng dấu phẩy.' }
+      # SEO: the page title / description search engines and Facebook show for /news/<slug>/.
+      - { label: Cụm từ khóa chính (SEO), name: seoKeyphrase, widget: string, required: false }
+      - { label: Tiêu đề SEO, name: seoTitle, widget: string, required: false, hint: 'Để trống = dùng tiêu đề bài viết.' }
+      - { label: Mô tả meta (SEO), name: seoDescription, widget: text, required: false, hint: 'Để trống = dùng phần tóm tắt.' }
+
+  - name: events
+    label: Sự kiện (Cleanup Map)
+    label_singular: sự kiện
+    description: Các sự kiện / điểm dọn rác hiện trên Cleanup Map, trang Projects và nút đăng ký tình nguyện viên.
+    folder: LetDIVN-main/content/events
+    media_folder: /LetDIVN-main/public/images/cms
+    public_folder: /images/cms
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{date}} · {{city}} · {{title}}'
+    sortable_fields: [order, date, title]
+    editor:
+      preview: false
+    fields:
+      # Original database id of migrated events: volunteer sign-ups and links use it.
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tên sự kiện, name: title, widget: string }
+      - label: Dự án
+        name: category
+        widget: select
+        default: World Cleanup Day
+        options:
+          - World Cleanup Day
+          - Environmental Day
+          - Green Ocean Campaign
+          - { label: 'Young Conservationists Save The Wildlife', value: 'Wildlife & Nature' }
+          - { label: 'Community Workshop', value: 'Workshop & Education' }
+      - label: Trạng thái
+        name: status
+        widget: select
+        default: Upcoming
+        options:
+          - { label: 'Sắp diễn ra', value: 'Upcoming' }
+          - { label: 'Đang diễn ra', value: 'Ongoing' }
+          - { label: 'Đã kết thúc', value: 'Completed' }
+      - { label: Ngày, name: date, widget: datetime, format: 'YYYY-MM-DD', date_format: 'DD/MM/YYYY', time_format: false }
+      - { label: Giờ, name: time, widget: string, required: false, hint: 'Ví dụ: 07:00 - 11:30' }
+      - { label: Địa điểm, name: location, widget: string }
+      - { label: Tỉnh / thành phố, name: city, widget: string, hint: 'Dùng để tạo link trang chiến dịch, ví dụ "Da Nang" -> /explore-campaigns/da-nang/' }
+      - label: Tọa độ trên bản đồ
+        name: coordinates
+        widget: object
+        required: false
+        hint: 'Mở Google Maps, chuột phải vào điểm rồi bấm vào dòng số đầu tiên để copy (vĩ độ, kinh độ).'
+        fields:
+          - { label: Vĩ độ (lat), name: lat, widget: number, value_type: float, required: false }
+          - { label: Kinh độ (lng), name: lng, widget: number, value_type: float, required: false }
+      - { label: Link Google Maps, name: googleMapsUrl, widget: string, required: false }
+      - { label: Ảnh, name: image, widget: image, choose_url: true }
+      - { label: Ảnh banner, name: bannerImage, widget: image, choose_url: true, required: false }
+      - { label: Mô tả, name: description, widget: text }
+      - { label: Số tình nguyện viên cần, name: targetVolunteers, widget: number, value_type: int, default: 100 }
+      - { label: Rác thu gom (kg), name: trashCollectedKg, widget: number, value_type: int, default: 0, required: false }
+      - { label: Trưởng nhóm, name: leader, widget: string, required: false }
+      - { label: Điểm tập trung, name: meetingPoint, widget: string, required: false }
+      - { label: Link Google Sheet riêng, name: sheetUrl, widget: string, required: false, hint: 'Để trống để dùng Google Sheet chung.' }
+      - label: Lịch trình
+        name: schedule
+        widget: list
+        required: false
+        label_singular: mốc
+        summary: '{{fields.time}} · {{fields.activity}}'
+        fields:
+          - { label: Giờ, name: time, widget: string }
+          - { label: Hoạt động, name: activity, widget: string }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  # --- Lists below are shown in the order of the "Thứ tự" (order) field, smallest first.
+
+  - name: videos
+    label: Videos
+    label_singular: video
+    description: Video YouTube ở mục "Capturing Change, One Frame at a Time".
+    folder: LetDIVN-main/content/videos
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Link YouTube, name: youtube, widget: string, hint: 'Dán link dạng https://www.youtube.com/watch?v=... hoặc https://youtu.be/...' }
+      - { label: Thứ tự, name: order, widget: number, default: 0, value_type: int, hint: 'Số nhỏ hiện trước. Để 0 để video mới lên đầu.' }
+      - { label: Ngày thêm, name: addedAt, widget: hidden, required: false }
+
+  - name: partners
+    label: Đối tác
+    label_singular: đối tác
+    description: Logo đối tác ở trang Our Partners.
+    folder: LetDIVN-main/content/partners
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{name}}'
+    identifier_field: name
+    summary: '{{order}} · {{name}}'
+    sortable_fields: [order, name]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tên, name: name, widget: string }
+      - { label: Logo, name: logo, widget: image }
+      - { label: Website, name: website, widget: string, required: false }
+      - label: Hạng
+        name: tier
+        widget: select
+        default: Community
+        options: [Diamond, Gold, Silver, Community, Media]
+      - { label: Loại hình, name: type, widget: string, required: false, hint: 'Ví dụ: Corporate, NGO, University' }
+      - { label: Mô tả, name: description, widget: text, required: false }
+      - { label: Năm bắt đầu hợp tác, name: joinedYear, widget: number, value_type: int, required: false }
+      - { label: Tỉ lệ logo (%), name: scale, widget: number, value_type: int, default: 100, min: 50, max: 180, required: false, hint: 'Phóng to/thu nhỏ logo. 100 = kích thước chuẩn.' }
+      - { label: Thứ tự, name: order, widget: number, default: 0, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: team
+    label: Đội ngũ
+    label_singular: thành viên
+    description: Thành viên ở trang Our Team.
+    folder: LetDIVN-main/content/team
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{name}}'
+    identifier_field: name
+    summary: '{{order}} · {{name}} — {{role}}'
+    sortable_fields: [order, name]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Họ tên, name: name, widget: string }
+      - { label: Chức vụ, name: role, widget: string }
+      - { label: Ảnh, name: avatar, widget: image }
+      - { label: Bộ phận, name: department, widget: string, required: false }
+      - { label: Giới thiệu, name: bio, widget: text, required: false }
+      - { label: LinkedIn, name: linkedin, widget: string, required: false }
+      - { label: Facebook, name: facebook, widget: string, required: false }
+      - { label: Email, name: email, widget: string, required: false }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: what-we-do
+    label: What We Do
+    label_singular: hoạt động
+    description: Các khối ảnh + chữ ở trang What We Do.
+    folder: LetDIVN-main/content/what-we-do
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Nội dung, name: desc, widget: text }
+      - { label: Ảnh, name: image, widget: image }
+      - label: Vị trí ảnh
+        name: layout
+        widget: select
+        default: image-left
+        options:
+          - { label: 'Ảnh bên trái', value: image-left }
+          - { label: 'Ảnh bên phải', value: image-right }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: who-we-are
+    label: Who We Are
+    label_singular: mục
+    description: Các khối ảnh + chữ bổ sung ở cuối trang Who We Are.
+    folder: LetDIVN-main/content/who-we-are
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Nội dung, name: desc, widget: text }
+      - { label: Ảnh, name: image, widget: image }
+      - label: Vị trí ảnh
+        name: layout
+        widget: select
+        default: image-left
+        options:
+          - { label: 'Ảnh bên trái', value: image-left }
+          - { label: 'Ảnh bên phải', value: image-right }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }
+
+  - name: media-coverage
+    label: Media on Us
+    label_singular: mục báo chí
+    description: Các năm báo chí đưa tin ở trang Media on Us.
+    folder: LetDIVN-main/content/media-coverage
+    format: json
+    extension: json
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}}'
+    sortable_fields: [order, title]
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Tiêu đề (chữ trên nút), name: title, widget: string }
+      - { label: Ảnh, name: image, widget: image }
+      - { label: Số bài báo, name: articleCount, widget: number, value_type: int, default: 0 }
+      - { label: Số phóng sự, name: segmentCount, widget: number, value_type: int, default: 0 }
+      - { label: File PDF / link tổng hợp, name: pdfUrl, widget: file, hint: 'Tải file PDF lên hoặc dán link.' }
+      - { label: Thứ tự, name: order, widget: number, default: 99, value_type: int, hint: 'Số nhỏ hiện trước.' }

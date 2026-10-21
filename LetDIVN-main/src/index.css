@@ -1,0 +1,416 @@
+@import "tailwindcss";
+
+html, body, #root {
+  overflow-x: clip !important;
+  max-width: 100vw;
+  width: 100%;
+  position: relative;
+  scroll-behavior: smooth;
+  background-color: #fafbfc;
+  color: #1e293b;
+}
+
+/* Prevent awkward single-word wrapping on mobile */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+
+/* Reference-site typography (letsdoitvietnam.org): brand pink section
+   titles use "Chau Philomene One", body copy uses "Poppins". */
+.ref-heading {
+  font-family: 'Chau Philomene One', sans-serif;
+  font-weight: 500;
+}
+
+.ref-body {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Pink section titles, sized like letsdoitvietnam.org — the same size on
+   phones, line height equal to the font size. */
+.ref-title-xl { font-size: 45px; line-height: 1; text-wrap: balance; }
+.ref-title-lg { font-size: 40px; line-height: 1; text-wrap: balance; }
+.ref-title-md { font-size: 30px; line-height: 1; text-wrap: balance; }
+
+/* Body text of the content sections, as on letsdoitvietnam.org: 18px grey. */
+.ref-text { font-family: 'Poppins', sans-serif; font-size: 18px; line-height: 30px; color: #7A7A7A; }
+
+/* Formatted text written in the admin editor: news paragraphs (NewsContentBlock
+   type "html") and any multi-line page field once it has formatting (RichText). */
+.news-html > * + *, .rich-text > * + * { margin-top: 1em; }
+.news-html h2, .rich-text h2 { font-size: 1.5em; font-weight: 700; color: #54595F; }
+.news-html h3, .rich-text h3 { font-size: 1.25em; font-weight: 700; color: #54595F; }
+.news-html h4, .rich-text h4 { font-size: 1.1em; font-weight: 700; color: #54595F; }
+.news-html ul, .rich-text ul { list-style: disc; padding-left: 1.5em; }
+.news-html ol, .rich-text ol { list-style: decimal; padding-left: 1.5em; }
+.news-html li + li, .rich-text li + li { margin-top: 0.25em; }
+.news-html blockquote, .rich-text blockquote { border-left: 4px solid #E81A7F; padding-left: 1em; font-style: italic; }
+.news-html a, .rich-text a { color: #E81A7F; text-decoration: underline; }
+.news-html hr, .rich-text hr { border-top: 1px solid #e2e8f0; }
+.news-html h1, .rich-text h1 { font-size: 1.8em; font-weight: 700; color: #54595F; }
+.news-html h5, .news-html h6, .rich-text h5, .rich-text h6 { font-size: 1em; font-weight: 700; color: #54595F; }
+.news-html pre, .rich-text pre { white-space: pre-wrap; font-family: monospace; font-size: 0.85em; background: #f8fafc; padding: 0.75em 1em; }
+.news-html img, .rich-text img { max-width: 100%; height: auto; display: inline-block; }
+.news-html .alignleft, .rich-text .alignleft { float: left; margin: 0.3em 1.4em 0.8em 0; }
+.news-html .alignright, .rich-text .alignright { float: right; margin: 0.3em 0 0.8em 1.4em; }
+.news-html .aligncenter, .rich-text .aligncenter { display: block; margin-left: auto; margin-right: auto; }
+.news-html::after, div.rich-text::after { content: ''; display: table; clear: both; }
+.news-html figure.image, .rich-text figure.image { display: table; margin-left: auto; margin-right: auto; }
+.news-html figure.image figcaption, .rich-text figure.image figcaption { display: table-caption; caption-side: bottom; text-align: center; font-size: 0.8em; color: #94a3b8; padding-top: 0.4em; }
+.news-html table, .rich-text table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+.news-html td, .news-html th, .rich-text td, .rich-text th { border: 1px solid #e2e8f0; padding: 0.4em 0.6em; vertical-align: top; }
+.news-html th, .rich-text th { background: #f8fafc; font-weight: 600; }
+
+/* Reference-site News card typography (letsdoitvietnam.org/news/) */
+.ref-news-title {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  color: #54595F;
+}
+
+.ref-news-date {
+  font-family: 'Roboto Slab', serif;
+  color: #ADADAD;
+}
+
+.ref-news-readmore {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: #61CE70;
+}
+
+/* Mobile responsive smooth touch */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================================
+   1. MULTI-LAYER GLASSMORPHISM & 3D CARDS
+   ========================================================================= */
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 
+              0 20px 40px -15px rgba(232, 26, 127, 0.08);
+}
+
+.glass-card-dark {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.35);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(232, 26, 127, 0.15);
+}
+
+.card-3d,
+article,
+.grid > div.rounded-2xl,
+.grid > div.rounded-3xl,
+.grid > div.rounded-xl {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
+}
+
+.card-3d:hover,
+article:hover,
+.grid > div.rounded-2xl:hover,
+.grid > div.rounded-3xl:hover,
+.grid > div.rounded-xl:hover {
+  transform: translateY(-5px) scale(1.008);
+  box-shadow: 0 24px 45px -10px rgba(232, 26, 127, 0.18), 
+              0 12px 25px -6px rgba(15, 23, 42, 0.07);
+}
+
+/* =========================================================================
+   2. IMAGE ZOOM & 3D PARALLAX EFFECT
+   ========================================================================= */
+.group img,
+.card-image img,
+article img {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+  will-change: transform;
+}
+
+.group:hover img,
+.card-image:hover img,
+article:hover img {
+  transform: scale(1.06) rotate(0.5deg);
+}
+
+/* =========================================================================
+   3. 3D PILL BUTTONS WITH SHIMMER SWEEP & NEON HALO
+   ========================================================================= */
+.btn-pill-3d {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 6px 18px -2px rgba(232, 26, 127, 0.35),
+              inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.btn-pill-3d::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  transform: rotate(25deg);
+  transition: all 0.75s ease;
+  pointer-events: none;
+}
+
+.btn-pill-3d:hover::after {
+  left: 130%;
+}
+
+.btn-pill-3d:hover {
+  transform: translateY(-2.5px) scale(1.02);
+  box-shadow: 0 10px 25px -2px rgba(232, 26, 127, 0.55),
+              0 0 20px rgba(232, 26, 127, 0.35);
+}
+
+.btn-pill-3d:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Generic button hover enhancement */
+button,
+a.inline-flex {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+}
+
+button.bg-\[\#E81A7F\]:hover,
+button[class*="bg-pink-"]:hover {
+  box-shadow: 0 0 22px rgba(232, 26, 127, 0.45), 
+              0 8px 18px -4px rgba(232, 26, 127, 0.3);
+}
+
+/* 4.2 Lush Green Eco Gradient (Xanh Trồng Cây / Bảo Vệ Rừng) */
+.gradient-text-emerald {
+  background: linear-gradient(135deg, #059669 0%, #10B981 30%, #34D399 50%, #84CC16 75%, #059669 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s ease infinite;
+}
+
+/* 4.3 Ocean Clean Gradient (Xanh Đại Dương) */
+.gradient-text-ocean {
+  background: linear-gradient(135deg, #0284C7 0%, #06B6D4 30%, #38BDF8 50%, #6366F1 75%, #0284C7 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s ease infinite;
+}
+
+/* 4.4 Ultra Vibrant Neon Pink Gradient */
+.gradient-text-pink {
+  background: linear-gradient(135deg, #E81A7F 0%, #FF2E93 30%, #F43F5E 50%, #C026D3 75%, #E81A7F 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s ease infinite;
+}
+
+/* 4.5 FLOWING RAINBOW ANIMATED BORDER (VIỀN CHẠY MÀU CẦU VỒNG XUNG QUANH THẺ LOGO) */
+@keyframes rainbow-border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.rainbow-border-card {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 3px;
+  background: linear-gradient(
+    90deg,
+    #E81A7F,
+    #FF0055,
+    #FF5E00,
+    #FFB700,
+    #00E676,
+    #00B0FF,
+    #7C4DFF,
+    #E040FB,
+    #E81A7F
+  );
+  background-size: 300% 300%;
+  animation: rainbow-border-flow 3.5s ease infinite;
+  box-shadow: 0 4px 15px -2px rgba(232, 26, 127, 0.12);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.rainbow-border-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 28px -4px rgba(232, 26, 127, 0.35);
+}
+
+.rainbow-border-inner {
+  background: #ffffff;
+  border-radius: calc(1.25rem - 3px);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1.25rem;
+  overflow: hidden;
+}
+
+/* 4.5 Fast Dynamic Flowing Wave */
+.gradient-text-flow {
+  background: linear-gradient(90deg, #10B981, #06B6D4, #E81A7F, #8B5CF6, #F59E0B, #10B981);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-flow-fast 3s linear infinite;
+}
+
+/* =========================================================================
+   5. AMBIENT GLOW & FLOATING ANIMATIONS
+   ========================================================================= */
+@keyframes ambient-pulse {
+  0%, 100% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.1) translate(20px, -15px);
+    opacity: 1;
+  }
+}
+
+@keyframes ambient-float {
+  0%, 100% {
+    transform: scale(1) translate(0px, 0px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.12) translate(-25px, 20px);
+    opacity: 1;
+  }
+}
+
+.animate-ambient-pulse {
+  animation: ambient-pulse 14s ease-in-out infinite;
+}
+
+.animate-ambient-float {
+  animation: ambient-float 18s ease-in-out infinite;
+}
+
+/* =========================================================================
+   6. SEAMLESS COMPACT LAYOUT & EQUAL HEIGHT CARDS
+   ========================================================================= */
+.section-compact {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .section-compact {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+}
+
+/* Standardized line-clamp card heights */
+.card-equal-height {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-equal-height > .card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* =========================================================================
+   7. MARQUEE & UTILITIES
+   ========================================================================= */
+@keyframes marquee-scroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-infinite {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 28s linear infinite;
+  will-change: transform;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ambient Slow Zoom for Banner Photo */
+@keyframes subtle-zoom {
+  0%, 100% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.animate-subtle-zoom {
+  animation: subtle-zoom 20s ease-in-out infinite;
+}
+
+/* The cleanup map's popups live outside .leaflet-container (so they can sit
+   over the search card), where Leaflet's own close-button style doesn't reach. */
+.leaflet-topPopup-pane a.leaflet-popup-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  font: 16px/24px Tahoma, Verdana, sans-serif;
+  text-align: center;
+  color: #757575;
+  text-decoration: none;
+  background: transparent;
+}
+.leaflet-topPopup-pane a.leaflet-popup-close-button:hover {
+  color: #585858;
+}

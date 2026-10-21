@@ -1,0 +1,17 @@
+{
+  "title": "Let's do it! Vietnam Movement",
+  "p1": "World Cleanup Day is the world's largest civic environmental movement, mobilizing millions of volunteers across 190+ countries.",
+  "p2": "Since 2015, we not only collect waste but transform community awareness, map pollution hotspots, and build zero-waste habits.",
+  "stat2": {
+    "img": "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop&q=80",
+    "number": "1 Million+",
+    "title": "Volunteers Engaged",
+    "sub": "Across 63 provinces in Vietnam"
+  },
+  "stat3": {
+    "img": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&auto=format&fit=crop&q=90",
+    "number": "100+",
+    "title": "Cleanup Events Organized",
+    "sub": "Mobilized nationwide"
+  }
+}

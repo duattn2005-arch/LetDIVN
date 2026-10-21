@@ -1,0 +1,19 @@
+{
+  "heroImage": "/images/news/hero.png",
+  "titleDefault": "News",
+  "stripImage1": "/images/what-we-do/strip1.jpg",
+  "stripImage2": "/images/what-we-do/strip2.jpg",
+  "card1Title": "World Cleanup Day",
+  "card1Desc": "Create a positive impact on the environment by mobilizing millions of volunteers in Vietnam.",
+  "card2Title": "Environmental Awareness",
+  "card2Desc": "Empower individuals to make informed choices and take action for a greener planet",
+  "card3Title": "Community Engagement",
+  "card3Desc": "Drive meaningful change and inspire others to join the cause.",
+  "card4Title": "Sustainable Lifestyle",
+  "card4Desc": "Emphasizing responsible consumption, waste reduction, and eco-friendly choices",
+  "readMoreBtn": "Read Article",
+  "backToListBtn": "Back to List",
+  "sourceOriginalLabel": "View original article at:",
+  "defaultSourceLabel": "Original Source",
+  "titleMedia": "Press & TV Coverage About Us"
+}

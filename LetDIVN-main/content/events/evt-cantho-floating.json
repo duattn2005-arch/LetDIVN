@@ -1,0 +1,39 @@
+{
+  "id": "evt-cantho-floating",
+  "title": "Green Mekong River - Cai Rang Floating Market, Can Tho",
+  "category": "World Cleanup Day",
+  "status": "Upcoming",
+  "date": "2026-09-20",
+  "time": "05:30 - 10:30",
+  "location": "Ninh Kieu Wharf & Cai Rang Floating Market, Can Tho",
+  "city": "Can Tho",
+  "coordinates": {
+    "lat": 10.0452,
+    "lng": 105.7469
+  },
+  "image": "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1000&auto=format&fit=crop&q=80",
+  "description": "Collecting floating debris from the Can Tho River and raising awareness among floating-market households against dumping waste into the Mekong.",
+  "targetVolunteers": 600,
+  "trashCollectedKg": 3800,
+  "leader": "Huynh Thanh Tung",
+  "meetingPoint": "Uncle Ho Statue, Ninh Kieu Wharf, Can Tho",
+  "schedule": [
+    {
+      "time": "05:30",
+      "activity": "Gather at Ninh Kieu Wharf, check-in and gear distribution"
+    },
+    {
+      "time": "06:00",
+      "activity": "Depart by boat to Cai Rang Floating Market"
+    },
+    {
+      "time": "06:30 - 09:30",
+      "activity": "River and market waste collection, sorting recyclable and hazardous waste"
+    },
+    {
+      "time": "10:00",
+      "activity": "Return to wharf, weigh the total, take group photos and wrap up"
+    }
+  ],
+  "order": 6
+}

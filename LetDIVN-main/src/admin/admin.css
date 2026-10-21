@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+/* WordPress admin look: system font, grey canvas, blue accents. */
+:root {
+  --wp-bar: #1d2327;
+  --wp-menu: #1d2327;
+  --wp-submenu: #2c3338;
+  --wp-blue: #2271b1;
+  --wp-blue-dark: #135e96;
+  --wp-canvas: #f0f0f1;
+  --wp-border: #c3c4c7;
+  --wp-text: #3c434a;
+  --wp-muted: #646970;
+  --wp-red: #b32d2e;
+}
+
+/* In layers, so Tailwind's utility classes (text-*, bg-*) win over these defaults. */
+@layer base {
+  html,
+  body {
+    margin: 0;
+    background: var(--wp-canvas);
+    color: var(--wp-text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  a {
+    color: var(--wp-blue);
+  }
+  a:hover {
+    color: var(--wp-blue-dark);
+  }
+}
+
+@layer components {
+  .wp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--wp-blue);
+    border-radius: 3px;
+    background: #f6f7f7;
+    color: var(--wp-blue);
+    font-size: 13px;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .wp-btn:hover {
+    background: #f0f0f1;
+    border-color: var(--wp-blue-dark);
+    color: var(--wp-blue-dark);
+  }
+  .wp-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .wp-btn-primary {
+    background: var(--wp-blue);
+    color: #fff;
+  }
+  .wp-btn-primary:hover {
+    background: var(--wp-blue-dark);
+    color: #fff;
+  }
+  .wp-btn-lg {
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+  .wp-btn-sm {
+    min-height: 26px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .wp-input {
+    width: 100%;
+    min-height: 32px;
+    padding: 4px 8px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    background: #fff;
+    color: #2c3338;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .wp-input:focus {
+    outline: 2px solid transparent;
+    border-color: var(--wp-blue);
+    box-shadow: 0 0 0 1px var(--wp-blue);
+  }
+  textarea.wp-input {
+    padding: 6px 8px;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  .wp-box {
+    background: #fff;
+    border: 1px solid var(--wp-border);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  }
+  .wp-box-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--wp-border);
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+  }
+
+  .wp-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid var(--wp-border);
+    border-left: 4px solid #00a32a;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  }
+  .wp-notice-error {
+    border-left-color: #d63638;
+  }
+  .wp-notice-info {
+    border-left-color: var(--wp-blue);
+  }
+
+  .wp-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--wp-border);
+  }
+  .wp-table th {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--wp-border);
+    text-align: left;
+    font-weight: 400;
+    color: #2c3338;
+  }
+  .wp-table td {
+    padding: 8px 10px;
+    vertical-align: top;
+  }
+  .wp-table tbody tr:nth-child(odd) {
+    background: #f6f7f7;
+  }
+  .wp-table .row-actions {
+    visibility: hidden;
+    font-size: 13px;
+    padding-top: 2px;
+  }
+  .wp-table tr:hover .row-actions,
+  .wp-table tr:focus-within .row-actions {
+    visibility: visible;
+  }
+  @media (max-width: 782px) {
+    .wp-table .row-actions {
+      visibility: visible;
+    }
+  }
+
+  /* Content of the visual (rich text) editor — close to how the news page shows it. */
+  .wp-editor-content {
+    min-height: 360px;
+    padding: 16px 20px;
+    outline: none;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.6;
+    color: #1d2327;
+  }
+  .wp-editor-content > * + * {
+    margin-top: 0.9em;
+  }
+  .wp-editor-content h2 {
+    font-size: 1.6em;
+    font-weight: 700;
+  }
+  .wp-editor-content h3 {
+    font-size: 1.3em;
+    font-weight: 700;
+  }
+  .wp-editor-content h4 {
+    font-size: 1.1em;
+    font-weight: 700;
+  }
+  .wp-editor-content ul {
+    list-style: disc;
+    padding-left: 1.6em;
+  }
+  .wp-editor-content ol {
+    list-style: decimal;
+    padding-left: 1.6em;
+  }
+  .wp-editor-content blockquote {
+    border-left: 4px solid #ccc;
+    padding-left: 1em;
+    font-style: italic;
+    color: #50575e;
+  }
+  .wp-editor-content a {
+    color: var(--wp-blue);
+    text-decoration: underline;
+  }
+  .wp-editor-content hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+  }
+  .wp-editor-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+  }
+  .wp-editor-content img.is-selected {
+    outline: 3px solid var(--wp-blue);
+  }
+  .wp-editor-content:empty::before {
+    content: attr(data-placeholder);
+    color: #8c8f94;
+  }
+
+  .wp-checker {
+    background-image: linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  }
+}

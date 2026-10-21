@@ -1,0 +1,39 @@
+{
+  "id": "evt-env-day-hcm",
+  "title": "World Environment Day 2026 - Ho Chi Minh City",
+  "category": "Environmental Day",
+  "status": "Upcoming",
+  "date": "2026-06-05",
+  "time": "07:00 - 11:00",
+  "location": "Tao Dan Park & Along Nhieu Loc - Thi Nghe Canal",
+  "city": "Ho Chi Minh City",
+  "coordinates": {
+    "lat": 10.7769,
+    "lng": 106.6924
+  },
+  "image": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1000&auto=format&fit=crop&q=80",
+  "description": "A campaign to clean up public spaces, restore canal banks, and launch the Zero Waste Life movement.",
+  "targetVolunteers": 2500,
+  "trashCollectedKg": 5400,
+  "leader": "Tran Thi Mai Linh",
+  "meetingPoint": "Central area of Tao Dan Park, Truong Dinh Street, District 1",
+  "schedule": [
+    {
+      "time": "07:00",
+      "activity": "Gather at Tao Dan Park, check-in and gear distribution"
+    },
+    {
+      "time": "07:30",
+      "activity": "Opening ceremony and environmental awareness talk"
+    },
+    {
+      "time": "08:00 - 10:00",
+      "activity": "Park cleanup and tree planting activities"
+    },
+    {
+      "time": "10:30",
+      "activity": "Waste sorting, recycling demonstration, and closing remarks"
+    }
+  ],
+  "order": 3
+}
