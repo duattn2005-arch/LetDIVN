@@ -704,6 +704,15 @@ add_action('init', function () {
     wp_register_script('ldv', LDM_URL . 'assets/js/volunteer.js', [], LDM_VERSION, true);
 });
 
+/** The round, playful font of the form's titles, cards and button (--ldv-display in volunteer.css). */
+const LDV_DISPLAY_FONT = 'https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap';
+
+/** The children standing along the chalkboard's foot, if their picture is in the plugin; else ''. */
+function ldv_kids_url(): string
+{
+    return is_file(LDM_DIR . '/assets/images/volunteer-kids.png') ? LDM_URL . 'assets/images/volunteer-kids.png' : '';
+}
+
 /** Loads the form's files (once), with what it needs to know. */
 function ldv_enqueue(): void
 {
@@ -715,6 +724,7 @@ function ldv_enqueue(): void
     $s = ldm_settings();
     $form = ldv_form(); // Tình nguyện viên → Sửa form đăng ký
     wp_enqueue_style('ldv');
+    wp_enqueue_style('ldv-display', LDV_DISPLAY_FONT, [], null);
     if ($form['style']['font'] !== '') {
         wp_enqueue_style('ldv-font', ldv_font_url($form['style']['font']), [], null);
     }
@@ -722,7 +732,8 @@ function ldv_enqueue(): void
     wp_add_inline_script('ldv', 'window.LDIVN_VOLUNTEER = ' . wp_json_encode(ldv_form_js($form) + [
         'api' => add_query_arg('ldv_api', '1', home_url('/')),
         'ajax' => admin_url('admin-ajax.php'),
-        'logo' => LDM_URL . 'assets/images/logo-icon-light.png',
+        'logo' => LDM_URL . 'assets/images/logo-footer.png',
+        'kids' => ldv_kids_url(),
         'onMap' => (bool) $s['vol_on_map'],
         // The buttons and links go to the form's page instead of opening it over the page.
         'asPage' => (bool) $s['vol_page'],

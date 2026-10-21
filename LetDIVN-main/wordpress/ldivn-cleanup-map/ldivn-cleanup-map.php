@@ -2,8 +2,8 @@
 /**
  * Plugin Name: LDIVN Cleanup Map
  * Plugin URI: https://letsdoitvietnam.org
- * Description: Báº£n Ä‘á»“ Ä‘iá»ƒm dá»n rÃ¡c toÃ n quá»‘c (Nationwide Cleanup Spot Map) vÃ  form "Register to Volunteer" cá»§a Let's Do It Vietnam. ChÃ¨n báº£n Ä‘á»“ báº±ng shortcode [ldivn_cleanup_map]; form má»Ÿ tá»« nÃºt Register trÃªn báº£n Ä‘á»“, tá»« link "#volunteer" (vd. má»™t má»¥c menu) hoáº·c [ldivn_volunteer_form]. Xem Ä‘Äƒng kÃ½ á»Ÿ menu "TÃ¬nh nguyá»‡n viÃªn".
- * Version: 1.12.0
+ * Description: Bản đồ điểm dọn rác toàn quốc (Nationwide Cleanup Spot Map) và form "Register to Volunteer" của Let's Do It Vietnam. Chèn bản đồ bằng shortcode [ldivn_cleanup_map]; form mở từ nút Register trên bản đồ, từ link "#volunteer" (vd. một mục menu) hoặc [ldivn_volunteer_form]. Xem đăng ký ở menu "Tình nguyện viên".
+ * Version: 1.22.3
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Author: Let's Do It Vietnam
@@ -13,7 +13,7 @@
 
 defined('ABSPATH') || exit;
 
-define('LDM_VERSION', '1.12.0');
+define('LDM_VERSION', '1.22.3');
 define('LDM_DIR', __DIR__);
 define('LDM_URL', plugin_dir_url(__FILE__));
 define('LDM_TYPE', 'ldivn_map_spot');
@@ -50,12 +50,16 @@ function ldm_defaults(): array
         'vol_on_map' => 1,
         'vol_everywhere' => 1,
         'vol_forward' => 1,
+        // /volunteer/ is a page of its own, the form in it (no window over the page).
+        'vol_page' => 1,
         'vol_email' => '',
         // The contact bubble on every page (includes/bubble.php), its window open.
         'bubble' => 1,
         'bubble_open' => 1,
         // The newest posts running along the top of every page (includes/latest.php).
         'latest' => 1,
+        // The site's footer (includes/footer.php) instead of the theme's.
+        'footer' => 1,
     ];
 }
 
@@ -102,8 +106,12 @@ require_once LDM_DIR . '/includes/videos.php';
 require_once LDM_DIR . '/includes/bubble.php';
 require_once LDM_DIR . '/includes/latest.php';
 require_once LDM_DIR . '/includes/media-coverage.php';
+require_once LDM_DIR . '/includes/stats.php';
+require_once LDM_DIR . '/includes/footer.php';
+require_once LDM_DIR . '/includes/news.php';
+require_once LDM_DIR . '/includes/justify.php';
 
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {
-    array_unshift($links, '<a href="' . esc_url(admin_url('edit.php?post_type=' . LDM_TYPE . '&page=ldivn-map-settings')) . '">CÃ i Ä‘áº·t</a>');
+    array_unshift($links, '<a href="' . esc_url(admin_url('edit.php?post_type=' . LDM_TYPE . '&page=ldivn-map-settings')) . '">Cài đặt</a>');
     return $links;
 });

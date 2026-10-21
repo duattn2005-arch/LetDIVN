@@ -2,7 +2,7 @@
 
 Plugin WordPress của **Let's Do It Vietnam**: bản đồ điểm dọn rác toàn quốc, form đăng ký tình nguyện viên và các khối giao diện của website.
 
-![Version](https://img.shields.io/badge/version-1.18.0-blue)
+![Version](https://img.shields.io/badge/version-1.22.3-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-21759b?logo=wordpress)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4?logo=php)
 

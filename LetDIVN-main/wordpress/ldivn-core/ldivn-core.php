@@ -4,7 +4,7 @@
  * Description: Nội dung, API và biểu mẫu của website Let's Do It Vietnam. Giao diện nằm ở theme "Let's Do It Vietnam".
  * Version: 1.0.0
  * Requires at least: 6.5
- * Requires PHP: 8.1
+ * Requires PHP: 7.4
  * Requires Plugins: secure-custom-fields
  * Text Domain: ldivn
  */

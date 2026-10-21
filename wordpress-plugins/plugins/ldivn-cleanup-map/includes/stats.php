@@ -56,16 +56,9 @@ const LDMS_CARDS = [
     ],
 ];
 
-/** The words left of the cards, as on the website's "Let's do it! Vietnam Movement" block. */
-const LDMS_INTRO = [
-    'title' => "Let's do it! Vietnam Movement",
-    'p1' => "World Cleanup Day is the world's largest civic environmental movement, mobilizing millions of volunteers across 190+ countries.",
-    'p2' => 'Since 2015, we not only collect waste but transform community awareness, map pollution hotspots, and build zero-waste habits.',
-];
-
 /**
  * What the block shows: 'sample' (nothing saved yet), 'years' (year => [card => int|null],
- * oldest first), 'cards' (card => title, sub, image) and 'intro' (title, p1, p2): the admin's or the defaults.
+ * oldest first) and 'cards' (card => title, sub, image): the admin's or the defaults.
  */
 function ldms_data(): array
 {
@@ -93,11 +86,7 @@ function ldms_data(): array
         ];
     }
 
-    $intro = [];
-    foreach (LDMS_INTRO as $key => $text) {
-        $intro[$key] = (string) ($saved['intro'][$key] ?? $text);
-    }
-    return ['sample' => $saved === null, 'years' => $years, 'cards' => $cards, 'intro' => $intro];
+    return ['sample' => $saved === null, 'years' => $years, 'cards' => $cards];
 }
 
 function ldms_default_image(string $key): string
@@ -131,7 +120,7 @@ function ldms_icon(string $key): string
 // --- [ldivn_wcd_stats] ------------------------------------------------------------------------
 
 add_shortcode('ldivn_wcd_stats', function ($atts) {
-    $atts = shortcode_atts(['interval' => 4, 'year' => '', 'intro' => 'yes'], $atts, 'ldivn_wcd_stats');
+    $atts = shortcode_atts(['interval' => 4, 'year' => ''], $atts, 'ldivn_wcd_stats');
     $data = ldms_data();
     if (!$data['years']) {
         // No year at all: its homepage section is hidden too, not left with a heading over nothing.
@@ -146,11 +135,11 @@ add_shortcode('ldivn_wcd_stats', function ($atts) {
     wp_enqueue_script('ldms', LDM_URL . 'assets/js/stats.js', [], LDM_VERSION, true);
     ob_start();
     wp_print_styles('ldms');
-    return ob_get_clean() . ldms_render($data, max(2.0, (float) $atts['interval']), (int) $atts['year'], $atts['intro'] !== 'no');
+    return ob_get_clean() . ldms_render($data, max(2.0, (float) $atts['interval']), (int) $atts['year']);
 });
 
-/** The block's HTML: the words on the left (unless $intro is false), the cards at the chosen year (the first one shown if none). */
-function ldms_render(array $data, float $interval, int $year, bool $intro = true): string
+/** The block's HTML: the cards at the chosen year (the first one shown if none). */
+function ldms_render(array $data, float $interval, int $year): string
 {
     $data['years'] = array_slice($data['years'], -LDMS_SHOWN, null, true);
     $years = array_keys($data['years']);
@@ -208,16 +197,6 @@ function ldms_render(array $data, float $interval, int $year, bool $intro = true
         ? '<p class="ldms-sample">Đang hiện số liệu mẫu cho mọi người xem. Nhập số thật ở menu <a href="' . esc_url(admin_url('admin.php?page=' . LDMS_PAGE)) . '">Số liệu WCD</a>. (Dòng này chỉ người quản trị thấy.)</p>'
         : '';
 
-    $words = '';
-    if ($intro) {
-        $t = $data['intro'];
-        // The title at the cards' top, the words at their foot.
-        $text = ($t['p1'] !== '' ? '<p class="ldms-p1">' . nl2br(esc_html($t['p1'])) . '</p>' : '')
-            . ($t['p2'] !== '' ? '<p class="ldms-p2">' . nl2br(esc_html($t['p2'])) . '</p>' : '');
-        $words = ($t['title'] !== '' ? '<h2 class="ldms-h">' . esc_html($t['title']) . '</h2>' : '')
-            . ($text !== '' ? '<div class="ldms-text">' . $text . '</div>' : '');
-    }
-
     $config = [
         'interval' => (int) round($interval * 1000),
         'start' => $start,
@@ -226,9 +205,8 @@ function ldms_render(array $data, float $interval, int $year, bool $intro = true
         'cards' => $figures,
         'raw' => $raw,
     ];
-    return '<div class="ldms' . ($words !== '' ? ' ldms--intro' : '') . '" data-ldms="' . esc_attr(wp_json_encode($config)) . '">'
+    return '<div class="ldms" data-ldms="' . esc_attr(wp_json_encode($config)) . '">'
         . $sample
-        . ($words !== '' ? '<div class="ldms-intro">' . $words . '</div>' : '')
         . '<div class="ldms-cards">' . $cards . '</div>'
         // Keeps the pace: when its animation ends, the next year comes (assets/js/stats.js).
         . (count($years) > 1 ? '<span class="ldms-clock" aria-hidden="true"></span>' : '')
@@ -254,8 +232,8 @@ add_action('init', function () {
 
 /**
  * A new section after the homepage's posts: a copy of its videos section (its
- * spacing) with the block instead of the videos, and without its centred heading:
- * the block has its words on the left. Plain, with just the block, when there is no such section.
+ * spacing) with the block instead of the videos, and without its centred heading.
+ * Plain, with just the block, when there is no such section.
  */
 function ldms_place_on_home(): array
 {
@@ -319,8 +297,7 @@ function ldms_place_on_home(): array
 
 /**
  * The section put on the homepage by 1.13.1 without its centred "Our Impact" line and
- * heading, now that the block has its words on the left. Only while they still say
- * what they said then: changed in Elementor, they stay.
+ * heading. Only while they still say what they said then: changed in Elementor, they stay.
  */
 function ldms_home_without_heading(): string
 {
@@ -465,14 +442,7 @@ add_action('admin_post_ldms_save', function () {
         ];
     }
 
-    $intro = [];
-    foreach (array_keys(LDMS_INTRO) as $key) {
-        $text = $_POST['ldms_intro'][$key] ?? '';
-        $text = is_string($text) ? wp_unslash($text) : '';
-        $intro[$key] = $key === 'title' ? sanitize_text_field($text) : sanitize_textarea_field($text);
-    }
-
-    update_option(LDMS_OPTION, ['years' => $years, 'cards' => $cards, 'intro' => $intro], false);
+    update_option(LDMS_OPTION, ['years' => $years, 'cards' => $cards], false);
     wp_safe_redirect(admin_url('admin.php?page=' . LDMS_PAGE . '&updated=1'));
     exit;
 });
@@ -568,24 +538,6 @@ function ldms_page(): void
                 <span class="description" style="margin-left:8px">Thêm hay xoá dòng xong thì bấm <strong>Lưu số liệu</strong> ở cuối trang.</span>
             </p>
             <template id="ldms-row"><?php echo $row('__i__', ['year' => '__year__'], '<span style="color:#2271b1">Năm mới: điền số rồi Lưu</span>', true); ?></template>
-
-            <h2 style="margin-top:32px">Chữ bên trái</h2>
-            <p class="description">Tiêu đề hồng và hai đoạn chữ bên trái ba thẻ (tiếng Anh như trang web). Xoá hết cả ba ô thì ba thẻ chiếm cả bề ngang.
-                Muốn đặt khối ở trang khác mà không có chữ: <code>[ldivn_wcd_stats intro="no"]</code>.</p>
-            <table class="form-table" role="presentation">
-                <tr>
-                    <th scope="row"><label for="ldms-intro-title">Tiêu đề</label></th>
-                    <td><input id="ldms-intro-title" name="ldms_intro[title]" value="<?php echo esc_attr($data['intro']['title']); ?>" class="large-text"></td>
-                </tr>
-                <tr>
-                    <th scope="row"><label for="ldms-intro-p1">Đoạn 1</label></th>
-                    <td><textarea id="ldms-intro-p1" name="ldms_intro[p1]" rows="3" class="large-text"><?php echo esc_textarea($data['intro']['p1']); ?></textarea></td>
-                </tr>
-                <tr>
-                    <th scope="row"><label for="ldms-intro-p2">Đoạn 2 (chữ nhỏ hơn)</label></th>
-                    <td><textarea id="ldms-intro-p2" name="ldms_intro[p2]" rows="3" class="large-text"><?php echo esc_textarea($data['intro']['p2']); ?></textarea></td>
-                </tr>
-            </table>
 
             <h2 style="margin-top:32px">Ba thẻ</h2>
             <p class="description">Chữ trên thẻ (tiếng Anh như trang web) và ảnh nền. Để trống tên thẻ thì dùng tên mặc định.</p>

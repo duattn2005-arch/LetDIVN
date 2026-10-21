@@ -251,6 +251,7 @@ add_action('admin_enqueue_scripts', function () {
     $form = ldv_form();
     wp_enqueue_media();
     wp_enqueue_style('ldv-edit-form', LDM_URL . 'assets/css/volunteer.css', [], LDM_VERSION);
+    wp_enqueue_style('ldv-display', LDV_DISPLAY_FONT, [], null);
     if ($form['style']['font'] !== '') {
         wp_enqueue_style('ldv-font', ldv_font_url($form['style']['font']), [], null);
     }
@@ -259,7 +260,8 @@ add_action('admin_enqueue_scripts', function () {
         'edit' => true,
         'api' => add_query_arg('ldv_api', '1', home_url('/')),
         'ajax' => admin_url('admin-ajax.php'),
-        'logo' => LDM_URL . 'assets/images/logo-icon-light.png',
+        'logo' => LDM_URL . 'assets/images/logo-footer.png',
+        'kids' => ldv_kids_url(),
     ] + ldv_form_js($form)) . ';', 'before');
     wp_enqueue_script('ldv-edit', LDM_URL . 'assets/js/volunteer-edit.js', ['ldv-edit-form', 'jquery-ui-sortable'], LDM_VERSION, true);
     $fonts = [];

@@ -4,8 +4,9 @@
  * right as the shown ones slide out, the figure counting up from the last year's,
  * and a light sweeps across. An unseen clock sets the pace: when its animation
  * ends, the next year comes, whether the mouse is on the block or not. It waits
- * only while the block is out of view; with reduced motion, the years change
- * without moving.
+ * only while the block is out of view. With reduced motion (a computer or phone set
+ * to show fewer animations) the year and the figure fade in place instead of sliding,
+ * with no sweep (assets/css/stats.css).
  */
 (function () {
   'use strict';
@@ -43,12 +44,10 @@
       fill(next);
       out.classList.remove('is-on', 'is-in');
       next.classList.remove('is-out');
-      if (!still) {
-        out.classList.remove('is-out');
-        void box.offsetWidth; // start the animations over
-        out.classList.add('is-out');
-        next.classList.add('is-in');
-      }
+      out.classList.remove('is-out');
+      void box.offsetWidth; // start the animations over
+      out.classList.add('is-out');
+      next.classList.add('is-in');
       next.classList.add('is-on');
       out.setAttribute('aria-hidden', 'true');
       next.removeAttribute('aria-hidden');
@@ -68,7 +67,7 @@
       var a = cfg.raw[c][from];
       var b = cfg.raw[c][to];
       var text = cfg.cards[c][to];
-      if (still || a == null || b == null || a === b) return;
+      if (a == null || b == null || a === b) return;
       var begin = null;
       el.textContent = draft(c, a, text[1]);
       function step(t) {
@@ -111,7 +110,7 @@
       current = i;
       cards.forEach(function (card, c) {
         clearTimeout(pending[c]);
-        pending[c] = setTimeout(function () { slide(c, i); }, still ? 0 : c * STAGGER);
+        pending[c] = setTimeout(function () { slide(c, i); }, c * STAGGER);
       });
       restart();
     }

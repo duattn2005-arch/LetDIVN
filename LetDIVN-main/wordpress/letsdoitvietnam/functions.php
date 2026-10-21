@@ -43,6 +43,33 @@ add_action('wp_enqueue_scripts', function () {
     }
 }, 100);
 
+// A site moved over from Elementor: its pages keep their Elementor layouts,
+// which would take the place of the app (Elementor picks their template).
+// The app shows every page; Elementor's editor preview is left alone.
+function ldivn_is_elementor_page($post): bool
+{
+    return $post instanceof WP_Post && get_post_meta($post->ID, '_elementor_edit_mode', true) === 'builder';
+}
+
+add_filter('template_include', function ($template) {
+    return isset($_GET['elementor-preview']) ? $template : __DIR__ . '/index.php';
+}, PHP_INT_MAX);
+
+// Nor do Elementor's styles and scripts belong on the app's pages.
+add_action('wp_enqueue_scripts', function () {
+    if (isset($_GET['elementor-preview'])) {
+        return;
+    }
+    foreach ([wp_styles(), wp_scripts()] as $deps) {
+        foreach ($deps->queue as $handle) {
+            $src = (string) ($deps->registered[$handle]->src ?? '');
+            if (preg_match('#/plugins/(elementor|elementor-pro|premium-addons[a-z-]*)/|/uploads/elementor/#', $src)) {
+                $deps instanceof WP_Scripts ? wp_dequeue_script($handle) : wp_dequeue_style($handle);
+            }
+        }
+    }
+}, PHP_INT_MAX);
+
 remove_action('wp_head', 'print_emoji_detection_script', 7);
 remove_action('wp_print_styles', 'print_emoji_styles');
 remove_action('wp_head', 'wp_generator');

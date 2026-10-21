@@ -104,8 +104,11 @@
     set('--ldv-navy', s.text);
     set('--ldv-radius', s.radius !== undefined && s.radius !== '' ? s.radius + 'px' : '');
     set('--ldv-head', s.headImage ? 'url("' + String(s.headImage).replace(/"/g, '%22') + '") center / cover no-repeat'
-      : s.head ? 'linear-gradient(180deg, ' + s.head + ' 0%, #fff 100%)' : '');
+      : s.head ? 'linear-gradient(180deg, ' + s.head + ' 0%, transparent 100%)' : '');
     set('--ldv-font', s.fontFamily);
+    // The children along the chalkboard's foot, when their picture is there (assets/css/volunteer.css).
+    set('--ldv-kids', CFG.kids ? 'url("' + String(CFG.kids).replace(/"/g, '%22') + '")' : '');
+    card.classList.toggle('ldv--kids', !!CFG.kids);
   }
 
   var uid = 0;
@@ -198,10 +201,10 @@
     return '<h4 class="ldv-h">' + icon(name, 'ldv-h-ic') + tx(key) + '</h4>';
   }
 
+  // The Let's Do It! Vietnam logo, its words in white for the chalkboard (assets/images/logo-footer.png).
   function logo() {
     return '<div class="ldv-logo">' +
-      (CFG.logo ? '<img src="' + esc(CFG.logo) + '" alt="">' : '') +
-      '<div class="ldv-logo-text"><div class="ldv-logo-1">Let’s do it!</div><div class="ldv-logo-2">Vietnam</div></div>' +
+      (CFG.logo ? '<img src="' + esc(CFG.logo) + '" alt="Let’s do it! Vietnam" width="720" height="246">' : '') +
     '</div>';
   }
 
@@ -341,7 +344,7 @@
         '<svg viewBox="0 0 960 80" preserveAspectRatio="none" class="ldv-wave" aria-hidden="true"><path d="M0 80 L0 38 C 120 0, 300 8, 470 60 C 520 74, 560 80, 600 80 Z" fill="#fff"/><rect x="0" y="70" width="960" height="10" fill="#fff"/></svg>' +
         '<div class="ldv-head-row' + (modal ? ' ldv-head-row--close' : '') + '">' +
           '<div class="ldv-head-text">' + logo() +
-            '<div><h3 class="ldv-title" id="' + p + '-title" data-t="title">' + t('title') + '</h3>' +
+            '<div class="ldv-head-words"><h3 class="ldv-title" id="' + p + '-title" data-t="title">' + t('title') + '</h3>' +
             '<p class="ldv-sub" data-t="subtitle">' + t('subtitle') + '</p></div>' +
           '</div>' +
           '<div class="ldv-photo" aria-hidden="true">' +
@@ -583,6 +586,7 @@
 
   function done(card, name, opts) {
     card.className = 'ldv ldv--done';
+    applyStyle(card);
     card.innerHTML = doneHtml(name, opts.modal);
     var again = function () {
       if (opts.modal) close();

@@ -3,76 +3,22 @@
    Everything under .ldms and set explicitly, so the theme's styles don't leak in. */
 
 .ldms {
+  /* As wide as the video block under it on the homepage (up to 1536px),
+     reaching out of a narrower column to both sides. */
+  --ldms-w: min(1536px, calc(100vw - 32px));
   position: relative;
-  width: 100%;
-  margin: 0;
+  width: var(--ldms-w);
+  max-width: none;
+  margin: 0 0 0 calc(50% - var(--ldms-w) / 2);
   color: #0f172a;
   /* The site's font (Poppins), as in its menu and buttons. */
   font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
   text-align: left;
 }
-.ldms *, .ldms *::before, .ldms *::after { box-sizing: border-box; }
-
-/* --- With its words on the left: as wide as the video block under it on the
-   homepage (up to 1536px), reaching out of a narrower column to both sides --- */
-.ldms.ldms--intro {
-  --ldms-w: min(1536px, calc(100vw - 32px));
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 28px;
-  width: var(--ldms-w);
-  max-width: none;
-  margin-left: calc(50% - var(--ldms-w) / 2);
-}
 @media (min-width: 1024px) {
-  .ldms.ldms--intro { --ldms-w: min(1536px, calc(100vw - 64px)); }
+  .ldms { --ldms-w: min(1536px, calc(100vw - 64px)); }
 }
-.ldms.ldms--intro .ldms-sample { grid-column: 1 / -1; margin: 0; }
-.ldms .ldms-intro { max-width: 640px; }
-
-/* Side by side: the title right over the words, the two together in the middle
-   of the cards' height (and the cards grow if the words are taller). */
-@media (min-width: 1200px) {
-  .ldms.ldms--intro {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    align-items: stretch;
-    column-gap: 48px;
-  }
-  .ldms .ldms-intro {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 20px;
-    max-width: none;
-  }
-  .ldms .ldms-intro .ldms-h { margin: 0; }
-  .ldms .ldms-intro .ldms-p1 { font-size: 18px; line-height: 1.7; }
-  .ldms .ldms-intro .ldms-p2 { font-size: 15px; line-height: 1.7; }
-  .ldms.ldms--intro .ldms-card { height: auto; min-height: 400px; }
-}
-/* The pink section title of the website */
-.ldms .ldms-h {
-  margin: 0 0 16px;
-  padding: 0;
-  color: #f1138d;
-  font-family: ChauPhilomeneOne, "Chau Philomene One", Poppins, sans-serif;
-  font-size: 40px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  text-wrap: balance;
-}
-.ldms .ldms-p1,
-.ldms .ldms-p2 {
-  margin: 0;
-  padding: 0;
-  font-family: inherit;
-  font-weight: 400;
-  line-height: 1.65;
-}
-.ldms .ldms-p1 { color: #475569; font-size: 16px; }
-.ldms .ldms-p2 { margin-top: 16px; color: #64748b; font-size: 14px; }
+.ldms *, .ldms *::before, .ldms *::after { box-sizing: border-box; }
 
 .ldms .ldms-sample {
   margin: 0 0 12px;
@@ -352,10 +298,12 @@
   to { opacity: 1; }
 }
 
+/* Set to show fewer animations: nothing moves, the year and the figure only fade. */
 @media (prefers-reduced-motion: reduce) {
   .ldms .ldms-photo,
-  .ldms .ldms-card.is-sweep::after,
-  .ldms .ldms-swap > .is-in,
-  .ldms .ldms-swap > .is-out { animation: none; }
-  .ldms .ldms-swap > .is-out { visibility: hidden; }
+  .ldms .ldms-card.is-sweep::after { animation: none; }
+  .ldms .ldms-swap > .is-in { animation: ldms-fade-in 0.6s ease 0.15s both; }
+  .ldms .ldms-swap > .is-out { animation: ldms-fade-out 0.3s ease both; }
 }
+@keyframes ldms-fade-in { from { opacity: 0; } }
+@keyframes ldms-fade-out { to { opacity: 0; } }

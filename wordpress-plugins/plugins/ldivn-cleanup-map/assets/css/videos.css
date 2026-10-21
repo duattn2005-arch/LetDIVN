@@ -63,6 +63,63 @@
   font-size: 10px;
   font-weight: 700;
 }
+/* Year filter: pill chips, wrapping onto a new line so every year stays in sight. */
+.ldmv .ldmv-years {
+  display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 2px 2px 4px;
+}
+.ldmv .ldmv-year {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
+  height: auto;
+  margin: 0;
+  padding: 5px 12px;
+  border: 1px solid #f1f5f9;
+  border-radius: 999px;
+  /* Each chip's colours come from menu Video > Màu thẻ năm (includes/videos.php). */
+  background: var(--ldmv-bg, #fff);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  color: var(--ldmv-text, #475569);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.ldmv .ldmv-year:hover,
+.ldmv .ldmv-year:focus-visible,
+.ldmv .ldmv-year.is-active {
+  border-color: transparent;
+  background: var(--ldmv-hbg, #e81a7f);
+  box-shadow: 0 4px 10px -2px rgb(0 0 0 / 0.18);
+  color: var(--ldmv-htext, #fff);
+  outline: none;
+}
+/* The count: a faint pill of the chip's own text colour. */
+.ldmv .ldmv-year-n {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.15);
+  background: color-mix(in srgb, currentColor 15%, transparent);
+  color: inherit;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+.ldmv .ldmv-item[hidden] { display: none; }
+
 .ldmv .ldmv-items {
   display: flex;
   flex-direction: column;

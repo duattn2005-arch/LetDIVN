@@ -4,7 +4,7 @@ Tags: map, leaflet, cleanup, events, vietnam
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.18.0
+Stable tag: 1.22.3
 License: GPLv2 or later
 
 Bản đồ điểm dọn rác toàn quốc (Nationwide Cleanup Spot Map) của Let's Do It Vietnam.

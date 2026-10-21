@@ -9,8 +9,9 @@ add_action('rest_api_init', function () {
     $ns = 'ldivn/v1';
     $read = [
         '/content' => fn() => (object) ldivn_cached('content', 'ldivn_get_page_content'),
-        // No events here (see LDIVN_TYPES); the app still asks for them.
-        '/events' => fn() => [],
+        // No events here (see LDIVN_TYPES): those of the cleanup map plugin, for
+        // the app's map where it runs elsewhere (the Vercel site reads this API).
+        '/events' => 'ldivn_get_map_events',
         '/news' => fn() => ldivn_cached('news', 'ldivn_get_news'),
         '/partners' => fn() => ldivn_cached('partners', 'ldivn_get_partners'),
         '/team' => fn() => ldivn_cached('team', 'ldivn_get_team'),
@@ -241,4 +242,40 @@ function ldivn_api_geocode(string $kind, WP_REST_Request $req)
     $data = json_decode(wp_remote_retrieve_body($res), true);
     set_transient($key, $data, 10 * MINUTE_IN_SECONDS);
     return new WP_REST_Response($data);
+}
+
+// --- Cleanup map ------------------------------------------------------------------------
+
+/** The cleanup map plugin's spots as the app's events (src/types.ts CleanupEvent). */
+function ldivn_get_map_events(): array
+{
+    if (!function_exists('ldm_events')) {
+        return [];
+    }
+    $today = wp_date('Y-m-d');
+    $out = [];
+    foreach (ldm_events() as $e) {
+        if (strpos((string) $e['id'], 'spot-') !== 0 || !empty($e['sample'])) {
+            continue;
+        }
+        $out[] = [
+            'id' => $e['id'],
+            'title' => $e['title'],
+            'category' => 'World Cleanup Day',
+            'date' => $e['date'],
+            'time' => $e['time'],
+            'location' => $e['location'],
+            'city' => $e['city'],
+            'coordinates' => $e['lat'] !== null && $e['lng'] !== null ? ['lat' => $e['lat'], 'lng' => $e['lng']] : null,
+            'image' => $e['image'],
+            'description' => '',
+            'targetVolunteers' => 0,
+            'registeredCount' => $e['registered'],
+            'status' => $e['pending'] ? 'Pending' : ($e['date'] < $today ? 'Completed' : 'Upcoming'),
+            'leader' => '',
+            'meetingPoint' => $e['location'],
+            'googleMapsUrl' => $e['mapsUrl'],
+        ];
+    }
+    return $out;
 }

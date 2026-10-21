@@ -126,8 +126,9 @@
     border: 0 !important;
     background: transparent !important;
     color: #334155 !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
+    /* As big as "Other", "Projects"… above them (set by includes/menu.php). */
+    font-size: var(--ldm-item-size, 16px) !important;
+    font-weight: var(--ldm-item-weight, 500) !important;
     line-height: 1.4 !important;
     white-space: normal;
     transition: color 0.15s, background-color 0.15s;
@@ -143,23 +144,171 @@
     color: #e81a7f !important;
   }
 }
-/* Narrower computer screens: smaller items, as that header does below 1536px. */
-@media (min-width: 1025px) and (max-width: 1535px) {
+/* The whole menu always on one line: never a second row under the first. */
+@media (min-width: 1280px) {
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .elementor-nav-menu {
+    flex-wrap: nowrap !important;
+  }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .elementor-nav-menu > li {
+    flex-shrink: 0;
+  }
+}
+/* Narrower computer screens (1366px laptops, 1920px ones at 150%): smaller items and
+   tighter spacing, as that header does below 1536px, so all of it fits from 1280px. */
+@media (min-width: 1280px) and (max-width: 1535px) {
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) {
+    --padding-left: 20px !important;
+    --padding-right: 20px !important;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner > .e-con:last-child {
+    --gap: 12px !important;
+    margin-left: 16px;
+  }
   .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) {
     --e-nav-menu-horizontal-menu-item-margin: 2px !important;
   }
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-item {
     font-size: 15px !important;
   }
+  .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .elementor-nav-menu > li:not(.ldivn-menu-volunteer) > .elementor-item {
+    padding: 8px 5px !important;
+  }
   .elementor-location-header .elementor-nav-menu--main:has(.ldivn-menu-volunteer) .ldivn-menu-volunteer > a {
     height: 42px;
-    padding: 0 20px !important;
+    padding: 0 18px !important;
+  }
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-button .elementor-button {
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+  }
+}
+
+/* "Contact us": its name in the middle of the button (Elementor's padding put it
+   higher), as tall as the Volunteer button next to it. */
+.elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-button .elementor-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1;
+  white-space: nowrap;
+}
+@media (max-width: 1535px) {
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-button .elementor-button {
+    height: 42px;
+  }
+}
+/* Below 1280px the menu doesn't fit on one line (it wrapped onto two or three):
+   the ☰ button opens it instead, as in that header below its "xl" size. The ☰
+   goes to the right, after the "Contact us" button. */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .elementor-location-header .elementor-nav-menu--dropdown-mobile:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-nav-menu--main {
+    display: none !important;
+  }
+  .elementor-location-header .elementor-nav-menu--dropdown-mobile:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-menu-toggle {
+    display: flex !important;
+  }
+  .elementor-location-header .elementor-nav-menu--dropdown-mobile:has(.ldivn-menu-map, .ldivn-menu-volunteer) nav.elementor-nav-menu--dropdown.elementor-nav-menu__container {
+    display: block !important;
+  }
+}
+/* The opened menu right under the header: no strip of the page between them,
+   not over the header either (1px over it, so no gap on any zoom). */
+@media (max-width: 767px) {
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) nav.elementor-nav-menu--dropdown.elementor-nav-menu__container {
+    margin-top: 12px !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) nav.elementor-nav-menu--dropdown.elementor-nav-menu__container {
+    margin-top: 22px !important;
+  }
+}
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) nav.elementor-nav-menu--dropdown.elementor-nav-menu__container {
+    margin-top: 17px !important;
+  }
+}
+@media (max-width: 1279px) {
+  /* Logo on the left only as wide as it is, the buttons taking the rest. */
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner {
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner > .e-con:first-child {
+    --width: auto !important;
+    flex-shrink: 0;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner > .e-con:last-child {
+    --width: auto !important;
+    --flex-grow: 1 !important;
+    --gap: 12px !important;
+    margin-left: 16px;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner > .e-con:first-child img {
+    width: auto !important;
+    max-width: none !important;
+    height: 52px !important;
+  }
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) {
+    justify-content: flex-end !important;
+  }
+  /* The ☰ in the site's navy (pink under the finger/mouse), not the default blue. */
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-menu-toggle {
+    --nav-menu-icon-size: 26px;
+    padding: 6px !important;
+    border-radius: 10px;
+    background: transparent !important;
+    color: #1c244b !important;
+    fill: #1c244b !important;
+  }
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-menu-toggle:is(:hover, :focus-visible, .elementor-active) {
+    background: rgba(241, 245, 249, 0.9) !important;
+    color: #f1138d !important;
+    fill: #f1138d !important;
+  }
+  .elementor-location-header .elementor-widget-nav-menu:has(.ldivn-menu-map, .ldivn-menu-volunteer) .elementor-menu-toggle svg {
+    fill: currentColor !important;
+  }
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-nav-menu {
+    --flex-grow: 0 !important;
+    order: 2;
+  }
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-button {
+    --flex-grow: 0 !important;
+    order: 1;
+  }
+}
+
+/* Phones: a smaller button and logo so they sit evenly beside the ☰. */
+@media (max-width: 767px) {
+  .elementor-location-header .e-con:has(> .elementor-widget-nav-menu :is(.ldivn-menu-map, .ldivn-menu-volunteer)) > .elementor-widget-button .elementor-button {
+    height: 38px;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner > .e-con:first-child img {
+    height: 42px !important;
+  }
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner > .e-con:last-child {
+    --gap: 6px !important;
+    margin-left: 8px;
+  }
+}
+@media (max-width: 359px) {
+  .elementor-location-header .e-con-boxed:has(.ldivn-menu-map, .ldivn-menu-volunteer) > .e-con-inner > .e-con:first-child img {
+    height: 36px !important;
   }
 }
 
 /* In the mobile dropdown it is an ordinary item, in pink. */
 .elementor-nav-menu--dropdown .ldivn-menu-volunteer > a {
   display: flex !important;
+  justify-content: flex-start;
   height: auto;
   padding: 13px 20px !important;
   border: 0 !important;

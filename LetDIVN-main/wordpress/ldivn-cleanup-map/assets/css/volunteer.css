@@ -11,14 +11,37 @@
   --ldv-radius: 26px;
   --ldv-r: calc(var(--ldv-radius) * 0.46);
   --ldv-r-in: calc(var(--ldv-radius) * 0.3);
-  --ldv-head: linear-gradient(180deg, #e3f0fa 0%, #f3f8fc 55%, #fff 100%);
+  --ldv-head: transparent;
   --ldv-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  /* The titles, the cards' names and the button: a round, playful face (includes/volunteer.php loads it). */
+  --ldv-display: "Baloo 2", var(--ldv-font);
+  /* The logo's faces, for the icons. */
+  --ldv-orange: #f26522;
+  --ldv-green: #00a651;
+  --ldv-blue: #1c75bc;
+  --ldv-yellow: #e99a12;
   position: relative;
   width: 100%;
   margin: auto;
   overflow: hidden;
   border-radius: var(--ldv-radius);
-  background: #fff;
+  /* A school chalkboard (more under "The chalkboard"): grey and white stripes in the
+     padding, the green board of the picture inside it (assets/images/volunteer-board.jpg).
+     Backgrounds that scroll with the form (local), so the board goes all the way down
+     when the window scrolls. */
+  --ldv-frame: 10px;
+  --ldv-board: #0f442e;
+  --ldv-chalk: #fdfcf5;
+  --ldv-chalk-2: #e8eee4;
+  --ldv-yellow-chalk: #ffd23f;
+  --ldv-chalkboard:
+    url("../images/volunteer-board.jpg") center / cover no-repeat content-box,
+    linear-gradient(var(--ldv-board), var(--ldv-board)) content-box;
+  --ldv-stripes: repeating-linear-gradient(90deg, #f6f6f8 0 10px, #e2e2e8 10px 15px, #fafafb 15px 26px, #d9d9e0 26px 30px, #f1f1f4 30px 41px, #e6e6eb 41px 44px) border-box;
+  box-sizing: border-box;
+  padding: var(--ldv-frame);
+  background: var(--ldv-chalkboard), var(--ldv-stripes);
+  background-attachment: local;
   box-shadow: 0 30px 80px -20px rgba(15, 31, 75, 0.45);
   color: var(--ldv-navy);
   font-family: var(--ldv-font);
@@ -46,7 +69,7 @@
 }
 .ldv section { padding: 0; border: 0; }
 .ldv--form { max-width: 960px; }
-.ldv--done { max-width: 448px; padding: 36px 32px; text-align: center; }
+.ldv--done { max-width: 448px; padding: calc(var(--ldv-frame) + 36px) calc(var(--ldv-frame) + 32px); text-align: center; }
 
 /* --- The window ------------------------------------------------------------------------ */
 
@@ -104,21 +127,51 @@
 .ldv-blob--1 { left: 8px; top: 16px; width: 160px; height: 64px; background: rgba(255, 255, 255, 0.8); filter: blur(24px); }
 .ldv-blob--2 { left: -48px; top: 112px; width: 192px; height: 160px; background: rgba(94, 158, 69, 0.4); filter: blur(40px); }
 .ldv-blob--3 { left: 80px; top: 144px; width: 176px; height: 128px; background: rgba(143, 194, 111, 0.35); filter: blur(40px); }
+/* Confetti in the logo's colours along the edges, over the sky and under the wave. */
+.ldv-head::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  background:
+    radial-gradient(circle at 3% 16%, #f26522 0 5px, transparent 6px),
+    radial-gradient(circle at 6% 66%, #8dc63f 0 4px, transparent 5px),
+    radial-gradient(circle at 17% 6%, #fbb040 0 3px, transparent 4px),
+    radial-gradient(circle at 31% 5%, #1c75bc 0 3px, transparent 4px),
+    radial-gradient(circle at 69% 5%, #e8197c 0 4px, transparent 5px),
+    radial-gradient(circle at 83% 6%, #8b5e3c 0 3px, transparent 4px),
+    radial-gradient(circle at 95% 64%, #00a651 0 3px, transparent 4px),
+    radial-gradient(circle at 97% 22%, #ed1c24 0 4px, transparent 5px);
+}
 .ldv-wave { position: absolute; left: 0; bottom: 0; width: 100%; height: 48px; pointer-events: none; }
-.ldv-head-row { position: relative; display: flex; align-items: center; gap: 24px; }
-.ldv-head-text { flex: 1; min-width: 0; text-align: center; }
+/* Phones: the logo, the title and the line under it, one under the other, in the middle. */
+.ldv-head-row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.ldv-head-text { display: flex; flex: 1; flex-direction: column; align-items: center; gap: 18px; min-width: 0; text-align: center; }
+.ldv-head-words { min-width: 0; }
 
-.ldv-logo { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 10px; color: var(--ldv-navy); }
-.ldv .ldv-logo img { width: 48px !important; height: 48px !important; object-fit: contain; }
-.ldv-logo-text { text-align: left; line-height: 1; }
-.ldv-logo-1 { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-weight: 900; font-size: 24px; letter-spacing: -0.025em; white-space: nowrap; }
-.ldv-logo-2 { margin: 4px 0 0 12px; font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; font-size: 18px; }
+.ldv-logo { display: flex; flex-shrink: 0; align-items: center; justify-content: center; }
+.ldv .ldv-logo img { display: block; width: auto !important; max-width: 100% !important; height: 52px !important; margin: 0 !important; object-fit: contain; }
+/* The logo with white words (assets/images/logo-footer.png), straight on the board like the chalk. */
+.ldv-head .ldv-logo { max-width: 100%; }
 
-.ldv .ldv-title { margin-top: 16px !important; color: var(--ldv-navy) !important; font-size: 28px !important; font-weight: 800 !important; line-height: 1.25 !important; }
-.ldv .ldv-sub { margin-top: 4px !important; color: #34406b !important; color: color-mix(in srgb, var(--ldv-navy) 85%, #fff) !important; font-size: 15px !important; font-weight: 400 !important; line-height: 1.5 !important; }
+.ldv .ldv-title { color: var(--ldv-navy) !important; font-family: var(--ldv-display) !important; font-size: 30px !important; font-weight: 800 !important; line-height: 1.15 !important; }
+/* A pink-to-orange stroke under the title. */
+.ldv .ldv-title::after { content: ""; display: block; width: 64px; height: 5px; margin: 12px auto 0; border-radius: 9999px; background: linear-gradient(90deg, var(--ldv-pink), #ff9d1c); }
+.ldv .ldv-sub { margin-top: 12px !important; color: #34406b !important; color: color-mix(in srgb, var(--ldv-navy) 85%, #fff) !important; font-size: 15px !important; font-weight: 400 !important; line-height: 1.5 !important; }
 
-.ldv-photo { display: none; position: relative; flex-shrink: 0; width: 132px; height: 132px; margin-right: 8px; pointer-events: none; }
-.ldv-photo-img { width: 100%; height: 100%; overflow: hidden; border: 4px solid #fff; border-radius: 50%; box-shadow: 0 10px 30px -8px rgba(15, 31, 75, 0.35); }
+.ldv-photo { display: none; position: relative; flex-shrink: 0; width: 132px; height: 132px; margin-right: 8px; pointer-events: none; animation: ldv-float 6s ease-in-out infinite; }
+@keyframes ldv-float { 50% { transform: translateY(-6px) rotate(-2deg); } }
+/* A pink-to-orange ring round the photo. */
+.ldv-photo-img {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  background: linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, var(--ldv-pink), #ff9d1c 60%, #fbd240) border-box;
+  box-shadow: 0 0 0 4px #fff, 0 14px 32px -10px rgba(15, 31, 75, 0.4);
+}
 .ldv .ldv-photo-img img { width: 100% !important; height: 100% !important; object-fit: cover; object-position: 60% 40%; }
 .ldv-ray { position: absolute; display: block; border-radius: 9999px; background: var(--ldv-pink); }
 .ldv-ray--1 { left: -6px; top: -4px; width: 6px; height: 24px; transform: rotate(-30deg); }
@@ -137,8 +190,9 @@
 .ldv-sr { position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 !important; opacity: 0; }
 .ldv .ldv-hr { display: block; height: 0; margin: 0 !important; border: 0 !important; border-top: 1px solid #e3e8f0 !important; background: none !important; }
 
-.ldv .ldv-h { display: flex; align-items: center; gap: 12px; margin-bottom: 12px !important; color: var(--ldv-navy) !important; font-size: 18px !important; font-weight: 700 !important; line-height: 1.4 !important; }
-.ldv-h-ic { width: 28px; height: 28px; color: var(--ldv-navy); }
+.ldv .ldv-h { display: flex; align-items: center; gap: 12px; margin-bottom: 12px !important; color: var(--ldv-navy) !important; font-family: var(--ldv-display) !important; font-size: 19px !important; font-weight: 700 !important; line-height: 1.3 !important; }
+/* The parts' icons: pink, on a pink-tinted round tile. */
+.ldv-h-ic { width: 34px; height: 34px; padding: 7px; border-radius: 12px; background: color-mix(in srgb, var(--ldv-pink) 12%, #fff); color: var(--ldv-pink); }
 
 /* Radio cards: "Join as" and "Preferred role". */
 .ldv-join { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
@@ -153,18 +207,29 @@
   color: var(--ldv-navy) !important;
   font-size: inherit !important;
   cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
-.ldv .ldv-choice.is-on, .ldv .ldv-role.is-on { border-color: color-mix(in srgb, var(--ldv-pink) 50%, #fff) !important; background: color-mix(in srgb, var(--ldv-pink) 6%, #fff) !important; }
+/* Under the mouse a card lifts a little; the chosen one in pink, with a pink glow. */
+.ldv .ldv-choice:hover, .ldv .ldv-role:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -12px rgba(15, 31, 75, 0.25); }
+.ldv .ldv-choice.is-on, .ldv .ldv-role.is-on {
+  border-color: var(--ldv-pink) !important;
+  background: color-mix(in srgb, var(--ldv-pink) 6%, #fff) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ldv-pink) 14%, transparent), 0 12px 24px -14px color-mix(in srgb, var(--ldv-pink) 60%, transparent);
+}
+/* Each card its own colour, from the logo's faces: its icon on a tile of that colour. */
+.ldv-choice:nth-child(3n + 1), .ldv-role:nth-child(4n + 2) { --ldv-c: var(--ldv-blue); }
+.ldv-choice:nth-child(3n + 2), .ldv-role:nth-child(4n + 1) { --ldv-c: var(--ldv-green); }
+.ldv-choice:nth-child(3n + 3), .ldv-role:nth-child(4n + 3) { --ldv-c: var(--ldv-orange); }
+.ldv-role:nth-child(4n + 4) { --ldv-c: var(--ldv-yellow); }
 .ldv-choice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
-.ldv-choice-ic { width: 36px; height: 36px; color: var(--ldv-navy); }
-.ldv-choice-title { flex: 1; min-width: 0; padding-right: 24px; font-weight: 700; font-size: 16px; line-height: 1.4; }
+.ldv-choice-ic { width: 44px; height: 44px; padding: 9px; border-radius: 14px; background: color-mix(in srgb, var(--ldv-c, var(--ldv-navy)) 14%, #fff); color: var(--ldv-c, var(--ldv-navy)); transition: transform 0.2s; }
+.ldv-choice-title { flex: 1; min-width: 0; padding-right: 24px; font-family: var(--ldv-display); font-weight: 700; font-size: 17px; line-height: 1.3; }
 .ldv-choice-mark { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); }
 .ldv-role { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 78px; padding: 10px 8px; }
-.ldv-role-ic { width: 32px; height: 32px; color: var(--ldv-navy); }
-.ldv-role-title { max-width: 100%; font-weight: 700; font-size: 15px; line-height: 1.3; text-align: center; }
+.ldv-role-ic { width: 40px; height: 40px; padding: 8px; border-radius: 13px; background: color-mix(in srgb, var(--ldv-c, var(--ldv-navy)) 14%, #fff); color: var(--ldv-c, var(--ldv-navy)); transition: transform 0.2s; }
+.ldv-role-title { max-width: 100%; font-family: var(--ldv-display); font-weight: 700; font-size: 16px; line-height: 1.25; text-align: center; }
 .ldv-role-mark { position: absolute; top: 8px; right: 8px; }
-.is-on > .ldv-choice-ic, .is-on > .ldv-role-ic { color: var(--ldv-pink); }
+.is-on > .ldv-choice-ic, .is-on > .ldv-role-ic { transform: rotate(-6deg) scale(1.06); }
 .ldv .ldv-choice input:focus-visible ~ .ldv-choice-title, .ldv .ldv-role input:focus-visible ~ .ldv-role-title { text-decoration: underline; }
 
 /* The round radio mark in a card's corner. */
@@ -207,6 +272,7 @@
   line-height: normal !important;
   letter-spacing: normal !important;
   outline: none !important;
+  text-overflow: ellipsis;
   transition: border-color 0.15s, box-shadow 0.15s;
   -webkit-appearance: none;
   appearance: none;
@@ -261,6 +327,14 @@
 }
 .ldv .ldv-submit:hover, .ldv .ldv-done-btn:hover, .ldv-button:hover { filter: brightness(1.1); }
 .ldv .ldv-submit { width: 100%; }
+/* The form's own buttons: pink into orange, the round font, lifting under the mouse. */
+.ldv .ldv-submit, .ldv .ldv-done-btn {
+  background: linear-gradient(100deg, var(--ldv-pink) 0%, color-mix(in srgb, var(--ldv-pink) 55%, #ff9d1c) 100%) !important;
+  font-family: var(--ldv-display) !important;
+  font-size: 18px !important;
+  transition: filter 0.15s, transform 0.2s, box-shadow 0.2s;
+}
+.ldv .ldv-submit:not(:disabled):hover, .ldv .ldv-done-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 28px -10px color-mix(in srgb, var(--ldv-pink) 55%, transparent) !important; }
 /* A long text on it takes more lines. */
 .ldv .ldv-submit, .ldv .ldv-done-btn { height: auto !important; min-height: 48px; padding-top: 10px !important; padding-bottom: 10px !important; line-height: 1.3 !important; text-align: center; white-space: normal; }
 .ldv .ldv-submit:disabled { opacity: 0.7; cursor: wait; }
@@ -272,7 +346,7 @@
 
 .ldv-done-ic { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; margin: 24px auto 16px; border-radius: 50%; background: color-mix(in srgb, var(--ldv-pink) 12%, #fff); color: var(--ldv-pink); }
 .ldv-done-ic svg { width: 36px; height: 36px; }
-.ldv .ldv-done-title { margin-bottom: 8px !important; color: var(--ldv-navy) !important; font-size: 24px !important; font-weight: 800 !important; line-height: 1.3 !important; }
+.ldv .ldv-done-title { margin-bottom: 8px !important; color: var(--ldv-navy) !important; font-family: var(--ldv-display) !important; font-size: 26px !important; font-weight: 800 !important; line-height: 1.3 !important; }
 .ldv .ldv-done-text { margin-bottom: 24px !important; color: #475569 !important; font-size: 15px !important; line-height: 1.5 !important; }
 .ldv .ldv-done-btn { width: 100%; }
 
@@ -285,23 +359,25 @@
 
 @media (min-width: 640px) {
   .ldv-overlay { align-items: center; padding: 16px; }
-  .ldv-head { padding: 24px 40px 40px; }
+  /* Room above the photo: it sits lower, clear of the board's top edge. */
+  .ldv-head { padding: 40px 40px 40px; }
   .ldv-head-row--close { padding-right: 48px; }
-  .ldv .ldv-logo img { width: 60px !important; height: 60px !important; }
-  .ldv-logo-1 { font-size: 30px; }
-  .ldv-logo-2 { font-size: 20px; }
+  /* Tablets: the logo, the title and its line to the left, the photo to the right. */
+  .ldv-head-text { align-items: flex-start; text-align: left; }
+  .ldv .ldv-title::after { margin-left: 0; }
+  .ldv .ldv-logo img { height: 64px !important; }
   .ldv .ldv-title { font-size: 34px !important; }
   .ldv .ldv-sub { font-size: 17px !important; }
   .ldv-photo { display: block; }
   .ldv-form { padding: 0 40px 32px; }
   .ldv .ldv-h { font-size: 22px !important; }
-  .ldv-h-ic { width: 32px; height: 32px; }
+  .ldv-h-ic { width: 38px; height: 38px; padding: 8px; }
   .ldv-join { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-  .ldv-choice { flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px; }
-  .ldv-choice-title { padding-right: 0; font-size: 17px; }
+  .ldv-choice { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; }
+  .ldv-choice-title { padding-right: 0; font-size: 18px; }
   .ldv-choice-mark { top: 12px; right: 12px; transform: none; }
   .ldv-roles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
-  .ldv-role-title { font-size: 16px; }
+  .ldv-role-title { font-size: 17px; }
   .ldv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ldv-wide { grid-column: 1 / -1; }
   .ldv .ldv-label { font-size: 16px !important; }
@@ -312,35 +388,154 @@
   .ldv-overlay { padding: 12px; }
   .ldv--form { max-width: 1320px; }
   .ldv-overlay > .ldv--form { max-height: calc(100vh - 24px); overflow-y: auto; }
-  .ldv-head { padding: 20px 48px 36px; }
-  .ldv-head-row { gap: 40px; }
-  .ldv-head-text { display: flex; align-items: center; justify-content: center; gap: 24px; text-align: left; }
-  .ldv .ldv-title { margin-top: 0 !important; font-size: 38px !important; }
-  .ldv-form { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px 48px; padding: 0 48px 24px; }
-  .ldv .ldv-col > * + * { margin-top: 20px !important; }
+  /* Computers: the whole form on one screen under the site's header, so a tight header. */
+  .ldv-head { padding: 26px 48px 4px; }
+  /* Computers: three even parts, the logo at the left, the title right in the middle,
+     the photo at the right (the two sides as wide as each other). */
+  .ldv-head-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 32px; }
+  .ldv-head-text { display: contents; }
+  .ldv-head-text > .ldv-logo { justify-self: start; }
+  .ldv-head-words { max-width: 640px; text-align: center; }
+  .ldv .ldv-title::after { margin-left: auto; }
+  .ldv-photo { justify-self: end; }
+  .ldv .ldv-logo img { height: 68px !important; }
+  .ldv .ldv-title { font-size: 38px !important; }
+  .ldv-form { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px 48px; padding: 0 48px 24px; }
+  .ldv .ldv-col > * + * { margin-top: 16px !important; }
   .ldv .ldv-hr { display: none; }
   .ldv .ldv-col > .ldv-hr + * { margin-top: 0 !important; }
   .ldv .ldv-h { margin-bottom: 10px !important; font-size: 20px !important; }
-  .ldv-role { min-height: 74px; }
+  /* Lower cards, shorter fields. */
+  .ldv-choice { gap: 4px; padding: 10px 12px; }
+  .ldv-choice-ic { width: 38px; height: 38px; padding: 7px; }
+  .ldv-role { min-height: 0; gap: 4px; padding: 8px 6px; }
+  .ldv-grid { row-gap: 12px; }
+  .ldv .ldv-label { margin-bottom: 4px !important; }
+  .ldv .ldv-input { height: 42px !important; }
+  .ldv-role-ic { width: 36px; height: 36px; padding: 7px; }
   .ldv-actions { padding-top: 0; }
 }
 
 @media (min-width: 1280px) {
-  .ldv-head-text { gap: 40px; }
-  .ldv-photo { width: 150px; height: 150px; }
+  .ldv-head { padding-left: 64px; padding-right: 64px; }
+  .ldv .ldv-logo img { height: 76px !important; }
+  .ldv .ldv-title { font-size: 38px !important; }
+  .ldv-photo { width: 100px; height: 100px; }
+}
+
+/* Small phones: a little smaller, so the title keeps to two lines. */
+@media (max-width: 379px) {
+  .ldv-head { padding-left: 16px; padding-right: 16px; }
+  .ldv .ldv-logo img { height: 44px !important; }
+  .ldv .ldv-title { font-size: 24px !important; }
+  .ldv .ldv-sub { font-size: 14px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ldv-photo { animation: none; }
 }
 
 /* Short desktop screens: tighter, so the whole form still fits. */
 @media (min-width: 1024px) and (max-height: 820px) {
-  .ldv-head { padding-top: 12px; padding-bottom: 32px; }
-  .ldv-photo { width: 112px; height: 112px; }
-  .ldv-form { gap: 16px 48px; padding-bottom: 16px; }
-  .ldv .ldv-col > * + * { margin-top: 16px !important; }
+  .ldv-head { padding-top: 22px; padding-bottom: 4px; }
+  .ldv .ldv-logo img { height: 58px !important; }
+  .ldv .ldv-title { font-size: 34px !important; }
+  .ldv .ldv-title::after { margin-top: 8px; }
+  .ldv .ldv-sub { margin-top: 8px !important; }
+  .ldv-photo { width: 96px; height: 96px; }
+  .ldv-form { gap: 12px 48px; padding-bottom: 16px; }
+  .ldv .ldv-col > * + * { margin-top: 12px !important; }
   .ldv .ldv-col > .ldv-hr + * { margin-top: 0 !important; }
   .ldv .ldv-h { font-size: 18px !important; }
-  .ldv-choice-ic, .ldv-role-ic { width: 28px; height: 28px; }
+  .ldv-choice-ic, .ldv-role-ic { width: 36px; height: 36px; padding: 7px; border-radius: 11px; }
   .ldv-role { min-height: 68px; }
   .ldv-grid { row-gap: 10px; }
   .ldv .ldv-label { margin-bottom: 4px !important; }
   .ldv .ldv-input { height: 40px !important; }
+}
+
+/* --- The chalkboard ------------------------------------------------------------------------
+   As in the school-board picture it was drawn from: the stripes round the card, a dark
+   green board with chalk dust on it, the titles in white chalk, the words under them in
+   yellow chalk. The fields and the choice cards stay white, to be read and filled easily.
+   With assets/images/volunteer-kids.png (CFG.kids, .ldv--kids) the children of the
+   picture stand along the board's foot. */
+
+.ldv .ldv-close { top: calc(var(--ldv-frame) + 12px); right: calc(var(--ldv-frame) + 12px); }
+
+/* The children of the picture, along the foot of the board (cut at its edges), and room
+   for them under the button: as tall as they are, a share of the board's width. */
+.ldv--kids {
+  /* At least 560px wide, so on phones they stay big enough (their sides cut). */
+  background: var(--ldv-kids) center bottom / max(100%, 560px) auto no-repeat content-box, var(--ldv-chalkboard), var(--ldv-stripes);
+  background-attachment: local;
+}
+.ldv--kids .ldv-form { padding-bottom: calc(max(9.72%, 55px) + 20px); }
+.ldv--kids.ldv--done { padding-bottom: calc(var(--ldv-frame) + 72px); }
+
+/* The header: straight on the board, no sky, no wave. */
+.ldv .ldv-blob, .ldv .ldv-wave { display: none; }
+.ldv-head::before { opacity: 0.45; }
+.ldv .ldv-title {
+  color: var(--ldv-chalk) !important;
+  letter-spacing: 0.01em !important;
+  /* Chalk: a little dusty at the edges. */
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.6), 0 0 8px rgba(255, 255, 255, 0.18), 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+.ldv .ldv-title::after { background: linear-gradient(90deg, var(--ldv-yellow-chalk), #ff9d1c); opacity: 0.9; }
+.ldv .ldv-sub { color: var(--ldv-yellow-chalk) !important; font-weight: 500 !important; }
+.ldv-photo-img { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9), 0 14px 32px -10px rgba(0, 0, 0, 0.55); }
+
+/* The parts' titles and the fields' names in chalk. */
+.ldv .ldv-h { color: var(--ldv-chalk) !important; }
+.ldv-h-ic { background: rgba(255, 210, 63, 0.16); color: var(--ldv-yellow-chalk); }
+.ldv .ldv-label { color: var(--ldv-chalk-2) !important; }
+.ldv-req { color: var(--ldv-yellow-chalk); }
+.ldv .ldv-check { color: var(--ldv-chalk-2); }
+.ldv .ldv-hr { border-top-color: rgba(255, 255, 255, 0.18) !important; }
+.ldv .ldv-err { color: #ffc1c1 !important; }
+.ldv .ldv-formerr { color: #ffc1c1 !important; }
+.ldv .ldv-input.is-bad { border-color: #ff8a8a !important; background: #fff5f5 !important; }
+.ldv .ldv-input.is-locked { background: #e7ece6 !important; }
+/* The chosen card glows yellow on the board. */
+.ldv .ldv-choice.is-on, .ldv .ldv-role.is-on { box-shadow: 0 0 0 3px rgba(255, 210, 63, 0.55), 0 12px 24px -12px rgba(0, 0, 0, 0.5); }
+.ldv .ldv-choice:hover, .ldv .ldv-role:hover { box-shadow: 0 14px 26px -12px rgba(0, 0, 0, 0.5); }
+.ldv .ldv-submit { box-shadow: 0 14px 28px -10px rgba(0, 0, 0, 0.55) !important; }
+
+/* Done */
+.ldv .ldv-done-title { color: var(--ldv-chalk) !important; }
+.ldv .ldv-done-text { color: var(--ldv-chalk-2) !important; }
+.ldv-done-ic { background: rgba(255, 210, 63, 0.16); color: var(--ldv-yellow-chalk); }
+.ldv--done .ldv-logo img { height: 56px !important; }
+
+@media (min-width: 640px) {
+  .ldv { --ldv-frame: 18px; }
+}
+@media (min-width: 1024px) {
+  .ldv { --ldv-frame: 18px; }
+  .ldv--done { --ldv-frame: 16px; }
+  .ldv--kids .ldv-form { padding-bottom: calc(9.72% + 14px); }
+}
+
+/* --- /volunteer/ as a page of its own (templates/volunteer-page.php) ------------------------ */
+.ldv-page {
+  padding: clamp(28px, 4vw, 56px) clamp(16px, 2.5vw, 48px) clamp(56px, 6vw, 88px);
+  background:
+    radial-gradient(900px 420px at 15% 0%, rgba(241, 19, 141, 0.07), transparent 70%),
+    radial-gradient(900px 420px at 85% 10%, rgba(70, 127, 247, 0.07), transparent 70%),
+    #f9fafd;
+}
+.ldv-page .ldv-page-in { max-width: 1320px; margin: 0 auto; }
+/* Computers: little room above it, so it fits on the screen under the site's header. */
+@media (min-width: 1024px) {
+  .ldv-page { padding-top: 16px; padding-bottom: 48px; }
+}
+.ldv-page .ldv-inline > .ldv--form { max-width: none; }
+.ldv-page .ldv-inline > .ldv--done { margin: 0 auto; }
+/* The footer's pink "Get Involved" card would only lead back here. */
+.ldv-page-body .ldf .ldf-cta { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ldv .ldv-choice:hover, .ldv .ldv-role:hover, .ldv .ldv-submit:hover, .ldv .ldv-done-btn:hover,
+  .is-on > .ldv-choice-ic, .is-on > .ldv-role-ic { transform: none; }
 }

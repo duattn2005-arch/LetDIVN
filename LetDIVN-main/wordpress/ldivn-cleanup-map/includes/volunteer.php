@@ -634,7 +634,9 @@ function ldv_after_signup(int $post_id, array $data): void
 }
 
 // --- /volunteer/: the form's own address ------------------------------------------------------
-// The front page with the form open. Unless the site has a page of that name.
+// A page of its own, the site's header and footer around the form (templates/volunteer-page.php);
+// or, with "vol_page" off, the front page with the form open over it. Unless the site has a page
+// of that name (then [ldivn_volunteer_form] goes in it).
 
 /** The form's own address. */
 function ldv_page_url(): string
@@ -657,8 +659,28 @@ add_filter('request', function ($vars) {
     if ($path !== 'volunteer' || is_admin() || get_page_by_path('volunteer', OBJECT, ['page', 'post'])) {
         return $vars;
     }
+    if (ldm_settings()['vol_page']) {
+        return ['ldv_page' => 1];
+    }
     $front = get_option('show_on_front') === 'page' ? (int) get_option('page_on_front') : 0;
     return $front ? ['page_id' => $front, 'ldv_page' => 1] : ['ldv_page' => 1];
+});
+
+/** Whether this is /volunteer/ as a page of its own. */
+function ldv_is_page(): bool
+{
+    return (bool) get_query_var('ldv_page') && (bool) ldm_settings()['vol_page'];
+}
+
+// After the theme's and Elementor's own choices.
+add_filter('template_include', fn($template) => ldv_is_page() ? LDM_DIR . '/templates/volunteer-page.php' : $template, 99);
+
+add_filter('body_class', function ($classes) {
+    if (ldv_is_page()) {
+        $classes = array_diff($classes, ['home', 'blog']);
+        $classes[] = 'ldv-page-body';
+    }
+    return $classes;
 });
 
 // WordPress would send the front page's other address to "/".
@@ -666,6 +688,11 @@ add_filter('redirect_canonical', fn($url) => get_query_var('ldv_page') ? false :
 
 // After SEO plugins and themes, which set the front page's own title.
 add_filter('pre_get_document_title', fn($title) => get_query_var('ldv_page') ? 'Register to Volunteer – ' . get_bloginfo('name') : $title, 99);
+
+// Yoast SEO would give the page the posts' address.
+foreach (['wpseo_canonical', 'wpseo_opengraph_url'] as $hook) {
+    add_filter($hook, fn($url) => ldv_is_page() ? ldv_page_url() : $url, 99);
+}
 
 // --- On the pages ------------------------------------------------------------------------------
 
@@ -676,6 +703,15 @@ add_action('init', function () {
     wp_register_style('ldv', LDM_URL . 'assets/css/volunteer.css', [], LDM_VERSION);
     wp_register_script('ldv', LDM_URL . 'assets/js/volunteer.js', [], LDM_VERSION, true);
 });
+
+/** The round, playful font of the form's titles, cards and button (--ldv-display in volunteer.css). */
+const LDV_DISPLAY_FONT = 'https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap';
+
+/** The children standing along the chalkboard's foot, if their picture is in the plugin; else ''. */
+function ldv_kids_url(): string
+{
+    return is_file(LDM_DIR . '/assets/images/volunteer-kids.png') ? LDM_URL . 'assets/images/volunteer-kids.png' : '';
+}
 
 /** Loads the form's files (once), with what it needs to know. */
 function ldv_enqueue(): void
@@ -688,6 +724,7 @@ function ldv_enqueue(): void
     $s = ldm_settings();
     $form = ldv_form(); // Tình nguyện viên → Sửa form đăng ký
     wp_enqueue_style('ldv');
+    wp_enqueue_style('ldv-display', LDV_DISPLAY_FONT, [], null);
     if ($form['style']['font'] !== '') {
         wp_enqueue_style('ldv-font', ldv_font_url($form['style']['font']), [], null);
     }
@@ -695,8 +732,11 @@ function ldv_enqueue(): void
     wp_add_inline_script('ldv', 'window.LDIVN_VOLUNTEER = ' . wp_json_encode(ldv_form_js($form) + [
         'api' => add_query_arg('ldv_api', '1', home_url('/')),
         'ajax' => admin_url('admin-ajax.php'),
-        'logo' => LDM_URL . 'assets/images/logo-icon-light.png',
+        'logo' => LDM_URL . 'assets/images/logo-footer.png',
+        'kids' => ldv_kids_url(),
         'onMap' => (bool) $s['vol_on_map'],
+        // The buttons and links go to the form's page instead of opening it over the page.
+        'asPage' => (bool) $s['vol_page'],
         // The form's own address: shown while it is open, and it opens the form.
         'page' => (string) wp_parse_url(ldv_page_url(), PHP_URL_PATH),
         'home' => home_url('/'),

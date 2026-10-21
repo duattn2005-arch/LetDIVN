@@ -10,6 +10,25 @@
     var player = root.querySelector('.ldmv-player');
 
     root.addEventListener('click', function (e) {
+      var chip = e.target.closest ? e.target.closest('.ldmv-year') : null;
+      if (chip && root.contains(chip)) {
+        var want = chip.getAttribute('data-ldmv-filter');
+        root.querySelectorAll('.ldmv-year').forEach(function (el) {
+          el.classList.toggle('is-active', el === chip);
+          el.setAttribute('aria-pressed', el === chip ? 'true' : 'false');
+        });
+        var shown = 0;
+        root.querySelectorAll('.ldmv-item').forEach(function (el) {
+          var on = el.getAttribute('data-ldmv-year') === want;
+          el.hidden = !on;
+          if (on) shown++;
+        });
+        var num = root.querySelector('.ldmv-num');
+        if (num) num.textContent = shown;
+        var items = root.querySelector('.ldmv-items');
+        if (items) items.scrollTop = 0;
+        return;
+      }
       var item = e.target.closest ? e.target.closest('.ldmv-item') : null;
       if (!item || !root.contains(item) || !frame) return;
       root.querySelectorAll('.ldmv-item.is-active').forEach(function (el) {

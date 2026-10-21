@@ -1,0 +1,98 @@
+/* The news (Elementor's Posts widget, Classic skin: the homepage, the News page):
+   each post in a white rounded card that rises when the mouse is over it, its
+   photo zooming in slowly (includes/news.php). */
+
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(241, 19, 141, 0.08);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 14px 34px -14px rgba(241, 19, 141, 0.22), 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post:hover,
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post:focus-within {
+  transform: translateY(-8px);
+  border-color: rgba(241, 19, 141, 0.22);
+  box-shadow: 0 26px 48px -16px rgba(241, 19, 141, 0.34), 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+/* The list as wide as the header and the footer: from the header's logo to its last button. */
+.elementor .elementor-element.e-con:has(> .e-con-inner > .elementor-widget-posts),
+.elementor .elementor-element.e-con:has(> .elementor-widget-posts) {
+  --content-width: 100%;
+  --padding-left: clamp(16px, 2.5vw, 48px);
+  --padding-right: clamp(16px, 2.5vw, 48px);
+}
+.elementor-widget-posts .elementor-posts--skin-classic.elementor-grid {
+  padding-bottom: 12px; /* room for the lifted card's shadow */
+}
+
+/* The photo: edge to edge at the top, zooming in. Its frame zooms, not the photo:
+   Elementor places the photo with a transform of its own, set once the page has loaded. */
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__thumbnail__link {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  overflow: hidden;
+}
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__thumbnail {
+  border-radius: 0;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.6s ease;
+}
+/* The frame 3:2, as the photos are taken, so a photo shows whole, its corners too
+   (the logo in them). A photo of another shape fills it, centred. */
+.elementor .elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__thumbnail {
+  padding-bottom: 66.667%;
+}
+.elementor .elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__thumbnail img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  transform: none;
+}
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post:hover .elementor-post__thumbnail {
+  transform: scale(1.04);
+  filter: saturate(1.1);
+}
+
+/* The words: inside the card, "Read More" at its foot. */
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__text {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 4px 24px 24px;
+}
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__title a {
+  transition: color 0.25s ease;
+}
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post:hover .elementor-post__title a {
+  color: #f1138d;
+}
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__read-more {
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 12px;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+.elementor-widget-posts .elementor-posts--skin-classic .elementor-post:hover .elementor-post__read-more {
+  color: #f1138d;
+  transform: translateX(4px);
+}
+
+@media (max-width: 767px) {
+  .elementor-widget-posts .elementor-posts--skin-classic .elementor-post { border-radius: 20px; }
+  .elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__text { padding: 4px 18px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .elementor-widget-posts .elementor-posts--skin-classic .elementor-post,
+  .elementor-widget-posts .elementor-posts--skin-classic .elementor-post .elementor-post__thumbnail { transition: none; }
+}

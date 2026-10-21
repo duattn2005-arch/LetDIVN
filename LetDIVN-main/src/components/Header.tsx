@@ -28,8 +28,16 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const currentView = propCurrentView || propActiveView || 'home';
   const { t } = useLanguage();
-  // The WordPress build leaves out Cleanup Map and Volunteer; they're added there by hand.
+  // In the WordPress build Cleanup Map and Volunteer are links: to the page with the
+  // cleanup map plugin's map, and "#volunteer", which opens that plugin's sign-up form.
   const isWordPress = import.meta.env.VITE_WORDPRESS === '1';
+  const MapItem: any = isWordPress ? 'a' : 'button';
+  const mapItemProps = (after?: () => void) =>
+    isWordPress ? { href: '/cleanup-map/', onClick: after } : { onClick: () => { onNavigate('map'); after?.(); } };
+  const volunteerItemProps = (after?: () => void) =>
+    isWordPress ? { href: '#volunteer', onClick: after } : { onClick: () => { onOpenVolunteer(); after?.(); } };
+  // Menu items for those two would show them twice.
+  const extraMenu = wpMenu.filter((item) => !/\/cleanup-map\/?$|#volunteer$/.test(item.url));
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
@@ -260,7 +268,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* WordPress menu items (e.g. Cleanup Map, Volunteer) */}
-            {wpMenu.map((item) => (
+            {extraMenu.map((item) => (
               <a
                 key={item.url + item.title}
                 href={item.url}
@@ -275,10 +283,9 @@ export const Header: React.FC<HeaderProps> = ({
             ))}
 
             {/* 7. Real Cleanup Map (Pin Icon Badge) */}
-            {!isWordPress && (
-            <button
+            <MapItem
               id="nav-cleanup-map"
-              onClick={() => onNavigate('map')}
+              {...mapItemProps()}
               title={t.navMap}
               className={`shrink-0 flex items-center gap-1.5 px-2 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 currentView === 'map'
@@ -288,8 +295,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <MapPin className="w-4.5 h-4.5 text-[#E81A7F]" />
               <span>{t.navMap}</span>
-            </button>
-            )}
+            </MapItem>
 
           </nav>
 
@@ -299,15 +305,13 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="hidden xl:flex items-center gap-2.5 2xl:gap-3 shrink-0">
 
             {/* Volunteer registration button */}
-            {!isWordPress && (
-            <button
+            <MapItem
               id="header-volunteer-btn"
-              onClick={onOpenVolunteer}
+              {...volunteerItemProps()}
               className="inline-flex items-center justify-center h-[42px] 2xl:h-[44px] bg-white border-2 border-[#F1138D] text-[#F1138D] hover:bg-pink-50 text-[15px] 2xl:text-[16px] font-semibold leading-none px-5 2xl:px-[28px] rounded-full transition-all transform hover:-translate-y-0.5 cursor-pointer whitespace-nowrap shrink-0"
             >
               {t.joinVolunteer}
-            </button>
-            )}
+            </MapItem>
 
             {/* Contact Us button */}
             <button
@@ -399,7 +403,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* WordPress menu items in Mobile */}
-            {wpMenu.map((item) => (
+            {extraMenu.map((item) => (
               <a
                 key={item.url + item.title}
                 href={item.url}
@@ -411,15 +415,13 @@ export const Header: React.FC<HeaderProps> = ({
             ))}
 
             {/* Map in Mobile */}
-            {!isWordPress && (
-            <button
-              onClick={() => { onNavigate('map'); setMobileMenuOpen(false); }}
+            <MapItem
+              {...mapItemProps(() => setMobileMenuOpen(false))}
               className="text-left px-3 py-2 rounded-lg hover:bg-pink-50 hover:text-[#E81A7F] flex items-center gap-2 font-bold text-[#E81A7F] pt-2 border-t border-slate-100"
             >
               <MapPin className="w-4 h-4" />
               <span>{t.navMap}</span>
-            </button>
-            )}
+            </MapItem>
 
             {/* Contact Us in Mobile */}
             <button
@@ -430,16 +432,14 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Action Buttons in Mobile */}
-            {!isWordPress && (
             <div className="grid grid-cols-1 gap-2 pt-2 border-t border-slate-100">
-              <button
-                onClick={() => { onOpenVolunteer(); setMobileMenuOpen(false); }}
+              <MapItem
+                {...volunteerItemProps(() => setMobileMenuOpen(false))}
                 className="py-2.5 px-3 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 border border-emerald-200"
               >
                 <span>{t.joinVolunteer}</span>
-              </button>
+              </MapItem>
             </div>
-            )}
 
           </div>
         </div>

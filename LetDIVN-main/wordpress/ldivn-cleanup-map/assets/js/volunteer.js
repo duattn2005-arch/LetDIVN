@@ -6,6 +6,7 @@
  * [data-ldv-open] ([ldivn_volunteer_button]) and from the map's Register buttons
  * ([data-ldv-event]: that event chosen). [data-ldv-form] ([ldivn_volunteer_form])
  * is drawn in the page. ?register=<event id> or #volunteer in the address opens it too.
+ * With CFG.asPage the form has a page of its own (/volunteer/): all of these go there instead.
  * Settings come from window.LDIVN_VOLUNTEER, with the texts and roles set in
  * Tình nguyện viên → Sửa form đăng ký.
  */
@@ -103,8 +104,11 @@
     set('--ldv-navy', s.text);
     set('--ldv-radius', s.radius !== undefined && s.radius !== '' ? s.radius + 'px' : '');
     set('--ldv-head', s.headImage ? 'url("' + String(s.headImage).replace(/"/g, '%22') + '") center / cover no-repeat'
-      : s.head ? 'linear-gradient(180deg, ' + s.head + ' 0%, #fff 100%)' : '');
+      : s.head ? 'linear-gradient(180deg, ' + s.head + ' 0%, transparent 100%)' : '');
     set('--ldv-font', s.fontFamily);
+    // The children along the chalkboard's foot, when their picture is there (assets/css/volunteer.css).
+    set('--ldv-kids', CFG.kids ? 'url("' + String(CFG.kids).replace(/"/g, '%22') + '")' : '');
+    card.classList.toggle('ldv--kids', !!CFG.kids);
   }
 
   var uid = 0;
@@ -197,10 +201,10 @@
     return '<h4 class="ldv-h">' + icon(name, 'ldv-h-ic') + tx(key) + '</h4>';
   }
 
+  // The Let's Do It! Vietnam logo, its words in white for the chalkboard (assets/images/logo-footer.png).
   function logo() {
     return '<div class="ldv-logo">' +
-      (CFG.logo ? '<img src="' + esc(CFG.logo) + '" alt="">' : '') +
-      '<div class="ldv-logo-text"><div class="ldv-logo-1">Let’s do it!</div><div class="ldv-logo-2">Vietnam</div></div>' +
+      (CFG.logo ? '<img src="' + esc(CFG.logo) + '" alt="Let’s do it! Vietnam" width="720" height="246">' : '') +
     '</div>';
   }
 
@@ -340,7 +344,7 @@
         '<svg viewBox="0 0 960 80" preserveAspectRatio="none" class="ldv-wave" aria-hidden="true"><path d="M0 80 L0 38 C 120 0, 300 8, 470 60 C 520 74, 560 80, 600 80 Z" fill="#fff"/><rect x="0" y="70" width="960" height="10" fill="#fff"/></svg>' +
         '<div class="ldv-head-row' + (modal ? ' ldv-head-row--close' : '') + '">' +
           '<div class="ldv-head-text">' + logo() +
-            '<div><h3 class="ldv-title" id="' + p + '-title" data-t="title">' + t('title') + '</h3>' +
+            '<div class="ldv-head-words"><h3 class="ldv-title" id="' + p + '-title" data-t="title">' + t('title') + '</h3>' +
             '<p class="ldv-sub" data-t="subtitle">' + t('subtitle') + '</p></div>' +
           '</div>' +
           '<div class="ldv-photo" aria-hidden="true">' +
@@ -582,6 +586,7 @@
 
   function done(card, name, opts) {
     card.className = 'ldv ldv--done';
+    applyStyle(card);
     card.innerHTML = doneHtml(name, opts.modal);
     var again = function () {
       if (opts.modal) close();
@@ -657,9 +662,19 @@
     }
   }
 
+  /** The form's page (CFG.asPage): there, the form in it; elsewhere, going to it. */
+  function go(eventId) {
+    var box = location.pathname === CFG.page ? document.querySelector('.ldv-inline') : null;
+    if (box) {
+      box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    location.href = CFG.page + (eventId ? '?register=' + encodeURIComponent(eventId) : '');
+  }
+
   // Back/forward: leaving /volunteer/ closes the form, coming back to it opens it.
   window.addEventListener('popstate', function () {
-    if (!CFG.page) return;
+    if (!CFG.page || CFG.asPage) return;
     if (location.pathname === CFG.page) {
       if (!overlay) open(registerParam() || '', false);
     } else if (overlay) {
@@ -687,7 +702,7 @@
     if (!mapButton && !t.hasAttribute('data-ldv-open') && !t.classList.contains('ldivn-volunteer-open') && !isVolunteerLink(t)) return;
     e.preventDefault();
     e.stopPropagation();
-    open(t.getAttribute('data-ldv-event') || '');
+    (CFG.asPage ? go : open)(t.getAttribute('data-ldv-event') || '');
   }, true);
 
   function start() {
@@ -697,9 +712,14 @@
       var card = document.createElement('div');
       box.innerHTML = '';
       box.appendChild(card);
-      build(card, { modal: false, event: box.getAttribute('data-ldv-form') || '' });
+      // On the form's page, ?register=<event id> chooses that event.
+      build(card, { modal: false, event: box.getAttribute('data-ldv-form') || (CFG.asPage && registerParam()) || '' });
     });
 
+    if (CFG.asPage) {
+      if (location.hash === '#volunteer') go('');
+      return;
+    }
     // ?register=<event id> (the website's own link), /volunteer/ or #volunteer opens the form.
     var event = registerParam();
     if (event !== null) open(event, false);
@@ -708,10 +728,10 @@
   }
 
   window.addEventListener('hashchange', function () {
-    if (location.hash === '#volunteer' && !overlay) open('');
+    if (location.hash === '#volunteer' && !overlay) (CFG.asPage ? go : open)('');
   });
 
-  window.LDIVN_VOLUNTEER_OPEN = open;
+  window.LDIVN_VOLUNTEER_OPEN = CFG.asPage ? go : open;
   // The form drawn again from CFG, as changed by the in-place editor.
   window.LDIVN_VOLUNTEER_BUILD = function (card) { build(card, { modal: false, event: '' }); };
   window.LDIVN_VOLUNTEER_STYLE = applyStyle;

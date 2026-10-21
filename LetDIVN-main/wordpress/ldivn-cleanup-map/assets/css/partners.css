@@ -1,0 +1,89 @@
+/* The Our Partners page (includes/footer.php puts .ldivn-partners on its body):
+   each logo of its Elementor grid in a white card with a pink-to-orange border,
+   five in a row. Only grids made of image widgets, so the rest of the page stays as it is. */
+
+/* Wider than the page's other boxes, so the cards are big enough for the logos. */
+body.ldivn-partners .e-con:has(> .e-con-inner > .e-con.e-grid > .elementor-widget-image) {
+  --content-width: min(100%, 1400px);
+}
+
+body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) {
+  --e-con-grid-template-columns: repeat(5, minmax(0, 1fr));
+  --e-con-grid-template-rows: none;
+  --grid-auto-flow: row;
+  --gap: 48px 48px;
+  --row-gap: 48px;
+  --column-gap: 48px;
+  --justify-items: stretch;
+  --align-items: stretch;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) > .elementor-widget-image {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) > .elementor-widget-image > .elementor-widget-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 262 / 178;
+  padding: 14px 20px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  border-radius: 24px;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(105deg, #ec1c7f 0%, #f0287a 38%, #ff7a2a 78%, #ff9d1c 100%) border-box;
+  box-shadow: 0 6px 18px rgba(236, 28, 127, 0.07), 0 2px 6px rgba(15, 23, 42, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) > .elementor-widget-image > .elementor-widget-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(236, 28, 127, 0.16), 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) > .elementor-widget-image a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) > .elementor-widget-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0 auto;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 1024px) {
+  body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) {
+    --e-con-grid-template-columns: repeat(3, minmax(0, 1fr));
+    --gap: 32px 32px;
+    --row-gap: 32px;
+    --column-gap: 32px;
+  }
+}
+@media (max-width: 767px) {
+  body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) {
+    --e-con-grid-template-columns: repeat(2, minmax(0, 1fr));
+    --gap: 16px 16px;
+    --row-gap: 16px;
+    --column-gap: 16px;
+  }
+  body.ldivn-partners .e-con.e-grid:has(> .elementor-widget-image) > .elementor-widget-image > .elementor-widget-container {
+    padding: 10px 12px;
+    border-radius: 18px;
+  }
+}

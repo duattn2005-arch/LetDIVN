@@ -48,11 +48,13 @@ function ldm_sanitize_settings($in): array
         'site_url' => untrailingslashit(esc_url_raw(trim((string) ($in['site_url'] ?? '')))) ?: $d['site_url'],
         'vol_on_map' => empty($in['vol_on_map']) ? 0 : 1,
         'vol_everywhere' => empty($in['vol_everywhere']) ? 0 : 1,
+        'vol_page' => empty($in['vol_page']) ? 0 : 1,
         'vol_forward' => empty($in['vol_forward']) ? 0 : 1,
         'vol_email' => implode(', ', array_filter(array_map('sanitize_email', explode(',', (string) ($in['vol_email'] ?? ''))))),
         'bubble' => empty($in['bubble']) ? 0 : 1,
         'bubble_open' => empty($in['bubble_open']) ? 0 : 1,
         'latest' => empty($in['latest']) ? 0 : 1,
+        'footer' => empty($in['footer']) ? 0 : 1,
     ];
 }
 
@@ -178,6 +180,13 @@ function ldm_settings_page(): void
                         <label><input type="checkbox" name="<?php echo $name('latest'); ?>" value="1" <?php checked($s['latest'], 1); ?>> Chạy chữ 5 bài viết (Posts) mới nhất trên đầu mọi trang, tự cập nhật khi đăng bài mới</label>
                     </td>
                 </tr>
+                <tr>
+                    <th scope="row">Chân trang</th>
+                    <td>
+                        <label><input type="checkbox" name="<?php echo $name('footer'); ?>" value="1" <?php checked($s['footer'], 1); ?>> Dùng chân trang mới (dải hồng "People for a clean planet!", logo và 3 cột link trên nền xanh) thay cho chân trang của theme</label>
+                        <p class="description">Bỏ chọn thì chân trang cũ (dựng bằng Elementor) hiện lại như trước. Link "Privacy Policy" và "Terms of Service" ở dòng cuối chỉ hiện khi đã đăng trang có địa chỉ <code>/privacy-policy/</code> và <code>/terms-of-service/</code>.</p>
+                    </td>
+                </tr>
             </table>
 
             <h2>Đăng ký tình nguyện viên</h2>
@@ -195,6 +204,7 @@ function ldm_settings_page(): void
                 <tr>
                     <th scope="row">Mở form</th>
                     <td>
+                        <label><input type="checkbox" name="<?php echo $name('vol_page'); ?>" value="1" <?php checked($s['vol_page'], 1); ?>> Form là một trang riêng ở <a href="<?php echo esc_url(ldv_page_url()); ?>" target="_blank"><?php echo esc_html(ldv_page_url()); ?></a>, có header và chân trang như các trang khác: nút Volunteer, nút Register trên bản đồ và link <code>#volunteer</code> mở trang này (bỏ chọn: form hiện thành cửa sổ nổi trên trang đang xem)</label><br>
                         <label><input type="checkbox" name="<?php echo $name('vol_on_map'); ?>" value="1" <?php checked($s['vol_on_map'], 1); ?>> Nút Register trên bản đồ mở form ngay trên web này (bỏ chọn: mở form của website ở trên)</label><br>
                         <label><input type="checkbox" name="<?php echo $name('vol_everywhere'); ?>" value="1" <?php checked($s['vol_everywhere'], 1); ?>> Link <code>#volunteer</code> mở form ở mọi trang (bỏ chọn: chỉ ở trang có bản đồ hoặc shortcode của form)</label>
                     </td>

@@ -28,7 +28,7 @@ $ldivn_page = is_page() ? get_queried_object() : null;
   <body class="bg-white text-slate-900 antialiased font-sans selection:bg-pink-500 selection:text-white">
     <?php wp_body_open(); ?>
     <div id="root"></div>
-    <?php if ($ldivn_page && trim($ldivn_page->post_content) !== '') : ?>
+    <?php if ($ldivn_page && trim($ldivn_page->post_content) !== '' && !ldivn_is_elementor_page($ldivn_page)) : ?>
     <div id="ldivn-page-content"><?php echo apply_filters('the_content', $ldivn_page->post_content); ?></div>
     <?php endif; ?>
     <?php wp_footer(); ?>

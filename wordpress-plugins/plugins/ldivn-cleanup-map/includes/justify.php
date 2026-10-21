@@ -7,6 +7,10 @@
 defined('ABSPATH') || exit;
 
 add_action('wp_footer', function () {
+    // The theme "Let's Do It Vietnam" is the app itself, which aligns its own text.
+    if (get_template() === 'letsdoitvietnam') {
+        return;
+    }
     ?>
 <style id="ldm-justify-css">.ldm-justify{text-align:justify!important;text-justify:inter-word}</style>
 <script id="ldm-justify-js">

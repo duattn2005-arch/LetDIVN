@@ -43,4 +43,24 @@ add_filter('nav_menu_link_attributes', function ($atts, $item) {
 
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('ldm-menu', LDM_URL . 'assets/css/menu.css', [], LDM_VERSION);
+    // The dropdowns' items as big and as bold as the menu's own ones ("Other", "Projects"),
+    // whatever Elementor gives those: theirs is copied into --ldm-item-size and
+    // --ldm-item-weight (assets/css/menu.css). Not from the page you're on: that one is bolder.
+    wp_register_script('ldm-menu', false, [], LDM_VERSION, true);
+    wp_enqueue_script('ldm-menu');
+    wp_add_inline_script('ldm-menu', <<<'JS'
+(function () {
+    function size() {
+        document.querySelectorAll('.elementor-location-header .elementor-nav-menu--main').forEach(function (nav) {
+            var item = nav.querySelector('.elementor-nav-menu > li:not(.ldivn-menu-volunteer) > .elementor-item:not(.elementor-item-active)');
+            if (!item) return;
+            var style = getComputedStyle(item);
+            nav.style.setProperty('--ldm-item-size', style.fontSize);
+            nav.style.setProperty('--ldm-item-weight', style.fontWeight);
+        });
+    }
+    size();
+    addEventListener('resize', size);
+})();
+JS);
 });

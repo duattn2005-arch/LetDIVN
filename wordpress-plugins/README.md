@@ -8,7 +8,7 @@ Mã nguồn các plugin WordPress tự viết cho website **Let's Do It Vietnam*
 
 | Plugin | Phiên bản | Chức năng |
 |---|---|---|
-| [LDIVN Cleanup Map](plugins/ldivn-cleanup-map/) | 1.18.0 | Bản đồ dọn rác, form tình nguyện viên, thống kê, video, footer, menu của website |
+| [LDIVN Cleanup Map](plugins/ldivn-cleanup-map/) | 1.22.3 | Bản đồ dọn rác, form tình nguyện viên, thống kê, video, footer, menu của website |
 | [LDIVN Guard](plugins/ldivn-guard/) | 1.0.0 | Giám sát file PHP, cảnh báo Administrator mới, gia cố bảo mật cơ bản |
 
 ## Cấu trúc
