@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { LanguageProvider } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
-import { AboutSection } from './components/AboutSection';
-import { GetInvolvedSection } from './components/GetInvolvedSection';
-import { TakeActionStrip } from './components/TakeActionStrip';
+import { WcdStats } from './components/home/WcdStats';
+import { HomeVideos } from './components/home/HomeVideos';
+import { HomeFeatures } from './components/home/HomeFeatures';
 import { Footer } from './components/Footer';
 
 // Modals
@@ -301,17 +301,13 @@ export function AppContent() {
               onExploreMap={() => handleNavigate('map')}
             />
             <HomeQuickLinksSection onNavigate={handleNavigate} />
-            <AboutSection
-              onLearnMore={() => handleNavigate('who-we-are')}
-            />
-            <MediaVideosPage />
-            <GetInvolvedSection
-              onRegisterVolunteer={() => handleOpenVolunteerModal()}
-              onJoinVolunteer={() => handleOpenVolunteerModal()}
-              onBecomePartner={() => setIsPartnerModalOpen(true)}
-            />
-            {/* The reference homepage ends with the four coloured tiles too. */}
-            <TakeActionStrip contentKeyPrefix="home" photos={false} />
+            {/* As letsdoitvietnam.org: World Cleanup Day year by year, the
+                videos, then the four boxes over the footer. */}
+            <div className="bg-white">
+              <WcdStats />
+              <HomeVideos />
+              <HomeFeatures />
+            </div>
           </>
         )}
 

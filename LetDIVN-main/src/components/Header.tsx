@@ -3,6 +3,9 @@ import { ChevronDown, Menu, X, MapPin } from 'lucide-react';
 import { ActiveView } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { EditableText } from './EditableText';
+import { dbService } from '../services/dbService';
+import { NewsArticle } from '../types';
+import '../wp/latest.css';
 
 /** Items of the WordPress menu "Menu trên header" (the theme prints them; none on the Node site). */
 const wpMenu: { title: string; url: string }[] =
@@ -40,6 +43,15 @@ export const Header: React.FC<HeaderProps> = ({
   const extraMenu = wpMenu.filter((item) => !/\/cleanup-map\/?$|#volunteer$/.test(item.url));
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // The bar over the header shows the 5 newest posts, as on letsdoitvietnam.org.
+  const [latest, setLatest] = useState<NewsArticle[]>([]);
+  useEffect(() => {
+    const refresh = () => dbService.getNews().then((all) => setLatest(
+      all.filter((n) => n.status !== 'Pending').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
+    ));
+    refresh();
+    return dbService.subscribe(refresh);
+  }, []);
   const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
   const [otherDropdownOpen, setOtherDropdownOpen] = useState(false);
 
@@ -74,40 +86,33 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs select-none">
       
-      {/* Top Notification & Utility Bar with Smooth Running Marquee */}
-      <div className="bg-slate-900 text-white text-xs py-1.5 px-3 sm:px-4 overflow-hidden w-full relative">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-4 overflow-hidden">
-          
-          {/* Running Text Marquee Area */}
-          <div className="flex-1 overflow-hidden relative flex items-center h-5">
-            <div className="animate-marquee-infinite flex items-center gap-8 whitespace-nowrap">
-              {/* Track Part 1 */}
-              <div className="flex items-center gap-8 shrink-0">
-                <span className="font-medium text-slate-200 text-[11px] sm:text-xs flex items-center gap-1.5">
-                  <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                  <EditableText contentKey="header.topAnnouncement" defaultValue={t.topBarAnnouncement} as="span" />
-                </span>
-                <span className="font-medium text-pink-300 text-[11px] sm:text-xs flex items-center gap-1.5">
-                  <span className="flex h-2 w-2 rounded-full bg-[#E81A7F] animate-pulse shrink-0"></span>
-                  <EditableText contentKey="header.topTagline" defaultValue={t.topBarTagline} as="span" />
-                </span>
-              </div>
-
-              {/* Track Part 2 (Seamless loop duplicate) */}
-              <div className="flex items-center gap-8 shrink-0" aria-hidden="true">
-                <span className="font-medium text-slate-200 text-[11px] sm:text-xs flex items-center gap-1.5">
-                  <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                  <EditableText contentKey="header.topAnnouncement" defaultValue={t.topBarAnnouncement} as="span" />
-                </span>
-                <span className="font-medium text-pink-300 text-[11px] sm:text-xs flex items-center gap-1.5">
-                  <span className="flex h-2 w-2 rounded-full bg-[#E81A7F] animate-pulse shrink-0"></span>
-                  <EditableText contentKey="header.topTagline" defaultValue={t.topBarTagline} as="span" />
-                </span>
+      {/* The newest posts running by, as letsdoitvietnam.org's bar (the plugin's latest.css) */}
+      {latest.length > 0 && (
+        <div className="ldlp" role="region" aria-label="Latest posts">
+          <div className="ldlp-in">
+            <div className="ldlp-view">
+              <div className="ldlp-track">
+                {[false, true].map((copy) => (
+                  <div className="ldlp-run" key={String(copy)} aria-hidden={copy || undefined}>
+                    {latest.map((n) => (
+                      <a
+                        key={n.id}
+                        className="ldlp-item"
+                        href={`/news/${n.slug || n.id}/`}
+                        tabIndex={copy ? -1 : undefined}
+                        onClick={(e) => { e.preventDefault(); onNavigate('news', n.slug || n.id); }}
+                      >
+                        <span className="ldlp-dot" />
+                        {n.title}
+                      </a>
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Navigation Bar */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 w-full relative">
@@ -119,19 +124,11 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onNavigate('home')}
             className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group shrink-0 py-1"
           >
-            <img 
-              src="/logo-icon.png" 
-              alt="Let's do it! Vietnam Icon" 
-              className="h-10 w-10 sm:h-13 sm:w-13 object-contain transition-transform group-hover:scale-105"
+            <img
+              src="/logo-horizontal.png"
+              alt="Let’s do it! Vietnam"
+              className="h-11 sm:h-[52px] w-auto object-contain transition-transform group-hover:scale-105"
             />
-            <div className="flex flex-col justify-center whitespace-nowrap">
-              <span className="font-serif font-black text-base sm:text-2xl tracking-tight text-slate-950 leading-none group-hover:text-[#E81A7F] transition-colors whitespace-nowrap">
-                Let’s do it!
-              </span>
-              <span className="font-serif font-semibold text-[11px] sm:text-sm text-slate-700 tracking-normal leading-tight mt-0.5 whitespace-nowrap">
-                Vietnam
-              </span>
-            </div>
           </div>
 
           {/* Desktop Nav Items: Centered and well-spaced across the available width */}
@@ -324,7 +321,14 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Mobile / Tablet Menu Toggle (Shown when < xl) */}
-          <div className="flex xl:hidden items-center gap-2 shrink-0 z-10">
+          <div className="flex xl:hidden items-center gap-3 shrink-0 z-10">
+            {/* As letsdoitvietnam.org: Contact Us beside the menu button */}
+            <button
+              onClick={() => onNavigate('contact')}
+              className="hidden sm:inline-flex items-center justify-center h-[42px] px-[30px] rounded-full bg-[#F1138D] hover:bg-[#D01370] text-white font-['Poppins'] text-[16px] leading-none whitespace-nowrap cursor-pointer transition-colors"
+            >
+              {t.navContactUs}
+            </button>
 
             <button
               id="mobile-menu-toggle"

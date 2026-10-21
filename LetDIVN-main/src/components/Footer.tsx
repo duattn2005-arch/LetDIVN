@@ -1,9 +1,10 @@
 import React from 'react';
-import { Phone, Mail, MapPin, Instagram, Facebook, ArrowRight } from 'lucide-react';
-import { ActiveView } from '../types';
-import { useLanguage } from '../context/LanguageContext';
-import { EditableText } from './EditableText';
-import { GrowingTree } from './GrowingTree';
+import '../wp/footer.css';
+
+// The footer of letsdoitvietnam.org: a pink "People for a clean planet!" card,
+// then the logo and three columns of links on the header's dark blue, then the
+// copyright line. Same markup and CSS as the WordPress plugin's footer
+// (wordpress-plugins/plugins/ldivn-cleanup-map/includes/footer.php).
 
 interface FooterProps {
   onNavigate: (view: any, extraId?: string) => void;
@@ -11,217 +12,105 @@ interface FooterProps {
   onOpenPartner?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
-  const { t } = useLanguage();
+/** [text, app view or address] — a view opens in the app, an address loads that page. */
+const COLUMNS: [string, [string, string][]][] = [
+  ['About', [
+    ['Who We Are', 'who-we-are'],
+    ['What We Do', 'what-we-do'],
+    ['Our Team', 'our-team'],
+    ['Our Partners', 'our-partners'],
+    ['Media Coverage', 'media-on-us'],
+  ]],
+  ['Campaigns', [
+    ['World Cleanup Day', '/world-cleanup-day/'],
+    ['Environmental Day', '/environmental-day/'],
+    ['Green Ocean Campaign', '/green-ocean-campaign/'],
+    ['Community Workshop', '/community-workshop/'],
+    ['Young Conservationists Save the Wildlife', '/ycsw/'],
+  ]],
+  ['Get Involved', [
+    ['Volunteer', '#volunteer'],
+    ['Cleanup Map', 'map'],
+    ['News', 'news'],
+    ['Contact Us', 'contact'],
+  ]],
+];
+
+const VIEW_URLS: Record<string, string> = {
+  'who-we-are': '/who-we-are/', 'what-we-do': '/what-we-do/', 'our-team': '/our-team/', 'our-partners': '/our-partners/',
+  'media-on-us': '/media-on-us/', map: '/cleanup-map/', news: '/news/', contact: '/contact/',
+};
+
+const SOCIAL: [string, string, string][] = [
+  ['Facebook', 'https://www.facebook.com/LetsDoItVietNam', 'M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.51c-1.5 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07'],
+  ['Instagram', 'https://www.instagram.com/letsdoitvietnam/', 'M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z'],
+  ['Email', 'mailto:letsdoitvietnam@gmail.com', 'M3 5h18a1 1 0 0 1 1 1v.4l-10 6.25L2 6.4V6a1 1 0 0 1 1-1zm-1 3.75V18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V8.75l-9.47 5.92a1 1 0 0 1-1.06 0z'],
+];
+
+export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenVolunteer }) => {
+  const link = (target: string) => {
+    if (target === '#volunteer') {
+      return { href: '#volunteer', onClick: (e: React.MouseEvent) => { e.preventDefault(); onOpenVolunteer?.(); } };
+    }
+    if (target.startsWith('/')) return { href: target };
+    return { href: VIEW_URLS[target] || '/', onClick: (e: React.MouseEvent) => { e.preventDefault(); onNavigate(target); } };
+  };
 
   return (
-    <footer className="bg-white border-t border-slate-200 text-slate-700 pt-16 pb-12 select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Decorative growing forest — small "cây mọc lên" welcome to the footer */}
-        <div className="flex items-end justify-center gap-1 sm:gap-2 pb-8">
-          <GrowingTree size={30} variant="lime" delay={0} />
-          <GrowingTree size={46} variant="emerald" delay={120} />
-          <GrowingTree size={60} variant="pink" delay={60} />
-          <GrowingTree size={44} variant="emerald" delay={200} />
-          <GrowingTree size={28} variant="lime" delay={260} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-12 border-b border-slate-100">
-          
-          {/* Col 1: Logo & Brief */}
-          <div className="md:col-span-5 space-y-4">
-            <div 
-              onClick={() => onNavigate('home')}
-              className="flex items-center gap-3 cursor-pointer group"
-            >
-              <img 
-                src="/logo-icon.png" 
-                alt="Let's do it! Vietnam Icon" 
-                className="h-12 w-12 object-contain transition-transform group-hover:scale-105"
-              />
-              <div className="flex flex-col justify-center">
-                <span className="font-serif font-black text-xl tracking-tight text-slate-950 leading-none group-hover:text-[#E81A7F] transition-colors">
-                  Let’s do it!
-                </span>
-                <span className="font-serif font-medium text-sm text-slate-800 tracking-normal leading-tight mt-0.5">
-                  Vietnam
-                </span>
-              </div>
-            </div>
-
-            <EditableText
-              contentKey="footer.desc"
-              defaultValue={t.footerDesc}
-              as="p"
-              multiline
-              className="text-sm text-slate-500 max-w-sm leading-relaxed"
-            />
-
-            <div>
-              <button
-                id="footer-full-contact-link"
-                onClick={() => onNavigate('contact')}
-                className="text-xs font-bold text-[#E81A7F] hover:text-[#C9136B] underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>{t.navContactUs}</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
-            </div>
+    <footer className="ldf" role="contentinfo">
+      <div className="ldf-cta">
+        <div className="ldf-in">
+          <div className="ldf-cta-card">
+            <p className="ldf-cta-t">
+              <span className="ldf-cta-ic" aria-hidden="true">
+                <svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M58 4C30 4 12 14 9 36c-1 7 1 13 4 18L6 61l3 2 7-7c5 3 11 4 17 2C52 52 60 30 58 4zM18 50c8-14 18-24 30-33-10 10-18 20-26 36z" /></svg>
+              </span>
+              People for a clean planet!
+            </p>
+            <a className="ldf-btn" {...link('#volunteer')}>
+              Get Involved
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></svg>
+            </a>
           </div>
+        </div>
+      </div>
 
-          {/* Col 2: Contact Us */}
-          <div className="md:col-span-4 space-y-4">
-            <h4 className="text-base font-bold text-slate-900">
-              {t.contactInfo}
-            </h4>
-
-            <div className="flex flex-col space-y-3 text-sm text-slate-600">
-              {/* Phone 1 */}
-              <div>
-                <EditableText
-                  contentKey="contact.phone1"
-                  defaultValue="035.872.6755 (Mr. Son)"
-                  render={(value) => (
-                    <a href={`tel:${value.replace(/\D/g, '')}`} className="flex items-center gap-3 hover:text-[#E81A7F] transition-colors group">
-                      <div className="w-7 h-7 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shrink-0">
-                        <Phone className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="font-medium text-slate-700">{value}</span>
+      <div className="ldf-main">
+        <div className="ldf-in ldf-grid">
+          <div className="ldf-brand">
+            <a className="ldf-logo" href="/" aria-label="Let’s do it! Vietnam" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
+              <img src="/wp/logo-footer.png" alt="" width={720} height={246} loading="lazy" decoding="async" />
+            </a>
+            <p className="ldf-tag">Together for a cleaner Vietnam.</p>
+            <p className="ldf-about">We mobilize volunteers, raise environmental awareness, and build community action for a greener, healthier Vietnam.</p>
+          </div>
+          {COLUMNS.map(([title, links]) => (
+            <nav className="ldf-col" aria-label={title} key={title}>
+              <h3 className="ldf-h">{title}</h3>
+              <ul>
+                {links.map(([text, target]) => (
+                  <li key={text}><a {...link(target)}>{text}</a></li>
+                ))}
+              </ul>
+              {title === 'Get Involved' && (
+                <div className="ldf-social">
+                  {SOCIAL.map(([name, url, d]) => (
+                    <a key={name} href={url} aria-label={name} title={name} {...(url.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={d} /></svg>
                     </a>
-                  )}
-                />
-              </div>
-
-              {/* Phone 2 */}
-              <div>
-                <EditableText
-                  contentKey="contact.phone2"
-                  defaultValue="0968.514.882 (Ms. Tu)"
-                  render={(value) => (
-                    <a href={`tel:${value.replace(/\D/g, '')}`} className="flex items-center gap-3 hover:text-[#E81A7F] transition-colors group">
-                      <div className="w-7 h-7 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shrink-0">
-                        <Phone className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="font-medium text-slate-700">{value}</span>
-                    </a>
-                  )}
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <EditableText
-                  contentKey="contact.email"
-                  defaultValue="letsdoitvietnam@gmail.com"
-                  render={(value) => (
-                    <a href={`mailto:${value.trim()}`} className="flex items-center gap-3 hover:text-[#E81A7F] transition-colors group">
-                      <div className="w-7 h-7 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shrink-0">
-                        <Mail className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="font-medium text-slate-700">{value}</span>
-                    </a>
-                  )}
-                />
-              </div>
-
-              {/* Address */}
-              <div className="flex items-center gap-3 text-slate-600 text-xs">
-                <div className="w-7 h-7 rounded-full bg-pink-50 flex items-center justify-center text-[#E81A7F] shrink-0">
-                  <MapPin className="w-3.5 h-3.5" />
+                  ))}
                 </div>
-                <EditableText contentKey="footer.address" defaultValue="Hanoi, Ho Chi Minh City & Da Nang, Vietnam" as="span" className="font-medium text-slate-700 leading-snug" />
-              </div>
-            </div>
-
-            {/* Official Social Links (Facebook & Instagram Only) */}
-            <div className="flex items-center gap-3 pt-1">
-              <a 
-                href="https://www.facebook.com/LetsDoItVietNam" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="w-8 h-8 rounded-full bg-pink-50 hover:bg-[#1877F2] text-[#1877F2] hover:text-white flex items-center justify-center transition-all shadow-xs cursor-pointer"
-                title="Let's do it! Vietnam Facebook"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a 
-                href="https://www.instagram.com/letsdoitvietnam/" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="w-8 h-8 rounded-full bg-pink-50 hover:bg-[#E1306C] text-[#E1306C] hover:text-white flex items-center justify-center transition-all shadow-xs cursor-pointer"
-                title="Let's do it! Vietnam Instagram"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-
-          {/* Col 3: Quick Links */}
-          <div className="md:col-span-3 space-y-3">
-            <h4 className="text-base font-bold text-slate-900">
-              {t.quickLinks}
-            </h4>
-
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li>
-                <button
-                  onClick={() => onNavigate('who-we-are')}
-                  className="hover:text-[#E81A7F] transition-colors cursor-pointer text-left"
-                >
-                  {t.navWhoWeAre}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('what-we-do')}
-                  className="hover:text-[#E81A7F] transition-colors cursor-pointer text-left"
-                >
-                  {t.navWhatWeDo}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('our-team')}
-                  className="hover:text-[#E81A7F] transition-colors cursor-pointer text-left"
-                >
-                  {t.navOurTeam}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('our-partners')}
-                  className="hover:text-[#E81A7F] transition-colors cursor-pointer text-left"
-                >
-                  {t.navOurPartners}
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('map')}
-                  className="hover:text-[#E81A7F] transition-colors cursor-pointer text-left font-bold text-[#E81A7F]"
-                >
-                  {t.navMap}
-                </button>
-              </li>
-
-            </ul>
-          </div>
-
+              )}
+            </nav>
+          ))}
         </div>
+      </div>
 
-        {/* Bottom copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
-          <p>{t.allRightsReserved}</p>
-          <div className="flex items-center gap-6">
-            <span className="hover:text-slate-600 cursor-pointer">{t.privacyPolicy}</span>
-            <span className="hover:text-slate-600 cursor-pointer">{t.termsOfService}</span>
-          </div>
+      <div className="ldf-bottom">
+        <div className="ldf-in ldf-bottom-in">
+          <p>© {new Date().getFullYear()} Let’s Do It! Vietnam. All rights reserved.</p>
         </div>
-
       </div>
     </footer>
   );
 };
-
-
