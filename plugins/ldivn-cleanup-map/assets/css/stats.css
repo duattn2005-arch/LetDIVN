@@ -1,0 +1,361 @@
+/* [ldivn_wcd_stats]: World Cleanup Day year by year (includes/stats.php).
+   Three photo cards whose figures slide to the next year by themselves.
+   Everything under .ldms and set explicitly, so the theme's styles don't leak in. */
+
+.ldms {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  color: #0f172a;
+  /* The site's font (Poppins), as in its menu and buttons. */
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+  text-align: left;
+}
+.ldms *, .ldms *::before, .ldms *::after { box-sizing: border-box; }
+
+/* --- With its words on the left: as wide as the video block under it on the
+   homepage (up to 1536px), reaching out of a narrower column to both sides --- */
+.ldms.ldms--intro {
+  --ldms-w: min(1536px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  width: var(--ldms-w);
+  max-width: none;
+  margin-left: calc(50% - var(--ldms-w) / 2);
+}
+@media (min-width: 1024px) {
+  .ldms.ldms--intro { --ldms-w: min(1536px, calc(100vw - 64px)); }
+}
+.ldms.ldms--intro .ldms-sample { grid-column: 1 / -1; margin: 0; }
+.ldms .ldms-intro { max-width: 640px; }
+
+/* Side by side: the title right over the words, the two together in the middle
+   of the cards' height (and the cards grow if the words are taller). */
+@media (min-width: 1200px) {
+  .ldms.ldms--intro {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    align-items: stretch;
+    column-gap: 48px;
+  }
+  .ldms .ldms-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    max-width: none;
+  }
+  .ldms .ldms-intro .ldms-h { margin: 0; }
+  .ldms .ldms-intro .ldms-p1 { font-size: 18px; line-height: 1.7; }
+  .ldms .ldms-intro .ldms-p2 { font-size: 15px; line-height: 1.7; }
+  .ldms.ldms--intro .ldms-card { height: auto; min-height: 400px; }
+}
+/* The pink section title of the website */
+.ldms .ldms-h {
+  margin: 0 0 16px;
+  padding: 0;
+  color: #f1138d;
+  font-family: ChauPhilomeneOne, "Chau Philomene One", Poppins, sans-serif;
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  text-wrap: balance;
+}
+.ldms .ldms-p1,
+.ldms .ldms-p2 {
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 1.65;
+}
+.ldms .ldms-p1 { color: #475569; font-size: 16px; }
+.ldms .ldms-p2 { margin-top: 16px; color: #64748b; font-size: 14px; }
+
+.ldms .ldms-sample {
+  margin: 0 0 12px;
+  padding: 8px 14px;
+  border: 1px dashed #f59e0b;
+  border-radius: 12px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ldms .ldms-sample a { color: inherit; font-weight: 700; text-decoration: underline; }
+
+.ldms .ldms-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .ldms .ldms-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* --- A card: the photo, the year at the top, the figure and the bars at the foot ---------- */
+.ldms .ldms-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 360px;
+  margin: 0;
+  padding: 20px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  background: #020617;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.12), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  color: #fff;
+  cursor: pointer;
+}
+@media (min-width: 1024px) {
+  .ldms .ldms-card { height: 400px; padding: 24px; }
+}
+
+/* The photo drifts slowly, each card at its own point of the drift. */
+.ldms .ldms-photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  object-fit: cover;
+  animation: ldms-drift 18s ease-in-out infinite alternate;
+}
+.ldms .ldms-card:nth-child(2) .ldms-photo { animation-delay: -6s; }
+.ldms .ldms-card:nth-child(3) .ldms-photo { animation-delay: -12s; }
+@keyframes ldms-drift {
+  from { transform: scale(1.02) translate(0, 0); }
+  to { transform: scale(1.12) translate(-2%, -1.5%); }
+}
+
+/* A light sweeping across the card as the next year slides in. */
+.ldms .ldms-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0.05) 56%, transparent 70%);
+  pointer-events: none;
+  transform: translateX(-110%);
+}
+.ldms .ldms-card.is-sweep::after { animation: ldms-sweep 1.1s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes ldms-sweep {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(110%); }
+}
+/* Dark at the foot for the figures, a little at the top for the year. On a
+   pseudo-element: Elementor's lazy background images blank every element's
+   background-image in its lower sections until they are scrolled to. */
+.ldms .ldms-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.ldms .ldms-shade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(2, 6, 23, 0.95) 0%, rgba(2, 6, 23, 0.72) 38%, rgba(2, 6, 23, 0.1) 68%, rgba(2, 6, 23, 0.45) 100%);
+}
+.ldms .ldms-top,
+.ldms .ldms-body { position: relative; z-index: 1; }
+
+/* The year and the figure: the next one slides in from the right, sharpening,
+   as the shown one slides out to the left, blurring. The figure follows the year. */
+.ldms .ldms-swap { display: grid; }
+.ldms .ldms-swap > * { grid-area: 1 / 1; }
+.ldms .ldms-swap > :not(.is-on):not(.is-out) { visibility: hidden; }
+.ldms .ldms-swap > .is-in { animation: ldms-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+.ldms .ldms-swap > .is-out { animation: ldms-out 0.35s cubic-bezier(0.55, 0, 1, 0.45) both; }
+.ldms .ldms-value > .is-in { animation-delay: 0.3s; }
+.ldms .ldms-value > .is-out { animation-delay: 0.08s; }
+@keyframes ldms-in {
+  from { opacity: 0; transform: translateX(56px); filter: blur(10px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes ldms-out {
+  from { opacity: 1; transform: none; filter: blur(0); }
+  to { opacity: 0; transform: translateX(-40px); filter: blur(10px); }
+}
+
+/* The top: the figure's icon, the year */
+.ldms .ldms-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ldms .ldms-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--ldms-accent);
+}
+.ldms .ldms-icon svg { width: 22px; height: 22px; }
+.ldms .ldms-when {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.ldms .ldms-event {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ldms .ldms-year {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* The foot: the figure, its name, every year's bar */
+.ldms .ldms-value {
+  color: #fff;
+  font-size: clamp(32px, 3.4vw, 46px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+.ldms .ldms-value > span {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+}
+.ldms .ldms-unit {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: normal;
+}
+.ldms .ldms-unit:empty { display: none; }
+.ldms .ldms-title {
+  margin-top: 6px;
+  color: var(--ldms-accent);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.ldms .ldms-sub {
+  margin-top: 2px;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ldms .ldms-chart {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+}
+.ldms .ldms-b {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  cursor: pointer;
+}
+.ldms .ldms-track {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+.ldms .ldms-b i {
+  display: block;
+  width: 100%;
+  max-width: 20px;
+  border-radius: 4px 4px 0 0;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background-color 0.5s, box-shadow 0.5s;
+}
+.ldms .ldms-b:hover i { background: rgba(255, 255, 255, 0.6); }
+.ldms .ldms-b.is-on i { background: var(--ldms-accent); box-shadow: 0 0 14px -2px var(--ldms-accent); }
+.ldms .ldms-b em {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1;
+}
+.ldms .ldms-b.is-on em { color: #fff; }
+/* The year's figure over its bar */
+.ldms .ldms-b::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  z-index: 2;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.ldms .ldms-b:first-child::after { left: 0; transform: translate(0, 4px); }
+.ldms .ldms-b:last-child::after { left: auto; right: 0; transform: translate(0, 4px); }
+.ldms .ldms-b:hover::after { opacity: 1; transform: translate(-50%, 0); }
+.ldms .ldms-b:first-child:hover::after,
+.ldms .ldms-b:last-child:hover::after { transform: translate(0, 0); }
+
+/* The time on this year, unseen: when its animation ends, the next year comes.
+   Held still (paused) while the block is out of view. */
+.ldms .ldms-clock {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ldms .ldms-clock.is-run { animation: ldms-clock var(--ldms-t, 4000ms) linear forwards; }
+.ldms.is-paused .ldms-clock.is-run { animation-play-state: paused; }
+@keyframes ldms-clock {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ldms .ldms-photo,
+  .ldms .ldms-card.is-sweep::after,
+  .ldms .ldms-swap > .is-in,
+  .ldms .ldms-swap > .is-out { animation: none; }
+  .ldms .ldms-swap > .is-out { visibility: hidden; }
+}

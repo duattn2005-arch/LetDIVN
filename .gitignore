@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+*.zip
+*.log
+*.wpress
+__pycache__/
+.idea/
+.vscode/
+node_modules/
+# ban sao luu giai nen va bao cao quet
+site/
+bao_cao*.md
+wp-config.php
